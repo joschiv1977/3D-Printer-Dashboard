@@ -4,7 +4,6 @@
 
 **Professionelle Steuerung & Überwachung für Bambu Lab 3D-Drucker mit nativer iOS App**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![iOS 16.1+](https://img.shields.io/badge/iOS-16.1+-black.svg)](https://www.apple.com/ios/)
 
@@ -218,9 +217,6 @@ Für jeden Drucker-Typ stehen professionelle Wartungspläne bereit:
 
 ### ⚡ Schnellinstallation (1 Befehl)
 
-```bash
-bash <(curl -s https://raw.githubusercontent.com/joschiv1977/3d-printer-web-app/main/quick-install.sh)
-```
 
 > **Was macht das Script?**
 > - Installiert alle Abhängigkeiten automatisch
@@ -229,11 +225,6 @@ bash <(curl -s https://raw.githubusercontent.com/joschiv1977/3d-printer-web-app/
 > - Öffnet Setup-Seite automatisch
 
 ### 📦 Manuelle Installation
-
-```bash
-# Repository klonen
-git clone https://github.com/joschiv1977/3d-printer-web-app.git
-cd 3d-printer-web-app
 
 # Installer ausführen
 sudo chmod +x install.sh
@@ -479,18 +470,10 @@ POST /api/maintenance/initialize/:printer_id # Wartungsplan laden
 
 **Joachim Vogel (joschiv77)**
 
-- 🐙 GitHub: [@joschiv1977](https://github.com/joschiv1977)
-- 📦 Projekt: [3d-printer-web-app](https://github.com/joschiv1977/3d-printer-web-app)
-
 ---
 
 ## 📄 Lizenz
-
-MIT License - Copyright (c) 2025 Joachim Vogel
-
-```
-Die Software wird "wie besehen" ohne jegliche Gewährleistung bereitgestellt.
-```
+ Copyright (c) 2025 Joachim Vogel
 
 ---
 
@@ -502,14 +485,6 @@ Die Software wird "wie besehen" ohne jegliche Gewährleistung bereitgestellt.
 - **Spoolman** Entwickler
 - **Home Assistant** Community
 - Alle Beta-Tester & Contributors
-
----
-
-## 📞 Support
-
-- 🐛 **Bug-Reports:** [GitHub Issues](https://github.com/joschiv1977/3d-printer-web-app/issues)
-- 💡 **Feature-Requests:** [GitHub Issues](https://github.com/joschiv1977/3d-printer-web-app/issues)
-- 💬 **Diskussionen:** [GitHub Discussions](https://github.com/joschiv1977/3d-printer-web-app/discussions)
 
 ---
 
