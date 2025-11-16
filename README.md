@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**Professionelle Steuerung & Überwachung für Bambu Lab 3D-Drucker mit nativer iOS App**
+**Professionelle Steuerung & Überwachung für Bambu Lab 3D-Drucker mit nativer iOS/Android App**
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![iOS 16.1+](https://img.shields.io/badge/iOS-16.1+-black.svg)](https://www.apple.com/ios/)
