@@ -9,6 +9,12 @@
 
 [Features](#-features) • [Installation](#-installation) • [iOS App](#-ios-app-features) • [Screenshots](#-screenshots)
 
+<br>
+
+<a href="https://buymeacoffee.com/joschiv1977" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="50">
+</a>
+
 </div>
 
 ---
