@@ -494,4 +494,6 @@ POST /api/maintenance/initialize/:printer_id # Wartungsplan laden
 
 Made with ❤️ for the 3D Printing Community
 
+buymeacoffee.com/joschiv1977
+
 </div>
