@@ -385,8 +385,24 @@ install_docker() {
     if check_docker; then
         print_success "Docker is already installed"
         docker --version
-        docker-compose --version
+        docker-compose --version 2>/dev/null || docker compose version
         return 0
+    fi
+
+    # Check if running in LXC
+    if [ -f /proc/1/environ ] && grep -qa container=lxc /proc/1/environ; then
+        print_warning "LXC Container detected!"
+        echo -e "${YELLOW}Docker in LXC requires special configuration:${NC}"
+        echo -e "${YELLOW}1. Container must have: features: nesting=1,keyctl=1${NC}"
+        echo -e "${YELLOW}2. Edit LXC config: pct set <CTID> -features nesting=1,keyctl=1${NC}"
+        echo -e "${YELLOW}3. Reboot container after config change${NC}"
+        echo
+        read -p "Continue with Docker installation? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            print_warning "Skipping Docker installation"
+            return 1
+        fi
     fi
 
     print_status "Installing Docker..."
@@ -400,18 +416,31 @@ install_docker() {
     curl -fsSL https://download.docker.com/linux/$(get_distro)/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg > /dev/null 2>&1
     sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
+    # Determine Docker repository codename
+    # Debian 13 (trixie) not yet supported by Docker, use bookworm (Debian 12)
+    . /etc/os-release
+    DOCKER_CODENAME="$VERSION_CODENAME"
+    if [ "$VERSION_CODENAME" = "trixie" ]; then
+        print_warning "Debian 13 (trixie) detected - using Debian 12 (bookworm) Docker repository"
+        DOCKER_CODENAME="bookworm"
+    fi
+
     # Add repository
     echo \
       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/$(get_distro) \
-      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      $DOCKER_CODENAME stable" | \
       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
     # Install Docker Engine
     sudo apt-get update > /dev/null 2>&1
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1 &
-    spinner $!
+    if ! sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin > /dev/null 2>&1; then
+        print_error "Failed to install Docker packages"
+        echo "Trying to get more info..."
+        sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+        return 1
+    fi
 
-    # Install docker-compose standalone
+    # Install docker-compose standalone for compatibility
     sudo curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
         -o /usr/local/bin/docker-compose > /dev/null 2>&1
     sudo chmod +x /usr/local/bin/docker-compose
@@ -420,14 +449,27 @@ install_docker() {
     sudo usermod -aG docker ${SUDO_USER:-$(whoami)}
 
     # Start Docker service
-    sudo systemctl start docker
+    if ! sudo systemctl start docker; then
+        print_error "Failed to start Docker service"
+        echo "Checking Docker logs..."
+        sudo journalctl -xeu docker.service --no-pager | tail -20
+        return 1
+    fi
     sudo systemctl enable docker > /dev/null 2>&1
 
-    print_success "Docker successfully installed"
-    docker --version
-    docker-compose --version
+    # Test Docker
+    if ! sudo docker run --rm hello-world > /dev/null 2>&1; then
+        print_warning "Docker installed but test container failed"
+        print_warning "This is common in LXC - may need container restart"
+    else
+        print_success "Docker successfully installed and tested"
+    fi
 
-    print_warning "IMPORTANT: Please log out and log back in for Docker group to take effect!"
+    docker --version
+    docker-compose --version 2>/dev/null || docker compose version
+
+    print_warning "IMPORTANT: Log out and log back in for Docker group to take effect!"
+    print_warning "Or run: newgrp docker"
 }
 
 # ============================================================================
@@ -474,19 +516,33 @@ networks:
 EOF
     fi
 
-    # Start Spoolman
+    # Start Spoolman (try both docker-compose and docker compose)
     cd "$APP_DIR"
-    sudo docker-compose up -d > /dev/null 2>&1 &
-    spinner $!
+    print_status "Starting Spoolman container..."
+
+    if command -v docker-compose &> /dev/null; then
+        sudo docker-compose up -d > /dev/null 2>&1 &
+        spinner $!
+    elif docker compose version &> /dev/null; then
+        sudo docker compose up -d > /dev/null 2>&1 &
+        spinner $!
+    else
+        print_error "Neither docker-compose nor docker compose plugin found"
+        return 1
+    fi
 
     # Wait for container to start
-    sleep 3
+    print_status "Waiting for container to initialize..."
+    sleep 5
 
+    # Check if container is running
     if sudo docker ps | grep -q spoolman; then
         print_success "Spoolman is running on port 7912"
         echo -e "${GREEN}   ${ARROW} Web-UI: ${WHITE}http://$(hostname -I | awk '{print $1}'):7912${NC}"
     else
         print_error "Could not start Spoolman"
+        echo "Checking container logs..."
+        sudo docker logs spoolman 2>&1 | tail -20
         return 1
     fi
 }
