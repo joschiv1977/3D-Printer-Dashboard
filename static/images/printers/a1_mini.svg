@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Base (compact) -->
+  <rect x="50" y="168" width="100" height="7" fill="#2c3e50" rx="2"/>
+
+  <!-- Frame (very compact) -->
+  <rect x="60" y="75" width="4" height="93" fill="#34495e" rx="1"/>
+  <rect x="136" y="75" width="4" height="93" fill="#34495e" rx="1"/>
+  <rect x="60" y="75" width="80" height="4" fill="#34495e" rx="1"/>
+  <rect x="60" y="164" width="80" height="4" fill="#34495e" rx="1"/>
+
+  <!-- Side panels (minimal) -->
+  <rect x="62" y="77" width="2" height="87" fill="#7f8c8d" opacity="0.2"/>
+  <rect x="136" y="77" width="2" height="87" fill="#7f8c8d" opacity="0.2"/>
+
+  <!-- Build plate (smaller) -->
+  <rect x="70" y="152" width="60" height="3" fill="#95a5a6" rx="1"/>
+
+  <!-- Compact print head with camera -->
+  <rect x="88" y="95" width="24" height="14" fill="#e74c3c" rx="2"/>
+  <circle cx="100" cy="101" r="4.5" fill="#3498db"/>
+  <circle cx="100" cy="101" r="2.5" fill="#ecf0f1"/>
+  <circle cx="100" cy="101" r="1" fill="#2c3e50"/>
+  <rect x="95" y="104" width="10" height="25" fill="#c0392b" rx="1"/>
+
+  <!-- Mini LED ring -->
+  <circle cx="100" cy="101" r="6" fill="none" stroke="#3498db" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Compact display -->
+  <rect x="136" y="105" width="10" height="2.5" fill="#34495e" rx="1"/>
+  <rect x="144" y="97" width="6" height="18" fill="#2c3e50" rx="2"/>
+  <rect x="145" y="98" width="4" height="14" fill="#e74c3c" opacity="0.3" rx="1"/>
+
+  <!-- "MINI" label -->
+  <text x="100" y="45" font-family="Arial" font-size="16" fill="#e74c3c" text-anchor="middle" font-weight="bold">A1 Mini</text>
+  <text x="100" y="60" font-family="Arial" font-size="9" fill="#7f8c8d" text-anchor="middle">COMPACT</text>
+</svg>

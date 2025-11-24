@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bambu Lab Printer Web App - Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #7c3aed;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            font-size: 2em;
+            margin: 40px 0 20px 0;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+            color: var(--secondary-color);
+        }
+
+        h4 {
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+            color: var(--text-color);
+        }
+
+        p {
+            margin: 15px 0;
+            color: var(--text-muted);
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 40px;
+        }
+
+        li {
+            margin: 8px 0;
+            color: var(--text-muted);
+        }
+
+        code {
+            background: var(--bg-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--danger-color);
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-card h4 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .screenshot-section {
+            margin: 40px 0;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .screenshot-item {
+            text-align: center;
+        }
+
+        .screenshot-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .screenshot-item img:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--bg-color);
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: var(--warning-color);
+            color: #92400e;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: var(--primary-color);
+            color: #1e40af;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.2s;
+            font-weight: 600;
+        }
+
+        .button:hover {
+            background: var(--secondary-color);
+        }
+
+        details {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary-color);
+            padding: 10px;
+        }
+
+        summary:hover {
+            color: var(--secondary-color);
+        }
+
+        .toc {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .toc a {
+            color: var(--primary-color);
+            text-decoration: none;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .toc a:hover {
+            color: var(--secondary-color);
+            text-decoration: underline;
+        }
+
+        footer {
+            background: var(--bg-color);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .roadmap-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: var(--bg-color);
+            border-radius: 6px;
+        }
+
+        .roadmap-item::before {
+            content: "☐ ";
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .screenshot-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            .screenshot-item img {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖨️ Bambu Lab Printer Web App</h1>
+            <div class="subtitle">Professionelle Steuerung & Überwachung für Bambu Lab 3D-Drucker mit nativer iOS App</div>
+            <div class="badges">
+                <span class="badge">Python 3.9+</span>
+                <span class="badge">iOS 16.1+</span>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="toc">
+                <h3>📑 Inhaltsverzeichnis</h3>
+                <a href="#features">✨ Features im Überblick</a>
+                <a href="#screenshots">📸 Screenshots</a>
+                <a href="#ios-app">📱 Mobile Apps</a>
+                <a href="#tech-stack">🏗️ Tech Stack</a>
+                <a href="#requirements">📋 Systemanforderungen</a>
+                <a href="#roadmap">🎯 Roadmap</a>
+            </div>
+
+            <section id="features">
+                <h2>✨ Features im Überblick</h2>
+
+                <h3>🎮 Drucker-Steuerung</h3>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4>⚡ Echtzeit-Überwachung</h4>
+                        <p>Via MQTT mit <100ms Latenz</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🎯 Developer Mode</h4>
+                        <p>Direkte G-Code Befehle & Achsen-Steuerung</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🌡️ Temperatur-Management</h4>
+                        <p>Für Düse, Bett & Kammer</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>💨 Lüftersteuerung</h4>
+                        <p>Part/Aux/Chamber</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>💡 Kammer-Beleuchtung</h4>
+                        <p>Mit Auto-Timer</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔌 Smart Power Management</h4>
+                        <p>Auto Power-Off, Home Assistant, Meross</p>
+                    </div>
+                </div>
+
+                <h3>📱 Native iOS App</h3>
+                <p>Die iOS App bietet modernste Features, die keine andere 3D-Drucker-App hat:</p>
+
+                <h4>🌟 Live Activities & Dynamic Island (iOS 16.1+)</h4>
+                <ul>
+                    <li><strong>Lock Screen Integration</strong> - Druckfortschritt direkt am Sperrbildschirm</li>
+                    <li><strong>Dynamic Island</strong> - Kompakte Echtzeit-Anzeige am iPhone 14 Pro+</li>
+                    <li><strong>Push-to-Start</strong> - Automatischer Start bei Druckbeginn</li>
+                    <li><strong>Echtzeit-Updates</strong> - Fortschritt, Restzeit, Layer-Info</li>
+                </ul>
+
+                <h4>🏠 Home Screen Widgets</h4>
+                <ul>
+                    <li><strong>Mehrere Größen</strong> - Klein, Mittel, Groß</li>
+                    <li><strong>Live-Daten</strong> - Druckfortschritt, Temperaturen, Thumbnail</li>
+                    <li><strong>Schnellzugriff</strong> - Direkt zum Drucker</li>
+                </ul>
+
+                <h4>🔥 Filament-Trocknung</h4>
+                <ul>
+                    <li><strong>Material-Bibliothek</strong> - Vordefinierte Trocknungsprofile (PLA, PETG, ABS, etc.)</li>
+                    <li><strong>Intelligente Konflikterkennung</strong> - Verhindert Druckstart während Trocknung</li>
+                    <li><strong>Skip Homing Option</strong> - Für mehrfache Trocknungen ohne Wartezeit</li>
+                    <li><strong>Progress Tracking</strong> - Live-Fortschrittsanzeige mit Countdown</li>
+                </ul>
+
+                <h4>📅 Geplante Drucke</h4>
+                <ul>
+                    <li><strong>Druck-Scheduler</strong> - Zeitgesteuerte Druckaufträge</li>
+                    <li><strong>Konflikt-Prävention</strong> - Automatische Prüfung auf Überschneidungen</li>
+                    <li><strong>Intelligente Warnungen</strong> - Verhindert Probleme mit laufenden Prozessen</li>
+                </ul>
+
+                <h3>📊 Monitoring & Analyse</h3>
+                <ul>
+                    <li>📈 <strong>Sensor-Charts</strong> - Echtzeit-Diagramme für Temperaturen, Lüfter, Power</li>
+                    <li>📚 <strong>Druck-Historie</strong> - SQLite-Datenbank mit detaillierten Statistiken</li>
+                    <li>🎬 <strong>Timelapse-Videos</strong> - Automatische Aufnahme & Konvertierung</li>
+                    <li>📸 <strong>Live-Kamera</strong> - MJPEG-Stream vom Drucker oder µStreamer</li>
+                </ul>
+
+                <h3>🔔 Multi-Channel Benachrichtigungen</h3>
+                <ul>
+                    <li>📱 <strong>Firebase Cloud Messaging</strong> (iOS Push mit Rich Media)</li>
+                    <li>🌐 <strong>Web Push Notifications</strong> (Browser-basiert)</li>
+                    <li>🖼️ <strong>Thumbnails & Bilder</strong> in Benachrichtigungen</li>
+                    <li>🎯 <strong>Event-Trigger:</strong> Druckstart, Meilensteine (25/50/75/100%), Ende, Fehler</li>
+                    <li>🔕 <strong>Do Not Disturb</strong> Zeitfenster</li>
+                </ul>
+
+                <h3>🧵 Filament-Management</h3>
+                <ul>
+                    <li>🔌 <strong>Spoolman Integration</strong> - Automatisches Filament-Tracking</li>
+                    <li>🎨 <strong>Multi-Filament Support</strong> - AMS-kompatibel</li>
+                    <li>💰 <strong>Kosten-Berechnung</strong> - Filament & Stromkosten pro Druck</li>
+                    <li>📦 <strong>3MF-Analyse</strong> - Automatische Gewichts-Extraktion</li>
+                </ul>
+
+                <h3>🔧 Intelligentes Wartungssystem</h3>
+                <p>Das Wartungssystem überwacht automatisch den Zustand deines Druckers und erinnert dich an notwendige Wartungsarbeiten - <strong>bevor</strong> Probleme auftreten.</p>
+
+                <h4>📊 Automatisches Tracking</h4>
+                <ul>
+                    <li>🕐 <strong>Druckstunden</strong> - Erfassung über MQTT nach jedem erfolgreichen Druck</li>
+                    <li>🖨️ <strong>Druckanzahl</strong> - Zählt alle erfolgreichen Drucke</li>
+                    <li>🧵 <strong>Filamentverbrauch</strong> - Tracking in Gramm/Rollen</li>
+                    <li>📅 <strong>Zeitbasierte Intervalle</strong> - Kalenderbasierte Wartungen (Tage)</li>
+                </ul>
+
+                <h4>🎯 Flexible Wartungsintervalle</h4>
+                <p>Jede Wartungsaufgabe kann nach verschiedenen Kriterien fällig werden:</p>
+                <ul>
+                    <li><strong>Stunden</strong> - Nach X Druckstunden (z.B. "Düse reinigen nach 100h")</li>
+                    <li><strong>Drucke</strong> - Nach X erfolgreichen Drucken (z.B. "Bett nivellieren nach 50 Drucken")</li>
+                    <li><strong>Filament</strong> - Nach X Kilogramm/Rollen (z.B. "Extruder schmieren nach 2kg")</li>
+                    <li><strong>Tage</strong> - Zeitbasiert (z.B. "Lüfter reinigen alle 30 Tage")</li>
+                </ul>
+
+                <h4>🎨 Dashboard & Übersicht</h4>
+                <ul>
+                    <li>🏠 <strong>Widget auf Homescreen</strong> - Kompakte Anzeige (2×2 Grid) mit Überfällig/Fällig-Counter</li>
+                    <li>📊 <strong>Wartungsliste</strong> - Sortiert nach Dringlichkeit mit Farb-Codierung</li>
+                    <li>🔴 <strong>Überfällig</strong> - Rot markiert, sofortiger Handlungsbedarf</li>
+                    <li>🟠 <strong>Fällig</strong> - Orange, nächste 3 Tage</li>
+                    <li>🟢 <strong>Geplant</strong> - Grün, zukünftige Wartungen</li>
+                </ul>
+
+                <h3>🏠 Smart Home Integration</h3>
+                <ul>
+                    <li>🏡 <strong>Home Assistant</strong> - Native MQTT Auto-Discovery</li>
+                    <li>🔌 <strong>Meross Smart Plug</strong> - Direkte Steuerung ohne HA</li>
+                    <li>📊 <strong>Alle Sensoren</strong> als HA-Entities verfügbar</li>
+                    <li>🎮 <strong>Steuerungs-Entities</strong> für Aktionen</li>
+                </ul>
+
+                <h3>🔐 Enterprise Security</h3>
+                <ul>
+                    <li>🔑 <strong>JWT-basierte Authentifizierung</strong> mit Access & Refresh Tokens</li>
+                    <li>👥 <strong>Multi-User Support</strong> mit Rollen (Admin, Guest)</li>
+                    <li>🛡️ <strong>Rate Limiting</strong> - Schutz vor Brute-Force</li>
+                    <li>🚫 <strong>Path Traversal Protection</strong> - Validierte Dateioperationen</li>
+                    <li>🔒 <strong>Device Token Authentication</strong> für iOS App</li>
+                </ul>
+            </section>
+
+            <section id="screenshots" class="screenshot-section">
+                <h2>📸 Screenshots</h2>
+
+                <h3>🔐 Login & Dashboard</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/Login.png" alt="Login" loading="lazy">
+                        <p>Login</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/UbersichtKamera.png" alt="Übersicht mit Kamera" loading="lazy">
+                        <p>Übersicht mit Kamera</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/MenuBar.png" alt="Menu Bar" loading="lazy">
+                        <p>Menu Bar</p>
+                    </div>
+                </div>
+
+                <h3>🎮 Drucker-Steuerung</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/Druckersteuerung.png" alt="Druckersteuerung" loading="lazy">
+                        <p>Druckersteuerung</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/DruckersteuerungExtruder.png" alt="Extruder Steuerung" loading="lazy">
+                        <p>Extruder Steuerung</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/DruckersteuerungFilament.png" alt="Filament Steuerung" loading="lazy">
+                        <p>Filament Steuerung</p>
+                    </div>
+                </div>
+
+                <h3>💾 SD-Karte & Dateien</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SD-Card.png" alt="SD-Card" loading="lazy">
+                        <p>SD-Card</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SD-CardmitDruckoptionen.png" alt="SD-Card mit Druckoptionen" loading="lazy">
+                        <p>SD-Card mit Druckoptionen</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SD-CardMultiFilament.png" alt="Multi-Filament" loading="lazy">
+                        <p>Multi-Filament</p>
+                    </div>
+                </div>
+
+                <h3>📅 Druckplanung</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SD-CardDruckplanen.png" alt="Druck planen" loading="lazy">
+                        <p>Druck planen</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/DruckplanenErstellen.png" alt="Druckplan erstellen" loading="lazy">
+                        <p>Druckplan erstellen</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/GeplanteDruckeubersicht.png" alt="Geplante Drucke" loading="lazy">
+                        <p>Geplante Drucke</p>
+                    </div>
+                </div>
+
+                <h3>📊 Druck-Historie</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/DruckHistorieUbersicht.png" alt="Druck-Historie Übersicht" loading="lazy">
+                        <p>Druck-Historie Übersicht</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/DruckHistorieStatistik.png" alt="Druck-Statistik" loading="lazy">
+                        <p>Druck-Statistik</p>
+                    </div>
+                </div>
+
+                <h3>⚙️ Einstellungen</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/Settingsubersicht.png" alt="Settings Übersicht" loading="lazy">
+                        <p>Settings Übersicht</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SettingsDrucker.png" alt="Drucker Settings" loading="lazy">
+                        <p>Drucker Settings</p>
+                    </div>
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/SettingsDruckstandard.png" alt="Druckstandard Settings" loading="lazy">
+                        <p>Druckstandard Settings</p>
+                    </div>
+                </div>
+
+                <h3>🔪 Slicer</h3>
+                <div class="screenshot-grid">
+                    <div class="screenshot-item">
+                        <img src="docs/screenshots/Slicer.png" alt="Slicer" loading="lazy">
+                        <p>Slicer</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="ios-app">
+                <h2>📱 Mobile Apps</h2>
+
+                <div class="alert alert-info">
+                    <strong>🎉 Komplett native mobile Apps verfügbar!</strong>
+                    <ul>
+                        <li><strong>iOS App</strong> - Native Swift Entwicklung mit modernsten iOS Features</li>
+                        <li><strong>Android App</strong> - Vollständig native Android Implementierung</li>
+                    </ul>
+                </div>
+
+                <h3>iOS App Features</h3>
+
+                <h4>🌟 Live Activities</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Funktion</th>
+                            <th>Beschreibung</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Lock Screen Widget</strong></td>
+                            <td>Druckfortschritt immer sichtbar</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dynamic Island</strong></td>
+                            <td>Kompakte Ansicht am iPhone 14 Pro+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Push-to-Start</strong></td>
+                            <td>Automatischer Start via Push</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Echtzeit-Updates</strong></td>
+                            <td>Max. 1 Update/Sekunde (Apple Limit)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>🔥 Filament-Trocknung</h4>
+                <p>Materialien mit vordefinierten Profilen:</p>
+                <ul>
+                    <li>PLA → 50°C, 6h</li>
+                    <li>PETG → 65°C, 6h</li>
+                    <li>ABS → 70°C, 12h</li>
+                    <li>TPU → 55°C, 8h</li>
+                    <li>PA (Nylon) → 80°C, 16h</li>
+                    <li>ASA → 70°C, 12h</li>
+                </ul>
+
+                <p><strong>Features:</strong></p>
+                <ul>
+                    <li>✅ Intelligente Konflikterkennung</li>
+                    <li>✅ Skip Homing & Parking für schnelle mehrfache Trocknung</li>
+                    <li>✅ Live Progress Bar mit Gradient-Animation</li>
+                    <li>✅ Automatische Druck-Blockierung während Trocknung</li>
+                </ul>
+
+                <h4>📅 Scheduled Prints</h4>
+                <ul>
+                    <li>⏰ Zeitgesteuerte Druckaufträge</li>
+                    <li>🚫 Automatische Konflikt-Erkennung</li>
+                    <li>📊 Dauer-Berechnung & Warnung bei Überschneidung</li>
+                    <li>🔄 Integration mit Filament-Trocknung</li>
+                </ul>
+
+                <h4>🎨 Weitere iOS Features</h4>
+                <ul>
+                    <li><strong>Theme Manager</strong> - Light/Dark/Auto mit System-Sync</li>
+                    <li><strong>Offline-Mode</strong> - Cached-Daten verfügbar</li>
+                    <li><strong>Multi-Printer Support</strong> - Mehrere Drucker verwaltbar</li>
+                    <li><strong>Siri Shortcuts</strong> - Kommandos via Siri</li>
+                    <li><strong>Background Refresh</strong> - Automatische Updates</li>
+                    <li><strong>Haptic Feedback</strong> - Moderne Interaktionen</li>
+                </ul>
+            </section>
+
+            <section id="tech-stack">
+                <h2>🏗️ Tech Stack</h2>
+
+                <h3>Backend</h3>
+                <ul>
+                    <li><strong>Python 3.9+</strong> - Flask, SocketIO</li>
+                    <li><strong>MQTT</strong> - Echtzeit-Kommunikation mit Drucker</li>
+                    <li><strong>Redis</strong> - Caching & Rate Limiting</li>
+                    <li><strong>SQLite</strong> - Druck-Historie & Wartungssystem</li>
+                    <li><strong>ffmpeg</strong> - Timelapse-Konvertierung</li>
+                    <li><strong>FTPS</strong> - Sicherer Datei-Zugriff auf SD-Karte</li>
+                </ul>
+
+                <h3>iOS App</h3>
+                <ul>
+                    <li><strong>Swift 5.9+</strong> - Modern SwiftUI & UIKit Hybrid</li>
+                    <li><strong>iOS 16.1+</strong> - Live Activities, Dynamic Island</li>
+                    <li><strong>ActivityKit</strong> - Lock Screen Widgets</li>
+                    <li><strong>WidgetKit</strong> - Home Screen Widgets</li>
+                    <li><strong>Firebase</strong> - Cloud Messaging</li>
+                    <li><strong>Socket.IO</strong> - Echtzeit-Updates</li>
+                </ul>
+
+                <h3>Integrationen</h3>
+                <ul>
+                    <li><strong>Spoolman</strong> - Filament-Management</li>
+                    <li><strong>Home Assistant</strong> - Smart Home</li>
+                    <li><strong>Meross</strong> - Smart Plug Steuerung</li>
+                    <li><strong>µStreamer</strong> - Raspberry Pi Kamera</li>
+                </ul>
+            </section>
+
+            <section id="requirements">
+                <h2>📋 Systemanforderungen</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Komponente</th>
+                            <th>Minimal</th>
+                            <th>Empfohlen</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Python</strong></td>
+                            <td>3.9+</td>
+                            <td>3.11+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>RAM</strong></td>
+                            <td>512 MB</td>
+                            <td>2 GB+</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Speicher</strong></td>
+                            <td>2 GB</td>
+                            <td>10 GB+ (mit Timelapses)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CPU</strong></td>
+                            <td>1 Core @ 1GHz</td>
+                            <td>2+ Cores @ 1.5GHz</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Redis</strong></td>
+                            <td>6.0+</td>
+                            <td>Latest</td>
+                        </tr>
+                        <tr>
+                            <td><strong>iOS</strong></td>
+                            <td>-</td>
+                            <td>16.1+ (für Live Activities)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Unterstützte Drucker</h3>
+                <ul>
+                    <li>✅ Bambu Lab P1P</li>
+                    <li>✅ Bambu Lab P1S</li>
+                    <li>✅ Bambu Lab X1 Carbon</li>
+                    <li>✅ Bambu Lab X1E</li>
+                    <li>✅ Bambu Lab A1</li>
+                    <li>✅ Bambu Lab A1 Mini</li>
+                </ul>
+            </section>
+
+            <section id="roadmap">
+                <h2>🎯 Roadmap</h2>
+
+                <div class="roadmap-item">Web-basierte Live Activities</div>
+                <div class="roadmap-item">AI-basierte Fehler-Erkennung</div>
+                <div class="roadmap-item">Multi-Drucker Dashboard</div>
+                <div class="roadmap-item">Wartungssystem: Push-Benachrichtigungen bei fälligen Wartungen</div>
+                <div class="roadmap-item">Wartungssystem: Automatische Ersatzteil-Bestellvorschläge</div>
+                <div class="roadmap-item">Wartungssystem: Statistische Auswertungen & Reports</div>
+            </section>
+        </div>
+
+        <footer>
+            <h3>👤 Autor</h3>
+            <p><strong>Joachim Vogel (joschiv77)</strong></p>
+
+            <h3>🙏 Danksagungen</h3>
+            <p>
+                <strong>Bambu Lab</strong> für Hardware & MQTT-Dokumentation •
+                <strong>Flask & SocketIO Communities</strong> •
+                <strong>Firebase</strong> für Cloud Messaging •
+                <strong>Spoolman</strong> Entwickler •
+                <strong>Home Assistant</strong> Community •
+                Alle Beta-Tester & Contributors
+            </p>
+
+            <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                <p>Made with ❤️ for the 3D Printing Community</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Image click to open in new tab
+        document.querySelectorAll('.screenshot-item img').forEach(img => {
+            img.addEventListener('click', function() {
+                window.open(this.src, '_blank');
+            });
+        });
+
+        // Add lazy loading for images
+        if ('loading' in HTMLImageElement.prototype) {
+            const images = document.querySelectorAll('img[loading="lazy"]');
+            images.forEach(img => {
+                img.src = img.src;
+            });
+        }
+    </script>
+</body>
+</html>

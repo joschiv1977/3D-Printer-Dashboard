@@ -1,0 +1,70 @@
+# HINWEIS: Diese Datei ist ein Template.
+# Für die Installation:
+# 1. Ersetze YOUR_USER und YOUR_GROUP mit deinem User (z.B. pi)
+# 2. Kopiere nach /etc/systemd/system/printer-web-app.service
+# 3. sudo systemctl daemon-reload
+# 4. sudo systemctl enable printer-web-app
+# 5. sudo systemctl start printer-web-app
+
+[Unit]
+Description=3D Printer Web App (Gunicorn + Flask + SocketIO)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+User=YOUR_USER
+Group=YOUR_GROUP
+WorkingDirectory=/opt/printer-web-app
+Environment="PATH=/opt/printer-web-app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="FLASK_ENV=production"
+
+# Gunicorn mit eventlet worker für SocketIO
+ExecStart=/opt/printer-web-app/venv/bin/gunicorn \
+    --config /opt/printer-web-app/gunicorn_config.py \
+    --bind 0.0.0.0:5555 \
+    --worker-class eventlet \
+    --workers 1 \
+    --worker-connections 1000 \
+    --certfile /opt/printer-web-app/cert.pem \
+    --keyfile /opt/printer-web-app/key.pem \
+    --access-logfile /opt/printer-web-app/logs/gunicorn-access.log \
+    --error-logfile /opt/printer-web-app/logs/gunicorn-error.log \
+    --log-level info \
+    --timeout 120 \
+    --graceful-timeout 30 \
+    --keep-alive 5 \
+    web_app:app
+
+# Graceful Reload (Zero-Downtime)
+ExecReload=/bin/kill -s HUP $MAINPID
+
+# Restart Policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=printer-web-app
+
+# Security Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/printer-web-app
+ReadOnlyPaths=/opt/printer-web-app/cert.pem
+ReadOnlyPaths=/opt/printer-web-app/key.pem
+
+# Performance & Limits
+LimitNOFILE=65536
+LimitNPROC=512
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Watchdog (Gunicorn sendet Heartbeat an systemd)
+WatchdogSec=30
+
+[Install]
+WantedBy=multi-user.target

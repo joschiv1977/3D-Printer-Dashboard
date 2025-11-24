@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1f2e">
+    <title>Lizenz Aktivierung - 3D Drucker Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+        }
+
+        /* Theme Variables */
+        :root[data-theme="dark"] {
+            --bg-gradient-start: #0f1419;
+            --bg-gradient-end: #1a1f2e;
+            --bg-card: #1a1f2e;
+            --bg-input: #0f1419;
+            --text-primary: #e8eaed;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #2d3748;
+            --theme-color: #1a1f2e;
+        }
+
+        :root[data-theme="light"] {
+            --bg-gradient-start: #e8f4f8;
+            --bg-gradient-end: #f5f5f5;
+            --bg-card: #ffffff;
+            --bg-input: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border-color: #d1d5db;
+            --theme-color: #ffffff;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            padding-left: calc(20px + var(--safe-area-inset-left));
+            padding-right: calc(20px + var(--safe-area-inset-right));
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px 20px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .status-valid {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .status-invalid {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .status-expired {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid #ff9800;
+        }
+
+        /* License Info Box */
+        .license-info {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+        }
+
+        .license-info h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #2196f3;
+        }
+
+        .license-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .license-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .license-info-label {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .license-info-value {
+            color: #e8eaed;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #9ca3af;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #2196f3;
+            background: var(--bg-card);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #2d3748;
+            color: #e8eaed;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background: #374151;
+        }
+
+        /* Hardware ID Section */
+        .hardware-id-box {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 25px;
+        }
+
+        .hardware-id-box h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .hardware-id-value {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #2196f3;
+            word-break: break-all;
+            padding: 10px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #1976d2;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+
+        .alert-error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .alert-info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid #2196f3;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* File Upload */
+        .file-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 20px;
+        }
+
+        .file-upload:hover {
+            border-color: #2196f3;
+            background: rgba(33, 150, 243, 0.05);
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-icon {
+            font-size: 32px;
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Divider */
+        .divider {
+            text-align: center;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .divider span {
+            background: var(--bg-card);
+            padding: 0 15px;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">
+            <span id="theme-icon">🌙</span>
+        </button>
+
+        <div class="header">
+            <h1>🔐 Lizenz Aktivierung</h1>
+            <p>3D Drucker Dashboard - Server Lizenz</p>
+        </div>
+
+        <div class="content">
+            <!-- Alert Messages -->
+            <div id="alert" class="alert"></div>
+
+            <!-- Current License Status -->
+            {% if license_info.valid %}
+            <div class="license-info">
+                <span class="status-badge status-valid">✓ Lizenz Aktiv</span>
+                <h3>Aktuelle Lizenz</h3>
+                <div class="license-info-row">
+                    <span class="license-info-label">Lizenztyp:</span>
+                    <span class="license-info-value">{{ license_info.license_type }}</span>
+                </div>
+                <div class="license-info-row">
+                    <span class="license-info-label">Kunde:</span>
+                    <span class="license-info-value">{{ license_info.customer_name }}</span>
+                </div>
+                {% if license_info.days_remaining != None %}
+                <div class="license-info-row">
+                    <span class="license-info-label">Verbleibende Tage:</span>
+                    <span class="license-info-value">{{ license_info.days_remaining }} Tage</span>
+                </div>
+                {% else %}
+                <div class="license-info-row">
+                    <span class="license-info-label">Gültigkeitsdauer:</span>
+                    <span class="license-info-value">Unbegrenzt (Lifetime)</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <a href="/" class="btn btn-primary">
+                ✓ Zum Dashboard
+            </a>
+
+            <button class="btn btn-secondary" onclick="showDeactivateConfirm()">
+                Lizenz Deaktivieren
+            </button>
+
+            {% else %}
+            <div class="license-info">
+                <span class="status-badge status-invalid">✗ Keine Gültige Lizenz</span>
+                <h3>Lizenz Status</h3>
+                <div class="license-info-row">
+                    <span class="license-info-label">Status:</span>
+                    <span class="license-info-value">{{ license_info.status }}</span>
+                </div>
+            </div>
+
+            <!-- License Activation Form -->
+            <form id="activationForm" onsubmit="activateLicense(event)">
+                <div class="form-group">
+                    <label class="form-label">Lizenzschlüssel</label>
+                    <input
+                        type="text"
+                        id="licenseKey"
+                        name="license_key"
+                        class="form-input"
+                        placeholder="XXXXX-XXXXX-XXXXX-XXXXX"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="activateBtn">
+                    Lizenz Aktivieren
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>oder</span>
+            </div>
+
+            <!-- File Upload for Offline Activation -->
+            <label for="licenseFile" class="file-upload">
+                <input type="file" id="licenseFile" accept=".json" onchange="uploadLicenseFile(event)">
+                <div class="file-upload-icon">📄</div>
+                <div class="file-upload-text">
+                    <strong>Lizenzdatei hochladen</strong><br>
+                    Für Offline-Aktivierung (.json Datei)
+                </div>
+            </label>
+            {% endif %}
+
+            <!-- Hardware ID Display -->
+            <div class="hardware-id-box">
+                <h4>Hardware-ID (für Lizenzanforderung benötigt):</h4>
+                <div class="hardware-id-value" id="hardwareId">
+                    Lade...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load Hardware ID
+        async function loadHardwareId() {
+            try {
+                const response = await fetch('/license/api/hardware-id');
+                const data = await response.json();
+                const hwIdElement = document.getElementById('hardwareId');
+                hwIdElement.innerHTML = `
+                    ${data.hardware_id}
+                    <button class="copy-btn" onclick="copyHardwareId('${data.hardware_id}')">
+                        <i class="fa fa-copy"></i> Kopieren
+                    </button>
+                `;
+            } catch (error) {
+                console.error('Error loading hardware ID:', error);
+                document.getElementById('hardwareId').textContent = 'Fehler beim Laden';
+            }
+        }
+
+        // Copy Hardware ID to clipboard
+        function copyHardwareId(hwid) {
+            navigator.clipboard.writeText(hwid).then(() => {
+                showAlert('Hardware-ID in Zwischenablage kopiert!', 'success');
+            }).catch(err => {
+                console.error('Error copying:', err);
+                showAlert('Kopieren fehlgeschlagen', 'error');
+            });
+        }
+
+        // Activate License
+        async function activateLicense(event) {
+            event.preventDefault();
+
+            const btn = document.getElementById('activateBtn');
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+
+            // Disable button and show loading
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Aktiviere...';
+
+            try {
+                const response = await fetch('/license/api/activate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ license_key: licenseKey })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => {
+                        // Redirect based on setup completion status
+                        if (data.setup_completed) {
+                            // Setup already completed - go to dashboard
+                            window.location.href = '/';
+                        } else {
+                            // Setup not completed - go to setup wizard
+                            window.location.href = '/setup';
+                        }
+                    }, 2000);
+                } else {
+                    showAlert(data.message, 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = 'Lizenz Aktivieren';
+                }
+            } catch (error) {
+                console.error('Activation error:', error);
+                showAlert('Netzwerkfehler: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = 'Lizenz Aktivieren';
+            }
+        }
+
+        // Upload License File
+        async function uploadLicenseFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('license_file', file);
+
+            try {
+                const response = await fetch('/license/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => {
+                        // Redirect based on setup completion status
+                        if (data.setup_completed) {
+                            // Setup already completed - go to dashboard
+                            window.location.href = '/';
+                        } else {
+                            // Setup not completed - go to setup wizard
+                            window.location.href = '/setup';
+                        }
+                    }, 2000);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                showAlert('Fehler beim Hochladen: ' + error.message, 'error');
+            }
+
+            // Reset file input
+            event.target.value = '';
+        }
+
+        // Deactivate License
+        async function deactivateLicense() {
+            try {
+                const response = await fetch('/license/api/deactivate', {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Deactivation error:', error);
+                showAlert('Fehler: ' + error.message, 'error');
+            }
+        }
+
+        // Show deactivation confirmation
+        function showDeactivateConfirm() {
+            if (confirm('Möchten Sie die Lizenz wirklich deaktivieren? Die Server-Funktionalität wird danach eingeschränkt.')) {
+                deactivateLicense();
+            }
+        }
+
+        // Show Alert
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${type} show`;
+            alert.textContent = message;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 5000);
+        }
+
+        // Theme Management
+        function initTheme() {
+            // Check if user has saved preference, otherwise use system preference
+            let theme = localStorage.getItem('license-theme');
+
+            if (!theme) {
+                // Auto-detect system theme
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                theme = prefersDark ? 'dark' : 'light';
+            }
+
+            document.documentElement.setAttribute('data-theme', theme);
+            updateThemeIcon(theme);
+
+            // Update meta theme-color
+            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', theme === 'dark' ? '#1a1f2e' : '#ffffff');
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('license-theme', newTheme);
+            updateThemeIcon(newTheme);
+
+            // Update meta theme-color
+            const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute('content', newTheme === 'dark' ? '#1a1f2e' : '#ffffff');
+            }
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+
+        // Initialize on page load
+        initTheme();
+        loadHardwareId();
+    </script>
+</body>
+</html>

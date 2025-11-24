@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title id="page-title">Wartung - 3D Printer Dashboard</title>
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/static/css/shared-styles.css">
+
+    <!-- Sprachdateien laden -->
+    <script src="/static/lang/de.js"></script>
+    <script src="/static/lang/en.js"></script>
+    <script src="/static/lang/fr.js"></script>
+    <script src="/static/lang/es.js"></script>
+    <script src="/static/lang/it.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 0;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .content {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Stats Overview */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--bg-section);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .stat-card.active {
+            background: var(--bg-hover);
+            box-shadow: 0 0 0 2px var(--accent-blue);
+        }
+
+        .stat-card.overdue {
+            border-left-color: var(--accent-red);
+        }
+
+        .stat-card.overdue.active {
+            box-shadow: 0 0 0 2px var(--accent-red);
+        }
+
+        .stat-card.due {
+            border-left-color: var(--accent-orange);
+        }
+
+        .stat-card.due.active {
+            box-shadow: 0 0 0 2px var(--accent-orange);
+        }
+
+        .stat-card.upcoming {
+            border-left-color: var(--accent-green);
+        }
+
+        .stat-card.upcoming.active {
+            box-shadow: 0 0 0 2px var(--accent-green);
+        }
+
+        .stat-icon {
+            font-size: 32px;
+        }
+
+        .stat-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .stat-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: var(--bg-section);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .task-status-indicator {
+            width: 4px;
+            height: 100%;
+            border-radius: 2px;
+            align-self: stretch;
+        }
+
+        .task-status-indicator.overdue {
+            background: var(--accent-red);
+        }
+
+        .task-status-indicator.due {
+            background: var(--accent-orange);
+        }
+
+        .task-status-indicator.upcoming {
+            background: var(--accent-green);
+        }
+
+        .task-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .task-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .task-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .task-badge.priority-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .task-badge.priority-medium {
+            background: #fed7aa;
+            color: #9a3412;
+        }
+
+        .task-badge.priority-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .task-details {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--bg-section);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-small {
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-section);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: grid;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid var(--input-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--input-bg);
+        }
+
+        .radio-option:hover {
+            border-color: var(--accent-blue);
+            background: var(--bg-hover);
+        }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .radio-option.selected {
+            border-color: var(--accent-blue);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .radio-option-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .radio-option-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            min-width: 100px;
+        }
+
+        .radio-option input[type="number"] {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .radio-option input[type="number"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 8px 12px;
+            background: var(--bg-section);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--accent-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+                padding-bottom: max(5px, env(safe-area-inset-bottom, 5px));
+            }
+
+            .container {
+                padding: 8px;
+                padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 15px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .header > div {
+                width: 100%;
+            }
+
+            .header .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #printer-selector {
+                width: 100%;
+                order: 2;
+            }
+
+            .task-item {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .task-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .task-actions .btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                margin: 10px;
+                max-height: 95vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Apply dark mode immediately to prevent white flash -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <!-- Shared Module Scripts -->
+    <script src="/static/js/modules/theme-manager.js"></script>
+    <script src="/static/js/modules/i18n-manager.js"></script>
+    <script src="/static/js/modules/sidebar-manager.js"></script>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header" style="display: flex; align-items: center; gap: 15px;">
+            <button class="menu-toggle" id="menu-toggle-header" onclick="toggleSidebar()">☰</button>
+            <h1 style="margin: 0; flex: 1;">🔧 <span data-i18n="maintenance_plan">Wartungsplan</span></h1>
+            <select id="printer-selector" onchange="switchPrinter()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-size: 14px; cursor: pointer;">
+                <option value="" data-i18n="maintenance_loading_printers">Loading printers...</option>
+            </select>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 6px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin: 0; color: white; font-size: 14px;">
+                        <input type="checkbox" id="include-prints-checkbox" checked style="cursor: pointer; width: 16px; height: 16px;">
+                        <span data-i18n="maintenance_include_prints">Drucke einbeziehen</span>
+                    </label>
+                    <button class="btn btn-secondary" onclick="exportPDF()" style="margin: 0;">
+                        📄 <span data-i18n="maintenance_export_pdf">PDF Export</span>
+                    </button>
+                </div>
+                <button class="btn btn-secondary" onclick="showAddPrinterModal()">
+                    🖨️ <span data-i18n="maintenance_add_printer">Drucker hinzufügen</span>
+                </button>
+                <button class="btn btn-secondary" onclick="showInitModal()">
+                    🔄 <span data-i18n="maintenance_init">Wartungsplan laden</span>
+                </button>
+                <button class="btn btn-primary" onclick="showNewTaskModal()">
+                    ➕ <span data-i18n="maintenance_new">Neue Wartung</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Alerts -->
+            <div id="alert-success" class="alert alert-success"></div>
+            <div id="alert-error" class="alert alert-error"></div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card overdue" id="filter-overdue" onclick="toggleFilter('overdue')">
+                    <div class="stat-icon">🔴</div>
+                    <div class="stat-info">
+                        <h3 id="stat-overdue">0</h3>
+                        <p data-i18n="maintenance_overdue">Überfällig</p>
+                    </div>
+                </div>
+                <div class="stat-card due" id="filter-due" onclick="toggleFilter('due')">
+                    <div class="stat-icon">🟡</div>
+                    <div class="stat-info">
+                        <h3 id="stat-due">0</h3>
+                        <p data-i18n="maintenance_due">Fällig</p>
+                    </div>
+                </div>
+                <div class="stat-card upcoming" id="filter-upcoming" onclick="toggleFilter('upcoming')">
+                    <div class="stat-icon">🟢</div>
+                    <div class="stat-info">
+                        <h3 id="stat-upcoming">0</h3>
+                        <p data-i18n="maintenance_upcoming">Geplant</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overdue Tasks -->
+            <div id="section-overdue" style="display: none;">
+                <div class="section-header">
+                    <h2>🔴 <span data-i18n="maintenance_overdue">Überfällig</span></h2>
+                </div>
+                <div id="tasks-overdue" class="task-list"></div>
+            </div>
+
+            <!-- Due Tasks -->
+            <div id="section-due" style="display: none; margin-top: 25px;">
+                <div class="section-header">
+                    <h2>🟡 <span data-i18n="maintenance_due_next_days">Fällig (nächste 3 Tage)</span></h2>
+                </div>
+                <div id="tasks-due" class="task-list"></div>
+            </div>
+
+            <!-- Upcoming Tasks -->
+            <div id="section-upcoming" style="margin-top: 25px;">
+                <div class="section-header">
+                    <h2>🟢 <span data-i18n="maintenance_planned">Geplante Wartungen</span></h2>
+                </div>
+                <div id="tasks-upcoming" class="task-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New/Edit Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title" data-i18n="maintenance_new">➕ Neue Wartung</h3>
+                <button class="modal-close" onclick="closeTaskModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <input type="hidden" id="task-id">
+
+                    <div class="form-group">
+                        <label for="task-name" data-i18n="maintenance_name">Name *</label>
+                        <input type="text" id="task-name" placeholder="z.B. X/Y-Achsen Reinigung" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-printer-id" data-i18n="maintenance_printer">Drucker *</label>
+                        <select id="task-printer-id" required>
+                            <option value="">Drucker wählen...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-interval" data-i18n="maintenance_interval">Intervall *</label>
+                        <select id="task-interval" required>
+                            <!-- Days -->
+                            <optgroup id="interval-group-days" label="Tage">
+                                <option value="days:7">7 Tage</option>
+                                <option value="days:14">14 Tage</option>
+                                <option value="days:30" selected>30 Tage</option>
+                                <option value="days:60">60 Tage</option>
+                                <option value="days:90">90 Tage</option>
+                                <option value="days:180">180 Tage</option>
+                                <option value="days:365">365 Tage (1 Jahr)</option>
+                            </optgroup>
+                            <!-- Print Hours -->
+                            <optgroup id="interval-group-hours" label="Druckstunden">
+                                <option value="hours:50">50 Druckstunden</option>
+                                <option value="hours:100">100 Druckstunden</option>
+                                <option value="hours:250">250 Druckstunden</option>
+                                <option value="hours:500">500 Druckstunden</option>
+                                <option value="hours:720">720 Druckstunden (~90 Tage)</option>
+                                <option value="hours:1000">1000 Druckstunden</option>
+                            </optgroup>
+                            <!-- Prints -->
+                            <optgroup id="interval-group-prints" label="Drucke">
+                                <option value="prints:10">10 Drucke</option>
+                                <option value="prints:25">25 Drucke</option>
+                                <option value="prints:50">50 Drucke</option>
+                                <option value="prints:100">100 Drucke</option>
+                                <option value="prints:250">250 Drucke</option>
+                            </optgroup>
+                            <!-- Filament Rolls -->
+                            <optgroup id="interval-group-rolls" label="Filament-Rollen">
+                                <option value="filament_rolls:2">2 Rollen</option>
+                                <option value="filament_rolls:5">5 Rollen</option>
+                                <option value="filament_rolls:10">10 Rollen</option>
+                                <option value="filament_rolls:20">20 Rollen</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-priority" data-i18n="maintenance_priority">Priorität</label>
+                        <select id="task-priority">
+                            <option value="low" data-i18n="maintenance_priority_low">Niedrig</option>
+                            <option value="medium" selected data-i18n="maintenance_priority_medium">Mittel</option>
+                            <option value="high" data-i18n="maintenance_priority_high">Hoch</option>
+                            <option value="critical" data-i18n="maintenance_priority_critical">Kritisch</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-description" data-i18n="maintenance_description">Beschreibung</label>
+                        <textarea id="task-description" placeholder="z.B. Linearstangen reinigen und schmieren..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-first-due" data-i18n="maintenance_first_due">Erste Wartung</label>
+                        <input type="date" id="task-first-due">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-category" data-i18n="maintenance_category">Kategorie</label>
+                        <select id="task-category">
+                            <option value="cleaning" data-i18n="maintenance_category_cleaning">Reinigung</option>
+                            <option value="lubrication" data-i18n="maintenance_category_lubrication">Schmierung</option>
+                            <option value="inspection" data-i18n="maintenance_category_inspection">Inspektion</option>
+                            <option value="replacement" data-i18n="maintenance_category_replacement">Austausch</option>
+                            <option value="maintenance" data-i18n="maintenance">Wartung</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="task-notes" data-i18n="maintenance_notes">Hinweise</label>
+                        <textarea id="task-notes" placeholder="Zusätzliche Hinweise zur Durchführung..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div style="flex: 1;">
+                    <button id="delete-task-btn" class="btn btn-danger" onclick="deleteTask()" style="display: none;" data-i18n="maintenance_delete">🗑️ Löschen</button>
+                </div>
+                <div>
+                    <button class="btn btn-secondary" onclick="closeTaskModal()" data-i18n="cancel">Abbrechen</button>
+                    <button class="btn btn-primary" onclick="saveTask()" data-i18n="save">Erstellen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Complete Task Modal -->
+    <div id="complete-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="maintenance_complete_title">✓ Wartung abschließen</h3>
+                <button class="modal-close" onclick="closeCompleteModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="complete-task-name" style="font-weight: 600; margin-bottom: 15px;"></p>
+
+                <div id="complete-checklist-container"></div>
+
+                <div class="form-group" style="margin-top: 20px;">
+                    <label for="complete-notes" data-i18n="maintenance_completion_notes">Notizen zur durchgeführten Wartung</label>
+                    <textarea id="complete-notes" data-i18n="maintenance_completion_placeholder" placeholder="Was wurde gemacht? Gab es Probleme oder Besonderheiten?"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCompleteModal()" data-i18n="cancel">Abbrechen</button>
+                <button class="btn btn-success" onclick="completeTask()" data-i18n="maintenance_mark_complete">✓ Als erledigt markieren</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize Maintenance Plan Modal -->
+    <div id="init-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="maintenance_init_title">🔄 Wartungsplan initialisieren</h3>
+                <button class="modal-close" onclick="closeInitModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: var(--bg-hover); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="margin: 0; font-size: 14px;" data-i18n="maintenance_init_info">
+                        Lädt vordefinierte Wartungsaufgaben für das ausgewählte Druckermodell. Diese beinhalten empfohlene Wartungsintervalle basierend auf den Herstellerangaben.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="init-model" data-i18n="maintenance_init_model">Druckermodell *</label>
+                    <select id="init-model">
+                        <option value="P1P">Bambu Lab P1P</option>
+                        <option value="P1S" selected>Bambu Lab P1S</option>
+                        <option value="X1C">Bambu Lab X1C</option>
+                        <option value="A1">Bambu Lab A1</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="init-force">
+                        <span data-i18n="maintenance_init_force">Bestehende Wartungen überschreiben</span>
+                    </label>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin: 5px 0 0 30px;" data-i18n="maintenance_init_force_info">
+                        Achtung: Alle bestehenden Wartungsaufgaben werden gelöscht!
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeInitModal()" data-i18n="cancel">Abbrechen</button>
+                <button class="btn btn-primary" onclick="initializeMaintenancePlan()" data-i18n="maintenance_init_button">🔄 Wartungsplan laden</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Postpone Task Modal -->
+    <div id="postpone-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="maintenance_postpone_title">⏰ Wartung verschieben</h3>
+                <button class="modal-close" onclick="closePostponeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <p id="postpone-task-name" style="font-weight: 600; margin-bottom: 20px;"></p>
+
+                <div style="display: grid; gap: 10px;">
+                    <button class="btn btn-secondary" style="justify-content: flex-start; padding: 15px;" onclick="postponeTask(7)">
+                        <span style="font-size: 18px; margin-right: 10px;">📅</span>
+                        <span>
+                            <strong data-i18n="maintenance_postpone_7days">+7 Tage</strong><br>
+                            <small style="color: var(--text-secondary);" data-i18n="maintenance_postpone_7days_desc">Wartung um eine Woche verschieben</small>
+                        </span>
+                    </button>
+
+                    <button class="btn btn-secondary" style="justify-content: flex-start; padding: 15px;" onclick="postponeTask(14)">
+                        <span style="font-size: 18px; margin-right: 10px;">📅</span>
+                        <span>
+                            <strong data-i18n="maintenance_postpone_14days">+14 Tage</strong><br>
+                            <small style="color: var(--text-secondary);" data-i18n="maintenance_postpone_14days_desc">Wartung um zwei Wochen verschieben</small>
+                        </span>
+                    </button>
+
+                    <button class="btn btn-secondary" style="justify-content: flex-start; padding: 15px;" onclick="postponeTask(30)">
+                        <span style="font-size: 18px; margin-right: 10px;">📅</span>
+                        <span>
+                            <strong data-i18n="maintenance_postpone_30days">+30 Tage</strong><br>
+                            <small style="color: var(--text-secondary);" data-i18n="maintenance_postpone_30days_desc">Wartung um einen Monat verschieben</small>
+                        </span>
+                    </button>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="postpone-custom-days" data-i18n="maintenance_postpone_custom">Benutzerdefiniert (Tage)</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="postpone-custom-days" min="1" placeholder="z.B. 3" style="flex: 1;">
+                            <button class="btn btn-primary" onclick="postponeTaskCustom()">
+                                ⏰ <span data-i18n="maintenance_postpone_button">Verschieben</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePostponeModal()" data-i18n="cancel">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Printer Modal -->
+    <div id="add-printer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="maintenance_add_printer_title">🖨️ Drucker hinzufügen</h3>
+                <button class="modal-close" onclick="closeAddPrinterModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="add-printer-form">
+                    <div class="form-group">
+                        <label for="printer-name" data-i18n="maintenance_printer_name">Name *</label>
+                        <input type="text" id="printer-name" data-i18n-placeholder="maintenance_printer_name_placeholder" placeholder="e.g. P1S Main Printer" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="printer-model" data-i18n="maintenance_printer_model">Model *</label>
+                        <select id="printer-model" required>
+                            <option value="P1P">Bambu Lab P1P</option>
+                            <option value="P1S" selected>Bambu Lab P1S</option>
+                            <option value="X1C">Bambu Lab X1C</option>
+                            <option value="A1">Bambu Lab A1</option>
+                            <option value="A1 Mini">Bambu Lab A1 Mini</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="printer-serial" data-i18n="maintenance_printer_serial">Serial Number *</label>
+                        <input type="text" id="printer-serial" data-i18n-placeholder="maintenance_printer_serial_placeholder" placeholder="e.g. 01S00A123456789" required>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin: 5px 0 0 0;" data-i18n="maintenance_printer_serial_hint">
+                            You can find the serial number on a sticker on the printer
+                        </p>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label style="display: flex; align-items: center; cursor: pointer; gap: 8px;">
+                            <input type="checkbox" id="import-history-checkbox" style="cursor: pointer; width: auto; margin: 0;">
+                            <span data-i18n="maintenance_import_history">📊 Druckhistorie importieren</span>
+                        </label>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin: 5px 0 0 24px;" data-i18n="maintenance_import_history_hint">
+                            Importiert Druckzeit und Filamentverbrauch aus vergangenen Drucken
+                        </p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddPrinterModal()" data-i18n="cancel">Abbrechen</button>
+                <button class="btn btn-primary" onclick="addPrinter()">
+                    ➕ <span data-i18n="maintenance_add_printer_button">Drucker hinzufügen</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/auth-handler.js"></script>
+    <script>
+        // Global variables
+        let currentLang = window.i18nManager ? window.i18nManager.getCurrentLang() : 'de';
+        let currentPrinterId = 'default';
+        let currentTasks = [];
+        let currentTaskForComplete = null;
+        let currentFilter = null; // null = show all, 'overdue', 'due', 'upcoming'
+
+        // Filter Functions
+        function toggleFilter(filterType) {
+            // Toggle filter (click again to disable)
+            if (currentFilter === filterType) {
+                currentFilter = null;
+            } else {
+                currentFilter = filterType;
+            }
+
+            // Update visual state
+            document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active'));
+            if (currentFilter) {
+                document.getElementById(`filter-${currentFilter}`).classList.add('active');
+            }
+
+            // Re-render tasks with filter
+            renderTasks();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Render sidebar using shared module
+            if (window.sidebarManager) {
+                window.sidebarManager.render();
+            }
+
+            // Apply translations (i18nManager already initialized)
+            if (window.i18nManager) {
+                window.i18nManager.applyTranslations();
+            }
+
+            loadPrinterSelector();
+            translateIntervalDropdown();
+        });
+
+        // Translate interval dropdown labels
+        function translateIntervalDropdown() {
+            const dayGroup = document.getElementById('interval-group-days');
+            const hourGroup = document.getElementById('interval-group-hours');
+            const printGroup = document.getElementById('interval-group-prints');
+            const rollGroup = document.getElementById('interval-group-rolls');
+
+            if (dayGroup) dayGroup.label = getText('maintenance_interval_days', 'Tage').replace(' {value}', '');
+            if (hourGroup) hourGroup.label = getText('maintenance_interval_hours', 'Druckstunden').replace(' {value}', '').replace('Alle ', '');
+            if (printGroup) printGroup.label = getText('maintenance_interval_prints', 'Drucke').replace(' {value}', '').replace('Alle ', '');
+            if (rollGroup) rollGroup.label = getText('maintenance_interval_rolls', 'Rollen').replace(' {value}', '').replace('Alle ', '');
+        }
+
+        async function loadPrinterSelector() {
+            try {
+                // Lade Drucker
+                const printersRes = await apiCall('/api/maintenance/printers');
+                if (printersRes.ok) {
+                    const printers = await printersRes.json();
+
+                    // Aktualisiere Header-Dropdown
+                    const selector = document.getElementById('printer-selector');
+                    selector.innerHTML = '';
+
+                    // Filter out the 'default' fallback printer - it doesn't really exist in DB
+                    const realPrinters = printers.filter(p => p.printer_id !== 'default' && p.serial);
+
+                    if (realPrinters.length > 0) {
+                        realPrinters.forEach(printer => {
+                            const option = document.createElement('option');
+                            option.value = printer.printer_id;
+                            option.textContent = `${printer.model || 'Drucker'} - ${printer.name || printer.printer_id}`;
+                            selector.appendChild(option);
+                        });
+
+                        currentPrinterId = realPrinters[0].printer_id;
+
+                        // Prüfe ob Wartungen initialisiert sind (nur wenn ECHTE Drucker vorhanden)
+                        await checkAndInitialize();
+
+                        // Lade Wartungen
+                        await loadTasks();
+                    } else {
+                        // Keine ECHTEN Drucker vorhanden
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = getText('maintenance_no_printers', 'Keine Drucker vorhanden');
+                        selector.appendChild(option);
+                        console.log('No printers found - please add a printer first');
+                    }
+                }
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showError(getText('maintenance_error_loading', 'Fehler beim Laden der Wartungen'));
+            }
+        }
+
+        async function switchPrinter() {
+            const selector = document.getElementById('printer-selector');
+            currentPrinterId = selector.value;
+
+            if (currentPrinterId) {
+                await loadTasks();
+            }
+        }
+
+        async function checkAndInitialize() {
+            try {
+                const tasksRes = await apiCall(`/api/maintenance/tasks?printer_id=${currentPrinterId}`);
+                if (tasksRes.ok) {
+                    const tasks = await tasksRes.json();
+                    
+                    // Wenn keine Tasks, automatisch initialisieren
+                    if (tasks.length === 0) {
+                        const initRes = await apiCall(`/api/maintenance/printers/${currentPrinterId}/initialize`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ model: 'P1S', force: false })
+                        });
+                        
+                        if (initRes.ok) {
+                            const result = await initRes.json();
+                            console.log(`Initialized ${result.created} maintenance tasks`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking initialization:', error);
+            }
+        }
+
+        async function loadTasks() {
+            try {
+                const response = await apiCall(`/api/maintenance/tasks?printer_id=${currentPrinterId}`);
+                if (!response.ok) throw new Error('Failed to load tasks');
+
+                currentTasks = await response.json();
+                renderTasks();
+                updateStats();
+
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+                showError(getText('maintenance_error_loading', 'Fehler beim Laden der Wartungen'));
+            }
+        }
+
+        function renderTasks() {
+            const overdue = currentTasks.filter(t => t.status === 'overdue');
+            const due = currentTasks.filter(t => t.status === 'due');
+            const upcoming = currentTasks.filter(t => t.status === 'upcoming');
+
+            // Apply filter if active
+            const overdueSection = document.getElementById('section-overdue');
+            const dueSection = document.getElementById('section-due');
+            const upcomingSection = document.getElementById('section-upcoming');
+
+            if (currentFilter) {
+                // Filter is active - show only filtered section
+                overdueSection.style.display = (currentFilter === 'overdue' && overdue.length > 0) ? 'block' : 'none';
+                dueSection.style.display = (currentFilter === 'due' && due.length > 0) ? 'block' : 'none';
+                upcomingSection.style.display = (currentFilter === 'upcoming') ? 'block' : 'none';
+            } else {
+                // No filter - show all sections with tasks
+                overdueSection.style.display = overdue.length > 0 ? 'block' : 'none';
+                dueSection.style.display = due.length > 0 ? 'block' : 'none';
+                upcomingSection.style.display = 'block';
+            }
+
+            // Render overdue
+            const overdueContainer = document.getElementById('tasks-overdue');
+            if (overdue.length > 0) {
+                overdueContainer.innerHTML = overdue.map(renderTaskItem).join('');
+            }
+
+            // Render due
+            const dueContainer = document.getElementById('tasks-due');
+            if (due.length > 0) {
+                dueContainer.innerHTML = due.map(renderTaskItem).join('');
+            }
+
+            // Render upcoming
+            const upcomingContainer = document.getElementById('tasks-upcoming');
+            if (upcoming.length > 0) {
+                upcomingContainer.innerHTML = upcoming.map(renderTaskItem).join('');
+            } else {
+                upcomingContainer.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📋</div><p>${getText('maintenance_no_planned', 'Keine geplanten Wartungen')}</p></div>`;
+            }
+        }
+
+        function renderTaskItem(task) {
+            const priorityClass = `priority-${task.priority}`;
+            const statusClass = task.status;
+
+            let dueText = '';
+            if (task.days_until_due < 0) {
+                dueText = getText('maintenance_overdue_since', 'Überfällig seit {days} Tag(en)').replace('{days}', Math.abs(task.days_until_due));
+            } else {
+                dueText = getText('maintenance_due_in', 'Fällig in {days} Tag(en)').replace('{days}', task.days_until_due);
+            }
+
+            const locale = currentLang === 'de' ? 'de-DE' : currentLang === 'en' ? 'en-US' : currentLang === 'fr' ? 'fr-FR' : currentLang === 'es' ? 'es-ES' : currentLang === 'it' ? 'it-IT' : 'de-DE';
+            const nextDueDate = new Date(task.next_due).toLocaleDateString(locale);
+            const intervalText = getIntervalText(task.interval_type, task.interval_value);
+
+            return `
+                <div class="task-item">
+                    <div class="task-status-indicator ${statusClass}"></div>
+                    <div class="task-content">
+                        <div class="task-header">
+                            <span class="task-name">${task.name}</span>
+                            <span class="task-badge ${priorityClass}">${getPriorityText(task.priority)}</span>
+                        </div>
+                        <div class="task-details">${task.description || ''}</div>
+                        <div class="task-meta">
+                            <span class="task-meta-item">📅 ${dueText}</span>
+                            <span class="task-meta-item">🔄 ${intervalText}</span>
+                            <span class="task-meta-item">✅ ${task.completed_count}x ${getText('maintenance_completed_times', 'durchgeführt')}</span>
+                        </div>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-success btn-small" onclick="showCompleteModal('${task.task_id}')">
+                            ✓ ${getText('maintenance_done', 'Erledigt')}
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="showPostponeModal('${task.task_id}')">
+                            ⏰ ${getText('maintenance_postpone', 'Verschieben')}
+                        </button>
+                        <button class="btn btn-secondary btn-small" onclick="editTask('${task.task_id}')">
+                            ✏️ ${getText('maintenance_edit', 'Bearbeiten')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            const overdue = currentTasks.filter(t => t.status === 'overdue').length;
+            const due = currentTasks.filter(t => t.status === 'due').length;
+            const upcoming = currentTasks.filter(t => t.status === 'upcoming').length;
+
+            document.getElementById('stat-overdue').textContent = overdue;
+            document.getElementById('stat-due').textContent = due;
+            document.getElementById('stat-upcoming').textContent = upcoming;
+        }
+
+        async function showNewTaskModal() {
+            document.getElementById('modal-title').textContent = getText('maintenance_new', '➕ Neue Wartung');
+            document.getElementById('task-form').reset();
+            document.getElementById('task-id').value = '';
+            document.getElementById('delete-task-btn').style.display = 'none';
+
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('task-first-due').value = today;
+
+            // Load printers
+            await loadPrinters();
+
+            // Set default interval (30 days is already selected in HTML)
+            document.getElementById('task-interval').value = 'days:30';
+
+            document.getElementById('task-modal').classList.add('active');
+        }
+
+        async function loadPrinters() {
+            try {
+                const response = await apiCall('/api/maintenance/printers');
+                const printers = await response.json();
+
+                const select = document.getElementById('task-printer-id');
+                select.innerHTML = '<option value="">Drucker wählen...</option>';
+
+                printers.forEach(printer => {
+                    const option = document.createElement('option');
+                    option.value = printer.printer_id;
+                    option.textContent = `${printer.model || 'Drucker'} - ${printer.name || printer.printer_id}`;
+                    if (printer.printer_id === currentPrinterId) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading printers:', error);
+            }
+        }
+
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.remove('active');
+        }
+
+        async function saveTask() {
+            const taskId = document.getElementById('task-id').value;
+            const printerId = document.getElementById('task-printer-id').value || currentPrinterId;
+
+            // Get interval type and value from dropdown
+            const intervalSelect = document.getElementById('task-interval');
+            const intervalValue = intervalSelect.value.split(':');
+            const intervalType = intervalValue[0];
+            const intervalNum = parseInt(intervalValue[1]);
+
+            const taskData = {
+                name: document.getElementById('task-name').value,
+                description: document.getElementById('task-description').value,
+                interval_type: intervalType,
+                interval_value: intervalNum,
+                priority: document.getElementById('task-priority').value,
+                category: document.getElementById('task-category').value,
+                notes: document.getElementById('task-notes').value
+            };
+
+            // Add first_due if set
+            const firstDue = document.getElementById('task-first-due').value;
+            if (firstDue) {
+                taskData.first_due = firstDue;
+            }
+
+            try {
+                let response;
+                if (taskId) {
+                    // Update
+                    response = await apiCall(`/api/maintenance/tasks/${printerId}/${taskId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(taskData)
+                    });
+                } else {
+                    // Create
+                    response = await apiCall(`/api/maintenance/tasks/${printerId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(taskData)
+                    });
+                }
+
+                if (response.ok) {
+                    showSuccess(taskId ? getText('maintenance_updated', 'Wartung aktualisiert') : getText('maintenance_created', 'Wartung erstellt'));
+                    closeTaskModal();
+                    await loadTasks();
+                } else {
+                    throw new Error('Failed to save task');
+                }
+            } catch (error) {
+                console.error('Error saving task:', error);
+                showError(getText('maintenance_error_saving', 'Fehler beim Speichern'));
+            }
+        }
+
+        async function editTask(taskId) {
+            const task = currentTasks.find(t => t.task_id === taskId);
+            if (!task) return;
+
+            document.getElementById('modal-title').textContent = getText('maintenance_edit_task', '✏️ Wartung bearbeiten');
+            document.getElementById('task-id').value = task.task_id;
+
+            // Load printers first
+            await loadPrinters();
+            document.getElementById('task-printer-id').value = task.printer_id;
+
+            document.getElementById('task-name').value = task.name;
+            document.getElementById('task-description').value = task.description || '';
+            document.getElementById('task-priority').value = task.priority;
+            document.getElementById('task-category').value = task.category;
+            document.getElementById('task-notes').value = task.notes || '';
+
+            // Set interval dropdown
+            const intervalType = task.interval_type;
+            const intervalValue = task.interval_value;
+            const intervalKey = `${intervalType}:${intervalValue}`;
+
+            const intervalSelect = document.getElementById('task-interval');
+            const option = intervalSelect.querySelector(`option[value="${intervalKey}"]`);
+            if (option) {
+                intervalSelect.value = intervalKey;
+            } else {
+                // If exact match not found, select first option of same type
+                const firstOption = intervalSelect.querySelector(`option[value^="${intervalType}:"]`);
+                if (firstOption) {
+                    intervalSelect.value = firstOption.value;
+                }
+            }
+
+            // Set first due if available
+            if (task.next_due) {
+                const dueDate = new Date(task.next_due).toISOString().split('T')[0];
+                document.getElementById('task-first-due').value = dueDate;
+            }
+
+            document.getElementById('delete-task-btn').style.display = 'inline-block';
+            document.getElementById('task-modal').classList.add('active');
+        }
+
+        async function deleteTask() {
+            const taskId = document.getElementById('task-id').value;
+            const printerId = document.getElementById('task-printer-id').value || currentPrinterId;
+            const taskName = document.getElementById('task-name').value;
+
+            if (!taskId) return;
+
+            // Confirmation dialog
+            const confirmMessage = getText('maintenance_delete_confirm',
+                'Möchten Sie diese Wartung wirklich löschen?\n\n"{name}"\n\nDiese Aktion kann nicht rückgängig gemacht werden!')
+                .replace('{name}', taskName);
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            try {
+                const response = await apiCall(`/api/maintenance/tasks/${printerId}/${taskId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showSuccess(getText('maintenance_deleted', 'Wartung gelöscht'));
+                    closeTaskModal();
+                    await loadTasks();
+                } else {
+                    throw new Error('Failed to delete task');
+                }
+            } catch (error) {
+                console.error('Error deleting task:', error);
+                showError(getText('maintenance_error_saving', 'Fehler beim Löschen'));
+            }
+        }
+
+        function showCompleteModal(taskId) {
+            const task = currentTasks.find(t => t.task_id === taskId);
+            if (!task) return;
+
+            currentTaskForComplete = task;
+
+            document.getElementById('complete-task-name').textContent = task.name;
+            document.getElementById('complete-notes').value = '';
+
+            // Render checklist if available
+            const checklistContainer = document.getElementById('complete-checklist-container');
+            if (task.checklist && task.checklist.length > 0) {
+                checklistContainer.innerHTML = `
+                    <div class="form-group">
+                        <label>Checkliste</label>
+                        <ul class="checklist">
+                            ${task.checklist.map((item, idx) => `
+                                <li>
+                                    <input type="checkbox" id="check-${idx}">
+                                    <label for="check-${idx}">${item}</label>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                checklistContainer.innerHTML = '';
+            }
+
+            document.getElementById('complete-modal').classList.add('active');
+        }
+
+        function closeCompleteModal() {
+            document.getElementById('complete-modal').classList.remove('active');
+            currentTaskForComplete = null;
+        }
+
+        async function completeTask() {
+            if (!currentTaskForComplete) return;
+
+            const notes = document.getElementById('complete-notes').value;
+
+            try {
+                const response = await apiCall(
+                    `/api/maintenance/tasks/${currentTaskForComplete.printer_id}/${currentTaskForComplete.task_id}/complete`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ notes })
+                    }
+                );
+
+                if (response.ok) {
+                    showSuccess('Wartung als erledigt markiert');
+                    closeCompleteModal();
+                    await loadTasks();
+                } else {
+                    throw new Error('Failed to complete task');
+                }
+            } catch (error) {
+                console.error('Error completing task:', error);
+                showError('Fehler beim Abschließen');
+            }
+        }
+
+        // Postpone Modal Functions
+        let currentTaskForPostpone = null;
+
+        function showPostponeModal(taskId) {
+            const task = currentTasks.find(t => t.task_id === taskId);
+            if (!task) return;
+
+            currentTaskForPostpone = task;
+            document.getElementById('postpone-task-name').textContent = task.name;
+            document.getElementById('postpone-custom-days').value = '';
+            document.getElementById('postpone-modal').classList.add('active');
+        }
+
+        function closePostponeModal() {
+            document.getElementById('postpone-modal').classList.remove('active');
+            currentTaskForPostpone = null;
+        }
+
+        async function postponeTask(days) {
+            if (!currentTaskForPostpone) return;
+
+            try {
+                const response = await apiCall(
+                    `/api/maintenance/tasks/${currentTaskForPostpone.printer_id}/${currentTaskForPostpone.task_id}/postpone`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ days })
+                    }
+                );
+
+                if (response.ok) {
+                    showSuccess(getText('maintenance_postponed', `Wartung um ${days} Tage verschoben`));
+                    closePostponeModal();
+                    await loadTasks();
+                } else {
+                    throw new Error('Failed to postpone task');
+                }
+            } catch (error) {
+                console.error('Error postponing task:', error);
+                showError(getText('maintenance_error_postpone', 'Fehler beim Verschieben'));
+            }
+        }
+
+        async function postponeTaskCustom() {
+            const days = parseInt(document.getElementById('postpone-custom-days').value);
+            if (!days || days < 1) {
+                showError(getText('maintenance_error_invalid_days', 'Bitte gültige Anzahl Tage eingeben'));
+                return;
+            }
+            await postponeTask(days);
+        }
+
+        // PDF Export Function
+        async function exportPDF() {
+            try {
+                showSuccess(getText('maintenance_generating_pdf', 'PDF wird generiert...'));
+
+                // Lese Checkbox-Wert
+                const includePrints = document.getElementById('include-prints-checkbox').checked;
+
+                // Sammle PDF-Übersetzungen aus den Sprachdateien
+                const pdfTranslations = {
+                    title: getText('pdf_title', 'Wartungsprotokoll'),
+                    printer: getText('pdf_printer', 'Drucker:'),
+                    model: getText('pdf_model', 'Modell:'),
+                    serial: getText('pdf_serial', 'Seriennummer:'),
+                    total_hours: getText('pdf_total_hours', 'Druckstunden gesamt:'),
+                    total_prints: getText('pdf_total_prints', 'Drucke gesamt:'),
+                    filament_used: getText('pdf_filament_used', 'Filament verbraucht:'),
+                    created: getText('pdf_created', 'Erstellt:'),
+                    current_tasks: getText('pdf_current_tasks', 'Aktuelle Wartungsaufgaben'),
+                    overdue: getText('pdf_overdue', 'Überfällig'),
+                    due_soon: getText('pdf_due_soon', 'Fällig (nächste 3 Tage)'),
+                    due_since: getText('pdf_due_since', 'Fällig seit'),
+                    due_in: getText('pdf_due_in', 'Fällig in'),
+                    days: getText('pdf_days', 'Tagen'),
+                    day_s: getText('pdf_day_s', 'Tag(en)'),
+                    history: getText('pdf_history', 'Wartungshistorie'),
+                    history_date: getText('pdf_history_date', 'Datum'),
+                    history_task: getText('pdf_history_task', 'Wartung'),
+                    history_notes: getText('pdf_history_notes', 'Notizen'),
+                    no_history: getText('pdf_no_history', 'Keine Wartungshistorie vorhanden.'),
+                    // NEU: Print History Übersetzungen
+                    print_history: getText('pdf_print_history', 'Druckhistorie'),
+                    print_summary: getText('pdf_print_summary', 'Zusammenfassung Drucke'),
+                    since_last_maintenance: getText('pdf_since_last_maintenance', 'Seit letzter Wartung'),
+                    in_period: getText('pdf_in_period', 'Im Zeitraum'),
+                    successful: getText('pdf_successful', 'Erfolgreich:'),
+                    failed: getText('pdf_failed', 'Fehlgeschlagen:'),
+                    cancelled: getText('pdf_cancelled', 'Abgebrochen:'),
+                    total_duration: getText('pdf_total_duration', 'Gesamtdauer:'),
+                    hours: getText('pdf_hours', 'Stunden'),
+                    avg_duration: getText('pdf_avg_duration', 'Ø Dauer:'),
+                    minutes: getText('pdf_minutes', 'Minuten'),
+                    total_filament: getText('pdf_total_filament', 'Filament gesamt:'),
+                    total_power: getText('pdf_total_power', 'Stromverbrauch:'),
+                    total_cost: getText('pdf_total_cost', 'Kosten gesamt:'),
+                    print_details: getText('pdf_print_details', 'Letzte Drucke (Details)'),
+                    print_date: getText('pdf_print_date', 'Datum'),
+                    print_filename: getText('pdf_print_filename', 'Dateiname'),
+                    print_duration: getText('pdf_print_duration', 'Dauer'),
+                    print_status: getText('pdf_print_status', 'Status'),
+                    print_filament: getText('pdf_print_filament', 'Filament'),
+                    no_prints: getText('pdf_no_prints', 'Keine Drucke im Zeitraum vorhanden.')
+                };
+
+                const response = await apiCall('/api/maintenance/export/pdf', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        printer_id: currentPrinterId,
+                        include_prints: includePrints,  // NEU: Parameter hinzugefügt
+                        translations: pdfTranslations
+                    })
+                });
+
+                if (response.ok) {
+                    // Download PDF
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `wartungsplan_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    showSuccess(getText('maintenance_pdf_downloaded', 'PDF wurde heruntergeladen'));
+                } else {
+                    throw new Error('Failed to generate PDF');
+                }
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+                showError(getText('maintenance_error_pdf', 'Fehler beim Generieren des PDFs'));
+            }
+        }
+
+        function showInitModal() {
+            document.getElementById('init-modal').classList.add('active');
+        }
+
+        function closeInitModal() {
+            document.getElementById('init-modal').classList.remove('active');
+        }
+
+        async function showAddPrinterModal() {
+            document.getElementById('add-printer-form').reset();
+
+            // Versuche Seriennummer aus API Config zu holen
+            try {
+                const response = await apiCall('/api/config');
+                if (response.ok) {
+                    const config = await response.json();
+                    if (config.mqtt && config.mqtt.bambu_serial) {
+                        document.getElementById('printer-serial').value = config.mqtt.bambu_serial;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not load printer serial from config');
+            }
+
+            document.getElementById('add-printer-modal').classList.add('active');
+        }
+
+        function closeAddPrinterModal() {
+            document.getElementById('add-printer-modal').classList.remove('active');
+            // Reset form
+            document.getElementById('add-printer-form').reset();
+            document.getElementById('import-history-checkbox').checked = false;
+        }
+
+        async function addPrinter() {
+            const name = document.getElementById('printer-name').value;
+            const model = document.getElementById('printer-model').value;
+            const serial = document.getElementById('printer-serial').value;
+            const importHistory = document.getElementById('import-history-checkbox').checked;
+
+            if (!name || !serial) {
+                showError(getText('maintenance_error_name_serial_required', 'Name and serial number are required'));
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/maintenance/printers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, model, serial, import_history: importHistory })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    // Build success message
+                    let successMsg = getText('maintenance_printer_added', 'Printer added successfully');
+
+                    // Add import info if history was imported
+                    if (importHistory && result.import_result && result.import_result.imported) {
+                        const stats = result.import_result;
+                        successMsg += `\n📊 ${getText('maintenance_import_success', 'Imported')}: ${stats.total_prints} ${getText('prints', 'Drucke')}, ${stats.total_hours}h, ${stats.total_filament_grams}g`;
+                    }
+
+                    showSuccess(successMsg);
+                    closeAddPrinterModal();
+                    // Reload printer selector and select new printer
+                    await loadPrinterSelector();
+                    await loadTasks();
+                } else {
+                    const error = await response.json();
+                    if (response.status === 409) {
+                        showError(getText('maintenance_error_printer_exists', 'A printer with this serial number already exists'));
+                    } else {
+                        showError(error.error || getText('maintenance_error_add_printer', 'Error adding printer'));
+                    }
+                }
+            } catch (error) {
+                console.error('Error adding printer:', error);
+                showError(getText('maintenance_error_add_printer', 'Error adding printer'));
+            }
+        }
+
+        async function initializeMaintenancePlan() {
+            const model = document.getElementById('init-model').value;
+            const force = document.getElementById('init-force').checked;
+
+            if (force && !confirm(getText('maintenance_init_force_confirm', 'Achtung: Alle bestehenden Wartungen werden gelöscht!\n\nMöchten Sie wirklich fortfahren?'))) {
+                return;
+            }
+
+            try {
+                const response = await apiCall(`/api/maintenance/printers/${currentPrinterId}/initialize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model, force, language: currentLang })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const message = getText('maintenance_init_success', 'Wartungsplan erfolgreich geladen: {count} Aufgaben').replace('{count}', result.tasks_created || 0);
+                    showSuccess(message);
+                    closeInitModal();
+                    await loadTasks();
+                } else {
+                    throw new Error('Failed to initialize maintenance');
+                }
+            } catch (error) {
+                console.error('Error initializing maintenance:', error);
+                showError(getText('maintenance_error_saving', 'Fehler beim Laden des Wartungsplans'));
+            }
+        }
+
+        function getIntervalText(type, value) {
+            const intervalTexts = {
+                'days': getText('maintenance_interval_days', 'Alle {value} Tage').replace('{value}', value),
+                'hours': getText('maintenance_interval_hours', 'Alle {value} Druckstunden').replace('{value}', value),
+                'prints': getText('maintenance_interval_prints', 'Alle {value} Drucke').replace('{value}', value),
+                'filament_rolls': getText('maintenance_interval_filament', 'Alle {value} Rollen').replace('{value}', value)
+            };
+            return intervalTexts[type] || `${getText('maintenance_every', 'Alle')} ${value}`;
+        }
+
+        function getPriorityText(priority) {
+            const priorityMap = {
+                'low': getText('maintenance_priority_low', 'Niedrig'),
+                'medium': getText('maintenance_priority_medium', 'Mittel'),
+                'high': getText('maintenance_priority_high', 'Hoch'),
+                'critical': getText('maintenance_priority_critical', 'Kritisch')
+            };
+            return priorityMap[priority] || priority;
+        }
+
+        function showSuccess(message) {
+            const alert = document.getElementById('alert-success');
+            alert.textContent = message;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 4000);
+        }
+
+        function showError(message) {
+            const alert = document.getElementById('alert-error');
+            alert.textContent = message;
+            alert.classList.add('show');
+            setTimeout(() => alert.classList.remove('show'), 4000);
+        }
+    </script>
+</body>
+</html>

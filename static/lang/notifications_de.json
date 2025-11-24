@@ -1,0 +1,262 @@
+{
+  "notifications": {
+    "print_started": {
+      "title": "🚀 Druck gestartet!",
+      "body": "'{filename}' wurde gestartet. Live Activity gestartet."
+    },
+    "print_finished": {
+      "title": "✅ Druck abgeschlossen!",
+      "body": "'{filename}' wurde erfolgreich gedruckt.\nDruckzeit: {duration}"
+    },
+    "print_cancelled": {
+      "title": "⚠️ Druck abgebrochen",
+      "body": "'{filename}' wurde vor dem Start abgebrochen."
+    },
+    "print_failed": {
+      "title": "❌ Druckfehler!",
+      "body": "'{filename}' ist fehlgeschlagen."
+    },
+    "filament_change_required": {
+      "title": "📥 Filament-Wechsel erforderlich!",
+      "body": "'{filename}' wartet auf Filament: {filament_info} ({progress}%)"
+    },
+    "ams_filament_change": {
+      "title": "🔄 AMS Filament-Wechsel",
+      "body": "Drucker wechselt von Slot {from_slot} zu Slot {to_slot}"
+    },
+    "filament_change_completed": {
+      "title": "✅ Filament-Wechsel abgeschlossen",
+      "body": "Der Filament-Wechsel wurde abgeschlossen"
+    },
+    "milestone_25": {
+      "title": "📊 25% erreicht",
+      "body": "'{filename}' ist zu 25% fertig"
+    },
+    "milestone_50": {
+      "title": "📊 Halbzeit!",
+      "body": "'{filename}' ist zur Hälfte fertig"
+    },
+    "milestone_75": {
+      "title": "📊 75% erreicht",
+      "body": "'{filename}' ist zu 75% fertig"
+    },
+    "print_resumed": {
+      "title": "▶️ Druck fortgesetzt",
+      "body": "Der Druck wurde fortgesetzt"
+    },
+    "print_paused": {
+      "title": "⏸️ Druck pausiert",
+      "body": "Der Druck wurde pausiert"
+    },
+    "printer_power_on": {
+      "title": "🟢 Drucker eingeschaltet",
+      "body": "{printer_name} wurde eingeschaltet"
+    },
+    "printer_power_on_scheduled": {
+      "title": "⏰ Geplanter Druck - Drucker eingeschaltet",
+      "body": "{printer_name} wurde für geplanten Druck eingeschaltet"
+    },
+    "printer_power_off": {
+      "title": "🔴 Drucker ausgeschaltet",
+      "body": "{printer_name} wurde ausgeschaltet"
+    },
+    "auto_shutdown": {
+      "title": "⏰ Auto-Shutdown in {minutes} Min",
+      "body": "Drucker schaltet automatisch ab ({reason})"
+    },
+    "drying_started": {
+      "title": "🌡️ Filament-Trocknung gestartet",
+      "body": "{material} wird bei {temp}°C für {duration}h getrocknet"
+    },
+    "drying_completed": {
+      "title": "✅ Filament-Trocknung abgeschlossen",
+      "body": "{material} ist fertig getrocknet"
+    },
+    "drying_cancelled": {
+      "title": "🚫 Filament-Trocknung abgebrochen",
+      "body": "{material} Trocknung wurde gestoppt"
+    },
+    "drying_reminder": {
+      "title": "🔄 Filament-Rolle umdrehen!",
+      "body": "{material}: Bitte Rolle umdrehen - Noch {hours}h verbleibend"
+    },
+    "scheduled_print_failed_filament": {
+      "title": "❌ Geplanter Druck abgebrochen",
+      "body": "'{filename}' konnte nicht gestartet werden - nicht genug Filament vorhanden"
+    },
+    "test": {
+      "test_started": {
+        "title": "🧪 Test Druck gestartet!",
+        "body": "'{filename}' Test wurde gestartet."
+      },
+      "test_completed": {
+        "title": "🧪 Test abgeschlossen!",
+        "body": "'{filename}' Test wurde erfolgreich gedruckt."
+      },
+      "test_cancelled": {
+        "title": "🧪 Test abgebrochen",
+        "body": "Test wurde bei {progress}% abgebrochen."
+      },
+      "milestone_25": {
+        "title": "🧪 Test 25% erreicht",
+        "body": "'{filename}' ist zu 25% fertig"
+      },
+      "milestone_50": {
+        "title": "🧪 Test 50% erreicht",
+        "body": "'{filename}' ist zur Hälfte fertig"
+      },
+      "milestone_75": {
+        "title": "🧪 Test 75% erreicht",
+        "body": "'{filename}' ist fast fertig!"
+      },
+      "progress": {
+        "title": "Test Progress",
+        "body": "Test {progress}%"
+      }
+    }
+  },
+  "status": {
+    "ready": "Bereit",
+    "printing": "Druckt:",
+    "preparing": "Vorbereitung...",
+    "starting_print": "Startet Druck...",
+    "print_completed": "Druck abgeschlossen",
+    "print_failed": "Druck fehlgeschlagen",
+    "paused": "Pausiert",
+    "no_print_active": "Kein Druck aktiv",
+    "no_filament": "Kein Filament",
+    "filament_loading": "Filament wird geladen...",
+    "filament_unloading": "Filament wird entladen...",
+    "filament_positioning": "Filament positioniert...",
+    "ams_ready": "AMS bereit"
+  },
+  "general": {
+    "print_job": "Druckauftrag"
+  },
+  "pause_reasons": {
+    "filament_end": "Pausiert durch Filament-Ende",
+    "heating": "Pausiert beim Aufheizen",
+    "ams_error": "Pausiert durch AMS Fehler",
+    "filament_break": "Pausiert durch Filament-Bruch",
+    "user_pause": "Manuell pausiert",
+    "generic": "Pausiert"
+  },
+  "power_off": {
+    "reason_print_finished": "Druck beendet",
+    "reason_idle": "Inaktivität ({minutes} Min)",
+    "banner_title": "⏰ Auto-Ausschaltung aktiv",
+    "banner_countdown": "Schaltet ab in {time}",
+    "banner_cancel": "Abbrechen"
+  },
+  "hms": {
+    "0700-0300-0002-0002": "Erste-Schicht-Fehler erkannt - Haftungsprobleme möglich",
+    "0700-0300-0002-0007": "Mögliche Erste-Schicht-Defekte",
+    "0C00-0300-0003-0008": "Mögliche Spaghetti-Defekte erkannt",
+    "0300-8013": "Filament-Wechsel für Multi-Color Druck erforderlich - bitte manuell wechseln",
+    "0300-8004": "Filament leer - bitte neues Filament laden",
+    "fallback": "HMS Fehler {code}"
+  },
+  "hms_notification_titles": {
+    "printer_info": "ℹ️ Drucker-Info",
+    "printer_error": "⚠️ Druckerfehler",
+    "info_prefix": "ℹ️ Info",
+    "hms_error_prefix": "HMS Fehler",
+    "new_hms_errors": "neue HMS Fehler",
+    "new_infos": "neue Infos",
+    "new_printer_infos": "neue Drucker-Infos"
+  },
+  "events": {
+    "pause": "⏸️ Druck pausiert",
+    "resume": "▶️ Druck fortgesetzt",
+    "printing_started": "🖨️ Druck gestartet",
+    "filament_change": "📥 Filament-Wechsel: {filament_info}",
+    "stage_change": "{icon} {stage_desc}",
+    "start": "Druck gestartet: {filename}",
+    "heating": "🔥 Aufheizen läuft",
+    "preparation": "⚙️ Vorbereitung läuft",
+    "bed_leveling": "📐 Bed Leveling läuft",
+    "manual_stop": "⏹️ Druck manuell abgebrochen",
+    "finish_success": "Druck erfolgreich",
+    "finish_failed": "Druck fehlgeschlagen",
+    "auto_power_off_scheduled": "⏰ Auto-Ausschaltung in {minutes} Minuten...",
+    "idle_power_off_scheduled": "⏰ Auto-Ausschaltung in {minutes} Minuten (Inaktivität)",
+    "auto_power_off_executed": "🔌 Drucker automatisch ausgeschaltet",
+    "power_off_cancelled": "⏹️ Auto-Ausschaltung abgebrochen",
+    "upload_start": "📤 Datei-Upload gestartet",
+    "upload_complete": "✅ Datei-Upload abgeschlossen",
+    "upload_failed": "❌ Datei-Upload fehlgeschlagen",
+    "print_error": "❌ Fehler: {reason}"
+  },
+  "stages": {
+    "0": "Druckt",
+    "1": "Auto Bed Leveling",
+    "2": "Heatbed aufheizen",
+    "3": "Vibrationskompensation",
+    "4": "Homing ändern",
+    "5": "Auto Z-align",
+    "6": "Heizen",
+    "7": "Extrude Kalibrierung",
+    "8": "Bed Leveling",
+    "9": "Toolhead homing",
+    "10": "Nozzle Tip Forming",
+    "11": "Extruder wechseln",
+    "12": "M400 Pause",
+    "13": "Toolhead homing",
+    "14": "Düsenreinigung",
+    "15": "Drucken",
+    "16": "Pausiert vom Benutzer",
+    "17": "Pausiert durch Filament-Bruch",
+    "18": "Pausiert durch AMS Fehler",
+    "19": "Pausiert durch Hotend Verstopfung",
+    "20": "Pausiert durch Filament-Ende",
+    "21": "Pausiert durch Überhitzung",
+    "22": "Pausiert durch Stromausfall",
+    "23": "Pausiert durch Überspringen",
+    "24": "Filament-Wechsel",
+    "25": "Filament lädt",
+    "26": "Schnitt-Filament entladen",
+    "27": "Manueller Filament-Feed",
+    "28": "Pausiert durch unbekannten Fehler",
+    "29": "Flow Kalibrierung",
+    "30": "Kammer heizen",
+    "31": "Extruder Scanning",
+    "32": "Vibrationskompensation",
+    "33": "Homing vor Pause",
+    "34": "Oberflächen-Scan",
+    "35": "Mikro Lidar Bed Scan",
+    "completed": "Abgeschlossen",
+    "unknown": "Unbekannte Stage {stage}"
+  },
+  "filament": {
+    "check": {
+      "no_spool_assigned": "Filament [{filament_index}]: Keine Spule zugewiesen! Benötigt {required_weight}g",
+      "spool_not_found": "Filament [{filament_index}]: Spule #{spool_id} nicht gefunden!",
+      "no_filament_left": "Filament [{filament_index}] ({spool_name}): Leer! Benötigt {required_weight}g",
+      "insufficient_filament": "Filament [{filament_index}] ({spool_name}): {available_weight}g verfügbar, {required_weight}g benötigt (fehlen {shortage}g)",
+      "critical_error_scheduling": "Druck kann nicht geplant werden - kritische Filament-Fehler vorhanden"
+    }
+  },
+  "maintenance": {
+    "overdue": {
+      "title": "⚠️ Wartung überfällig",
+      "body": "{task_name}",
+      "body_days": "{task_name} - seit {days} Tag(en) überfällig"
+    },
+    "due_today": {
+      "title": "🔧 Wartung heute fällig",
+      "body": "{task_name}"
+    },
+    "due_tomorrow": {
+      "title": "🔔 Wartung morgen fällig",
+      "body": "{task_name}"
+    },
+    "due_soon": {
+      "title": "🔔 Wartung bald fällig",
+      "body": "{task_name} - in {days} Tag(en)"
+    },
+    "planned": {
+      "title": "📅 Wartung geplant",
+      "body": "{task_name} - in {days} Tag(en)"
+    }
+  }
+}

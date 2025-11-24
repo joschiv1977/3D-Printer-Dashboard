@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Base -->
+  <rect x="30" y="160" width="140" height="10" fill="#2c3e50" rx="2"/>
+
+  <!-- Enclosure (closed) -->
+  <rect x="40" y="50" width="120" height="110" fill="#34495e" opacity="0.3" rx="3"/>
+  <rect x="40" y="50" width="120" height="6" fill="#34495e" rx="1"/>
+  <rect x="40" y="50" width="6" height="110" fill="#34495e" rx="1"/>
+  <rect x="154" y="50" width="6" height="110" fill="#34495e" rx="1"/>
+  <rect x="40" y="154" width="120" height="6" fill="#34495e" rx="1"/>
+
+  <!-- Door window -->
+  <rect x="60" y="70" width="80" height="70" fill="#7f8c8d" opacity="0.2" rx="2"/>
+
+  <!-- Build plate (visible through window) -->
+  <rect x="70" y="125" width="60" height="3" fill="#95a5a6" rx="1"/>
+
+  <!-- Print head (visible through window) -->
+  <rect x="90" y="85" width="20" height="15" fill="#e74c3c" rx="2"/>
+  <rect x="95" y="92" width="10" height="20" fill="#c0392b" rx="1"/>
+
+  <!-- Handle -->
+  <rect x="150" y="100" width="8" height="30" fill="#7f8c8d" rx="2"/>
+
+  <!-- "P1S" label -->
+  <text x="100" y="30" font-family="Arial" font-size="12" fill="#7f8c8d" text-anchor="middle" font-weight="bold">P1S</text>
+</svg>

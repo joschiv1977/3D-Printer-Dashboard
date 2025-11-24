@@ -1,0 +1,262 @@
+{
+  "notifications": {
+    "print_started": {
+      "title": "🚀 ¡Impresión iniciada!",
+      "body": "'{filename}' ha comenzado. Live Activity iniciada."
+    },
+    "print_finished": {
+      "title": "✅ ¡Impresión completada!",
+      "body": "'{filename}' se imprimió con éxito.\nDuración de impresión: {duration}"
+    },
+    "print_cancelled": {
+      "title": "⚠️ Impresión cancelada",
+      "body": "'{filename}' fue cancelado antes de comenzar."
+    },
+    "print_failed": {
+      "title": "❌ ¡Error de impresión!",
+      "body": "'{filename}' ha fallado."
+    },
+    "filament_change_required": {
+      "title": "📥 ¡Cambio de filamento requerido!",
+      "body": "'{filename}' espera filamento: {filament_info} ({progress}%)"
+    },
+    "ams_filament_change": {
+      "title": "🔄 Cambio de filamento AMS",
+      "body": "La impresora cambia de la ranura {from_slot} a la ranura {to_slot}"
+    },
+    "filament_change_completed": {
+      "title": "✅ Cambio de filamento completado",
+      "body": "El cambio de filamento está completado"
+    },
+    "milestone_25": {
+      "title": "📊 25% alcanzado",
+      "body": "'{filename}' está al 25% completado"
+    },
+    "milestone_50": {
+      "title": "📊 ¡A mitad de camino!",
+      "body": "'{filename}' está a la mitad"
+    },
+    "milestone_75": {
+      "title": "📊 75% alcanzado",
+      "body": "'{filename}' está al 75% completado"
+    },
+    "print_resumed": {
+      "title": "▶️ Impresión reanudada",
+      "body": "La impresión se ha reanudado"
+    },
+    "print_paused": {
+      "title": "⏸️ Impresión en pausa",
+      "body": "La impresión ha sido pausada"
+    },
+    "printer_power_on": {
+      "title": "🟢 Impresora encendida",
+      "body": "{printer_name} ha sido encendida"
+    },
+    "printer_power_on_scheduled": {
+      "title": "⏰ Impresión programada - Impresora encendida",
+      "body": "{printer_name} ha sido encendida para impresión programada"
+    },
+    "printer_power_off": {
+      "title": "🔴 Impresora apagada",
+      "body": "{printer_name} ha sido apagada"
+    },
+    "auto_shutdown": {
+      "title": "⏰ Apagado auto. en {minutes} min",
+      "body": "La impresora se apagará automáticamente ({reason})"
+    },
+    "drying_started": {
+      "title": "🌡️ Secado de filamento iniciado",
+      "body": "{material} está en secado a {temp}°C durante {duration}h"
+    },
+    "drying_completed": {
+      "title": "✅ Secado de filamento completado",
+      "body": "{material} ha terminado de secarse"
+    },
+    "drying_cancelled": {
+      "title": "🚫 Secado de filamento cancelado",
+      "body": "El secado de {material} ha sido detenido"
+    },
+    "drying_reminder": {
+      "title": "🔄 ¡Girar el carrete de filamento!",
+      "body": "{material}: Por favor, gire el carrete - Quedan {hours}h restantes"
+    },
+    "scheduled_print_failed_filament": {
+      "title": "❌ Impresión programada cancelada",
+      "body": "'{filename}' no se pudo iniciar - filamento insuficiente"
+    },
+    "test": {
+      "test_started": {
+        "title": "🧪 ¡Prueba de impresión iniciada!",
+        "body": "La prueba de '{filename}' ha comenzado."
+      },
+      "test_completed": {
+        "title": "🧪 ¡Prueba completada!",
+        "body": "La prueba de '{filename}' se imprimió con éxito."
+      },
+      "test_cancelled": {
+        "title": "🧪 Prueba cancelada",
+        "body": "La prueba se canceló al {progress}%."
+      },
+      "milestone_25": {
+        "title": "🧪 Prueba 25% alcanzado",
+        "body": "'{filename}' está al 25% completado"
+      },
+      "milestone_50": {
+        "title": "🧪 Prueba 50% alcanzado",
+        "body": "'{filename}' está a la mitad"
+      },
+      "milestone_75": {
+        "title": "🧪 Prueba 75% alcanzado",
+        "body": "'{filename}' está casi terminado!"
+      },
+      "progress": {
+        "title": "Progreso de Prueba",
+        "body": "Prueba {progress}%"
+      }
+    }
+  },
+  "status": {
+    "ready": "Listo",
+    "printing": "Imprimiendo:",
+    "preparing": "Preparando...",
+    "starting_print": "Iniciando impresión...",
+    "print_completed": "Impresión completada",
+    "print_failed": "Impresión fallida",
+    "paused": "En pausa",
+    "no_print_active": "Sin impresión activa",
+    "no_filament": "Sin filamento",
+    "filament_loading": "Cargando filamento...",
+    "filament_unloading": "Descargando filamento...",
+    "filament_positioning": "Posicionando filamento...",
+    "ams_ready": "AMS listo"
+  },
+  "general": {
+    "print_job": "Trabajo de impresión"
+  },
+  "pause_reasons": {
+    "filament_end": "Pausa (fin de filamento)",
+    "heating": "Pausa durante el calentamiento",
+    "ams_error": "Pausa (error AMS)",
+    "filament_break": "Pausa (rotura de filamento)",
+    "user_pause": "Pausa manual",
+    "generic": "En pausa"
+  },
+  "power_off": {
+    "reason_print_finished": "Impresión completada",
+    "reason_idle": "Inactividad ({minutes} min)",
+    "banner_title": "⏰ Auto-Apagado Activo",
+    "banner_countdown": "Apagando en {time}",
+    "banner_cancel": "Cancelar"
+  },
+  "hms": {
+    "0700-0300-0002-0002": "Error de primera capa detectado - Posibles problemas de adhesión",
+    "0700-0300-0002-0007": "Posibles defectos de primera capa",
+    "0C00-0300-0003-0008": "Posibles defectos de 'spaghetti' detectados",
+    "0300-8013": "Cambio de filamento requerido para impresión multicolor - por favor, cambie manualmente",
+    "0300-8004": "Filamento agotado - por favor, cargue un nuevo filamento",
+    "fallback": "Error HMS {code}"
+  },
+  "hms_notification_titles": {
+    "printer_info": "ℹ️ Info Impresora",
+    "printer_error": "⚠️ Error Impresora",
+    "info_prefix": "ℹ️ Info",
+    "hms_error_prefix": "Error HMS",
+    "new_hms_errors": "nuevos errores HMS",
+    "new_infos": "nuevas infos",
+    "new_printer_infos": "nuevas infos impresora"
+  },
+  "events": {
+    "pause": "⏸️ Impresión en pausa",
+    "resume": "▶️ Impresión reanudada",
+    "printing_started": "🖨️ Impresión iniciada",
+    "filament_change": "📥 Cambio de filamento: {filament_info}",
+    "stage_change": "{icon} {stage_desc}",
+    "start": "Impresión iniciada: {filename}",
+    "heating": "🔥 Calentamiento en progreso",
+    "preparation": "⚙️ Preparación en progreso",
+    "bed_leveling": "📐 Nivelación de cama en progreso",
+    "manual_stop": "⏹️ Impresión detenida manualmente",
+    "finish_success": "Impresión exitosa",
+    "finish_failed": "Impresión fallida",
+    "auto_power_off_scheduled": "⏰ Apagado automático en {minutes} minutos...",
+    "idle_power_off_scheduled": "⏰ Apagado automático en {minutes} minutos (inactividad)",
+    "auto_power_off_executed": "🔌 Impresora apagada automáticamente",
+    "power_off_cancelled": "⏹️ Apagado automático cancelado",
+    "upload_start": "📤 Carga de archivo iniciada",
+    "upload_complete": "✅ Carga de archivo completada",
+    "upload_failed": "❌ Carga de archivo fallida",
+    "print_error": "❌ Error: {reason}"
+  },
+  "stages": {
+    "0": "Imprimiendo",
+    "1": "Auto nivelación de cama",
+    "2": "Calentando cama",
+    "3": "Compensación de vibraciones",
+    "4": "Cambiando homing",
+    "5": "Auto alineación Z",
+    "6": "Calentando",
+    "7": "Calibración de extrusión",
+    "8": "Nivelación de cama",
+    "9": "Homing del cabezal",
+    "10": "Formación de punta de boquilla",
+    "11": "Cambiando extrusor",
+    "12": "Pausa M400",
+    "13": "Homing del cabezal",
+    "14": "Limpieza de boquilla",
+    "15": "Imprimiendo",
+    "16": "Pausado por usuario",
+    "17": "Pausado por rotura de filamento",
+    "18": "Pausado por error AMS",
+    "19": "Pausado por obstrucción hotend",
+    "20": "Pausado por fin de filamento",
+    "21": "Pausado por sobrecalentamiento",
+    "22": "Pausado por corte de energía",
+    "23": "Pausado por salto",
+    "24": "Cambio de filamento",
+    "25": "Cargando filamento",
+    "26": "Descargando filamento cortado",
+    "27": "Alimentación manual de filamento",
+    "28": "Pausado por error desconocido",
+    "29": "Calibración de flujo",
+    "30": "Calentando cámara",
+    "31": "Escaneo del extrusor",
+    "32": "Compensación de vibraciones",
+    "33": "Homing antes de pausa",
+    "34": "Escaneo de superficie",
+    "35": "Escaneo Micro Lidar de cama",
+    "completed": "Completado",
+    "unknown": "Etapa desconocida {stage}"
+  },
+  "filament": {
+    "check": {
+      "no_spool_assigned": "Filamento [{filament_index}]: ¡No hay bobina asignada! Requiere {required_weight}g",
+      "spool_not_found": "Filamento [{filament_index}]: ¡Bobina #{spool_id} no encontrada!",
+      "no_filament_left": "Filamento [{filament_index}] ({spool_name}): ¡Vacío! Requiere {required_weight}g",
+      "insufficient_filament": "Filamento [{filament_index}] ({spool_name}): {available_weight}g disponible, {required_weight}g requerido (faltan {shortage}g)",
+      "critical_error_scheduling": "No se puede programar la impresión - errores críticos de filamento presentes"
+    }
+  },
+  "maintenance": {
+    "overdue": {
+      "title": "⚠️ Mantenimiento vencido",
+      "body": "{task_name}",
+      "body_days": "{task_name} - vencido hace {days} día(s)"
+    },
+    "due_today": {
+      "title": "🔧 Mantenimiento hoy",
+      "body": "{task_name}"
+    },
+    "due_tomorrow": {
+      "title": "🔔 Mantenimiento mañana",
+      "body": "{task_name}"
+    },
+    "due_soon": {
+      "title": "🔔 Mantenimiento próximo",
+      "body": "{task_name} - en {days} día(s)"
+    },
+    "planned": {
+      "title": "📅 Mantenimiento planificado",
+      "body": "{task_name} - en {days} día(s)"
+    }
+  }
+}
