@@ -208,16 +208,16 @@ show_system_info() {
     fi
     echo
     echo -e "${BLUE}=== SSL Certificate ===${NC}"
-    if [ -f "$APP_DIR/cert.pem" ]; then
-        echo "Certificate: $APP_DIR/cert.pem ✅"
-        echo "Private Key: $APP_DIR/key.pem ✅"
-        if [ -f "$APP_DIR/cert.cer" ]; then
-            echo "Windows Cert: $APP_DIR/cert.cer ✅"
+    if [ -f "$APP_DIR/data/cert.pem" ]; then
+        echo "Certificate: $APP_DIR/data/cert.pem ✅"
+        echo "Private Key: $APP_DIR/data/key.pem ✅"
+        if [ -f "$APP_DIR/data/cert.cer" ]; then
+            echo "Windows Cert: $APP_DIR/data/cert.cer ✅"
         else
-            echo "Windows Cert: $APP_DIR/cert.cer ❌"
+            echo "Windows Cert: $APP_DIR/data/cert.cer ❌"
         fi
     else
-        print_error "SSL-Zertifikat nicht gefunden!"
+        print_error "SSL-Zertifikat nicht gefunden in $APP_DIR/data/"
     fi
     echo
     echo -e "${BLUE}=== Port Status ===${NC}"
@@ -231,9 +231,10 @@ setup_pwa() {
     echo
 
     # Zertifikat Check und erstellen falls nötig
-    if [ ! -f "$APP_DIR/cert.pem" ]; then
+    if [ ! -f "$APP_DIR/data/cert.pem" ]; then
         print_warning "Kein SSL-Zertifikat gefunden - erstelle neues..."
-        cd $APP_DIR
+        mkdir -p "$APP_DIR/data"
+        cd "$APP_DIR/data"
 
         # PWA-Zertifikat erstellen
         cat > create_cert_pwa.py << 'EOL'
@@ -363,10 +364,10 @@ check_health() {
     fi
 
     # SSL Check
-    if [ -f "$APP_DIR/cert.pem" ] && [ -f "$APP_DIR/key.pem" ]; then
+    if [ -f "$APP_DIR/data/cert.pem" ] && [ -f "$APP_DIR/data/key.pem" ]; then
         print_success "✅ SSL-Zertifikat vorhanden"
     else
-        print_error "❌ SSL-Zertifikat fehlt"
+        print_error "❌ SSL-Zertifikat fehlt (in $APP_DIR/data/)"
     fi
 
     # Config Check
