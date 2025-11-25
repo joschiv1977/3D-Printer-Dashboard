@@ -16,6 +16,8 @@
 </a>
 
 Ab 5 Euro/Dollar gibt es von Buy Me A Coffee eine Jahreslizenz die dann 365 Tage gültig ist, und ab 29 Euro gibt es eine Lifetime Lizenz ;-)
+
+<a href="https://testflight.apple.com/join/99nPkbVn" target="_blank">MacOS Testflight</a>
 </div>
 
 ---
