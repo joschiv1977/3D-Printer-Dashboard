@@ -1050,6 +1050,8 @@
             position: relative;
             overflow: hidden;
             padding: 12px !important;
+            height: 100%;
+            box-sizing: border-box;
             /* max-width entfernt - Card nutzt volle Grid-Breite */
         }
 
@@ -1117,6 +1119,9 @@
             position: relative;
             z-index: 1;
             color: white;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .print-header {
@@ -1127,7 +1132,7 @@
         }
 
         .print-file {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 600;
             margin-bottom: 3px;
             overflow: hidden;
@@ -1137,7 +1142,7 @@
         }
 
         .print-status {
-            font-size: 12px;
+            font-size: 11px;
             color: #4caf50;
             display: flex;
             align-items: center;
@@ -1145,7 +1150,7 @@
         }
 
         .print-percentage {
-            font-size: 34px;
+            font-size: 32px;
             font-weight: 700;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
             margin: 8px 0;
@@ -1156,22 +1161,16 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 6px 12px;
             margin-top: 12px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .detail-icon {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
-        .detail-text {
-            display: flex;
-            flex-direction: column;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+            padding: 4px 0;
         }
 
         .detail-label {
@@ -1190,7 +1189,9 @@
             background: rgba(255,255,255,0.2);
             border-radius: 3px;
             overflow: hidden;
-            margin-top: 12px;
+            margin-top: auto;
+            min-height: 5px;
+            flex-shrink: 0;
         }
 
         .progress-bar {
@@ -1259,7 +1260,7 @@
         /* Desktop extra kompakt */
         @media (min-width: 1024px) {
             .print-percentage {
-                font-size: 28px;
+                font-size: 26px;
             }
 
             #titelbild {
@@ -1394,12 +1395,16 @@
             }
 
             .print-percentage {
-                font-size: 60px;
+                font-size: 56px;
             }
 
             .print-details {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
+            }
+
+            .detail-item {
+                font-size: 11px;
             }
 
             .progress-card div[style*="display: flex"] {
@@ -3095,7 +3100,7 @@
           </div>
 
           <!-- Print Progress Card -->
-          <div class="grid-stack-item" gs-w="5" gs-h="3" gs-x="0" gs-y="5" gs-min-w="3" gs-min-h="2" gs-max-w="12" gs-max-h="6" id="progress-card-grid">
+          <div class="grid-stack-item" gs-w="5" gs-h="3" gs-x="0" gs-y="5" gs-min-w="3" gs-min-h="2" gs-max-w="12" gs-max-h="7" id="progress-card-grid">
               <div class="grid-stack-item-content">
                   <div class="card progress-card" id="progress-card">
                       <div class="print-info">
@@ -3115,48 +3120,12 @@
                               </div>
                           </div>
                           <div class="print-details">
-                              <div class="detail-item">
-                                  <span class="detail-icon">📏</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="layer-label"></span>
-                                      <span class="detail-value" id="layer-info">0/0</span>
-                                  </div>
-                              </div>
-                              <div class="detail-item">
-                                  <span class="detail-icon">⏱️</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="remaining-time-label"></span>
-                                      <span class="detail-value" id="remaining-time">--:--</span>
-                                  </div>
-                              </div>
-                              <div class="detail-item">
-                                  <span class="detail-icon">📏</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="z-height-label"></span>
-                                      <span class="detail-value" id="z-height">0mm</span>
-                                  </div>
-                              </div>
-                              <div class="detail-item">
-                                  <span class="detail-icon">⚡</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="speed-label"></span>
-                                      <span class="detail-value" id="print-speed">100%</span>
-                                  </div>
-                              </div>
-                              <div class="detail-item">
-                                  <span class="detail-icon">🎨</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="filament-label"></span>
-                                      <span class="detail-value" id="filament-info">--</span>
-                                  </div>
-                              </div>
-                              <div class="detail-item">
-                                  <span class="detail-icon">📶</span>
-                                  <div class="detail-text">
-                                      <span class="detail-label" id="wifi-label"></span>
-                                      <span class="detail-value" id="wifi-status">--</span>
-                                  </div>
-                              </div>
+                              <div class="detail-item" id="layer-info">📊 Layer: --/--</div>
+                              <div class="detail-item" id="time-info">⏱ Restzeit: --:--</div>
+                              <div class="detail-item" id="temp-info">🌡 Düse: --°C | Bett: --°C</div>
+                              <div class="detail-item" id="speed-info">⚡ Geschw.: Standard</div>
+                              <div class="detail-item" id="filament-info">🧵 Filament: --</div>
+                              <div class="detail-item" id="wifi-info">📶 WiFi: --</div>
                           </div>
                           <div class="progress-bar-container">
                               <div class="progress-bar" id="progress-bar"></div>
@@ -3550,7 +3519,7 @@
             // Default layout if no saved layout exists
             const defaultLayout = [
                 { "id": "camera-card-grid", "x": 0, "y": 0, "w": 5, "h": 8 },
-                { "id": "progress-card-grid", "x": 0, "y": 9, "w": 5, "h": 6 },
+                { "id": "progress-card-grid", "x": 0, "y": 9, "w": 5, "h": 7 },
                 { "id": "control-card-desktop", "x": 5, "y": 0, "w": 3, "h": 6 },
                 { "id": "dev-control-card-desktop", "x": 8, "y": 0, "w": 4, "h": 6 },
                 { "id": "spoolman-card-grid", "x": 5, "y": 7, "w": 4, "h": 6 },
@@ -4063,24 +4032,6 @@
             // Print Progress Card
             const printStatusText = document.getElementById('print-status-text');
             if (printStatusText) printStatusText.textContent = texts.no_print_active;
-
-            const layerLabel = document.getElementById('layer-label');
-            if (layerLabel) layerLabel.textContent = texts.layer;
-
-            const remainingTimeLabel = document.getElementById('remaining-time-label');
-            if (remainingTimeLabel) remainingTimeLabel.textContent = texts.remaining_time;
-
-            const zHeightLabel = document.getElementById('z-height-label');
-            if (zHeightLabel) zHeightLabel.textContent = texts.z_height;
-
-            const speedLabel = document.getElementById('speed-label');
-            if (speedLabel) speedLabel.textContent = texts.speed_short;
-
-            const filamentLabel = document.getElementById('filament-label');
-            if (filamentLabel) filamentLabel.textContent = texts.filament;
-
-            const wifiLabel = document.getElementById('wifi-label');
-            if (wifiLabel) wifiLabel.textContent = texts.wifi;
 
             // SD-Card Modal
             const sdCardTitle = document.getElementById('sd-card-title');
@@ -5035,6 +4986,11 @@
                 document.getElementById('control-camera-source').textContent = sourceText;
                 document.getElementById('camera-source-text').textContent =
                     data.source === 'µStreamer' ? 'P1S Kamera' : 'µStreamer';
+
+                // Zeige Info wenn P1S Kamera automatisch neugestartet wurde
+                if (data.auto_restarted) {
+                    showThemeToast(`🔄 P1S Kamera neugestartet: ${data.restart_reason}`);
+                }
             }
         } catch (error) {
             console.error(texts.console_camera_toggle_error + ':', error);
@@ -6266,8 +6222,11 @@
                                     }
                                 }
 
+                                // isPaused prüfen für Filament-Wechsel etc.
+                                const isPaused = data.gcode_state === 'PAUSE' || data.paused === true;
+
                                 if (isPrinting) {
-                                    // Nur SD-Karte, Homing und Steuerung VERSTECKEN
+                                    // Nur SD-Karte und Homing VERSTECKEN (nicht Steuerung bei Pause!)
                                     console.log(texts.console_print_running_hide_buttons);
                                     // SD-Karte Buttons verstecken
                                     document.querySelectorAll('button[onclick*="showSDFiles"]').forEach(btn => {
@@ -6278,9 +6237,23 @@
                                         const btn = document.getElementById(id);
                                         if (btn) btn.style.display = 'none';
                                     });
-                                    // Steuerung Buttons verstecken
+                                    // Steuerung Buttons verstecken (nur wenn NICHT pausiert - für Filament-Wechsel)
                                     document.querySelectorAll('button[onclick*="openPrinterControl"]').forEach(btn => {
                                         btn.style.display = 'none';
+                                    });
+                                } else if (isPaused) {
+                                    // PAUSE: SD-Karte und Homing verstecken, aber Steuerung ANZEIGEN (für Filament-Wechsel)
+                                    console.log('Druck pausiert - Steuerung bleibt sichtbar für Filament-Wechsel');
+                                    document.querySelectorAll('button[onclick*="showSDFiles"]').forEach(btn => {
+                                        btn.style.display = 'none';
+                                    });
+                                    ['homing-btn-mobile', 'homing-btn-desktop'].forEach(id => {
+                                        const btn = document.getElementById(id);
+                                        if (btn) btn.style.display = 'none';
+                                    });
+                                    // Steuerung Buttons ANZEIGEN bei Pause
+                                    document.querySelectorAll('button[onclick*="openPrinterControl"]').forEach(btn => {
+                                        btn.style.display = '';
                                     });
                                 } else {
                                     // Alle Buttons wieder anzeigen
@@ -8710,6 +8683,11 @@
 
                 document.getElementById('camera-source-text').textContent =
                     data.source === 'µStreamer' ? '📷 µStreamer' : '📹 P1S Kamera';
+
+                // Zeige Info wenn P1S Kamera automatisch neugestartet wurde
+                if (data.auto_restarted) {
+                    showThemeToast(`🔄 P1S Kamera neugestartet: ${data.restart_reason}`);
+                }
             }
         } catch (error) {
             alert(texts.alert_camera_toggle_error);
@@ -9940,41 +9918,69 @@
         if (progressBar) progressBar.style.width = data.progress + '%';
         const progressPercentage = document.getElementById('progress-percentage');
         if (progressPercentage) progressPercentage.textContent = Math.round(data.progress) + '%';
+        // iOS-Style: Einzeilige Info-Labels
         const layerInfo = document.getElementById('layer-info');
-        if (layerInfo) layerInfo.textContent = data.layer_num + '/' + data.total_layers;
-        const filamentInfo = document.getElementById('filament-info');
-        if (filamentInfo && data.filament_display) {
-            let filamentHtml = '';
+        if (layerInfo) {
+            layerInfo.textContent = `📊 ${texts.layer || 'Layer'}: ${data.layer_num || '--'}/${data.total_layers || '--'}`;
+        }
 
-            // Multi-Filament Badge
-            if (data.is_multifilament_print && data.filament_count > 1) {
-                filamentHtml = `
-                    <span style="display:inline-flex; align-items:center; gap:5px;
-                                 background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                 padding:4px 10px; border-radius:12px; color:white;
-                                 font-weight:500; box-shadow:0 2px 4px rgba(102,126,234,0.3);">
-                        🎨 ${texts.multifilament_count.replace('{count}', data.filament_count)}
-                    </span>
-                `;
+        const timeInfo = document.getElementById('time-info');
+        if (timeInfo) {
+            if (data.remaining_time > 0) {
+                const hours = Math.floor(data.remaining_time / 60);
+                const minutes = data.remaining_time % 60;
+                const etaText = data.eta_time ? ` (${data.eta_time})` : '';
+                timeInfo.textContent = `⏱ ${texts.remaining_time || 'Restzeit'}: ${hours}h ${String(minutes).padStart(2, '0')}m${etaText}`;
+            } else {
+                timeInfo.textContent = `⏱ ${texts.remaining_time || 'Restzeit'}: --:--`;
             }
-            // Single-Filament mit Farbe
-            else {
+        }
+
+        const tempInfo = document.getElementById('temp-info');
+        if (tempInfo) {
+            // Temperaturen: nozzle_temp und bed_temp (nicht nozzle_temper/bed_temper)
+            const nozzle = data.nozzle_temp !== undefined ? data.nozzle_temp.toFixed(1) : '--';
+            const bed = data.bed_temp !== undefined ? data.bed_temp.toFixed(1) : '--';
+            tempInfo.textContent = `🌡 ${texts.nozzle || 'Düse'}: ${nozzle}°C | ${texts.bed || 'Bett'}: ${bed}°C`;
+        }
+
+        const speedInfo = document.getElementById('speed-info');
+        if (speedInfo) {
+            const speedName = data.speed_level_text || 'Standard';
+            const speedPercent = data.speed_percent || 100;
+            speedInfo.textContent = `⚡ ${texts.speed || 'Geschw.'}: ${speedName} (${speedPercent}%)`;
+        }
+
+        const filamentInfo = document.getElementById('filament-info');
+        if (filamentInfo) {
+            let filamentHtml = '🧵 ' + (texts.filament || 'Filament') + ': ';
+
+            if (data.is_multifilament_print && data.filament_count > 1) {
+                filamentHtml += `<span style="display:inline-flex; align-items:center; gap:5px;
+                                 background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                 padding:2px 8px; border-radius:10px; color:white;
+                                 font-weight:500; font-size:12px;">
+                        ${texts.multifilament_count ? texts.multifilament_count.replace('{count}', data.filament_count) : data.filament_count + ' Farben'}
+                    </span>`;
+            } else if (data.filament_display) {
                 if (data.filament_color) {
-                    filamentHtml = `<span style="display:inline-block;width:12px;height:12px;background:${data.filament_color};border-radius:50%;margin-right:5px;border:1px solid rgba(255,255,255,0.3);"></span>`;
+                    filamentHtml += `<span style="display:inline-block;width:10px;height:10px;background:${data.filament_color};border-radius:50%;margin-right:5px;border:1px solid rgba(255,255,255,0.3);"></span>`;
                 }
                 filamentHtml += data.filament_display;
+            } else {
+                filamentHtml += '--';
             }
 
             filamentInfo.innerHTML = filamentHtml;
         }
-        const wifiElement = document.getElementById('wifi-status');
-        if (wifiElement && data.wifi_signal) {
-            let wifiText = data.wifi_signal.replace(/ 🟢.*/, '').replace(/ 🟡.*/, '').replace(/ 🔴.*/, '');
-            wifiElement.textContent = wifiText;
-            if (data.wifi_strength) {
-                if (data.wifi_strength > -50) wifiElement.style.color = '#4CAF50';
-                else if (data.wifi_strength > -70) wifiElement.style.color = '#FFC107';
-                else wifiElement.style.color = '#f44336';
+
+        const wifiInfo = document.getElementById('wifi-info');
+        if (wifiInfo) {
+            if (data.wifi_signal) {
+                let wifiText = data.wifi_signal.replace(/ 🟢.*/, '').replace(/ 🟡.*/, '').replace(/ 🔴.*/, '');
+                wifiInfo.textContent = `📶 WiFi: ${wifiText}`;
+            } else {
+                wifiInfo.textContent = `📶 WiFi: --`;
             }
         }
         const fileInfo = document.getElementById('file-info');
@@ -10008,16 +10014,6 @@
                 }
             }
             if (data.gcode_state === 'IDLE') window.currentPrintFilename = '';
-        }
-        const remainingTime = document.getElementById('remaining-time');
-        if (remainingTime) {
-            if (data.remaining_time > 0) {
-                const hours = Math.floor(data.remaining_time / 60);
-                const minutes = data.remaining_time % 60;
-                remainingTime.textContent = `${hours}h ${minutes}m${data.eta_time ? ` (${data.eta_time} Uhr)` : ''}`;
-            } else {
-                remainingTime.textContent = '--:--';
-            }
         }
         const titelbildImg = document.getElementById('titelbild');
         const titelbildContainer = document.getElementById('titelbild-container');
