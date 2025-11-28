@@ -258,6 +258,21 @@
             gap: 5px;
         }
 
+        /* Fortschrittsbalken für Stunden/Rollen */
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-tertiary, #e5e7eb);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
         .task-actions {
             display: flex;
             gap: 8px;
@@ -883,8 +898,12 @@
                     <select id="init-model">
                         <option value="P1P">Bambu Lab P1P</option>
                         <option value="P1S" selected>Bambu Lab P1S</option>
+                        <option value="P2S">Bambu Lab P2S</option>
                         <option value="X1C">Bambu Lab X1C</option>
+                        <option value="X1E">Bambu Lab X1E</option>
+                        <option value="H2S">Bambu Lab H2S</option>
                         <option value="A1">Bambu Lab A1</option>
+                        <option value="A1_MINI">Bambu Lab A1 Mini</option>
                     </select>
                 </div>
 
@@ -976,9 +995,12 @@
                         <select id="printer-model" required>
                             <option value="P1P">Bambu Lab P1P</option>
                             <option value="P1S" selected>Bambu Lab P1S</option>
+                            <option value="P2S">Bambu Lab P2S</option>
                             <option value="X1C">Bambu Lab X1C</option>
+                            <option value="X1E">Bambu Lab X1E</option>
+                            <option value="H2S">Bambu Lab H2S</option>
                             <option value="A1">Bambu Lab A1</option>
-                            <option value="A1 Mini">Bambu Lab A1 Mini</option>
+                            <option value="A1_MINI">Bambu Lab A1 Mini</option>
                         </select>
                     </div>
 
@@ -1208,11 +1230,57 @@
             const priorityClass = `priority-${task.priority}`;
             const statusClass = task.status;
 
+            // Fortschrittsanzeige für hours und filament_rolls
             let dueText = '';
-            if (task.days_until_due < 0) {
-                dueText = getText('maintenance_overdue_since', 'Überfällig seit {days} Tag(en)').replace('{days}', Math.abs(task.days_until_due));
+            let progressHtml = '';
+
+            if (task.progress_unit === 'hours' && task.progress_current !== undefined) {
+                // Stunden-basierte Anzeige
+                const current = task.progress_current;
+                const target = task.progress_target;
+                const remaining = task.progress_remaining;
+                const percent = task.progress_percent || 0;
+
+                if (task.status === 'overdue') {
+                    dueText = getText('maintenance_overdue_hours', 'Überfällig! {current}/{target}h').replace('{current}', current).replace('{target}', target);
+                } else {
+                    dueText = getText('maintenance_hours_progress', '{current}/{target}h (noch {remaining}h)').replace('{current}', current).replace('{target}', target).replace('{remaining}', remaining);
+                }
+
+                // Fortschrittsbalken
+                const progressColor = percent >= 100 ? '#ef4444' : percent >= 90 ? '#f59e0b' : '#10b981';
+                progressHtml = `
+                    <div class="progress-bar-container" style="margin-top: 8px;">
+                        <div class="progress-bar" style="width: ${Math.min(100, percent)}%; background: ${progressColor};"></div>
+                    </div>
+                `;
+            } else if (task.progress_unit === 'rolls' && task.progress_current !== undefined) {
+                // Rollen-basierte Anzeige
+                const current = task.progress_current;
+                const target = task.progress_target;
+                const remaining = task.progress_remaining;
+                const percent = task.progress_percent || 0;
+
+                if (task.status === 'overdue') {
+                    dueText = getText('maintenance_overdue_rolls', 'Überfällig! {current}/{target} Rollen').replace('{current}', current.toFixed(1)).replace('{target}', target);
+                } else {
+                    dueText = getText('maintenance_rolls_progress', '{current}/{target} Rollen (noch {remaining})').replace('{current}', current.toFixed(1)).replace('{target}', target).replace('{remaining}', remaining.toFixed(1));
+                }
+
+                // Fortschrittsbalken
+                const progressColor = percent >= 100 ? '#ef4444' : percent >= 90 ? '#f59e0b' : '#10b981';
+                progressHtml = `
+                    <div class="progress-bar-container" style="margin-top: 8px;">
+                        <div class="progress-bar" style="width: ${Math.min(100, percent)}%; background: ${progressColor};"></div>
+                    </div>
+                `;
             } else {
-                dueText = getText('maintenance_due_in', 'Fällig in {days} Tag(en)').replace('{days}', task.days_until_due);
+                // Tage-basierte Anzeige (wie bisher)
+                if (task.days_until_due < 0) {
+                    dueText = getText('maintenance_overdue_since', 'Überfällig seit {days} Tag(en)').replace('{days}', Math.abs(task.days_until_due));
+                } else {
+                    dueText = getText('maintenance_due_in', 'Fällig in {days} Tag(en)').replace('{days}', task.days_until_due);
+                }
             }
 
             const locale = currentLang === 'de' ? 'de-DE' : currentLang === 'en' ? 'en-US' : currentLang === 'fr' ? 'fr-FR' : currentLang === 'es' ? 'es-ES' : currentLang === 'it' ? 'it-IT' : 'de-DE';
@@ -1233,6 +1301,7 @@
                             <span class="task-meta-item">🔄 ${intervalText}</span>
                             <span class="task-meta-item">✅ ${task.completed_count}x ${getText('maintenance_completed_times', 'durchgeführt')}</span>
                         </div>
+                        ${progressHtml}
                     </div>
                     <div class="task-actions">
                         <button class="btn btn-success btn-small" onclick="showCompleteModal('${task.task_id}')">
@@ -1743,7 +1812,13 @@
 
                 if (response.ok) {
                     const result = await response.json();
-                    const message = getText('maintenance_init_success', 'Wartungsplan erfolgreich geladen: {count} Aufgaben').replace('{count}', result.tasks_created || 0);
+                    let message = getText('maintenance_init_success', 'Wartungsplan erfolgreich geladen: {count} Aufgaben').replace('{count}', result.tasks_created || result.created || 0);
+
+                    // Info über initialisierte Baselines
+                    if (result.baselines_initialized > 0) {
+                        message += `\n📊 ${result.baselines_initialized} Stunden/Rollen-Tasks initialisiert`;
+                    }
+
                     showSuccess(message);
                     closeInitModal();
                     await loadTasks();

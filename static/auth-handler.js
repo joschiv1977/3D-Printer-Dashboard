@@ -253,11 +253,12 @@ class AuthHandler {
             credentials: 'include'  // WICHTIG: Sendet Cookies automatisch mit
         });
 
-        // Bei 401 einmal Token refreshen und wiederholen
-        if (response.status === 401 && !options._retry) {
+        // Bei 401 oder 403 (CSRF invalid) einmal Token refreshen und wiederholen
+        // 403 mit CSRF-Fehler = Token in Redis abgelaufen, Refresh liefert neuen CSRF-Token
+        if ((response.status === 401 || response.status === 403) && !options._retry) {
             const refreshed = await this.refreshToken();
             if (refreshed) {
-                // Neuer Versuch mit refreshtem Cookie
+                // Neuer Versuch mit refreshtem Cookie und neuem CSRF Token
                 const newCsrf = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
 
                 // Device Token wieder hinzufügen falls vorhanden

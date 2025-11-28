@@ -6531,8 +6531,28 @@
 
         // Lade Dateien (Cache oder Force Refresh)
         apiCall(`/api/mqtt/sdcard${forceRefresh ? '?force_refresh=true' : ''}`)
-            .then(response => response.json())
+            .then(response => {
+                // Prüfe auf FTPS-Konflikt (409)
+                if (response.status === 409) {
+                    return response.json().then(data => {
+                        // FTPS ist beschäftigt - zeige Meldung
+                        if (progressInterval) clearInterval(progressInterval);
+                        document.getElementById('sd-loading').style.display = 'none';
+
+                        showThemeToast(`⚠️ ${data.message || 'FTPS beschäftigt - bitte warten'}`, 'warning');
+
+                        // Zeige trotzdem Cache-Dateien wenn vorhanden
+                        if (data.files && data.files.length > 0) {
+                            displaySDFiles(data.files);
+                        }
+                        return null;  // Verhindere weitere Verarbeitung
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                if (!data) return;  // War ein 409 Konflikt
+
                 // Bei Force Refresh: Progress auf 100% und Status updaten
                 if (forceRefresh && progressInterval) {
                     clearInterval(progressInterval);
@@ -8977,38 +8997,86 @@
         }
     });
 
-    // HMS Error Dismiss mit localStorage
+    // HMS Error Dismiss - Zentral über API (synchronisiert über alle Clients)
+    // Dismissed Errors werden im Backend gespeichert und via WebSocket synchronisiert
+    let serverDismissedHMSErrors = [];  // Vom Server synchronisiert
+
     function dismissHMSError() {
         const banner = document.getElementById('hms-error-banner');
         const errorCode = banner.dataset.errorCode;
 
         if (errorCode) {
-            // Dismissed Errors in localStorage speichern
-            let dismissed = JSON.parse(localStorage.getItem('dismissed_hms_errors') || '[]');
-            if (!dismissed.includes(errorCode)) {
-                dismissed.push(errorCode);
-                localStorage.setItem('dismissed_hms_errors', JSON.stringify(dismissed));
-                console.log('✅ HMS Error dismissed:', errorCode);
-            }
+            // CSRF Token für Web-Session
+            const csrfToken = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
+
+            // API Call zum zentralen Dismissal
+            fetch('/api/hms/dismiss/' + encodeURIComponent(errorCode), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': csrfToken || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('✅ HMS Error dismissed (zentral):', errorCode);
+                    // Server sendet WebSocket Update an alle Clients
+                } else {
+                    console.error('❌ Failed to dismiss HMS error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error dismissing HMS:', error);
+            });
         }
 
-        // Banner ausblenden
+        // Banner sofort ausblenden (optimistisch)
         banner.classList.remove('active');
     }
 
-    // Prüfe ob HMS Error dismissed wurde
+    // Prüfe ob HMS Error dismissed wurde (nutzt Server-Liste)
     function isHMSErrorDismissed(errorCode) {
-        const dismissed = JSON.parse(localStorage.getItem('dismissed_hms_errors') || '[]');
-        return dismissed.includes(errorCode);
+        return serverDismissedHMSErrors.includes(errorCode);
     }
 
-    // Clear dismissed HMS Errors (wenn alle Fehler behoben)
+    // Clear dismissed HMS Errors - wird automatisch vom Server gemacht wenn keine Fehler mehr
     function clearDismissedHMSErrors() {
-        const dismissed = localStorage.getItem('dismissed_hms_errors');
-        if (dismissed) {
-            localStorage.removeItem('dismissed_hms_errors');
-            console.log('🧹 Dismissed HMS Errors cleared');
-        }
+        // Nichts zu tun - Server handhabt das
+        console.log('🧹 Dismissed HMS Errors handled by server');
+    }
+
+    // HMS Status vom Server laden (beim Start)
+    function loadHMSStatus() {
+        fetch('/api/hms/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    serverDismissedHMSErrors = data.dismissed_errors || [];
+                    console.log('📥 HMS Status loaded, dismissed:', serverDismissedHMSErrors);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error loading HMS status:', error);
+            });
+    }
+
+    // WebSocket Listener für HMS Updates (Synchronisation)
+    if (typeof socket !== 'undefined') {
+        socket.on('hms_update', function(data) {
+            console.log('📡 HMS Update received:', data);
+            serverDismissedHMSErrors = data.dismissed_errors || [];
+
+            // Banner-Anzeige aktualisieren
+            const activeErrors = data.active_errors || [];
+            if (activeErrors.length === 0) {
+                // Alle Fehler dismissed oder behoben - Banner ausblenden
+                const banner = document.getElementById('hms-error-banner');
+                if (banner) {
+                    banner.classList.remove('active');
+                }
+            }
+        });
     }
 
 
@@ -9322,6 +9390,9 @@
         socket.on('connect', function() {
             console.log(texts.console_websocket_connected);
 
+            // HMS Status vom Server laden (Synchronisation)
+            loadHMSStatus();
+
             // Badge für geplante Drucke laden
             updateScheduledPrintsBadge();
 
@@ -9606,6 +9677,46 @@
                     progressBar.style.background = 'var(--accent-red)';
                 }
             }
+        });
+
+        // FTPS Status Updates (Upload/Download/Sync)
+        socket.on('ftps_status', function(data) {
+            // Globalen Status speichern
+            window.ftpsStatus = data;
+
+            // Aktualisieren-Button Status
+            const refreshBtn = document.getElementById('sd-refresh-btn');
+            if (refreshBtn) {
+                if (data.active) {
+                    refreshBtn.disabled = true;
+                    refreshBtn.style.opacity = '0.5';
+                    refreshBtn.innerHTML = `<span>⏳</span><span>${data.message || 'FTPS läuft...'}</span>`;
+                } else {
+                    refreshBtn.disabled = false;
+                    refreshBtn.style.opacity = '1';
+                    refreshBtn.innerHTML = '<span>🔄</span><span>' + (texts.refresh || 'Aktualisieren') + '</span>';
+                }
+            }
+
+            // Optional: Toast bei Start/Ende von FTPS-Operationen
+            if (data.operation !== 'idle' && data.progress === 0) {
+                // Operation gestartet
+                console.log(`📡 FTPS ${data.operation}: ${data.message}`);
+            }
+        });
+
+        // Bidirektionaler Sync abgeschlossen
+        socket.on('bidirectional_sync_complete', function(data) {
+            showThemeToast(`✅ Sync: ${data.downloaded} ⬇️ / ${data.uploaded} ⬆️`, 'success');
+            // SD-Dateien neu laden
+            if (document.getElementById('sd-modal')?.style.display === 'block') {
+                showSDFiles();
+            }
+        });
+
+        // Bidirektionaler Sync Fehler
+        socket.on('bidirectional_sync_error', function(data) {
+            showThemeToast(`❌ Sync-Fehler: ${data.error}`, 'error');
         });
 
         // Print Progress Updates
