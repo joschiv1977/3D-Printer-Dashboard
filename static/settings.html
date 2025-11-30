@@ -2314,6 +2314,45 @@
                                 🔄 Dashboard-Layout zurücksetzen
                             </button>
                         </div>
+
+                        <div class="form-group">
+                            <label id="label-card-visibility">Dashboard Cards</label>
+                            <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 15px;">
+                                Wähle welche Cards auf dem Dashboard angezeigt werden sollen.
+                            </p>
+
+                            <div class="toggle-row" style="margin-bottom: 10px;">
+                                <span>📹 Kamera</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="card_camera_visible" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-row" style="margin-bottom: 10px;">
+                                <span>📊 Druck-Fortschritt</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="card_progress_visible" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-row" style="margin-bottom: 10px;">
+                                <span>🧵 Spoolman</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="card_spoolman_visible" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-row" style="margin-bottom: 10px;">
+                                <span>🔥 Filament-Trocknung</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="card_drying_visible" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -2992,6 +3031,13 @@
             // UI Settings
             if (config.ui) {
                 document.getElementById('default_camera_size').value = config.ui.default_camera_size || 2;
+
+                // Card Visibility (default: alle sichtbar)
+                const cardVis = config.ui.card_visibility || {};
+                document.getElementById('card_camera_visible').checked = cardVis.camera !== false;
+                document.getElementById('card_progress_visible').checked = cardVis.progress !== false;
+                document.getElementById('card_spoolman_visible').checked = cardVis.spoolman !== false;
+                document.getElementById('card_drying_visible').checked = cardVis.drying !== false;
             }
 
             // Filament Drying
@@ -3204,7 +3250,13 @@
                     password: document.getElementById('ssh_password').value
                 },
                 ui: {
-                    default_camera_size: parseInt(document.getElementById('default_camera_size').value) || 2
+                    default_camera_size: parseInt(document.getElementById('default_camera_size').value) || 2,
+                    card_visibility: {
+                        camera: document.getElementById('card_camera_visible').checked,
+                        progress: document.getElementById('card_progress_visible').checked,
+                        spoolman: document.getElementById('card_spoolman_visible').checked,
+                        drying: document.getElementById('card_drying_visible').checked
+                    }
                 },
                 filament_drying: {
                     enabled: document.getElementById('filament_drying_enabled').checked,

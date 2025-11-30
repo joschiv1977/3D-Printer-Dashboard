@@ -6,11 +6,30 @@ class AuthHandler {
         this.activityTimeout = null;
         this.isRefreshing = false;
 
+        // Prüfe ob CSRF Token in sessionStorage fehlt (z.B. nach Tab-Neustart)
+        this.ensureCsrfToken();
+
         // Token alle 10 Minuten refreshen (vor den 480 Min Ablauf)
         this.startTokenRefresh();
 
         // Activity tracking
         this.trackUserActivity();
+    }
+
+    async ensureCsrfToken() {
+        // Wenn sessionStorage leer ist aber localStorage ein Token hat,
+        // könnte das Token in Redis abgelaufen sein -> proaktiv refreshen
+        const sessionCsrf = sessionStorage.getItem('csrf_token');
+        const localCsrf = localStorage.getItem('csrf_token');
+
+        if (!sessionCsrf && localCsrf) {
+            console.log('🔄 CSRF Token nur in localStorage - refreshe proaktiv...');
+            await this.refreshToken();
+        } else if (!sessionCsrf && !localCsrf) {
+            // Kein Token vorhanden - versuche Refresh (falls Cookie noch gültig)
+            console.log('🔄 Kein CSRF Token gefunden - versuche Refresh...');
+            await this.refreshToken();
+        }
     }
 
     async restorePWASession() {

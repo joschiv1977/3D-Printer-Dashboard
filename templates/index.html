@@ -2663,18 +2663,7 @@
                 </div>
             </div>
 
-            <!-- Homing Warning -->
-            <div id="homing-warning-control" style="display:none; background:rgba(255,149,0,0.1); border:2px solid var(--accent-orange); border-radius:12px; padding:20px; margin-bottom:20px; text-align:center;">
-                <div style="font-size:40px; margin-bottom:10px;">⚠️</div>
-                <h3 style="color:var(--text-primary); margin-bottom:10px;" id="homing-warning-title"></h3>
-                <p style="color:var(--text-secondary); margin-bottom:15px; font-size:14px;" id="homing-warning-text"></p>
-                <button onclick="performControlHoming()" id="homing-perform-button" style="background:var(--accent-orange); color:white; border:none; padding:12px 24px; border-radius:8px; font-size:16px; font-weight:bold; cursor:pointer; margin-right:10px;">
-                    🏠 <span id="homing-perform-btn"></span>
-                </button>
-                <button onclick="skipControlHoming()" style="background:var(--bg-secondary); color:var(--text-secondary); border:1px solid var(--border-color); padding:12px 24px; border-radius:8px; font-size:14px; cursor:pointer;">
-                    <span id="homing-skip-btn"></span>
-                </button>
-            </div>
+            <!-- DEPRECATED: Homing Warning entfernt - X/Y Homing passiert automatisch im Backend -->
 
             <!-- Tab Navigation -->
             <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--border-color);">
@@ -3055,8 +3044,8 @@
               </div>
           </div>
 
-          <!-- Developer Control Card (Mobile only) -->
-          <div class="grid-stack-item control-card-mobile" gs-w="12" gs-h="2" gs-x="0" gs-y="7" id="dev-control-card-mobile">
+          <!-- Developer Control Card (Mobile only, initial versteckt) -->
+          <div class="grid-stack-item control-card-mobile" gs-w="12" gs-h="2" gs-x="0" gs-y="7" id="dev-control-card-mobile" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card">
                       <div class="card-header">
@@ -3172,8 +3161,8 @@
               </div>
           </div>
 
-          <!-- Developer Control Card (Desktop only) -->
-          <div class="grid-stack-item control-card-desktop" gs-w="3" gs-h="5" gs-x="5" gs-y="4" gs-min-w="3" gs-min-h="2" gs-max-w="6" gs-max-h="6" id="dev-control-card-desktop">
+          <!-- Developer Control Card (Desktop only, initial versteckt) -->
+          <div class="grid-stack-item control-card-desktop" gs-w="3" gs-h="5" gs-x="5" gs-y="4" gs-min-w="3" gs-min-h="2" gs-max-w="6" gs-max-h="6" id="dev-control-card-desktop" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card">
                       <div class="card-header">
@@ -3278,8 +3267,8 @@
               </div>
           </div>
 
-          <!-- Filament Drying Card -->
-          <div class="grid-stack-item" gs-w="3" gs-h="4" gs-x="8" gs-y="4" gs-min-w="3" gs-min-h="3" gs-max-w="6" gs-max-h="8" id="filament-drying-card-grid">
+          <!-- Filament Drying Card (initial versteckt, wird bei Drucker online + Feature aktiv angezeigt) -->
+          <div class="grid-stack-item" gs-w="3" gs-h="4" gs-x="8" gs-y="4" gs-min-w="3" gs-min-h="3" gs-max-w="6" gs-max-h="8" id="filament-drying-card-grid" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card" id="filament-drying-card">
                       <div class="card-header">
@@ -3917,18 +3906,7 @@
             const controlTabFilament = document.getElementById('control-tab-filament');
             if (controlTabFilament) controlTabFilament.textContent = texts.filament_tab;
 
-            // Homing Warning
-            const homingWarningTitle = document.getElementById('homing-warning-title');
-            if (homingWarningTitle) homingWarningTitle.textContent = texts.homing_warning_title;
-
-            const homingWarningText = document.getElementById('homing-warning-text');
-            if (homingWarningText) homingWarningText.textContent = texts.homing_warning_text;
-
-            const homingPerformBtn = document.getElementById('homing-perform-btn');
-            if (homingPerformBtn) homingPerformBtn.textContent = texts.homing_perform_btn;
-
-            const homingSkipBtn = document.getElementById('homing-skip-btn');
-            if (homingSkipBtn) homingSkipBtn.textContent = texts.homing_skip_btn;
+            // DEPRECATED: Homing Warning Übersetzungen entfernt - X/Y Homing passiert automatisch im Backend
 
             // Movement Tab
             const controlXyMovement = document.getElementById('control-xy-movement');
@@ -4249,6 +4227,75 @@
         const img = document.getElementById('camera-stream');
         if (img) {
             img.addEventListener('error', handleCameraError);
+        }
+    }
+
+    // ============= CARD VISIBILITY =============
+    // Speichert die User-Settings für Card Visibility
+    window.cardVisibilitySettings = {};
+
+    function applyCardVisibility(cardVisibility) {
+        // Default: alle Cards sichtbar
+        const visibility = cardVisibility || {};
+        window.cardVisibilitySettings = visibility;
+
+        // Card Mappings: config key -> grid element ID
+        const cardMappings = {
+            camera: 'camera-card-grid',
+            progress: 'progress-card-grid',
+            spoolman: 'spoolman-card-grid',
+            drying: 'filament-drying-card-grid'
+        };
+
+        Object.entries(cardMappings).forEach(([key, elementId]) => {
+            const card = document.getElementById(elementId);
+            if (card) {
+                // Default ist true (sichtbar), nur wenn explizit false dann verstecken
+                const isVisible = visibility[key] !== false;
+                card.style.display = isVisible ? '' : 'none';
+
+                // Für Filament Drying: auch die interne Variable setzen
+                if (key === 'drying' && !isVisible) {
+                    window.cardDryingHiddenBySettings = true;
+                } else if (key === 'drying') {
+                    window.cardDryingHiddenBySettings = false;
+                }
+            }
+        });
+
+        console.log('📊 Card visibility applied:', visibility);
+
+        // Nach dem Setzen der Settings: Drucker-Status-basierte Visibility anwenden
+        updatePrinterDependentCards();
+    }
+
+    // Cards die nur bei eingeschaltetem Drucker sichtbar sein sollen
+    function updatePrinterDependentCards() {
+        const switchOn = window.lastKnownSwitchState === 'on';
+        const mqttConnected = window.lastMqttStatus === true;
+        const printerOnline = switchOn && mqttConnected;
+
+        // Developer Card - nur bei Drucker online anzeigen
+        const devCardMobile = document.getElementById('dev-control-card-mobile');
+        const devCardDesktop = document.getElementById('dev-control-card-desktop');
+
+        if (devCardMobile) {
+            devCardMobile.style.display = printerOnline ? '' : 'none';
+        }
+        if (devCardDesktop) {
+            devCardDesktop.style.display = printerOnline ? '' : 'none';
+        }
+
+        // Filament Drying Card - nur bei Drucker online UND wenn nicht in Settings versteckt
+        const dryingCard = document.getElementById('filament-drying-card-grid');
+        if (dryingCard) {
+            const hiddenBySettings = window.cardVisibilitySettings.drying === false;
+            if (hiddenBySettings || !printerOnline) {
+                dryingCard.style.display = 'none';
+            } else {
+                // Sichtbarkeit wird von updateFilamentCardVisibility() gesteuert
+                // (prüft zusätzlich ob Feature aktiviert ist)
+            }
         }
     }
 
@@ -4738,7 +4785,7 @@
             }, 500);
         }
 
-        // Spoolman Config prüfen
+        // Spoolman Config prüfen und Card Visibility laden
         apiCall('/api/config')
             .then(response => response.json())
             .then(data => {
@@ -4746,6 +4793,9 @@
                 // Spoolman NACH Config-Check initialisieren
                 console.log(texts.console_call_init_spoolman);
                 initSpoolman();
+
+                // Card Visibility anwenden
+                applyCardVisibility(data.ui?.card_visibility);
             });
 
         checkDeveloperMode();
@@ -5250,7 +5300,13 @@
                const hmsTitle = document.getElementById('hms-error-title');
                const hmsMessage = document.getElementById('hms-error-message');
 
-               if (data.hms_errors && data.hms_errors > 0 && data.hms_details && data.hms_details.length > 0) {
+               // WICHTIG: Warte bis HMS Status geladen ist, bevor Banner angezeigt wird
+               // Sonst wird Banner kurz angezeigt und dann erst dismissed-Check gemacht
+               if (!hmsStatusLoaded) {
+                   // HMS Status noch nicht geladen - Banner nicht anzeigen
+                   // (wird beim nächsten progress_update erneut geprüft)
+                   console.log('⏳ HMS Status not loaded yet - skipping banner display');
+               } else if (data.hms_errors && data.hms_errors > 0 && data.hms_details && data.hms_details.length > 0) {
                    // Nimm ersten Fehler (wichtigster)
                    const firstError = data.hms_details[0];
                    const errorCode = firstError.code;
@@ -5859,6 +5915,11 @@
                 window.lastMqttStatus = status.mqtt;
             }
 
+            // Cards aktualisieren die vom Drucker-Status abhängen
+            if (typeof updatePrinterDependentCards === 'function') {
+                updatePrinterDependentCards();
+            }
+
             // Verwende letzten bekannten Status wenn aktueller null ist
             const effectiveSwitchState = status.switch !== null ? status.switch : window.lastKnownSwitchState;
 
@@ -6257,7 +6318,6 @@
                                     });
                                 } else {
                                     // Alle Buttons wieder anzeigen
-                                    console.log(texts.console_no_print_all_buttons_visible);
                                     document.querySelectorAll('button[onclick*="showSDFiles"]').forEach(btn => {
                                         btn.style.display = '';
                                     });
@@ -9000,6 +9060,7 @@
     // HMS Error Dismiss - Zentral über API (synchronisiert über alle Clients)
     // Dismissed Errors werden im Backend gespeichert und via WebSocket synchronisiert
     let serverDismissedHMSErrors = [];  // Vom Server synchronisiert
+    let hmsStatusLoaded = false;  // Flag: Dismissed Liste wurde geladen
 
     function dismissHMSError() {
         const banner = document.getElementById('hms-error-banner');
@@ -9043,22 +9104,89 @@
     // Clear dismissed HMS Errors - wird automatisch vom Server gemacht wenn keine Fehler mehr
     function clearDismissedHMSErrors() {
         // Nichts zu tun - Server handhabt das
-        console.log('🧹 Dismissed HMS Errors handled by server');
     }
 
-    // HMS Status vom Server laden (beim Start)
-    function loadHMSStatus() {
-        fetch('/api/hms/status')
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    serverDismissedHMSErrors = data.dismissed_errors || [];
-                    console.log('📥 HMS Status loaded, dismissed:', serverDismissedHMSErrors);
+    // Power-Off Timer Status vom Server laden (beim Start/Reconnect)
+    async function loadPowerOffTimerStatus() {
+        try {
+            const response = await fetch('/api/power_off_timer/status');
+            const data = await response.json();
+            console.log('⏰ Power-Off Timer Status loaded:', data);
+
+            if (data.active) {
+                // Timer-Event simulieren um UI zu aktualisieren
+                const event = {
+                    active: true,
+                    end_time: data.end_time,
+                    minutes: data.minutes,
+                    reason: data.reason
+                };
+
+                // Direkt die UI aktualisieren (gleiche Logik wie socket.on('power_off_timer'))
+                const statusDiv = document.getElementById('power-off-status');
+                const headerTimer = document.getElementById('power-off-header');
+
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    document.getElementById('power-off-reason').textContent = data.reason;
                 }
-            })
-            .catch(error => {
-                console.error('❌ Error loading HMS status:', error);
-            });
+
+                if (headerTimer) {
+                    headerTimer.style.display = 'inline-block';
+                }
+
+                window.powerOffTimerActive = true;
+
+                // Countdown starten
+                const updateCountdown = () => {
+                    const remaining = Math.max(0, data.end_time - (Date.now() / 1000));
+                    const minutes = Math.floor(remaining / 60);
+                    const seconds = Math.floor(remaining % 60);
+                    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                    const modalCountdown = document.getElementById('power-off-countdown');
+                    if (modalCountdown) {
+                        modalCountdown.textContent = timeString;
+                    }
+
+                    const headerCountdown = document.getElementById('header-countdown');
+                    if (headerCountdown) {
+                        headerCountdown.textContent = timeString;
+                        if (minutes < 1) {
+                            headerTimer.style.color = '#ff4444';
+                        } else if (minutes < 5) {
+                            headerTimer.style.color = '#ff9800';
+                        } else {
+                            headerTimer.style.color = '#ffc107';
+                        }
+                    }
+
+                    if (remaining > 0 && window.powerOffTimerActive) {
+                        requestAnimationFrame(updateCountdown);
+                    }
+                };
+
+                updateCountdown();
+            }
+        } catch (error) {
+            console.error('❌ Error loading Power-Off Timer status:', error);
+        }
+    }
+
+    // HMS Status vom Server laden (beim Start) - MUSS vor progress_update fertig sein
+    async function loadHMSStatus() {
+        try {
+            const response = await fetch('/api/hms/status');
+            const data = await response.json();
+            if (data.success) {
+                serverDismissedHMSErrors = data.dismissed_errors || [];
+                console.log('📥 HMS Status loaded, dismissed:', serverDismissedHMSErrors);
+            }
+        } catch (error) {
+            console.error('❌ Error loading HMS status:', error);
+        } finally {
+            hmsStatusLoaded = true;
+        }
     }
 
     // WebSocket Listener für HMS Updates (Synchronisation)
@@ -9068,13 +9196,21 @@
             serverDismissedHMSErrors = data.dismissed_errors || [];
 
             // Banner-Anzeige aktualisieren
+            const banner = document.getElementById('hms-error-banner');
+            if (!banner) return;
+
+            const currentErrorCode = banner.dataset.errorCode;
             const activeErrors = data.active_errors || [];
+
+            // Banner ausblenden wenn:
+            // 1. Keine aktiven Fehler mehr ODER
+            // 2. Der aktuell angezeigte Fehler dismissed wurde
             if (activeErrors.length === 0) {
-                // Alle Fehler dismissed oder behoben - Banner ausblenden
-                const banner = document.getElementById('hms-error-banner');
-                if (banner) {
-                    banner.classList.remove('active');
-                }
+                banner.classList.remove('active');
+                console.log('🧹 HMS Banner hidden - no active errors');
+            } else if (currentErrorCode && serverDismissedHMSErrors.includes(currentErrorCode)) {
+                banner.classList.remove('active');
+                console.log(`🔕 HMS Banner hidden - error ${currentErrorCode} was dismissed`);
             }
         });
     }
@@ -9392,6 +9528,9 @@
 
             // HMS Status vom Server laden (Synchronisation)
             loadHMSStatus();
+
+            // Power-Off Timer Status laden (falls Timer läuft)
+            loadPowerOffTimerStatus();
 
             // Badge für geplante Drucke laden
             updateScheduledPrintsBadge();
@@ -9788,6 +9927,11 @@
 
             // Speichere MQTT Status
             window.lastMqttStatus = data.connected;
+
+            // Cards aktualisieren die vom Drucker-Status abhängen
+            if (typeof updatePrinterDependentCards === 'function') {
+                updatePrinterDependentCards();
+            }
 
             if (data.connected) {
                 updateBothButtons('mqtt-btn', 'control-btn active', '<span>📡</span><span>MQTT ✓</span>');
@@ -10217,7 +10361,10 @@
         const hmsTitle = document.getElementById('hms-error-title');
         const hmsMessage = document.getElementById('hms-error-message');
 
-        if (hmsBanner && data.hms_errors && data.hms_errors > 0 && data.hms_details && data.hms_details.length > 0) {
+        // WICHTIG: Warte bis HMS Status geladen ist, bevor Banner angezeigt wird
+        if (!hmsStatusLoaded) {
+            // HMS Status noch nicht geladen - Banner nicht anzeigen
+        } else if (hmsBanner && data.hms_errors && data.hms_errors > 0 && data.hms_details && data.hms_details.length > 0) {
             // Nimm ersten Fehler (wichtigster)
             const firstError = data.hms_details[0];
             const errorCode = firstError.code;
@@ -10302,12 +10449,9 @@
             }
         }
 
-        modalHomingDone = false;
-
-        // checkHomingStatus nur wenn vorhanden
-        if (typeof checkHomingStatus === 'function') {
-            checkHomingStatus();
-        }
+        // Homing-Check entfernt - X/Y Homing passiert automatisch im Backend bei Filament load/unload
+        modalHomingDone = true;
+        enableAllControlButtons();
 
         // Kamera Source Setup
         const savedSource = localStorage.getItem('controlCameraSource') || 'p1s';
@@ -10520,97 +10664,9 @@
 
     }
 
-    // Check Homing Status and show warning if needed
-    function checkHomingStatus() {
-        authFetch('/api/mqtt/homing-status')
-            .then(response => response.json())
-            .then(data => {
-                const isHomed = data.is_homed;
-                const warningDiv = document.getElementById('homing-warning-control');
-                const controlTabs = document.querySelectorAll('.control-tab-content');
-
-                if (!isHomed) {
-                    // Show warning, hide controls
-                    if (warningDiv) warningDiv.style.display = 'block';
-                    controlTabs.forEach(tab => tab.style.display = 'none');
-                    disableAllControlButtons();
-                    modalHomingDone = false;
-                } else {
-                    // Hide warning, show controls
-                    if (warningDiv) warningDiv.style.display = 'none';
-                    // Show the first tab (movement)
-                    const movementTab = document.getElementById('movement-tab');
-                    if (movementTab) movementTab.style.display = 'block';
-                    enableAllControlButtons();
-                    modalHomingDone = true;
-                }
-            })
-            .catch(error => {
-                console.error('Failed to check homing status:', error);
-                // On error, allow controls (fail-safe)
-                modalHomingDone = true;
-                enableAllControlButtons();
-            });
-    }
-
-    // Perform Homing from Control Modal
-    function performControlHoming() {
-        const button = document.getElementById('homing-perform-button');
-        if (!button) return;
-
-        button.disabled = true;
-        button.innerHTML = '🏠 <span>' + (texts.axis_homing || 'Homing...') + '</span>';
-        button.style.opacity = '0.5';
-
-        authFetch('/api/mqtt/home', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({axis: 'all'})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Wait 15 seconds for homing to complete
-                setTimeout(() => {
-                    modalHomingDone = true;
-                    enableAllControlButtons();
-                    const warningDiv = document.getElementById('homing-warning-control');
-                    if (warningDiv) warningDiv.style.display = 'none';
-                    // Show movement tab
-                    switchControlTab('movement');
-                    showThemeToast('✅ ' + (texts.toast_homing_completed || 'Homing completed'));
-                    // Reset button
-                    button.disabled = false;
-                    button.innerHTML = '🏠 <span id="homing-perform-btn">' + (texts.homing_perform_btn || 'Perform Homing') + '</span>';
-                    button.style.opacity = '1';
-                }, 15000);
-            } else {
-                showThemeToast('❌ ' + (texts.toast_homing_failed || 'Homing failed'));
-                button.disabled = false;
-                button.innerHTML = '🏠 <span id="homing-perform-btn">' + (texts.homing_perform_btn || 'Perform Homing') + '</span>';
-                button.style.opacity = '1';
-            }
-        })
-        .catch(error => {
-            console.error('Homing failed:', error);
-            showThemeToast('❌ ' + (texts.toast_homing_failed || 'Homing error'));
-            button.disabled = false;
-            button.innerHTML = '🏠 <span id="homing-perform-btn">' + (texts.homing_perform_btn || 'Perform Homing') + '</span>';
-            button.style.opacity = '1';
-        });
-    }
-
-    // Skip Homing from Control Modal
-    function skipControlHoming() {
-        if (confirm(texts.confirm_skip_homing_warning || 'Homing überspringen? Dies kann zu ungenauen Bewegungen führen.')) {
-            modalHomingDone = true;
-            enableAllControlButtons();
-            const warningDiv = document.getElementById('homing-warning-control');
-            if (warningDiv) warningDiv.style.display = 'none';
-            switchControlTab('movement');
-            showThemeToast('⚠️ ' + (texts.toast_homing_skipped_risk || 'Homing übersprungen - Vorsicht!'));
-        }
-    }
+    // DEPRECATED: Homing-Check komplett entfernt
+    // X/Y Homing passiert jetzt automatisch im Backend bei Filament load/unload (G28 X Y)
+    // Die Funktionen checkHomingStatus(), performControlHoming() und skipControlHoming() wurden entfernt.
 
     function switchControlTab(tab) {
         // Hide all tabs
@@ -12468,7 +12524,7 @@
     let selectedMaterial = null;
     let filamentDryingEnabled = false;
 
-    // Filament Card Sichtbarkeit basierend auf Drucker-Status
+    // Filament Card Sichtbarkeit basierend auf Drucker-Status und Feature-Flag
     function updateFilamentCardVisibility() {
         const card = document.getElementById('filament-drying-card-grid');
         const content = document.getElementById('filament-drying-content');
@@ -12479,12 +12535,27 @@
         const mqttConnected = window.lastMqttStatus === true;
         const printerOnline = switchOn && mqttConnected;
 
-        // Nur Content ein-/ausblenden, Card bleibt sichtbar
-        if (filamentDryingEnabled && printerOnline) {
-            content.style.display = 'block';
-        } else {
-            content.style.display = 'none';
+        // Wenn in UI-Settings versteckt, nicht anzeigen
+        if (window.cardDryingHiddenBySettings) {
+            card.style.display = 'none';
+            return;
         }
+
+        // Wenn Drucker offline, Card komplett verstecken
+        if (!printerOnline) {
+            card.style.display = 'none';
+            return;
+        }
+
+        // Wenn Feature komplett deaktiviert ist, Card komplett verstecken
+        if (!filamentDryingEnabled) {
+            card.style.display = 'none';
+            return;
+        }
+
+        // Alles OK - Card und Content anzeigen
+        card.style.display = '';
+        content.style.display = 'block';
     }
 
     // Material-Liste laden
