@@ -343,13 +343,13 @@
                 <div class="upload-area" id="uploadArea" onclick="document.getElementById('stlFile').click()">
                     <div style="font-size: 48px; margin-bottom: 10px;">📤</div>
                     <p style="margin: 0; font-size: 16px; color: var(--text-primary);">
-                        Klicken oder STL-Datei hierher ziehen
+                        Klicken oder 3D-Datei hierher ziehen
                     </p>
                     <p style="margin: 5px 0 0 0; font-size: 13px; color: var(--text-secondary);">
-                        Unterstützte Formate: .stl
+                        Unterstützte Formate: .stl, .step, .stp
                     </p>
                 </div>
-                <input type="file" id="stlFile" accept=".stl" style="display: none;" onchange="handleFileSelect(event)">
+                <input type="file" id="stlFile" accept=".stl,.step,.stp" style="display: none;" onchange="handleFileSelect(event)">
                 <div class="file-info" id="fileInfo">
                     <strong>Ausgewählte Datei:</strong> <span id="fileName">-</span><br>
                     <strong>Größe:</strong> <span id="fileSize">-</span>
@@ -393,9 +393,15 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="filamentSelect">🧵 Filament-Typ</label>
+                        <label for="filamentTypeSelect">🧵 Filament-Typ</label>
+                        <select id="filamentTypeSelect">
+                            <option value="">Typ wählen...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filamentSelect">🎨 Filament</label>
                         <select id="filamentSelect">
-                            <option value="">Lade Profile...</option>
+                            <option value="">Erst Typ wählen...</option>
                         </select>
                     </div>
                 </div>
@@ -411,6 +417,81 @@
                 </button>
                 <div class="progress-bar" id="progressBar">
                     <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+            </div>
+
+            <!-- Profile Management Section -->
+            <div class="section" id="profileManagementSection">
+                <h2>📦 Profile verwalten</h2>
+                <div class="profile-status" id="profileStatus" style="margin-bottom: 15px; padding: 15px; background: var(--bg-section); border-radius: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <strong>Lokale Profile:</strong>
+                            <span id="profileCount">Lade...</span>
+                        </div>
+                        <div id="backupInfo" style="display: none;">
+                            <strong>Backup:</strong>
+                            <span id="backupDate">-</span>
+                        </div>
+                    </div>
+                    <div id="lastCheckInfo" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); display: none;">
+                        <strong>Letzter Update-Check:</strong>
+                        <span id="lastCheckDate">-</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 13px; color: var(--text-secondary);">
+                        Unterstützte Drucker: <span id="supportedPrinters">-</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn" id="checkUpdatesBtn" onclick="checkProfileUpdates()" style="background: #2196f3;">
+                        🔍 Auf Updates prüfen
+                    </button>
+                    <button class="btn" id="updateProfilesBtn" onclick="updateProfiles()" style="background: #4caf50; display: none;">
+                        ⬇️ Profile aktualisieren
+                    </button>
+                    <button class="btn" id="restoreBackupBtn" onclick="restoreBackup()" style="background: #ff9800; display: none;">
+                        ♻️ Backup wiederherstellen
+                    </button>
+                </div>
+
+                <div id="updateResult" style="margin-top: 15px; padding: 15px; border-radius: 8px; display: none;"></div>
+
+                <!-- GitHub Token Settings (Collapsible) -->
+                <div id="githubTokenSettings" style="margin-top: 20px; background: var(--bg-section); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden;">
+                    <!-- Header (clickable) -->
+                    <div id="githubTokenHeader" onclick="toggleGithubTokenCard()" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 14px; font-weight: bold; color: var(--text-primary);">⚙️ GitHub API Einstellungen</span>
+                            <span id="githubTokenBadge" style="display: none; padding: 2px 8px; border-radius: 10px; font-size: 11px; background: #4caf50; color: white;">Token aktiv</span>
+                        </div>
+                        <span id="githubTokenExpandIcon" style="font-size: 12px; color: var(--text-secondary); transition: transform 0.2s;">▼</span>
+                    </div>
+                    <!-- Content (collapsible) -->
+                    <div id="githubTokenContent" style="padding: 0 15px 15px 15px; display: none;">
+                        <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 15px 0;">
+                            GitHub hat ein Rate-Limit von 60 Anfragen/Stunde. Mit einem Token erhöht sich das auf 5000/Stunde.
+                        </p>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <input type="checkbox" id="githubTokenEnabled" onchange="toggleGithubTokenInput()">
+                            <label for="githubTokenEnabled" style="font-size: 14px; cursor: pointer; margin: 0;">
+                                GitHub Token verwenden
+                            </label>
+                        </div>
+                        <div id="githubTokenInputContainer" style="display: none;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxx"
+                                       style="flex: 1; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 5px; background: var(--input-bg); color: var(--text-primary);">
+                                <button class="btn" onclick="saveGithubToken()" style="background: #4caf50; padding: 8px 16px;">
+                                    💾 Speichern
+                                </button>
+                            </div>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 8px 0 0 0;">
+                                Token erstellen unter: <a href="https://github.com/settings/tokens" target="_blank" style="color: #667eea;">github.com/settings/tokens</a> (keine Berechtigungen nötig)
+                            </p>
+                        </div>
+                        <div id="githubTokenStatus" style="margin-top: 10px; font-size: 12px; display: none;"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -429,6 +510,7 @@
         let selectedFile = null;
         let allFilaments = []; // Cache für alle Filamente
         let allProcesses = []; // Cache für alle Process Profiles
+        let filamentTypes = []; // Extrahierte Filament-Typen (PLA, PETG, etc.)
 
         // Helper function to get translation (uses global i18nManager)
         function t(key, replacements = {}) {
@@ -468,7 +550,8 @@
             document.querySelector('label[for="nozzleSize"]').innerHTML = t('slicer_nozzle_size_label') || '🔧 Düsendurchmesser (mm)';
             document.querySelector('label[for="bedType"]').innerHTML = t('slicer_bed_type_label') || '🛏️ Druckbett-Typ';
             document.querySelector('label[for="processSelect"]').innerHTML = t('slicer_layer_height_label') || '📐 Layer Height / Qualität';
-            document.querySelector('label[for="filamentSelect"]').innerHTML = t('slicer_filament_type_label') || '🧵 Filament-Typ';
+            document.querySelector('label[for="filamentTypeSelect"]').innerHTML = t('slicer_filament_type_label') || '🧵 Filament-Typ';
+            document.querySelector('label[for="filamentSelect"]').innerHTML = t('slicer_filament_label') || '🎨 Filament';
 
             // Button
             document.getElementById('sliceBtn').innerHTML = t('slicer_btn_slice') || '🔪 STL Slicen & auf SD-Karte speichern';
@@ -483,6 +566,7 @@
                 nozzleSize: document.getElementById('nozzleSize').value,
                 bedType: document.getElementById('bedType').value,
                 processProfile: document.getElementById('processSelect').value,
+                filamentType: document.getElementById('filamentTypeSelect').value,
                 filament: document.getElementById('filamentSelect').value
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
@@ -532,13 +616,25 @@
                     }, 100);
                 }
 
-                if (settings.filament) {
+                // Restore filament type first, then specific filament
+                if (settings.filamentType) {
                     setTimeout(() => {
-                        const filamentSelect = document.getElementById('filamentSelect');
-                        if (filamentSelect.querySelector(`option[value="${settings.filament}"]`)) {
-                            filamentSelect.value = settings.filament;
+                        const filamentTypeSelect = document.getElementById('filamentTypeSelect');
+                        if (filamentTypeSelect.querySelector(`option[value="${settings.filamentType}"]`)) {
+                            filamentTypeSelect.value = settings.filamentType;
+                            updateFilamentList(); // Update specific filaments based on type
                         }
-                        validateSliceButton();
+
+                        // Then restore specific filament
+                        if (settings.filament) {
+                            setTimeout(() => {
+                                const filamentSelect = document.getElementById('filamentSelect');
+                                if (filamentSelect.querySelector(`option[value="${settings.filament}"]`)) {
+                                    filamentSelect.value = settings.filament;
+                                }
+                                validateSliceButton();
+                            }, 50);
+                        }
                     }, 100);
                 }
             }
@@ -570,8 +666,11 @@
         }
 
         function handleFile(file) {
-            if (!file.name.toLowerCase().endsWith('.stl')) {
-                showError(t('slicer_error_select_stl') || 'Bitte wähle eine STL-Datei');
+            const fileName = file.name.toLowerCase();
+            const validExtensions = ['.stl', '.step', '.stp'];
+            const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+            if (!hasValidExtension) {
+                showError(t('slicer_error_select_3d_file') || 'Bitte wähle eine STL- oder STEP-Datei');
                 return;
             }
             selectedFile = file;
@@ -592,9 +691,10 @@
             const hasFile = selectedFile !== null;
             const hasPrinter = document.getElementById('printerSelect').value !== '';
             const hasProcess = document.getElementById('processSelect').value !== '';
+            const hasFilamentType = document.getElementById('filamentTypeSelect').value !== '';
             const hasFilament = document.getElementById('filamentSelect').value !== '';
 
-            const allValid = hasFile && hasPrinter && hasProcess && hasFilament;
+            const allValid = hasFile && hasPrinter && hasProcess && hasFilamentType && hasFilament;
             document.getElementById('sliceBtn').disabled = !allValid;
 
             // Show helpful message if user tries to slice without all fields
@@ -611,6 +711,12 @@
                     document.getElementById('processSelect').style.borderColor = '';
                 }
 
+                if (!hasFilamentType) {
+                    document.getElementById('filamentTypeSelect').style.borderColor = '#f44336';
+                } else {
+                    document.getElementById('filamentTypeSelect').style.borderColor = '';
+                }
+
                 if (!hasFilament) {
                     document.getElementById('filamentSelect').style.borderColor = '#f44336';
                 } else {
@@ -620,6 +726,7 @@
                 // Reset borders when valid
                 document.getElementById('printerSelect').style.borderColor = '';
                 document.getElementById('processSelect').style.borderColor = '';
+                document.getElementById('filamentTypeSelect').style.borderColor = '';
                 document.getElementById('filamentSelect').style.borderColor = '';
             }
         }
@@ -652,7 +759,7 @@
                     allProcesses = data.processes;
 
                     // Initial population (with default nozzle size)
-                    updateFilamentList();
+                    updateFilamentTypeList(); // Fills type dropdown, which triggers updateFilamentList
                     updateProcessList();
 
                     // Restore saved settings after profiles are loaded
@@ -666,42 +773,149 @@
             }
         }
 
-        // Filter and update filament list based on nozzle size
-        function updateFilamentList() {
+        // Bekannte Filament-Typen mit Priorität (Reihenfolge)
+        const FILAMENT_TYPE_ORDER = ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'PA', 'PC', 'PVA', 'HIPS', 'PET', 'PP', 'PPS'];
+
+        // Extrahiert den Filament-Typ aus dem Namen
+        function extractFilamentType(name) {
+            const upperName = name.toUpperCase();
+
+            // Spezielle Patterns für Typen
+            const patterns = [
+                { type: 'PLA', regex: /\bPLA\b|PLA[-+\s]?(?:HT|HS|CF|GF|Silk|Pro|Basic|Matte)?/i },
+                { type: 'PETG', regex: /\bPETG\b|\bPET[-]?G\b|easyPETG/i },
+                { type: 'PET', regex: /\bPET\b(?!G)/i },
+                { type: 'ABS', regex: /\bABS\b|ABS[-+]?(?:GF|CF)?/i },
+                { type: 'ASA', regex: /\bASA\b/i },
+                { type: 'TPU', regex: /\bTPU\b|\bTPE\b|\bFlex\b/i },
+                { type: 'PA', regex: /\bPA\b|\bPA[-]?\d+|\bNylon\b/i },
+                { type: 'PC', regex: /\bPC\b(?!I)|\bPolycarbonat/i },
+                { type: 'PVA', regex: /\bPVA\b/i },
+                { type: 'HIPS', regex: /\bHIPS\b/i },
+                { type: 'PP', regex: /\bPP\b(?!S)|\bPolypropylen/i },
+                { type: 'PPS', regex: /\bPPS\b|\bPPS[-]?CF/i },
+                { type: 'Support', regex: /\bSupport\b/i }
+            ];
+
+            for (const p of patterns) {
+                if (p.regex.test(name)) {
+                    return p.type;
+                }
+            }
+
+            return 'Andere'; // Fallback für unbekannte Typen
+        }
+
+        // Extrahiert alle einzigartigen Filament-Typen aus den Profilen
+        function extractFilamentTypes() {
             const nozzleSize = document.getElementById('nozzleSize').value;
-            const filamentSelect = document.getElementById('filamentSelect');
-            const currentSelection = filamentSelect.value; // Remember current selection
 
-            filamentSelect.innerHTML = `<option value="">${t('slicer_select_filament') || 'Filament wählen...'}</option>`;
+            // Filter filaments based on nozzle size first
+            const filteredFilaments = filterFilamentsByNozzle(allFilaments, nozzleSize);
 
-            // Filter filaments based on nozzle size
-            const filteredFilaments = allFilaments.filter(f => {
+            // Extract types
+            const typesSet = new Set();
+            filteredFilaments.forEach(f => {
+                const type = extractFilamentType(f.name);
+                typesSet.add(type);
+            });
+
+            // Sort by defined order, then alphabetically for unknown types
+            const types = Array.from(typesSet).sort((a, b) => {
+                const indexA = FILAMENT_TYPE_ORDER.indexOf(a);
+                const indexB = FILAMENT_TYPE_ORDER.indexOf(b);
+
+                if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                return a.localeCompare(b);
+            });
+
+            return types;
+        }
+
+        // Filter filaments by nozzle size
+        function filterFilamentsByNozzle(filaments, nozzleSize) {
+            return filaments.filter(f => {
                 const name = f.name.toLowerCase();
                 const id = f.id.toLowerCase();
 
-                // Check if profile contains nozzle size specification
                 const has02 = name.includes('0.2 nozzle') || id.includes('0.2 nozzle');
                 const has04 = name.includes('0.4 nozzle') || id.includes('0.4 nozzle');
                 const has06 = name.includes('0.6 nozzle') || id.includes('0.6 nozzle');
                 const has08 = name.includes('0.8 nozzle') || id.includes('0.8 nozzle');
 
-                // If no nozzle size specified, show for all nozzles (universal profile)
                 const hasNoNozzleSize = !has02 && !has04 && !has06 && !has08;
 
-                // Show profile if it matches current nozzle size or is universal
                 if (nozzleSize === '0.2') return has02 || hasNoNozzleSize;
                 if (nozzleSize === '0.4') return has04 || hasNoNozzleSize;
                 if (nozzleSize === '0.6') return has06 || hasNoNozzleSize;
                 if (nozzleSize === '0.8') return has08 || hasNoNozzleSize;
 
-                return hasNoNozzleSize; // Default: only show universal profiles
+                return hasNoNozzleSize;
             });
+        }
+
+        // Update filament type dropdown
+        function updateFilamentTypeList() {
+            const filamentTypeSelect = document.getElementById('filamentTypeSelect');
+            const currentSelection = filamentTypeSelect.value;
+
+            filamentTypes = extractFilamentTypes();
+
+            filamentTypeSelect.innerHTML = `<option value="">${t('slicer_select_filament_type') || 'Typ wählen...'}</option>`;
+
+            filamentTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                filamentTypeSelect.appendChild(option);
+            });
+
+            // Restore selection if still available
+            if (currentSelection && filamentTypes.includes(currentSelection)) {
+                filamentTypeSelect.value = currentSelection;
+            }
+
+            // Update specific filament list based on current type selection
+            updateFilamentList();
+        }
+
+        // Filter and update filament list based on selected type and nozzle size
+        function updateFilamentList() {
+            const nozzleSize = document.getElementById('nozzleSize').value;
+            const selectedType = document.getElementById('filamentTypeSelect').value;
+            const filamentSelect = document.getElementById('filamentSelect');
+            const currentSelection = filamentSelect.value;
+
+            // If no type selected, show placeholder
+            if (!selectedType) {
+                filamentSelect.innerHTML = `<option value="">${t('slicer_select_type_first') || 'Erst Typ wählen...'}</option>`;
+                validateSliceButton();
+                return;
+            }
+
+            filamentSelect.innerHTML = `<option value="">${t('slicer_select_filament') || 'Filament wählen...'}</option>`;
+
+            // Filter by nozzle size first
+            const nozzleFiltered = filterFilamentsByNozzle(allFilaments, nozzleSize);
+
+            // Then filter by type
+            const filteredFilaments = nozzleFiltered.filter(f => {
+                const type = extractFilamentType(f.name);
+                return type === selectedType;
+            });
+
+            // Sort alphabetically by name
+            filteredFilaments.sort((a, b) => a.name.localeCompare(b.name));
 
             // Populate filtered filaments
             filteredFilaments.forEach(f => {
                 const option = document.createElement('option');
                 option.value = f.id;
-                option.textContent = f.name;
+                // Remove redundant type info from display name
+                let displayName = f.name;
+                option.textContent = displayName;
                 filamentSelect.appendChild(option);
             });
 
@@ -710,12 +924,12 @@
                 filamentSelect.value = currentSelection;
             }
 
-            // Show info message if no filaments available for this nozzle size
+            // Show info message if no filaments available
             if (filteredFilaments.length === 0) {
-                showInfo(t('slicer_no_filament_profiles', { nozzleSize }) || `Keine Filament-Profile für ${nozzleSize}mm Düse gefunden`);
+                showInfo(t('slicer_no_filament_for_type', { type: selectedType, nozzleSize }) ||
+                    `Keine ${selectedType} Profile für ${nozzleSize}mm Düse gefunden`);
             }
 
-            // Re-validate after updating list
             validateSliceButton();
         }
 
@@ -992,6 +1206,540 @@
         const showError = (msg) => showAlert('errorAlert', msg);
         const showInfo = (msg) => showAlert('infoAlert', msg);
 
+        // ========== PROFILE MANAGEMENT ==========
+
+        async function loadProfileStatus() {
+            try {
+                const response = await apiCall('/api/slicer/profiles/status');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Update profile count
+                    const total = data.local_profiles?.total || 0;
+                    const machine = data.local_profiles?.machine || 0;
+                    const filament = data.local_profiles?.filament || 0;
+                    const process = data.local_profiles?.process || 0;
+                    document.getElementById('profileCount').textContent =
+                        `${total} (${machine} Drucker, ${filament} Filamente, ${process} Prozess)`;
+
+                    // Update supported printers
+                    if (data.supported_printers) {
+                        document.getElementById('supportedPrinters').textContent =
+                            data.supported_printers.join(', ');
+                    }
+
+                    // Show backup info if exists
+                    if (data.backup?.exists) {
+                        document.getElementById('backupInfo').style.display = 'block';
+                        if (data.backup.created) {
+                            const date = new Date(data.backup.created);
+                            document.getElementById('backupDate').textContent =
+                                date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE');
+                        } else {
+                            document.getElementById('backupDate').textContent = 'Vorhanden';
+                        }
+                        document.getElementById('restoreBackupBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('backupInfo').style.display = 'none';
+                        document.getElementById('restoreBackupBtn').style.display = 'none';
+                    }
+
+                    // Show last update check time if exists
+                    if (data.last_update_check) {
+                        document.getElementById('lastCheckInfo').style.display = 'block';
+                        const checkDate = new Date(data.last_update_check);
+                        document.getElementById('lastCheckDate').textContent =
+                            checkDate.toLocaleDateString('de-DE') + ' ' + checkDate.toLocaleTimeString('de-DE');
+                    } else {
+                        document.getElementById('lastCheckInfo').style.display = 'none';
+                    }
+
+                    // Prüfe ob Update läuft und stelle Fortschrittsanzeige wieder her
+                    if (data.update_in_progress && data.current_progress) {
+                        reconnectToUpdateStream(data.current_progress);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile status:', error);
+                document.getElementById('profileCount').textContent = 'Fehler beim Laden';
+            }
+        }
+
+        // Verbindet sich wieder mit laufendem Update-Stream
+        function reconnectToUpdateStream(initialProgress) {
+            const btn = document.getElementById('updateProfilesBtn');
+            const checkBtn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            // UI in Update-Modus setzen
+            btn.disabled = true;
+            checkBtn.disabled = true;
+            btn.innerHTML = '⏳ Aktualisiere...';
+            btn.style.display = 'inline-block';
+
+            // Progress-HTML mit aktuellem Stand
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = '#e3f2fd';
+            resultDiv.style.color = '#1565c0';
+            resultDiv.innerHTML = `
+                <div id="updateProgressContainer">
+                    <strong>⏳ Update läuft...</strong> (Wiederverbunden)<br><br>
+                    <div id="updatePhase">Verbinde...</div>
+                    <div style="margin-top: 10px; background: #ddd; border-radius: 4px; overflow: hidden;">
+                        <div id="updateProgressBar" style="height: 24px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"></div>
+                    </div>
+                    <div id="updateCurrentFile" style="margin-top: 8px; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+                </div>
+            `;
+
+            // Zeige initialen Fortschritt sofort an
+            if (initialProgress.phase) {
+                updateProgressUI(initialProgress);
+            }
+
+            // Mit SSE-Stream verbinden
+            connectToUpdateStream(btn, checkBtn, resultDiv);
+        }
+
+        // Verbindet sich mit dem Update-Stream
+        function connectToUpdateStream(btn, checkBtn, resultDiv) {
+            const eventSource = new EventSource('/api/slicer/profiles/update-stream');
+
+            eventSource.onmessage = function(event) {
+                const msg = JSON.parse(event.data);
+
+                if (msg.type === 'progress') {
+                    updateProgressUI(msg.data);
+                } else if (msg.type === 'result') {
+                    eventSource.close();
+                    handleUpdateResult(msg.data, btn, checkBtn, resultDiv);
+                }
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('EventSource error:', error);
+                eventSource.close();
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>❌ Verbindungsfehler</strong><br><br>Die Verbindung zum Server wurde unterbrochen.`;
+                btn.disabled = false;
+                checkBtn.disabled = false;
+                btn.innerHTML = '⬇️ Profile aktualisieren';
+            };
+        }
+
+        // Aktualisiert die Fortschritts-UI
+        function updateProgressUI(data) {
+            const phaseNames = {
+                'backup': '💾 Backup',
+                'machine': '🖨️ Drucker-Profile',
+                'filament': '🧵 Filament-Profile',
+                'process': '⚙️ Prozess-Profile',
+                'done': '✅ Fertig'
+            };
+
+            const phaseEl = document.getElementById('updatePhase');
+            if (phaseEl) {
+                phaseEl.innerHTML = `<strong>${phaseNames[data.phase] || data.phase}</strong>`;
+            }
+
+            // Gesamtfortschritt berechnen
+            let progress = 0;
+            if (data.phase === 'backup') {
+                progress = data.current * 5;
+            } else if (data.phase === 'machine') {
+                progress = 5 + (data.total > 0 ? (data.current / data.total) * 15 : 0);
+            } else if (data.phase === 'filament') {
+                progress = 20 + (data.total > 0 ? (data.current / data.total) * 30 : 0);
+            } else if (data.phase === 'process') {
+                progress = 50 + (data.total > 0 ? (data.current / data.total) * 50 : 0);
+            } else if (data.phase === 'done') {
+                progress = 100;
+            }
+
+            const progressBar = document.getElementById('updateProgressBar');
+            if (progressBar) {
+                progressBar.style.width = progress + '%';
+                progressBar.textContent = Math.round(progress) + '%';
+            }
+
+            const currentFile = document.getElementById('updateCurrentFile');
+            if (currentFile) {
+                currentFile.textContent = data.message;
+            }
+        }
+
+        // Verarbeitet das Update-Ergebnis
+        function handleUpdateResult(data, btn, checkBtn, resultDiv) {
+            if (data.success) {
+                resultDiv.style.background = '#d4edda';
+                resultDiv.style.color = '#155724';
+                resultDiv.innerHTML = `<strong>✅ Update erfolgreich!</strong><br><br>
+                    <strong>Heruntergeladen:</strong><br>
+                    • ${data.machine?.downloaded || 0} Drucker-Profile<br>
+                    • ${data.filament?.downloaded || 0} Filament-Profile<br>
+                    • ${data.process?.downloaded || 0} Prozess-Profile<br>
+                    <strong>Gesamt:</strong> ${data.total_downloaded || 0} Dateien<br><br>
+                    ${data.backup_created ? '💾 Backup wurde erstellt' : '⚠️ Backup konnte nicht erstellt werden'}`;
+
+                loadProfileStatus();
+                loadProfiles();
+            } else {
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+
+                let errorMsg = `<strong>❌ Update fehlgeschlagen</strong><br><br>`;
+                if (data.error) {
+                    errorMsg += `<strong>Fehler:</strong> ${data.error}<br><br>`;
+                }
+                if (data.total_errors > 0) {
+                    errorMsg += `<strong>Fehler bei:</strong><br>`;
+                    data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                }
+                resultDiv.innerHTML = errorMsg;
+            }
+
+            btn.disabled = false;
+            checkBtn.disabled = false;
+            btn.innerHTML = '⬇️ Profile aktualisieren';
+        }
+
+        async function checkProfileUpdates() {
+            const btn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Prüfe...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/check-updates');
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+                    resultDiv.innerHTML = `<strong>❌ Fehler:</strong> ${data.error}<br><br>
+                        <button class="btn" onclick="checkProfileUpdates()" style="background: #2196f3;">
+                            🔄 Erneut versuchen
+                        </button>`;
+                    document.getElementById('updateProfilesBtn').style.display = 'none';
+                } else {
+                    const totalNew = (data.machine?.new || 0) + (data.filament?.new || 0) + (data.process?.new || 0);
+                    const machineFiles = data.machine?.files?.length || 0;
+                    const filamentFiles = data.filament?.files?.length || 0;
+                    const processFiles = data.process?.files?.length || 0;
+
+                    resultDiv.style.display = 'block';
+
+                    if (totalNew > 0) {
+                        resultDiv.style.background = '#d4edda';
+                        resultDiv.style.color = '#155724';
+                        resultDiv.innerHTML = `<strong>✅ Updates verfügbar!</strong><br><br>
+                            <strong>Neue Profile:</strong> ${totalNew}<br>
+                            • Drucker: ${data.machine?.new || 0} neu<br>
+                            • Filamente: ${data.filament?.new || 0} neu<br>
+                            • Prozess: ${data.process?.new || 0} neu<br><br>
+                            <strong>Verfügbar auf GitHub:</strong><br>
+                            • ${machineFiles} Drucker-Profile<br>
+                            • ${filamentFiles} Filament-Profile<br>
+                            • ${processFiles} Prozess-Profile<br><br>
+                            <em>Klicke auf "Profile aktualisieren" um die neuesten Profile herunterzuladen.</em>`;
+                        document.getElementById('updateProfilesBtn').style.display = 'inline-block';
+                    } else {
+                        resultDiv.style.background = '#d1ecf1';
+                        resultDiv.style.color = '#0c5460';
+                        resultDiv.innerHTML = `<strong>ℹ️ Profile sind aktuell</strong><br><br>
+                            Alle ${machineFiles + filamentFiles + processFiles} verfügbaren Profile sind bereits vorhanden.<br><br>
+                            Du kannst trotzdem "Profile aktualisieren" klicken um die neuesten Versionen zu holen.`;
+                        document.getElementById('updateProfilesBtn').style.display = 'inline-block';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking updates:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔍 Auf Updates prüfen';
+            }
+        }
+
+        async function updateProfiles() {
+            const btn = document.getElementById('updateProfilesBtn');
+            const checkBtn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            if (!confirm('Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            checkBtn.disabled = true;
+            btn.innerHTML = '⏳ Aktualisiere...';
+
+            // Progress-HTML vorbereiten
+            resultDiv.style.display = 'block';
+            resultDiv.style.background = '#e3f2fd';
+            resultDiv.style.color = '#1565c0';
+            resultDiv.innerHTML = `
+                <div id="updateProgressContainer">
+                    <strong>⏳ Update läuft...</strong><br><br>
+                    <div id="updatePhase">Starte...</div>
+                    <div style="margin-top: 10px; background: #ddd; border-radius: 4px; overflow: hidden;">
+                        <div id="updateProgressBar" style="height: 24px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"></div>
+                    </div>
+                    <div id="updateCurrentFile" style="margin-top: 8px; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">-</div>
+                </div>
+            `;
+
+            // Mit Update-Stream verbinden (verwendet gemeinsame Funktionen)
+            connectToUpdateStream(btn, checkBtn, resultDiv);
+        }
+
+        // Alte updateProfiles Funktion als Fallback (ohne SSE)
+        async function updateProfilesFallback() {
+            const btn = document.getElementById('updateProfilesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            if (!confirm('Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Aktualisiere...';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ create_backup: true })
+                });
+                const data = await response.json();
+
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    resultDiv.style.background = '#d4edda';
+                    resultDiv.style.color = '#155724';
+                    resultDiv.innerHTML = `<strong>✅ Update erfolgreich!</strong><br><br>
+                        <strong>Heruntergeladen:</strong><br>
+                        • ${data.machine?.downloaded || 0} Drucker-Profile<br>
+                        • ${data.filament?.downloaded || 0} Filament-Profile<br>
+                        • ${data.process?.downloaded || 0} Prozess-Profile<br>
+                        <strong>Gesamt:</strong> ${data.total_downloaded || 0} Dateien<br><br>
+                        ${data.backup_created ? '💾 Backup wurde erstellt' : '⚠️ Backup konnte nicht erstellt werden'}`;
+
+                    // Reload profile status and profiles list
+                    loadProfileStatus();
+                    loadProfiles();
+                } else {
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+
+                    let errorMsg = `<strong>❌ Update fehlgeschlagen</strong><br><br>`;
+                    if (data.error) {
+                        errorMsg += `<strong>Fehler:</strong> ${data.error}<br><br>`;
+                    }
+                    if (data.total_errors > 0) {
+                        errorMsg += `<strong>Fehler bei:</strong><br>`;
+                        data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                        data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                        data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    }
+                    resultDiv.innerHTML = errorMsg;
+                }
+            } catch (error) {
+                console.error('Error updating profiles:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '⬇️ Profile aktualisieren';
+            }
+        }
+
+        async function restoreBackup() {
+            if (!confirm('Backup wiederherstellen?\n\nDie aktuellen Profile werden durch das Backup ersetzt.')) {
+                return;
+            }
+
+            const btn = document.getElementById('restoreBackupBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Wiederherstellen...';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/restore', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    resultDiv.style.background = '#d4edda';
+                    resultDiv.style.color = '#155724';
+                    resultDiv.innerHTML = `<strong>✅ Backup wiederhergestellt!</strong><br><br>${data.message}`;
+
+                    // Reload profile status and profiles list
+                    loadProfileStatus();
+                    loadProfiles();
+                } else {
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+                    resultDiv.innerHTML = `<strong>❌ Wiederherstellung fehlgeschlagen</strong><br><br>${data.message || data.error}`;
+                }
+            } catch (error) {
+                console.error('Error restoring backup:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '♻️ Backup wiederherstellen';
+            }
+        }
+
+        // ========== GITHUB TOKEN SETTINGS ==========
+
+        let githubTokenCardExpanded = false;
+
+        function toggleGithubTokenCard() {
+            githubTokenCardExpanded = !githubTokenCardExpanded;
+            const content = document.getElementById('githubTokenContent');
+            const icon = document.getElementById('githubTokenExpandIcon');
+
+            content.style.display = githubTokenCardExpanded ? 'block' : 'none';
+            icon.style.transform = githubTokenCardExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        function setGithubTokenCardExpanded(expanded) {
+            githubTokenCardExpanded = expanded;
+            const content = document.getElementById('githubTokenContent');
+            const icon = document.getElementById('githubTokenExpandIcon');
+
+            content.style.display = expanded ? 'block' : 'none';
+            icon.style.transform = expanded ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        async function loadGithubTokenSettings() {
+            try {
+                const response = await apiCall('/api/slicer/profiles/settings');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    const checkbox = document.getElementById('githubTokenEnabled');
+                    const container = document.getElementById('githubTokenInputContainer');
+                    const statusDiv = document.getElementById('githubTokenStatus');
+                    const badge = document.getElementById('githubTokenBadge');
+
+                    checkbox.checked = data.github_token_enabled;
+                    container.style.display = data.github_token_enabled ? 'block' : 'none';
+
+                    // Show badge and collapse if token is set
+                    if (data.github_token_enabled && data.github_token_set) {
+                        badge.style.display = 'inline';
+                        setGithubTokenCardExpanded(false); // Collapsed when token is active
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerHTML = '<span style="color: #4caf50;">✅ Token ist gespeichert und aktiv</span>';
+                    } else if (data.github_token_enabled && !data.github_token_set) {
+                        badge.style.display = 'none';
+                        setGithubTokenCardExpanded(true); // Expanded when token needed
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerHTML = '<span style="color: #ff9800;">⚠️ Bitte Token eingeben</span>';
+                    } else {
+                        badge.style.display = 'none';
+                        setGithubTokenCardExpanded(true); // Expanded when no token configured
+                        statusDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading GitHub token settings:', error);
+                // On error, expand card so user can configure
+                setGithubTokenCardExpanded(true);
+            }
+        }
+
+        function toggleGithubTokenInput() {
+            const checkbox = document.getElementById('githubTokenEnabled');
+            const container = document.getElementById('githubTokenInputContainer');
+            const statusDiv = document.getElementById('githubTokenStatus');
+            const badge = document.getElementById('githubTokenBadge');
+
+            container.style.display = checkbox.checked ? 'block' : 'none';
+
+            // Wenn deaktiviert, Token auch im Backend deaktivieren
+            if (!checkbox.checked) {
+                badge.style.display = 'none';
+                saveGithubToken(false);
+            }
+        }
+
+        async function saveGithubToken(showAlert = true) {
+            const checkbox = document.getElementById('githubTokenEnabled');
+            const tokenInput = document.getElementById('githubTokenInput');
+            const statusDiv = document.getElementById('githubTokenStatus');
+
+            const enabled = checkbox.checked;
+            const token = tokenInput.value.trim();
+
+            // Validierung
+            if (enabled && !token) {
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = '<span style="color: #f44336;">❌ Bitte Token eingeben</span>';
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        github_token_enabled: enabled,
+                        github_token: enabled ? token : null
+                    })
+                });
+
+                const data = await response.json();
+
+                statusDiv.style.display = 'block';
+                if (data.success) {
+                    if (enabled) {
+                        statusDiv.innerHTML = '<span style="color: #4caf50;">✅ Token gespeichert!</span>';
+                        tokenInput.value = ''; // Token aus Input löschen (Sicherheit)
+                        tokenInput.placeholder = '••••••••••••••••';
+                    } else {
+                        statusDiv.innerHTML = '<span style="color: var(--text-secondary);">Token deaktiviert</span>';
+                    }
+                    if (showAlert) {
+                        showSuccess(enabled ? 'GitHub Token gespeichert!' : 'GitHub Token deaktiviert');
+                    }
+                } else {
+                    statusDiv.innerHTML = `<span style="color: #f44336;">❌ Fehler: ${data.error}</span>`;
+                    if (showAlert) {
+                        showError(`Fehler: ${data.error}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving GitHub token:', error);
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `<span style="color: #f44336;">❌ Netzwerkfehler</span>`;
+                if (showAlert) {
+                    showError('Netzwerkfehler beim Speichern');
+                }
+            }
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             // Render Sidebar
@@ -1008,9 +1756,15 @@
             // Load profiles from server
             loadProfiles();
 
+            // Load profile management status
+            loadProfileStatus();
+
+            // Load GitHub token settings
+            loadGithubTokenSettings();
+
             // Add event listener for nozzle size change
             document.getElementById('nozzleSize').addEventListener('change', () => {
-                updateFilamentList();
+                updateFilamentTypeList(); // Update types first, which triggers updateFilamentList
                 updateProcessList();
                 validateSliceButton();
                 saveSlicerSettings();
@@ -1025,6 +1779,13 @@
 
             // Add event listeners for process and filament selection
             document.getElementById('processSelect').addEventListener('change', () => {
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            // Add event listener for filament type selection
+            document.getElementById('filamentTypeSelect').addEventListener('change', () => {
+                updateFilamentList(); // Update specific filaments based on selected type
                 validateSliceButton();
                 saveSlicerSettings();
             });

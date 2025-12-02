@@ -1005,6 +1005,11 @@
             background: #4caf50;
         }
 
+        /* Switch-Button: Keine Transition für Farbwechsel (sofort grün/rot) */
+        #switch-btn, #switch-btn-mobile {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
         /* Farben bleiben beim Hover erhalten */
         .control-btn.active:hover {
             background: #2196f3;
@@ -3018,7 +3023,7 @@
                           </h3>
                       </div>
                       <div class="control-grid">
-                          <button class="control-btn" id="switch-btn-mobile" onclick="toggleSwitch()">
+                          <button class="control-btn" id="switch-btn-mobile" onclick="toggleSwitch()" style="visibility: hidden;">
                               <span>🔌</span>
                               <span id="printer-text-mobile"></span>
                           </button>
@@ -3135,7 +3140,7 @@
                           </h3>
                       </div>
                       <div class="control-grid">
-                          <button class="control-btn" id="switch-btn" onclick="toggleSwitch()">
+                          <button class="control-btn" id="switch-btn" onclick="toggleSwitch()" style="visibility: hidden;">
                               <span>🔌</span>
                               <span id="switch-text-desktop"></span>
                           </button>
@@ -3750,8 +3755,7 @@
             const controlsTitle = document.getElementById('controls-title-desktop');
             if (controlsTitle) controlsTitle.textContent = texts.controls;
 
-            const switchText = document.getElementById('switch-text-desktop');
-            if (switchText) switchText.textContent = texts.printer;
+            // Switch-Button Text wird durch updateStatusDisplay gesetzt (Einschalten/Ausschalten)
 
             const lightText = document.getElementById('light-text-desktop');
             if (lightText) lightText.textContent = texts.light;
@@ -3765,8 +3769,7 @@
             const scheduledTextDesktop = document.getElementById('scheduled-text-desktop');
             if (scheduledTextDesktop) scheduledTextDesktop.textContent = texts.scheduled_prints;
 
-            const printerTextMobile = document.getElementById('printer-text-mobile');
-            if (printerTextMobile) printerTextMobile.textContent = texts.printer;
+            // Switch-Button Text wird durch updateStatusDisplay gesetzt (Einschalten/Ausschalten)
 
             const lightTextMobile = document.getElementById('light-text-mobile');
             if (lightTextMobile) lightTextMobile.textContent = texts.light;
@@ -4773,8 +4776,12 @@
     let currentCameraSize = 1;
     let pipWindow = null;
 
-    domReady(function() {
+    domReady(async function() {
         console.log(texts.console_app_loaded);
+
+        // WICHTIG: Status ZUERST holen, damit Buttons sofort richtig angezeigt werden
+        await loadEverything();
+        window.statusUpdateInterval = setInterval(loadEverything, 8000);
 
         // Stream neu initialisieren nach Navigation
         const img = document.getElementById('camera-stream');
@@ -4805,9 +4812,6 @@
 
         // Camera Source Button Status initialisieren (direkt, keine API nötig)
         initCameraSourceButton();
-
-        loadEverything();
-        window.statusUpdateInterval = setInterval(loadEverything, 8000);
 
         // Power-Off Timer Click Handler
         const powerOffHeader = document.getElementById('power-off-header');
@@ -5925,17 +5929,18 @@
 
             // Update control buttons
             if (status.switch !== null) {
+                const switchBtns = ['switch-btn', 'switch-btn-mobile'];
                 if (status.switch === 'on') {
                     // NEU: Prüfe ob Power-Off Timer läuft
                     if (window.powerOffTimerActive) {
                         return;
                     }
                     updateBothButtons('switch-btn', 'control-btn danger', '<span>🔌</span><span>Ausschalten</span>');
-                    const switchBtns = ['switch-btn', 'switch-btn-mobile'];
                     switchBtns.forEach(id => {
                         const btn = document.getElementById(id);
                         if (btn) {
                             btn.style.background = '#f44336';
+                            btn.style.visibility = 'visible';
                             btn.disabled = false;
                         }
                     });
@@ -5943,7 +5948,6 @@
                     // Drucker AUS
                     // Nur "HA nicht verfügbar" anzeigen wenn HA in Config aktiviert ist
                     if (status.ha_enabled && status.ha_available === false) {
-                        const switchBtns = ['switch-btn', 'switch-btn-mobile'];
                         switchBtns.forEach(id => {
                             const btn = document.getElementById(id);
                             if (btn) {
@@ -5952,15 +5956,16 @@
                                 btn.disabled = true;
                                 btn.style.background = '#ff9800';
                                 btn.style.cursor = 'not-allowed';
+                                btn.style.visibility = 'visible';
                             }
                         });
                     } else {
                         updateBothButtons('switch-btn', 'control-btn success', '<span>🔌</span><span>Einschalten</span>');
-                        const switchBtns = ['switch-btn', 'switch-btn-mobile'];
                         switchBtns.forEach(id => {
                             const btn = document.getElementById(id);
                             if (btn) {
                                 btn.style.background = '#4caf50';
+                                btn.style.visibility = 'visible';
                                 btn.disabled = false;
                                 btn.style.cursor = 'pointer';
                             }

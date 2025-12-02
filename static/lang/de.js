@@ -1554,6 +1554,7 @@ const translations_de = {
     slicer_bed_type_label: '🛏️ Druckbett-Typ',
     slicer_layer_height_label: '📐 Layer Height / Qualität',
     slicer_filament_type_label: '🧵 Filament-Typ',
+    slicer_filament_label: '🎨 Filament',
 
     // Options
     slicer_loading_profiles: 'Lade Profile...',

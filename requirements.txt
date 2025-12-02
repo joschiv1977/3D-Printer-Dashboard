@@ -33,9 +33,10 @@ gpiod==2.1.3; sys_platform == 'linux'
 grpcio==1.76.0
 grpcio-status==1.76.0
 h11==0.16.0
+h2>=4.0.0  # HTTP/2 Support für httpx
 httpcore==1.0.9
 httplib2==0.31.0
-httpx==0.28.1
+httpx[http2]==0.28.1
 idna==3.11
 invoke==2.2.1
 itsdangerous==2.2.0

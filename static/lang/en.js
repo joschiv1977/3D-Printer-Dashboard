@@ -1523,6 +1523,7 @@ const translations_en = {
     slicer_bed_type_label: '🛏️ Build Plate Type',
     slicer_layer_height_label: '📐 Layer Height / Quality',
     slicer_filament_type_label: '🧵 Filament Type',
+    slicer_filament_label: '🎨 Filament',
 
     // Options
     slicer_loading_profiles: 'Loading profiles...',

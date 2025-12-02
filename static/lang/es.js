@@ -1505,6 +1505,7 @@ const translations_es = {
     slicer_bed_type_label: '🛏️ Tipo de Plataforma',
     slicer_layer_height_label: '📐 Altura de Capa / Calidad',
     slicer_filament_type_label: '🧵 Tipo de Filamento',
+    slicer_filament_label: '🎨 Filamento',
 
     // Options
     slicer_loading_profiles: 'Cargando perfiles...',

@@ -1505,6 +1505,7 @@ const translations_fr = {
     slicer_bed_type_label: '🛏️ Type de Plateau',
     slicer_layer_height_label: '📐 Hauteur de Couche / Qualité',
     slicer_filament_type_label: '🧵 Type de Filament',
+    slicer_filament_label: '🎨 Filament',
 
     // Options
     slicer_loading_profiles: 'Chargement des profils...',

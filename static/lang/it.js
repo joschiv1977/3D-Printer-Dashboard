@@ -1505,6 +1505,7 @@ const translations_it = {
     slicer_bed_type_label: '🛏️ Tipo di Piano',
     slicer_layer_height_label: '📐 Altezza Strato / Qualità',
     slicer_filament_type_label: '🧵 Tipo di Filamento',
+    slicer_filament_label: '🎨 Filamento',
 
     // Options
     slicer_loading_profiles: 'Caricamento profili...',
