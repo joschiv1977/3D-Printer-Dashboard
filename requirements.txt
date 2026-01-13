@@ -47,8 +47,8 @@ MarkupSafe==3.0.3
 mdurl==0.1.2
 meross-iot==0.4.10.3
 msgpack==1.1.2
-numpy==1.26.4
-opencv-python==4.8.1.78
+numpy>=2.0.0
+opencv-python>=4.10.0
 ordered-set==4.1.0
 packaging==25.0
 paho-mqtt==2.1.0
