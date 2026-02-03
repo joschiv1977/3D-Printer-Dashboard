@@ -522,14 +522,16 @@
 
         async function revokeSession(sessionId, deviceName) {
             const confirmMsg = texts.users_confirm_end_session ? texts.users_confirm_end_session.replace('{name}', deviceName) : `Really end web session "${deviceName}"?`;
-            if (!confirm(confirmMsg)) return;
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Session beenden');
+            if (!confirmed) return;
             const successMsg = texts.users_session_ended ? texts.users_session_ended.replace('{name}', deviceName) : `Session "${deviceName}" has been ended.`;
             await revokeEntry(`/api/auth/session/${sessionId}`, successMsg);
         }
 
         async function revokeDevice(deviceId, deviceName) {
             const confirmMsg = texts.users_confirm_logout_device ? texts.users_confirm_logout_device.replace('{name}', deviceName) : `Really log out device "${deviceName}"?`;
-            if (!confirm(confirmMsg)) return;
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Gerät abmelden');
+            if (!confirmed) return;
             const successMsg = texts.users_device_logged_out ? texts.users_device_logged_out.replace('{name}', deviceName) : `Device "${deviceName}" has been logged out.`;
             await revokeEntry(`/api/auth/device/${deviceId}`, successMsg);
         }
@@ -627,7 +629,8 @@
                 ? texts.users_confirm_delete_user.replace('{username}', username)
                 : `Möchtest du den Benutzer "${username}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!`;
 
-            if (!confirm(confirmMsg)) return;
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_delete_title || 'Benutzer löschen');
+            if (!confirmed) return;
 
             try {
                 const response = await apiCall(`/api/users/${username}`, {
@@ -659,8 +662,33 @@
             alert.style.display = 'block';
             setTimeout(() => { alert.style.display = 'none'; }, 4000);
         }
-        const showSuccess = (msg) => showAlert('successAlert', msg);
-        const showError = (msg) => showAlert('errorAlert', msg);
+
+        // Wrapper-Funktionen die Electron Toast oder Web Alert nutzen
+        function showSuccess(msg) {
+            // Prüfe ob Electron Toast verfügbar ist (window.showToast von toast.js)
+            if (window.electronAPI && window.showToast) {
+                window.showToast({ title: 'Erfolg', message: msg, type: 'success', duration: 4000 });
+            } else {
+                showAlert('successAlert', msg);
+            }
+        }
+        function showError(msg) {
+            // Prüfe ob Electron Toast verfügbar ist (window.showToast von toast.js)
+            if (window.electronAPI && window.showToast) {
+                window.showToast({ title: 'Fehler', message: msg, type: 'error', duration: 4000 });
+            } else {
+                showAlert('errorAlert', msg);
+            }
+        }
+
+        // Wrapper für confirm() - nutzt Electron showConfirm oder native confirm
+        async function showConfirmDialog(message, title = 'Bestätigung') {
+            if (window.electronAPI && window.showConfirm) {
+                return await window.showConfirm({ title: title, message: message, type: 'warning' });
+            } else {
+                return confirm(message);
+            }
+        }
 
         // Language change functionality
         async function loadUserLanguage() {

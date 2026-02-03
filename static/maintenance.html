@@ -1852,17 +1852,31 @@
         }
 
         function showSuccess(message) {
-            const alert = document.getElementById('alert-success');
-            alert.textContent = message;
-            alert.classList.add('show');
-            setTimeout(() => alert.classList.remove('show'), 4000);
+            // Prüfe ob Electron Toast-System verfügbar ist
+            if (typeof window.showToast === 'function') {
+                // Electron: Nutze showToast mit title+message
+                window.showToast({ title: 'Erfolg', message: message, type: 'success' });
+            } else {
+                // Browser: Nutze lokale Alert-Box
+                const alert = document.getElementById('alert-success');
+                alert.textContent = message;
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 4000);
+            }
         }
 
         function showError(message) {
-            const alert = document.getElementById('alert-error');
-            alert.textContent = message;
-            alert.classList.add('show');
-            setTimeout(() => alert.classList.remove('show'), 4000);
+            // Prüfe ob Electron Toast-System verfügbar ist
+            if (typeof window.showToast === 'function') {
+                // Electron: Nutze showToast mit title+message
+                window.showToast({ title: 'Fehler', message: message, type: 'error' });
+            } else {
+                // Browser: Nutze lokale Alert-Box
+                const alert = document.getElementById('alert-error');
+                alert.textContent = message;
+                alert.classList.add('show');
+                setTimeout(() => alert.classList.remove('show'), 4000);
+            }
         }
     </script>
 </body>

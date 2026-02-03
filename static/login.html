@@ -135,6 +135,98 @@
     </script>
 
     <script>
+        // ============================================
+        // Auto-Login für Electron App
+        // ============================================
+        async function tryAutoLogin() {
+            // Prüfe ob Electron App läuft
+            if (!window.electronAPI) {
+                console.log('[Auto-Login] Kein Electron - Skip Auto-Login');
+                return false;
+            }
+
+            try {
+                console.log('[Auto-Login] Lade gespeicherte Credentials...');
+                const credentials = await window.electronAPI.loadCredentials();
+
+                if (!credentials || !credentials.username || !credentials.deviceToken) {
+                    console.log('[Auto-Login] Keine Credentials gespeichert');
+                    return false;
+                }
+
+                if (!credentials.autoLogin) {
+                    console.log('[Auto-Login] Auto-Login ist deaktiviert');
+                    return false;
+                }
+
+                console.log('[Auto-Login] Credentials gefunden für User:', credentials.username);
+                console.log('[Auto-Login] Versuche Auto-Login mit Device Token...');
+
+                // Zeige Status-Nachricht
+                const successMsg = document.getElementById('successMessage');
+                successMsg.textContent = 'Automatische Anmeldung läuft...';
+                successMsg.style.display = 'block';
+
+                // Verwende Device Token für Login
+                const language = localStorage.getItem('language') || 'de';
+                const response = await fetch('/api/auth/device/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username: credentials.username,
+                        device_token: credentials.deviceToken,
+                        language
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.username) {
+                    console.log('[Auto-Login] ✅ Auto-Login erfolgreich!');
+
+                    // Speichere User-Daten
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('role', data.role);
+
+                    if (data.csrf_token) {
+                        sessionStorage.setItem('csrf_token', data.csrf_token);
+                        localStorage.setItem('csrf_token', data.csrf_token);
+                    }
+
+                    // Redirect zum Dashboard
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const nextUrl = urlParams.get('next') || '/';
+
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    window.location.href = nextUrl;
+                    return true;
+                } else {
+                    console.log('[Auto-Login] ❌ Auto-Login fehlgeschlagen:', data.error);
+                    console.log('[Auto-Login] Fallback zu manuellem Login');
+
+                    // Verstecke Status-Nachricht
+                    successMsg.style.display = 'none';
+
+                    // Fülle Username-Feld vor
+                    document.getElementById('username').value = credentials.username;
+                    return false;
+                }
+            } catch (error) {
+                console.error('[Auto-Login] ❌ Error:', error);
+                return false;
+            }
+        }
+
+        // Versuche Auto-Login sobald DOM geladen ist
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[Auto-Login] DOM geladen, starte Auto-Login...');
+            await tryAutoLogin();
+        });
+
+        // ============================================
+        // Manuelles Login-Formular
+        // ============================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
@@ -162,6 +254,41 @@
                     if (data.csrf_token) {
                         sessionStorage.setItem('csrf_token', data.csrf_token);
                         localStorage.setItem('csrf_token', data.csrf_token);
+                    }
+
+                    // ============================================
+                    // Electron: Device Token registrieren für Auto-Login
+                    // ============================================
+                    if (window.electronAPI) {
+                        try {
+                            console.log('[Auto-Login] Registriere Device für Auto-Login...');
+                            const registerResponse = await fetch('/api/auth/device/register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    username: username,
+                                    password: password
+                                })
+                            });
+
+                            if (registerResponse.ok) {
+                                const registerData = await registerResponse.json();
+                                console.log('[Auto-Login] ✅ Device Token erhalten:', registerData.device_token.substring(0, 20) + '...');
+
+                                // Speichere Credentials mit Device Token
+                                await window.electronAPI.saveCredentials(
+                                    username,
+                                    password,
+                                    registerData.device_token
+                                );
+                                console.log('[Auto-Login] ✅ Credentials gespeichert für Auto-Login');
+                            } else {
+                                console.error('[Auto-Login] ❌ Device Registrierung fehlgeschlagen');
+                            }
+                        } catch (error) {
+                            console.error('[Auto-Login] ❌ Error bei Device Registrierung:', error);
+                        }
                     }
 
                     // FIX: Warte 100ms damit Browser Zeit hat Cookies zu schreiben (Race Condition Fix)

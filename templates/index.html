@@ -27,6 +27,9 @@
     <!-- Auth Handler laden -->
     <script src="/static/auth-handler.js"></script>
 
+    <!-- Firebase FCM wird von preload.js injiziert (electron-app/firebase-init.js) -->
+    <!-- electron-push-receiver wird von preload.js injiziert (electron-app/push-receiver-init.js) -->
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
 
@@ -189,6 +192,64 @@
 
         .hms-dismiss-btn:hover {
             background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Power-Off Timer Banner */
+        .power-off-banner {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: #000;
+            padding: 12px 20px;
+            padding-top: calc(12px + var(--safe-area-inset-top));
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 97;
+        }
+
+        .power-off-banner.active {
+            display: flex;
+        }
+
+        .power-off-banner-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .power-off-banner-icon {
+            font-size: 24px;
+        }
+
+        .power-off-banner-text h4 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .power-off-banner-text p {
+            margin: 4px 0 0 0;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .power-off-cancel-btn {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            color: #000;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .power-off-cancel-btn:hover {
+            background: rgba(0, 0, 0, 0.3);
         }
 
         /* Maintenance Banner */
@@ -2185,6 +2246,18 @@
         <button class="hms-dismiss-btn" onclick="dismissHMSError()" data-i18n="hms_dismiss">✕ Ausblenden</button>
     </div>
 
+    <!-- Power-Off Timer Banner -->
+    <div id="power-off-banner" class="power-off-banner">
+        <div class="power-off-banner-info">
+            <span class="power-off-banner-icon">⏰</span>
+            <div class="power-off-banner-text">
+                <h4 id="power-off-banner-title">Auto Power-Off in <span id="power-off-banner-countdown">--:--</span></h4>
+                <p id="power-off-banner-reason">--</p>
+            </div>
+        </div>
+        <button class="power-off-cancel-btn" onclick="cancelPowerOffTimerFromBanner()">✕ Cancel</button>
+    </div>
+
     <!-- Maintenance Banner -->
     <div id="maintenance-banner" class="maintenance-banner">
         <div class="maintenance-banner-info">
@@ -2540,6 +2613,118 @@
             </div>
         </div>
     </div>
+
+    <!-- Temperature Control Modal -->
+    <div id="tempModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1002;">
+        <div style="position:absolute; width:90%; max-width:400px; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--bg-card); border-radius:12px; padding:20px;">
+          <button onclick="closeTempModal()"
+                  style="position:absolute; right:10px; top:10px;
+                         background:rgba(255,255,255,0.1); color:var(--text-primary);
+                         border:1px solid transparent;
+                         padding:4px 10px; border-radius:8px; cursor:pointer;
+                         font-size:24px; line-height:1;
+                         box-shadow:0 1px 3px rgba(0,0,0,0.2);
+                         transition:all 0.2s;"
+                  onmouseover="this.style.transform='translateY(-1px)';
+                              this.style.border='1px solid rgba(255,255,255,0.3)';
+                              this.style.boxShadow='0 3px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5)';"
+                  onmouseout="this.style.transform='translateY(0)';
+                             this.style.border='1px solid transparent';
+                             this.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';">
+              ×
+          </button>
+            <h2 style="margin-bottom:20px; color:var(--text-primary);"><span>🌡️</span> <span id="temp-modal-title">Temperatur-Einstellung</span></h2>
+
+            <!-- Nozzle Temperature -->
+            <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--text-primary); font-weight:bold;">🔥 <span id="temp-nozzle-label">Düse</span></span>
+                    <span style="color:var(--text-secondary); font-size:13px;">
+                        <span id="temp-nozzle-current-label">Aktuell</span>: <span id="temp-nozzle-current">--</span>°C
+                    </span>
+                </div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <input type="range" id="temp-nozzle-slider" min="0" max="300" value="0" step="5"
+                           style="flex:1; cursor:pointer;"
+                           oninput="updateTempDisplay('nozzle', this.value)">
+                    <div style="display:flex; align-items:center; gap:5px; min-width:80px;">
+                        <input type="number" id="temp-nozzle-input" min="0" max="300" value="0"
+                               style="width:60px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:5px; color:var(--text-primary); text-align:center;"
+                               oninput="document.getElementById('temp-nozzle-slider').value = this.value">
+                        <span style="color:var(--text-secondary);">°C</span>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                    <button onclick="setTempPreset('nozzle', 0)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;" id="temp-off-btn-nozzle">Aus</button>
+                    <button onclick="setTempPreset('nozzle', 200)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">PLA</button>
+                    <button onclick="setTempPreset('nozzle', 230)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">PETG</button>
+                    <button onclick="setTempPreset('nozzle', 250)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">ASA</button>
+                    <button onclick="setTempPreset('nozzle', 260)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">ABS</button>
+                </div>
+            </div>
+
+            <!-- Bed Temperature -->
+            <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <span style="color:var(--text-primary); font-weight:bold;">🛏️ <span id="temp-bed-label">Bett</span></span>
+                    <span style="color:var(--text-secondary); font-size:13px;">
+                        <span id="temp-bed-current-label">Aktuell</span>: <span id="temp-bed-current">--</span>°C
+                    </span>
+                </div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <input type="range" id="temp-bed-slider" min="0" max="120" value="0" step="5"
+                           style="flex:1; cursor:pointer;"
+                           oninput="updateTempDisplay('bed', this.value)">
+                    <div style="display:flex; align-items:center; gap:5px; min-width:80px;">
+                        <input type="number" id="temp-bed-input" min="0" max="120" value="0"
+                               style="width:60px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:5px; color:var(--text-primary); text-align:center;"
+                               oninput="document.getElementById('temp-bed-slider').value = this.value">
+                        <span style="color:var(--text-secondary);">°C</span>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px;">
+                    <button onclick="setTempPreset('bed', 0)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;" id="temp-off-btn-bed">Aus</button>
+                    <button onclick="setTempPreset('bed', 60)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">PLA</button>
+                    <button onclick="setTempPreset('bed', 80)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">PETG</button>
+                    <button onclick="setTempPreset('bed', 100)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">ASA</button>
+                    <button onclick="setTempPreset('bed', 100)" style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:6px; padding:4px 10px; color:var(--text-secondary); cursor:pointer; font-size:12px;">ABS</button>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <button onclick="closeTempModal()"
+                      style="background:var(--border-color); color:var(--text-primary);
+                             border:1px solid transparent;
+                             padding:10px 20px; border-radius:10px; cursor:pointer;
+                             box-shadow:0 1px 3px rgba(0,0,0,0.2);
+                             transition:all 0.2s;"
+                      onmouseover="this.style.transform='translateY(-1px)';
+                                  this.style.border='1px solid rgba(255,255,255,0.3)';
+                                  this.style.boxShadow='0 3px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5)';"
+                      onmouseout="this.style.transform='translateY(0)';
+                                 this.style.border='1px solid transparent';
+                                 this.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';">
+                  <span id="temp-cancel-btn">Abbrechen</span>
+              </button>
+              <button onclick="applyTemperatures()"
+                      style="background:var(--accent-blue); color:white;
+                             border:1px solid transparent;
+                             padding:10px 20px; border-radius:10px; cursor:pointer;
+                             box-shadow:0 1px 3px rgba(0,0,0,0.2);
+                             transition:all 0.2s;"
+                      onmouseover="this.style.transform='translateY(-1px)';
+                                  this.style.border='1px solid rgba(255,255,255,0.3)';
+                                  this.style.boxShadow='0 3px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.5)';"
+                      onmouseout="this.style.transform='translateY(0)';
+                                 this.style.border='1px solid transparent';
+                                 this.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';">
+                  <span id="temp-apply-btn">Anwenden</span>
+              </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Druck-Detail Modal -->
     <div id="printDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1006;">
         <div style="position:absolute; width:95%; max-width:1100px; max-height:90vh; top:50%; left:50%; transform:translate(-50%, -50%); background:var(--bg-card); border-radius:12px; padding:20px; overflow-y:auto;">
@@ -3088,6 +3273,10 @@
                               <span>⚡</span>
                               <span id="speed-text-mobile"></span>
                           </button>
+                          <button class="control-btn info" onclick="openTempControl()" id="temp-btn-mobile">
+                              <span>🌡️</span>
+                              <span id="temp-text-mobile"></span>
+                          </button>
                       </div>
                   </div>
               </div>
@@ -3167,7 +3356,7 @@
           </div>
 
           <!-- Developer Control Card (Desktop only, initial versteckt) -->
-          <div class="grid-stack-item control-card-desktop" gs-w="3" gs-h="5" gs-x="5" gs-y="4" gs-min-w="3" gs-min-h="2" gs-max-w="6" gs-max-h="6" id="dev-control-card-desktop" style="display: none;">
+          <div class="grid-stack-item control-card-desktop" gs-w="3" gs-h="5" gs-x="5" gs-y="4" gs-min-w="3" gs-min-h="2" gs-max-w="6" gs-max-h="7" id="dev-control-card-desktop" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card">
                       <div class="card-header">
@@ -3204,6 +3393,10 @@
                           <button class="control-btn warning" onclick="openSpeedControl()">
                               <span>⚡</span>
                               <span id="speed-text-desktop"></span>
+                          </button>
+                          <button class="control-btn info" onclick="openTempControl()" id="temp-btn-desktop">
+                              <span>🌡️</span>
+                              <span id="temp-text-desktop"></span>
                           </button>
                       </div>
                   </div>
@@ -3515,7 +3708,7 @@
                 { "id": "camera-card-grid", "x": 0, "y": 0, "w": 5, "h": 8 },
                 { "id": "progress-card-grid", "x": 0, "y": 9, "w": 5, "h": 7 },
                 { "id": "control-card-desktop", "x": 5, "y": 0, "w": 3, "h": 6 },
-                { "id": "dev-control-card-desktop", "x": 8, "y": 0, "w": 4, "h": 6 },
+                { "id": "dev-control-card-desktop", "x": 8, "y": 0, "w": 4, "h": 7 },
                 { "id": "spoolman-card-grid", "x": 5, "y": 7, "w": 4, "h": 6 },
                 { "id": "filament-drying-card-grid", "x": 9, "y": 7, "w": 3, "h": 8 }
             ];
@@ -3882,6 +4075,12 @@
 
             const speedTextMobile = document.getElementById('speed-text-mobile');
             if (speedTextMobile) speedTextMobile.textContent = texts.speed;
+
+            const tempTextMobile = document.getElementById('temp-text-mobile');
+            if (tempTextMobile) tempTextMobile.textContent = texts.temp_control || 'Temp';
+
+            const tempTextDesktop = document.getElementById('temp-text-desktop');
+            if (tempTextDesktop) tempTextDesktop.textContent = texts.temp_control || 'Temp';
 
             // Sidebar Menu (inkl. Pin-Button)
             const sidebarItems = document.querySelectorAll('.sidebar span[data-i18n]');
@@ -4929,6 +5128,10 @@
 
             if (response.ok) {
                 showThemeToast('⏹️ ' + texts.toast_poweroff_cancelled);
+                // Banner sofort ausblenden
+                const banner = document.getElementById('power-off-banner');
+                if (banner) banner.classList.remove('active');
+                window.powerOffTimerActive = false;
             } else {
                 showThemeToast('❌ ' + texts.toast_error_cancelling);
             }
@@ -4938,55 +5141,127 @@
         }
     }
 
+    // Cancel from Banner with confirmation
+    function cancelPowerOffTimerFromBanner() {
+        if (confirm('Cancel auto power-off timer?')) {
+            cancelPowerOffTimer();
+        }
+    }
+
     function showThemeToast(theme) {
         // Keine Toast wenn von Native App getriggert
         if (window.isFromNativeApp) {
             return;
         }
 
+        // Electron App: Nutze das professionelle Toast-System
+        if (window.electronAPI && typeof showToast === 'function') {
+            // Electron Toast System nutzen (nur für Theme-Wechsel)
+            const messages = {
+                'auto': '🌓 ' + texts.theme_auto,
+                'dark': '🌙 ' + texts.theme_dark,
+                'light': '☀️ ' + texts.theme_light
+            };
+            const message = messages[theme] || theme;
+
+            // Nutze kurzen Auto-Close Toast (1.5s)
+            const toastDiv = document.createElement('div');
+            toastDiv.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%) scale(0.95);
+                background: var(--bg-secondary);
+                color: var(--text-primary);
+                padding: 12px 24px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px var(--shadow);
+                z-index: 999999;
+                font-size: 14px;
+                border: 1px solid var(--border-color);
+                opacity: 0;
+                transition: all 0.2s ease-out;
+                pointer-events: auto;
+            `;
+            toastDiv.textContent = message;
+            document.body.appendChild(toastDiv);
+
+            // Fade-in Animation
+            requestAnimationFrame(() => {
+                toastDiv.style.opacity = '1';
+                toastDiv.style.transform = 'translateX(-50%) scale(1)';
+            });
+
+            // Auto-Close nach 1.5s
+            setTimeout(() => {
+                toastDiv.style.opacity = '0';
+                toastDiv.style.transform = 'translateX(-50%) scale(0.95)';
+                setTimeout(() => toastDiv.remove(), 200);
+            }, 1500);
+            return;
+        }
+
+        // Web Browser: Einfaches Toast
         const messages = {
             'auto': '🌓 ' + texts.theme_auto,
             'dark': '🌙 ' + texts.theme_dark,
             'light': '☀️ ' + texts.theme_light
         };
 
+        // Entferne alte Toasts
+        const existingToasts = document.querySelectorAll('.web-toast');
+        existingToasts.forEach(t => t.remove());
+
         // Temporäre Nachricht anzeigen
         const toast = document.createElement('div');
+        toast.className = 'web-toast';
         toast.style.cssText = `
             position: fixed;
             bottom: 20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) scale(0.95);
             background: var(--bg-secondary);
             color: var(--text-primary);
             padding: 12px 24px;
             border-radius: 8px;
             box-shadow: 0 4px 12px var(--shadow);
-            z-index: 1000;
+            z-index: 999999;
             font-size: 14px;
             border: 1px solid var(--border-color);
+            opacity: 0;
+            transition: all 0.2s ease-out;
+            pointer-events: auto;
         `;
         toast.textContent = messages[theme] || theme;
+
         // Prüfe ob wir im Printer Control Modal sind
         const modal = document.getElementById('printerControlModal');
-        const isModalOpen = modal && modal.style.display === 'block';
+        const isModalOpen = modal && (modal.style.display === 'block' || modal.classList.contains('show'));
 
         if (isModalOpen) {
             // Toast im Modal anzeigen
             const modalContent = document.getElementById('printerControlModalContent') || modal;
-            toast.style.position = 'absolute'; // Wichtig: absolute statt fixed
+            toast.style.position = 'absolute';
             toast.style.bottom = '50px';
-            toast.style.zIndex = '99999';
+            toast.style.zIndex = '999999';
+            modalContent.style.position = 'relative'; // Wichtig für absolute positioning
             modalContent.appendChild(toast);
         } else {
             // Normal im Body
             document.body.appendChild(toast);
         }
 
+        // Fade-in Animation
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(-50%) scale(1)';
+        });
+
+        // Auto-Close nach 2s
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s';
-            setTimeout(() => toast.remove(), 300);
+            toast.style.transform = 'translateX(-50%) scale(0.95)';
+            setTimeout(() => toast.remove(), 200);
         }, 2000);
     }
 
@@ -8189,6 +8464,8 @@
                 document.getElementById('plateSelectModal').style.display = 'none';
                 closeSDModal();
 
+                // SpoolmanCard update is handled by backend via SocketIO 'spoolman_active_spool' event
+
                 const timelapseInfo = printOptions.timelapse ? (' ' + texts.with_timelapse) : '';
                 showThemeToast('✅ ' + texts.toast_print_started + timelapseInfo);
 
@@ -8742,6 +9019,9 @@
 
             if (data.success) {
                 closeSDModal();
+
+                // SpoolmanCard update is handled by backend via SocketIO 'spoolman_active_spool' event
+
                 const timelapseInfo = data.timelapse ? (' (' + texts.with_timelapse + ')') : '';
                 showThemeToast('✅ ' + texts.toast_print_started_file.replace('{filename}', filename) + timelapseInfo);
             } else {
@@ -9118,29 +9398,18 @@
             const data = await response.json();
             console.log('⏰ Power-Off Timer Status loaded:', data);
 
+            const banner = document.getElementById('power-off-banner');
+            const bannerCountdown = document.getElementById('power-off-banner-countdown');
+            const bannerReason = document.getElementById('power-off-banner-reason');
+
             if (data.active) {
-                // Timer-Event simulieren um UI zu aktualisieren
-                const event = {
-                    active: true,
-                    end_time: data.end_time,
-                    minutes: data.minutes,
-                    reason: data.reason
-                };
-
-                // Direkt die UI aktualisieren (gleiche Logik wie socket.on('power_off_timer'))
-                const statusDiv = document.getElementById('power-off-status');
-                const headerTimer = document.getElementById('power-off-header');
-
-                if (statusDiv) {
-                    statusDiv.style.display = 'block';
-                    document.getElementById('power-off-reason').textContent = data.reason;
-                }
-
-                if (headerTimer) {
-                    headerTimer.style.display = 'inline-block';
-                }
-
                 window.powerOffTimerActive = true;
+
+                // Banner anzeigen
+                if (banner) {
+                    banner.classList.add('active');
+                    if (bannerReason) bannerReason.textContent = data.reason;
+                }
 
                 // Countdown starten
                 const updateCountdown = () => {
@@ -9149,29 +9418,23 @@
                     const seconds = Math.floor(remaining % 60);
                     const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-                    const modalCountdown = document.getElementById('power-off-countdown');
-                    if (modalCountdown) {
-                        modalCountdown.textContent = timeString;
-                    }
-
-                    const headerCountdown = document.getElementById('header-countdown');
-                    if (headerCountdown) {
-                        headerCountdown.textContent = timeString;
-                        if (minutes < 1) {
-                            headerTimer.style.color = '#ff4444';
-                        } else if (minutes < 5) {
-                            headerTimer.style.color = '#ff9800';
-                        } else {
-                            headerTimer.style.color = '#ffc107';
-                        }
+                    if (bannerCountdown) {
+                        bannerCountdown.textContent = timeString;
                     }
 
                     if (remaining > 0 && window.powerOffTimerActive) {
                         requestAnimationFrame(updateCountdown);
+                    } else if (remaining <= 0) {
+                        // Timer abgelaufen - Banner ausblenden
+                        if (banner) banner.classList.remove('active');
                     }
                 };
 
                 updateCountdown();
+            } else {
+                // Timer nicht aktiv - Banner ausblenden
+                if (banner) banner.classList.remove('active');
+                window.powerOffTimerActive = false;
             }
         } catch (error) {
             console.error('❌ Error loading Power-Off Timer status:', error);
@@ -9320,6 +9583,92 @@
             updateSpeedDisplay(window.lastPrintData.speed_level);
         } else {
             updateSpeedDisplay(2);
+        }
+    }
+
+    // ========================================
+    // Temperature Control Modal
+    // ========================================
+    let lastNozzleTemp = 0;
+    let lastBedTemp = 0;
+    let lastNozzleTarget = 0;
+    let lastBedTarget = 0;
+
+    function openTempControl() {
+        document.getElementById('tempModal').style.display = 'block';
+
+        // Texte setzen
+        document.getElementById('temp-modal-title').textContent = texts.temp_control_title || 'Temperatur-Einstellung';
+        document.getElementById('temp-nozzle-label').textContent = texts.temp_nozzle || 'Düse';
+        document.getElementById('temp-bed-label').textContent = texts.temp_bed || 'Bett';
+        document.getElementById('temp-nozzle-current-label').textContent = texts.temp_current || 'Aktuell';
+        document.getElementById('temp-bed-current-label').textContent = texts.temp_current || 'Aktuell';
+        document.getElementById('temp-cancel-btn').textContent = texts.cancel || 'Abbrechen';
+        document.getElementById('temp-apply-btn').textContent = texts.apply || 'Anwenden';
+        document.getElementById('temp-off-btn-nozzle').textContent = texts.temp_off || 'Aus';
+        document.getElementById('temp-off-btn-bed').textContent = texts.temp_off || 'Aus';
+
+        // Aktuelle Temperaturen aus lastPrintData holen
+        if (window.lastPrintData) {
+            lastNozzleTemp = window.lastPrintData.nozzle_temp || 0;
+            lastBedTemp = window.lastPrintData.bed_temp || 0;
+            lastNozzleTarget = window.lastPrintData.nozzle_target || 0;
+            lastBedTarget = window.lastPrintData.bed_target || 0;
+        }
+
+        // Aktuelle Werte anzeigen
+        document.getElementById('temp-nozzle-current').textContent = Math.round(lastNozzleTemp);
+        document.getElementById('temp-bed-current').textContent = Math.round(lastBedTemp);
+
+        // Slider auf Zieltemperatur setzen (oder 0 wenn kein Ziel)
+        document.getElementById('temp-nozzle-slider').value = lastNozzleTarget;
+        document.getElementById('temp-nozzle-input').value = lastNozzleTarget;
+        document.getElementById('temp-bed-slider').value = lastBedTarget;
+        document.getElementById('temp-bed-input').value = lastBedTarget;
+    }
+
+    function closeTempModal() {
+        document.getElementById('tempModal').style.display = 'none';
+    }
+
+    function updateTempDisplay(type, value) {
+        document.getElementById(`temp-${type}-input`).value = value;
+        document.getElementById(`temp-${type}-slider`).value = value;
+    }
+
+    function setTempPreset(type, value) {
+        document.getElementById(`temp-${type}-slider`).value = value;
+        document.getElementById(`temp-${type}-input`).value = value;
+    }
+
+    async function applyTemperatures() {
+        const nozzleTemp = parseInt(document.getElementById('temp-nozzle-input').value) || 0;
+        const bedTemp = parseInt(document.getElementById('temp-bed-input').value) || 0;
+
+        try {
+            // Düsentemperatur setzen
+            if (nozzleTemp !== lastNozzleTarget) {
+                await apiCall('/api/mqtt/temperature', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({type: 'extruder', temperature: nozzleTemp})
+                });
+            }
+
+            // Betttemperatur setzen
+            if (bedTemp !== lastBedTarget) {
+                await apiCall('/api/mqtt/temperature', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({type: 'bed', temperature: bedTemp})
+                });
+            }
+
+            showThemeToast('🌡️ ' + (texts.temp_apply_success || 'Temperatur wird geändert'));
+            closeTempModal();
+        } catch (error) {
+            console.error('Temperature error:', error);
+            showThemeToast('❌ ' + (texts.temp_apply_error || 'Fehler beim Setzen der Temperatur'));
         }
     }
 
@@ -9572,20 +9921,17 @@
         socket.on('power_off_timer', function(data) {
             console.log(texts.console_poweroff_timer_event, data);
 
-            // === Desktop/Browser ===
-            const statusDiv = document.getElementById('power-off-status');
-            const headerTimer = document.getElementById('power-off-header');
+            const banner = document.getElementById('power-off-banner');
+            const bannerCountdown = document.getElementById('power-off-banner-countdown');
+            const bannerReason = document.getElementById('power-off-banner-reason');
 
             if (data.active) {
-                // Settings Modal Status
-                if (statusDiv) {
-                    statusDiv.style.display = 'block';
-                    document.getElementById('power-off-reason').textContent = data.reason;
-                }
+                window.powerOffTimerActive = true;
 
-                // Header Timer anzeigen
-                if (headerTimer) {
-                    headerTimer.style.display = 'inline-block';
+                // Banner anzeigen
+                if (banner) {
+                    banner.classList.add('active');
+                    if (bannerReason) bannerReason.textContent = data.reason;
                 }
 
                 // Countdown updaten
@@ -9595,41 +9941,25 @@
                     const seconds = Math.floor(remaining % 60);
                     const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-                    // Update Settings Modal
-                    const modalCountdown = document.getElementById('power-off-countdown');
-                    if (modalCountdown) {
-                        modalCountdown.textContent = timeString;
+                    if (bannerCountdown) {
+                        bannerCountdown.textContent = timeString;
                     }
 
-                    // Update Header Timer
-                    const headerCountdown = document.getElementById('header-countdown');
-                    if (headerCountdown) {
-                        headerCountdown.textContent = timeString;
-
-                        // Farbe ändern wenn wenig Zeit
-                        if (minutes < 1) {
-                            headerTimer.style.color = '#ff4444';  // Rot
-                        } else if (minutes < 5) {
-                            headerTimer.style.color = '#ff9800';  // Orange
-                        } else {
-                            headerTimer.style.color = '#ffc107';  // Gelb
-                        }
-                    }
-
-                    if (remaining > 0) {
+                    if (remaining > 0 && window.powerOffTimerActive) {
                         requestAnimationFrame(updateCountdown);
+                    } else if (remaining <= 0) {
+                        // Timer abgelaufen - Banner ausblenden
+                        if (banner) banner.classList.remove('active');
                     }
                 };
 
                 updateCountdown();
 
             } else {
-                // Timer deaktiviert - UI aufräumen
-                if (statusDiv) {
-                    statusDiv.style.display = 'none';
-                }
-                if (headerTimer) {
-                    headerTimer.style.display = 'none';
+                // Timer deaktiviert - Banner ausblenden
+                window.powerOffTimerActive = false;
+                if (banner) {
+                    banner.classList.remove('active');
                 }
             }
         });
@@ -9920,6 +10250,16 @@
                 console.log('Temps - Nozzle:', data.print_data.nozzle_temp + '°C, Bed:', data.print_data.bed_temp + '°C');
 
                 showThemeToast('✅ ' + texts.toast_full_data_received);
+            }
+        });
+
+        // Spoolman active spool update (from backend after print start)
+        socket.on('spoolman_active_spool', function(data) {
+            console.log('🧵 Spoolman active spool update:', data);
+            if (data.spool_id) {
+                window.activeSpoolId = data.spool_id;
+                activeSpoolId = data.spool_id;
+                updateSpoolmanDisplay();
             }
         });
 

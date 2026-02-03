@@ -406,7 +406,7 @@
                     </div>
                 </div>
                 <div class="alert alert-info" style="margin-top: 15px; display: block;">
-                    <strong>ℹ️ Hinweis:</strong> Alle Slice-Einstellungen (Layer Height, Infill, Support, etc.) werden aus dem Process-Profil geladen.
+                    <strong>ℹ️ <span id="infoHinweisLabel">Hinweis:</span></strong> <span id="infoProcessProfile">Alle Slice-Einstellungen (Layer Height, Infill, Support, etc.) werden aus dem Process-Profil geladen.</span>
                 </div>
             </div>
 
@@ -422,24 +422,24 @@
 
             <!-- Profile Management Section -->
             <div class="section" id="profileManagementSection">
-                <h2>📦 Profile verwalten</h2>
+                <h2 id="profileManagementTitle">📦 Profile verwalten</h2>
                 <div class="profile-status" id="profileStatus" style="margin-bottom: 15px; padding: 15px; background: var(--bg-section); border-radius: 8px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <strong>Lokale Profile:</strong>
+                            <strong id="localProfilesLabel">Lokale Profile:</strong>
                             <span id="profileCount">Lade...</span>
                         </div>
                         <div id="backupInfo" style="display: none;">
-                            <strong>Backup:</strong>
+                            <strong id="backupLabel">Backup:</strong>
                             <span id="backupDate">-</span>
                         </div>
                     </div>
                     <div id="lastCheckInfo" style="margin-top: 10px; font-size: 13px; color: var(--text-secondary); display: none;">
-                        <strong>Letzter Update-Check:</strong>
+                        <strong id="lastUpdateCheckLabel">Letzter Update-Check:</strong>
                         <span id="lastCheckDate">-</span>
                     </div>
                     <div style="margin-top: 10px; font-size: 13px; color: var(--text-secondary);">
-                        Unterstützte Drucker: <span id="supportedPrinters">-</span>
+                        <span id="supportedPrintersLabel">Unterstützte Drucker:</span> <span id="supportedPrinters">-</span>
                     </div>
                 </div>
 
@@ -462,19 +462,19 @@
                     <!-- Header (clickable) -->
                     <div id="githubTokenHeader" onclick="toggleGithubTokenCard()" style="padding: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 14px; font-weight: bold; color: var(--text-primary);">⚙️ GitHub API Einstellungen</span>
+                            <span id="githubSettingsLabel" style="font-size: 14px; font-weight: bold; color: var(--text-primary);">⚙️ GitHub API Einstellungen</span>
                             <span id="githubTokenBadge" style="display: none; padding: 2px 8px; border-radius: 10px; font-size: 11px; background: #4caf50; color: white;">Token aktiv</span>
                         </div>
                         <span id="githubTokenExpandIcon" style="font-size: 12px; color: var(--text-secondary); transition: transform 0.2s;">▼</span>
                     </div>
                     <!-- Content (collapsible) -->
                     <div id="githubTokenContent" style="padding: 0 15px 15px 15px; display: none;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 15px 0;">
+                        <p id="githubRateLimitInfo" style="font-size: 12px; color: var(--text-secondary); margin: 0 0 15px 0;">
                             GitHub hat ein Rate-Limit von 60 Anfragen/Stunde. Mit einem Token erhöht sich das auf 5000/Stunde.
                         </p>
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                             <input type="checkbox" id="githubTokenEnabled" onchange="toggleGithubTokenInput()">
-                            <label for="githubTokenEnabled" style="font-size: 14px; cursor: pointer; margin: 0;">
+                            <label for="githubTokenEnabled" id="githubUseTokenLabel" style="font-size: 14px; cursor: pointer; margin: 0;">
                                 GitHub Token verwenden
                             </label>
                         </div>
@@ -482,12 +482,12 @@
                             <div style="display: flex; gap: 10px; align-items: center;">
                                 <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxx"
                                        style="flex: 1; padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 5px; background: var(--input-bg); color: var(--text-primary);">
-                                <button class="btn" onclick="saveGithubToken()" style="background: #4caf50; padding: 8px 16px;">
+                                <button class="btn" id="githubSaveBtn" onclick="saveGithubToken()" style="background: #4caf50; padding: 8px 16px;">
                                     💾 Speichern
                                 </button>
                             </div>
                             <p style="font-size: 11px; color: var(--text-secondary); margin: 8px 0 0 0;">
-                                Token erstellen unter: <a href="https://github.com/settings/tokens" target="_blank" style="color: #667eea;">github.com/settings/tokens</a> (keine Berechtigungen nötig)
+                                <span id="githubCreateTokenLabel">Token erstellen unter:</span> <a href="https://github.com/settings/tokens" target="_blank" style="color: #667eea;">github.com/settings/tokens</a> <span id="githubNoPermissionsLabel">(keine Berechtigungen nötig)</span>
                             </p>
                         </div>
                         <div id="githubTokenStatus" style="margin-top: 10px; font-size: 12px; display: none;"></div>
@@ -555,6 +555,30 @@
 
             // Button
             document.getElementById('sliceBtn').innerHTML = t('slicer_btn_slice') || '🔪 STL Slicen & auf SD-Karte speichern';
+
+            // Info Hinweis
+            document.getElementById('infoHinweisLabel').textContent = t('slicer_info_note') || 'Hinweis:';
+            document.getElementById('infoProcessProfile').textContent = t('slicer_info_process_profile') || 'Alle Slice-Einstellungen (Layer Height, Infill, Support, etc.) werden aus dem Process-Profil geladen.';
+
+            // Profile Management Section
+            document.getElementById('profileManagementTitle').textContent = t('slicer_profile_management_title') || '📦 Profile verwalten';
+            document.getElementById('localProfilesLabel').textContent = t('slicer_local_profiles') || 'Lokale Profile:';
+            document.getElementById('profileCount').textContent = t('slicer_profile_status_loading') || 'Lade...';
+            document.getElementById('backupLabel').textContent = t('slicer_backup') || 'Backup:';
+            document.getElementById('lastUpdateCheckLabel').textContent = t('slicer_last_update_check') || 'Letzter Update-Check:';
+            document.getElementById('supportedPrintersLabel').textContent = t('slicer_supported_printers') || 'Unterstützte Drucker:';
+            document.getElementById('checkUpdatesBtn').innerHTML = t('slicer_check_updates') || '🔍 Auf Updates prüfen';
+            document.getElementById('updateProfilesBtn').innerHTML = t('slicer_update_profiles') || '⬇️ Profile aktualisieren';
+            document.getElementById('restoreBackupBtn').innerHTML = t('slicer_restore_backup') || '♻️ Backup wiederherstellen';
+
+            // GitHub Token Settings
+            document.getElementById('githubSettingsLabel').textContent = t('slicer_github_settings') || '⚙️ GitHub API Einstellungen';
+            document.getElementById('githubTokenBadge').textContent = t('slicer_github_token_active') || 'Token aktiv';
+            document.getElementById('githubRateLimitInfo').textContent = t('slicer_github_rate_limit_info') || 'GitHub hat ein Rate-Limit von 60 Anfragen/Stunde. Mit einem Token erhöht sich das auf 5000/Stunde.';
+            document.getElementById('githubUseTokenLabel').textContent = t('slicer_github_use_token') || 'GitHub Token verwenden';
+            document.getElementById('githubSaveBtn').innerHTML = t('slicer_github_save') || '💾 Speichern';
+            document.getElementById('githubCreateTokenLabel').textContent = t('slicer_github_create_token') || 'Token erstellen unter:';
+            document.getElementById('githubNoPermissionsLabel').textContent = t('slicer_github_no_permissions') || '(keine Berechtigungen nötig)';
         }
 
         // ========== LOCALSTORAGE PERSISTENCE ==========
@@ -1202,9 +1226,18 @@
             alert.style.display = 'block';
             setTimeout(() => { alert.style.display = 'none'; }, 5000);
         }
-        const showSuccess = (msg) => showAlert('successAlert', msg);
-        const showError = (msg) => showAlert('errorAlert', msg);
-        const showInfo = (msg) => showAlert('infoAlert', msg);
+        // In Electron, toast.js defines global showSuccess/showError with different signature
+        // Only define these if they don't exist (for web browser usage)
+        if (typeof window.showSuccess !== 'function') {
+            window.showSuccess = (msg) => showAlert('successAlert', msg);
+        }
+        if (typeof window.showError !== 'function') {
+            window.showError = (msg) => showAlert('errorAlert', msg);
+        }
+        if (typeof window.showInfo !== 'function') {
+            window.showInfo = (msg) => showAlert('infoAlert', msg);
+        }
+        // Use window.* directly throughout code - no local const needed
 
         // ========== PROFILE MANAGEMENT ==========
 
@@ -1302,8 +1335,26 @@
         }
 
         // Verbindet sich mit dem Update-Stream
-        function connectToUpdateStream(btn, checkBtn, resultDiv) {
-            const eventSource = new EventSource('/api/slicer/profiles/update-stream');
+        async function connectToUpdateStream(btn, checkBtn, resultDiv) {
+            // Hole Token vom Server für EventSource (HttpOnly Cookie kann nicht in JS gelesen werden)
+            // Der Server gibt den Token zurück wenn der User über Cookie authentifiziert ist
+            let tokenParam = '';
+            try {
+                const tokenResponse = await fetch('/api/auth/sse-token', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (tokenResponse.ok) {
+                    const tokenData = await tokenResponse.json();
+                    if (tokenData.token) {
+                        tokenParam = `?token=${encodeURIComponent(tokenData.token)}`;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not get SSE token, trying without:', e);
+            }
+
+            const eventSource = new EventSource(`/api/slicer/profiles/update-stream${tokenParam}`);
 
             eventSource.onmessage = function(event) {
                 const msg = JSON.parse(event.data);
@@ -1321,21 +1372,24 @@
                 eventSource.close();
                 resultDiv.style.background = '#f8d7da';
                 resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>❌ Verbindungsfehler</strong><br><br>Die Verbindung zum Server wurde unterbrochen.`;
+                resultDiv.innerHTML = `<strong>${t('slicer_connection_error') || '❌ Verbindungsfehler'}</strong><br><br>${t('slicer_connection_lost') || 'Die Verbindung zum Server wurde unterbrochen.'}<br><br>
+                    <button class="btn" onclick="updateProfiles()" style="background: #2196f3;">
+                        ${t('slicer_retry') || '🔄 Erneut versuchen'}
+                    </button>`;
                 btn.disabled = false;
                 checkBtn.disabled = false;
-                btn.innerHTML = '⬇️ Profile aktualisieren';
+                btn.innerHTML = t('slicer_update_profiles') || '⬇️ Profile aktualisieren';
             };
         }
 
         // Aktualisiert die Fortschritts-UI
         function updateProgressUI(data) {
             const phaseNames = {
-                'backup': '💾 Backup',
-                'machine': '🖨️ Drucker-Profile',
-                'filament': '🧵 Filament-Profile',
-                'process': '⚙️ Prozess-Profile',
-                'done': '✅ Fertig'
+                'backup': t('slicer_phase_backup') || '💾 Backup',
+                'machine': t('slicer_phase_machine') || '🖨️ Drucker-Profile',
+                'filament': t('slicer_phase_filament') || '🧵 Filament-Profile',
+                'process': t('slicer_phase_process') || '⚙️ Prozess-Profile',
+                'done': t('slicer_phase_done') || '✅ Fertig'
             };
 
             const phaseEl = document.getElementById('updatePhase');
@@ -1374,13 +1428,13 @@
             if (data.success) {
                 resultDiv.style.background = '#d4edda';
                 resultDiv.style.color = '#155724';
-                resultDiv.innerHTML = `<strong>✅ Update erfolgreich!</strong><br><br>
-                    <strong>Heruntergeladen:</strong><br>
-                    • ${data.machine?.downloaded || 0} Drucker-Profile<br>
-                    • ${data.filament?.downloaded || 0} Filament-Profile<br>
-                    • ${data.process?.downloaded || 0} Prozess-Profile<br>
-                    <strong>Gesamt:</strong> ${data.total_downloaded || 0} Dateien<br><br>
-                    ${data.backup_created ? '💾 Backup wurde erstellt' : '⚠️ Backup konnte nicht erstellt werden'}`;
+                resultDiv.innerHTML = `<strong>${t('slicer_update_success') || '✅ Update erfolgreich!'}</strong><br><br>
+                    <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
+                    • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
+                    • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
+                    • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
+                    <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
+                    ${data.backup_created ? (t('slicer_backup_created') || '💾 Backup wurde erstellt') : (t('slicer_backup_failed') || '⚠️ Backup konnte nicht erstellt werden')}`;
 
                 loadProfileStatus();
                 loadProfiles();
@@ -1388,12 +1442,12 @@
                 resultDiv.style.background = '#f8d7da';
                 resultDiv.style.color = '#721c24';
 
-                let errorMsg = `<strong>❌ Update fehlgeschlagen</strong><br><br>`;
+                let errorMsg = `<strong>${t('slicer_update_failed') || '❌ Update fehlgeschlagen'}</strong><br><br>`;
                 if (data.error) {
-                    errorMsg += `<strong>Fehler:</strong> ${data.error}<br><br>`;
+                    errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
                 }
                 if (data.total_errors > 0) {
-                    errorMsg += `<strong>Fehler bei:</strong><br>`;
+                    errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
                     data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
                     data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
                     data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
@@ -1403,7 +1457,7 @@
 
             btn.disabled = false;
             checkBtn.disabled = false;
-            btn.innerHTML = '⬇️ Profile aktualisieren';
+            btn.innerHTML = t('slicer_update_profiles') || '⬇️ Profile aktualisieren';
         }
 
         async function checkProfileUpdates() {
@@ -1411,7 +1465,7 @@
             const resultDiv = document.getElementById('updateResult');
 
             btn.disabled = true;
-            btn.innerHTML = '⏳ Prüfe...';
+            btn.innerHTML = t('slicer_checking_updates') || '⏳ Prüfe...';
             resultDiv.style.display = 'none';
 
             try {
@@ -1422,9 +1476,9 @@
                     resultDiv.style.display = 'block';
                     resultDiv.style.background = '#f8d7da';
                     resultDiv.style.color = '#721c24';
-                    resultDiv.innerHTML = `<strong>❌ Fehler:</strong> ${data.error}<br><br>
+                    resultDiv.innerHTML = `<strong>${t('slicer_update_failed') || '❌ Update fehlgeschlagen'}</strong> ${data.error}<br><br>
                         <button class="btn" onclick="checkProfileUpdates()" style="background: #2196f3;">
-                            🔄 Erneut versuchen
+                            ${t('slicer_retry') || '🔄 Erneut versuchen'}
                         </button>`;
                     document.getElementById('updateProfilesBtn').style.display = 'none';
                 } else {
@@ -1438,23 +1492,23 @@
                     if (totalNew > 0) {
                         resultDiv.style.background = '#d4edda';
                         resultDiv.style.color = '#155724';
-                        resultDiv.innerHTML = `<strong>✅ Updates verfügbar!</strong><br><br>
-                            <strong>Neue Profile:</strong> ${totalNew}<br>
-                            • Drucker: ${data.machine?.new || 0} neu<br>
-                            • Filamente: ${data.filament?.new || 0} neu<br>
-                            • Prozess: ${data.process?.new || 0} neu<br><br>
-                            <strong>Verfügbar auf GitHub:</strong><br>
-                            • ${machineFiles} Drucker-Profile<br>
-                            • ${filamentFiles} Filament-Profile<br>
-                            • ${processFiles} Prozess-Profile<br><br>
-                            <em>Klicke auf "Profile aktualisieren" um die neuesten Profile herunterzuladen.</em>`;
+                        resultDiv.innerHTML = `<strong>${t('slicer_updates_available') || '✅ Updates verfügbar!'}</strong><br><br>
+                            <strong>${t('slicer_new_profiles') || 'Neue Profile:'}</strong> ${totalNew}<br>
+                            • ${t('slicer_new_machine') || 'Drucker:'} ${data.machine?.new || 0} ${t('slicer_new') || 'neu'}<br>
+                            • ${t('slicer_new_filament') || 'Filamente:'} ${data.filament?.new || 0} ${t('slicer_new') || 'neu'}<br>
+                            • ${t('slicer_new_process') || 'Prozess:'} ${data.process?.new || 0} ${t('slicer_new') || 'neu'}<br><br>
+                            <strong>${t('slicer_available_on_github') || 'Verfügbar auf GitHub:'}</strong><br>
+                            • ${machineFiles} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
+                            • ${filamentFiles} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
+                            • ${processFiles} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br><br>
+                            <em>${t('slicer_click_update') || 'Klicke auf "Profile aktualisieren" um die neuesten Profile herunterzuladen.'}</em>`;
                         document.getElementById('updateProfilesBtn').style.display = 'inline-block';
                     } else {
                         resultDiv.style.background = '#d1ecf1';
                         resultDiv.style.color = '#0c5460';
-                        resultDiv.innerHTML = `<strong>ℹ️ Profile sind aktuell</strong><br><br>
-                            Alle ${machineFiles + filamentFiles + processFiles} verfügbaren Profile sind bereits vorhanden.<br><br>
-                            Du kannst trotzdem "Profile aktualisieren" klicken um die neuesten Versionen zu holen.`;
+                        resultDiv.innerHTML = `<strong>${t('slicer_profiles_up_to_date') || 'ℹ️ Profile sind aktuell'}</strong><br><br>
+                            ${t('slicer_all_profiles_present', {count: machineFiles + filamentFiles + processFiles}) || `Alle ${machineFiles + filamentFiles + processFiles} verfügbaren Profile sind bereits vorhanden.`}<br><br>
+                            ${t('slicer_can_still_update') || 'Du kannst trotzdem "Profile aktualisieren" klicken um die neuesten Versionen zu holen.'}`;
                         document.getElementById('updateProfilesBtn').style.display = 'inline-block';
                     }
                 }
@@ -1463,10 +1517,10 @@
                 resultDiv.style.display = 'block';
                 resultDiv.style.background = '#f8d7da';
                 resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || '❌ Netzwerkfehler:'}</strong> ${error.message}`;
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '🔍 Auf Updates prüfen';
+                btn.innerHTML = t('slicer_check_updates') || '🔍 Auf Updates prüfen';
             }
         }
 
@@ -1475,13 +1529,13 @@
             const checkBtn = document.getElementById('checkUpdatesBtn');
             const resultDiv = document.getElementById('updateResult');
 
-            if (!confirm('Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+            if (!confirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
                 return;
             }
 
             btn.disabled = true;
             checkBtn.disabled = true;
-            btn.innerHTML = '⏳ Aktualisiere...';
+            btn.innerHTML = t('slicer_updating_profiles') || '⏳ Aktualisiere...';
 
             // Progress-HTML vorbereiten
             resultDiv.style.display = 'block';
@@ -1489,8 +1543,8 @@
             resultDiv.style.color = '#1565c0';
             resultDiv.innerHTML = `
                 <div id="updateProgressContainer">
-                    <strong>⏳ Update läuft...</strong><br><br>
-                    <div id="updatePhase">Starte...</div>
+                    <strong>${t('slicer_update_progress') || '⏳ Update läuft...'}</strong><br><br>
+                    <div id="updatePhase">${t('slicer_update_starting') || 'Starte...'}</div>
                     <div style="margin-top: 10px; background: #ddd; border-radius: 4px; overflow: hidden;">
                         <div id="updateProgressBar" style="height: 24px; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"></div>
                     </div>
@@ -1507,12 +1561,12 @@
             const btn = document.getElementById('updateProfilesBtn');
             const resultDiv = document.getElementById('updateResult');
 
-            if (!confirm('Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+            if (!confirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = '⏳ Aktualisiere...';
+            btn.innerHTML = t('slicer_updating_profiles') || '⏳ Aktualisiere...';
 
             try {
                 const response = await apiCall('/api/slicer/profiles/update', {
@@ -1527,13 +1581,13 @@
                 if (data.success) {
                     resultDiv.style.background = '#d4edda';
                     resultDiv.style.color = '#155724';
-                    resultDiv.innerHTML = `<strong>✅ Update erfolgreich!</strong><br><br>
-                        <strong>Heruntergeladen:</strong><br>
-                        • ${data.machine?.downloaded || 0} Drucker-Profile<br>
-                        • ${data.filament?.downloaded || 0} Filament-Profile<br>
-                        • ${data.process?.downloaded || 0} Prozess-Profile<br>
-                        <strong>Gesamt:</strong> ${data.total_downloaded || 0} Dateien<br><br>
-                        ${data.backup_created ? '💾 Backup wurde erstellt' : '⚠️ Backup konnte nicht erstellt werden'}`;
+                    resultDiv.innerHTML = `<strong>${t('slicer_update_success') || '✅ Update erfolgreich!'}</strong><br><br>
+                        <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
+                        • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
+                        • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
+                        • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
+                        <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
+                        ${data.backup_created ? (t('slicer_backup_created') || '💾 Backup wurde erstellt') : (t('slicer_backup_failed') || '⚠️ Backup konnte nicht erstellt werden')}`;
 
                     // Reload profile status and profiles list
                     loadProfileStatus();
@@ -1542,12 +1596,12 @@
                     resultDiv.style.background = '#f8d7da';
                     resultDiv.style.color = '#721c24';
 
-                    let errorMsg = `<strong>❌ Update fehlgeschlagen</strong><br><br>`;
+                    let errorMsg = `<strong>${t('slicer_update_failed') || '❌ Update fehlgeschlagen'}</strong><br><br>`;
                     if (data.error) {
-                        errorMsg += `<strong>Fehler:</strong> ${data.error}<br><br>`;
+                        errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
                     }
                     if (data.total_errors > 0) {
-                        errorMsg += `<strong>Fehler bei:</strong><br>`;
+                        errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
                         data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
                         data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
                         data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
@@ -1559,15 +1613,15 @@
                 resultDiv.style.display = 'block';
                 resultDiv.style.background = '#f8d7da';
                 resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || '❌ Netzwerkfehler:'}</strong> ${error.message}`;
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '⬇️ Profile aktualisieren';
+                btn.innerHTML = t('slicer_update_profiles') || '⬇️ Profile aktualisieren';
             }
         }
 
         async function restoreBackup() {
-            if (!confirm('Backup wiederherstellen?\n\nDie aktuellen Profile werden durch das Backup ersetzt.')) {
+            if (!confirm(t('slicer_confirm_restore') || 'Backup wiederherstellen?\n\nDie aktuellen Profile werden durch das Backup ersetzt.')) {
                 return;
             }
 
@@ -1575,7 +1629,7 @@
             const resultDiv = document.getElementById('updateResult');
 
             btn.disabled = true;
-            btn.innerHTML = '⏳ Wiederherstellen...';
+            btn.innerHTML = t('slicer_restoring_backup') || '⏳ Wiederherstellen...';
 
             try {
                 const response = await apiCall('/api/slicer/profiles/restore', {
@@ -1588,7 +1642,7 @@
                 if (data.success) {
                     resultDiv.style.background = '#d4edda';
                     resultDiv.style.color = '#155724';
-                    resultDiv.innerHTML = `<strong>✅ Backup wiederhergestellt!</strong><br><br>${data.message}`;
+                    resultDiv.innerHTML = `<strong>${t('slicer_restore_success') || '✅ Backup wiederhergestellt!'}</strong><br><br>${data.message}`;
 
                     // Reload profile status and profiles list
                     loadProfileStatus();
@@ -1596,17 +1650,17 @@
                 } else {
                     resultDiv.style.background = '#f8d7da';
                     resultDiv.style.color = '#721c24';
-                    resultDiv.innerHTML = `<strong>❌ Wiederherstellung fehlgeschlagen</strong><br><br>${data.message || data.error}`;
+                    resultDiv.innerHTML = `<strong>${t('slicer_restore_failed') || '❌ Wiederherstellung fehlgeschlagen'}</strong><br><br>${data.message || data.error}`;
                 }
             } catch (error) {
                 console.error('Error restoring backup:', error);
                 resultDiv.style.display = 'block';
                 resultDiv.style.background = '#f8d7da';
                 resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>❌ Netzwerkfehler:</strong> ${error.message}`;
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || '❌ Netzwerkfehler:'}</strong> ${error.message}`;
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = '♻️ Backup wiederherstellen';
+                btn.innerHTML = t('slicer_restore_backup') || '♻️ Backup wiederherstellen';
             }
         }
 
@@ -1696,7 +1750,7 @@
             // Validierung
             if (enabled && !token) {
                 statusDiv.style.display = 'block';
-                statusDiv.innerHTML = '<span style="color: #f44336;">❌ Bitte Token eingeben</span>';
+                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_github_token_enter') || '❌ Bitte Token eingeben'}</span>`;
                 return;
             }
 
@@ -1715,27 +1769,27 @@
                 statusDiv.style.display = 'block';
                 if (data.success) {
                     if (enabled) {
-                        statusDiv.innerHTML = '<span style="color: #4caf50;">✅ Token gespeichert!</span>';
+                        statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || '✅ Token ist gespeichert und aktiv'}</span>`;
                         tokenInput.value = ''; // Token aus Input löschen (Sicherheit)
                         tokenInput.placeholder = '••••••••••••••••';
                     } else {
-                        statusDiv.innerHTML = '<span style="color: var(--text-secondary);">Token deaktiviert</span>';
+                        statusDiv.innerHTML = `<span style="color: var(--text-secondary);">${t('slicer_github_token_deactivated') || 'Token deaktiviert'}</span>`;
                     }
                     if (showAlert) {
-                        showSuccess(enabled ? 'GitHub Token gespeichert!' : 'GitHub Token deaktiviert');
+                        showSuccess(enabled ? (t('slicer_github_token_success') || 'GitHub Token gespeichert!') : (t('slicer_github_token_disabled') || 'GitHub Token deaktiviert'));
                     }
                 } else {
-                    statusDiv.innerHTML = `<span style="color: #f44336;">❌ Fehler: ${data.error}</span>`;
+                    statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_error') || '❌ Fehler:'} ${data.error}</span>`;
                     if (showAlert) {
-                        showError(`Fehler: ${data.error}`);
+                        showError(`${t('slicer_error') || 'Fehler:'} ${data.error}`);
                     }
                 }
             } catch (error) {
                 console.error('Error saving GitHub token:', error);
                 statusDiv.style.display = 'block';
-                statusDiv.innerHTML = `<span style="color: #f44336;">❌ Netzwerkfehler</span>`;
+                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_network_error') || '❌ Netzwerkfehler:'}</span>`;
                 if (showAlert) {
-                    showError('Netzwerkfehler beim Speichern');
+                    showError(t('slicer_network_error') || 'Netzwerkfehler beim Speichern');
                 }
             }
         }

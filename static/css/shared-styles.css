@@ -223,3 +223,53 @@ body.dark-mode .sidebar-item:hover {
         display: none !important;
     }
 }
+
+/* ========== WEB TOAST SYSTEM ========== */
+/* Einfaches, leichtgewichtiges Toast-System für Web-Browser */
+.web-toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px var(--shadow), 0 0 0 1px var(--border-color);
+    z-index: 999999;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: auto;
+    max-width: 90%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.web-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+.web-toast.hide {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.95);
+}
+
+/* Toast in Modals */
+.modal .web-toast {
+    position: absolute;
+    bottom: 50px;
+    z-index: 999999;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    .web-toast {
+        bottom: 80px; /* Über der Bottom Navigation */
+        max-width: 85%;
+        font-size: 13px;
+        padding: 10px 20px;
+    }
+}
