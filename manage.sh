@@ -140,6 +140,7 @@ update_app() {
     case "$ARCH" in
         x86_64|amd64) PLATFORM="x86_64" ;;
         aarch64|arm64) PLATFORM="aarch64" ;;
+        armv7l|armv6l) PLATFORM="armv7l" ;;
         *) PLATFORM="" ;;
     esac
 
@@ -500,6 +501,7 @@ deploy_app() {
     case "$ARCH" in
         x86_64|amd64) PLATFORM="x86_64" ;;
         aarch64|arm64) PLATFORM="aarch64" ;;
+        armv7l|armv6l) PLATFORM="armv7l" ;;
         *) PLATFORM="" ;;
     esac
 
