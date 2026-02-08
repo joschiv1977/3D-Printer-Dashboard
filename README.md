@@ -255,6 +255,39 @@ Passwort: admin123
 
 ---
 
+## 🔄 Update
+
+Das Update ist mit einem einzigen Befehl erledigt – die Plattform (x86_64 / ARM64) wird automatisch erkannt:
+
+```bash
+cd /opt/printer-web-app
+sudo ./manage.sh update
+```
+
+> **Was passiert beim Update?**
+> 1. Service wird gestoppt
+> 2. Neueste Version wird von GitHub geladen (`git pull`)
+> 3. Python-Dependencies werden aktualisiert
+> 4. Plattform wird automatisch erkannt (x86_64 oder aarch64)
+> 5. Die passenden kompilierten Module werden nach `dist/` kopiert
+> 6. Service wird neu gestartet
+
+**Alternativ** kannst du auch nur die kompilierten Module neu deployen (ohne `git pull`):
+
+```bash
+sudo ./manage.sh deploy
+```
+
+Falls du das Management-Menü bevorzugst:
+
+```bash
+sudo ./manage.sh
+# → Option 5: Update (Git Pull + Deploy)
+# → Option 6: Deploy (nur Module deployen)
+```
+
+---
+
 ## 📱 iOS App Features
 
 ### Installation der iOS App

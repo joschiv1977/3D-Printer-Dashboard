@@ -130,18 +130,46 @@ update_app() {
     # Service stoppen
     sudo systemctl stop $SERVICE_NAME
 
-    # Dependencies aktualisieren
-    cd $APP_DIR
-    source venv/bin/activate
-    pip install --upgrade -r requirements.txt
+    # Git Pull
+    cd "$APP_DIR"
+    print_status "Lade Updates von GitHub..."
+    git pull
 
-    print_status "Gib neue App-Dateien ein (web_app.py, templates/index.html)"
-    read -p "Dateien aktualisiert? Weiter mit Enter..."
+    # Plattform erkennen und .so Dateien deployen
+    ARCH=$(uname -m)
+    case "$ARCH" in
+        x86_64|amd64) PLATFORM="x86_64" ;;
+        aarch64|arm64) PLATFORM="aarch64" ;;
+        *) PLATFORM="" ;;
+    esac
+
+    DIST_SOURCE="dist_${PLATFORM}"
+    if [ -n "$PLATFORM" ] && [ -d "$DIST_SOURCE" ]; then
+        print_status "Deploye $DIST_SOURCE → dist/ ($PLATFORM)"
+        rm -rf dist
+        cp -r "$DIST_SOURCE" dist
+        SO_COUNT=$(find dist -name '*.so' 2>/dev/null | wc -l)
+        print_success "$SO_COUNT .so Dateien deployed ($PLATFORM)"
+    else
+        print_warning "Kein $DIST_SOURCE Ordner gefunden - überspringe .so Deployment"
+    fi
+
+    # Dependencies aktualisieren
+    if [ -d "venv" ]; then
+        source venv/bin/activate
+        pip install --upgrade -r requirements.txt -q
+    fi
 
     # Service wieder starten
     sudo systemctl start $SERVICE_NAME
 
-    print_success "Update abgeschlossen!"
+    sleep 2
+    if sudo systemctl is-active --quiet $SERVICE_NAME; then
+        print_success "Update abgeschlossen! Service läuft."
+    else
+        print_error "Service konnte nicht gestartet werden!"
+        echo "Prüfe mit: sudo journalctl -u $SERVICE_NAME -n 50"
+    fi
 }
 
 show_access_info() {
@@ -462,9 +490,37 @@ manage_cloudflare() {
 
 deploy_app() {
     cd "$APP_DIR"
+
+    # Git Pull
+    print_status "Git Pull..."
     git pull origin main
+
+    # Plattform erkennen und .so Dateien deployen
+    ARCH=$(uname -m)
+    case "$ARCH" in
+        x86_64|amd64) PLATFORM="x86_64" ;;
+        aarch64|arm64) PLATFORM="aarch64" ;;
+        *) PLATFORM="" ;;
+    esac
+
+    DIST_SOURCE="dist_${PLATFORM}"
+    if [ -n "$PLATFORM" ] && [ -d "$DIST_SOURCE" ]; then
+        print_status "Deploye $DIST_SOURCE → dist/ ($PLATFORM)"
+        rm -rf dist
+        cp -r "$DIST_SOURCE" dist
+        SO_COUNT=$(find dist -name '*.so' 2>/dev/null | wc -l)
+        print_success "$SO_COUNT .so Dateien deployed ($PLATFORM)"
+    fi
+
+    # Restart
     sudo systemctl restart printer-web-app
-    echo "Deployment erfolgreich!"
+
+    sleep 2
+    if sudo systemctl is-active --quiet printer-web-app; then
+        print_success "Deployment erfolgreich! Service läuft."
+    else
+        print_error "Service konnte nicht gestartet werden!"
+    fi
 }
 
 # ==================== LICENSE SERVER FUNKTIONEN ====================
