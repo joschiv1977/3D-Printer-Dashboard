@@ -1,0 +1,331 @@
+/* ============================================
+ * Modals - Glassmorphism Modal System
+ * ============================================ */
+
+/* ========== MODAL OVERLAY ========== */
+.modal-overlay {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ========== MODAL PANEL ========== */
+.modal-panel {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+}
+
+body.dark-mode .modal-panel {
+    background: rgba(26, 31, 46, 0.92) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+/* ========== MODAL BUTTONS ========== */
+.modal-btn {
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 10px 20px !important;
+    cursor: pointer !important;
+    font-size: var(--font-size-caption) !important;
+    font-weight: 500 !important;
+    transition: all var(--transition-fast) !important;
+    box-shadow: none !important;
+    /* iOS Press Animation */
+}
+
+body.dark-mode .modal-btn {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.modal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+body.dark-mode .modal-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.modal-btn:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
+/* Cancel Button */
+.modal-btn-cancel {
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--text-primary) !important;
+}
+
+body.dark-mode .modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+.modal-btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+body.dark-mode .modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Primary Button */
+.modal-btn-primary {
+    background: rgba(33, 150, 243, 0.15) !important;
+    color: #1565c0 !important;
+    border-color: rgba(33, 150, 243, 0.3) !important;
+}
+
+body.dark-mode .modal-btn-primary {
+    background: rgba(33, 150, 243, 0.3) !important;
+    color: #90caf9 !important;
+}
+
+.modal-btn-primary:hover {
+    background: rgba(33, 150, 243, 0.25) !important;
+}
+
+body.dark-mode .modal-btn-primary:hover {
+    background: rgba(33, 150, 243, 0.45) !important;
+    border-color: rgba(33, 150, 243, 0.5) !important;
+}
+
+/* Success Button */
+.modal-btn-success {
+    background: rgba(76, 175, 80, 0.15) !important;
+    color: #2e7d32 !important;
+    border-color: rgba(76, 175, 80, 0.3) !important;
+}
+
+body.dark-mode .modal-btn-success {
+    background: rgba(76, 175, 80, 0.3) !important;
+    color: #a5d6a7 !important;
+}
+
+.modal-btn-success:hover {
+    background: rgba(76, 175, 80, 0.25) !important;
+}
+
+body.dark-mode .modal-btn-success:hover {
+    background: rgba(76, 175, 80, 0.45) !important;
+    border-color: rgba(76, 175, 80, 0.5) !important;
+}
+
+/* Danger Button */
+.modal-btn-danger {
+    background: rgba(244, 67, 54, 0.15) !important;
+    color: #c62828 !important;
+    border-color: rgba(244, 67, 54, 0.3) !important;
+}
+
+body.dark-mode .modal-btn-danger {
+    background: rgba(244, 67, 54, 0.3) !important;
+    color: #ef9a9a !important;
+}
+
+.modal-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.25) !important;
+}
+
+body.dark-mode .modal-btn-danger:hover {
+    background: rgba(244, 67, 54, 0.45) !important;
+    border-color: rgba(244, 67, 54, 0.5) !important;
+}
+
+/* ========== MODAL CLOSE BUTTON ========== */
+.modal-close-btn {
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    color: var(--text-primary) !important;
+    padding: 4px 10px !important;
+    border-radius: var(--radius-md) !important;
+    cursor: pointer !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
+    transition: all var(--transition-fast) !important;
+    position: absolute !important;
+    right: 15px !important;
+    top: 15px !important;
+}
+
+body.dark-mode .modal-close-btn {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.12) !important;
+}
+
+body.dark-mode .modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ========== MODAL STICKY HEADER ========== */
+.modal-panel > div[style*="sticky"] {
+    background: rgba(255, 255, 255, 0.95);
+}
+
+body.dark-mode .modal-panel > div[style*="sticky"] {
+    background: rgba(26, 31, 46, 0.95);
+}
+
+/* ========== MODAL SECTIONS ========== */
+.modal-section {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-lg);
+}
+
+body.dark-mode .modal-section {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* SD CARD MODAL: Mobile styles moved to sd-card.css */
+
+/* ========== DETAIL MODAL MOBILE ========== */
+@media (max-width: 768px) {
+    #detailModal div[style*="position:absolute"] {
+        width: 98% !important;
+        padding: 15px !important;
+        height: 95vh !important;
+        max-width: 100% !important;
+    }
+
+    #detail-info,
+    #detail-events,
+    #detail-timelapse {
+        width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .detail-tab {
+        flex: 1 !important;
+        padding: 10px 5px !important;
+    }
+}
+
+/* ========== PRINT DETAIL MODAL MOBILE ========== */
+@media (max-width: 768px) {
+    #printDetailModal > div {
+        width: 100% !important;
+        height: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        padding: 15px !important;
+    }
+
+    #printDetailModal button[onclick="closePrintDetails()"] {
+        font-size: 28px !important;
+        padding: 10px !important;
+    }
+
+    #detail-thumbnail {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    #detail-title {
+        font-size: 16px !important;
+    }
+
+    #printDetailModal div[style*="display:flex"][style*="gap:10px"] {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+    }
+
+    .detail-tab {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        white-space: nowrap !important;
+    }
+
+    #printDetailModal > div > div:last-child {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+
+    #printDetailModal > div > div:last-child button {
+        width: 100% !important;
+        padding: 12px !important;
+    }
+}
+
+/* ========== SCHEDULE MANAGER MODAL MOBILE ========== */
+@media (max-width: 768px) {
+    #scheduleManagerModal > div {
+        position: fixed !important;
+        width: 95% !important;
+        height: 90vh !important;
+        max-width: 100% !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        padding: 15px !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    #scheduleManagerModal > div > div[style*="overflow-y"] {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding: 0 5px !important;
+    }
+
+    #schedule-files-list {
+        width: 100% !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    #schedule-files-list > div {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    #schedule-files-list button {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
+    }
+
+    #schedule-files-list img,
+    #schedule-files-list div[style*="width:80px"] {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    #schedule-files-list div[style*="font-size:16px"] {
+        font-size: 14px !important;
+    }
+
+    #schedule-files-list span[style*="font-size:13px"] {
+        font-size: 12px !important;
+    }
+
+    #schedule-files-list div[style*="position:absolute"][style*="background:#4caf50"] {
+        padding: 2px 8px !important;
+        font-size: 10px !important;
+    }
+
+    #schedule-files-list button[style*="background:var(--accent-blue)"] > span:first-child {
+        display: none !important;
+    }
+}

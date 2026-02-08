@@ -1,0 +1,128 @@
+/* ============================================
+ * Dashboard Layout - GridStack + iOS 2-Column
+ * ============================================ */
+
+/* ========== GRIDSTACK CONTAINER ========== */
+.grid-stack {
+    background: transparent;
+    min-height: 0 !important;
+}
+
+.grid-stack-item {
+    position: absolute;
+}
+
+.grid-stack-item-content {
+    background: transparent;
+    overflow: visible !important;
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cards inside GridStack take full height */
+.grid-stack-item-content > .card,
+.grid-stack-item-content > .status-grid {
+    margin-bottom: 0 !important;
+    flex: 1;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+.grid-stack-item-content > .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-stack-item-content > .card > .card-header {
+    flex-shrink: 0;
+}
+
+/* ========== RESIZE HANDLES ========== */
+.ui-resizable-handle {
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.ui-resizable-handle:hover {
+    opacity: 1 !important;
+}
+
+.ui-resizable-se::before,
+.ui-resizable-sw::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+}
+
+.ui-resizable-se::before {
+    right: 0;
+    bottom: 0;
+}
+
+.ui-resizable-sw::before {
+    left: 0;
+    bottom: 0;
+}
+
+.ui-resizable-se {
+    width: 20px !important;
+    height: 20px !important;
+    right: 4px !important;
+    bottom: 4px !important;
+    background: none !important;
+    border-radius: 0 0 12px 0;
+    cursor: se-resize !important;
+}
+
+.ui-resizable-sw {
+    width: 20px !important;
+    height: 20px !important;
+    left: 4px !important;
+    bottom: 4px !important;
+    background: none !important;
+    border-radius: 0 0 0 12px;
+    cursor: sw-resize !important;
+}
+
+/* ========== MOBILE: DISABLE GRIDSTACK ========== */
+@media (max-width: 768px) {
+    .grid-stack {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px;
+        height: auto !important;
+    }
+
+    .grid-stack-item {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        transform: none !important;
+    }
+
+    .grid-stack-item-content {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .grid-stack-item-content > .card {
+        margin-bottom: 0 !important;
+    }
+}
+
+/* ========== CONTROL CARD RESPONSIVE ========== */
+@media (min-width: 769px) {
+    .control-card-mobile {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .control-card-desktop {
+        display: none !important;
+    }
+}

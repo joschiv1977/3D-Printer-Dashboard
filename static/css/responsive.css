@@ -1,0 +1,27 @@
+/* ============================================
+ * Responsive - Media Queries
+ * Phone < 768px | Tablet 768-1023px | Desktop >= 1024px
+ * ============================================ */
+
+/* ========== PHONE (Default - Mobile First) ========== */
+.main-grid {
+    display: block;
+}
+
+/* ========== TABLET (>= 768px) ========== */
+@media (min-width: 768px) {
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========== DESKTOP (>= 1024px) ========== */
+@media (min-width: 1024px) {
+    /* Desktop specific styles handled by GridStack */
+}
+
+/* ========== PWA STANDALONE MODE ========== */
+@media (display-mode: standalone) {
+    /* PWA specific adjustments if needed */
+}

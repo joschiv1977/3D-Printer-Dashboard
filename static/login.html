@@ -8,11 +8,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
         .login-container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; padding: 40px; position: relative; }
-        .language-selector { position: absolute; top: 20px; right: 20px; display: flex; gap: 8px; }
-        .lang-btn { background: rgba(102, 126, 234, 0.1); border: 2px solid transparent; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; color: #667eea; transition: all 0.2s; }
+        .language-selector { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+        .lang-btn { background: rgba(102, 126, 234, 0.1); border: 2px solid transparent; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; line-height: 0; }
         .lang-btn:hover { background: rgba(102, 126, 234, 0.2); }
-        .lang-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #667eea; }
-        h1 { text-align: center; color: #333; margin-bottom: 30px; margin-top: 20px; }
+        .lang-btn.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-color: #667eea; }
+        h1 { text-align: center; color: #333; margin-bottom: 30px; }
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #555; font-size: 14px; }
         input { width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 10px; font-size: 16px; }
@@ -25,11 +25,11 @@
 <body>
     <div class="login-container">
         <div class="language-selector">
-            <button type="button" class="lang-btn" data-lang="de">🇩🇪 DE</button>
-            <button type="button" class="lang-btn" data-lang="en">🇬🇧 EN</button>
-            <button type="button" class="lang-btn" data-lang="fr">🇫🇷 FR</button>
-            <button type="button" class="lang-btn" data-lang="es">🇪🇸 ES</button>
-            <button type="button" class="lang-btn" data-lang="it">🇮🇹 IT</button>
+            <button type="button" class="lang-btn" data-lang="de"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="640" height="160" fill="#000"/><rect y="160" width="640" height="160" fill="#D00"/><rect y="320" width="640" height="160" fill="#FFCE00"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="en"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect fill="#012169" width="640" height="480"/><path d="M75 0l244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z" fill="#fff"/><path d="M424 281l216 159v40L369 281h55zm-184 20l6 35L54 480H0l240-179zM640 0v3L391 191l2-44L590 0h50zM0 0l239 176h-60L0 42V0z" fill="#C8102E"/><path d="M241 0v480h160V0H241zM0 160v160h640V160H0z" fill="#fff"/><path d="M0 193v96h640v-96H0zM273 0v480h96V0h-96z" fill="#C8102E"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="fr"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="213" height="480" fill="#002395"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#ED2939"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="es"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="640" height="480" fill="#c60b1e"/><rect y="120" width="640" height="240" fill="#ffc400"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="it"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="213" height="480" fill="#009246"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#CE2B37"/></svg></button>
         </div>
         <h1 id="login-title">3D Printer Dashboard</h1>
         <div id="errorMessage" class="error-message"></div>
@@ -262,13 +262,23 @@
                     if (window.electronAPI) {
                         try {
                             console.log('[Auto-Login] Registriere Device für Auto-Login...');
+                            // Device-Info von Electron holen (wie in preload.js)
+                            let deviceInfo = {};
+                            if (window.electronAPI.fcm && window.electronAPI.fcm.getDeviceInfo) {
+                                deviceInfo = await window.electronAPI.fcm.getDeviceInfo();
+                            }
                             const registerResponse = await fetch('/api/auth/device/register', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 credentials: 'include',
                                 body: JSON.stringify({
                                     username: username,
-                                    password: password
+                                    password: password,
+                                    device_name: deviceInfo.device_name || 'Electron App',
+                                    device_type: 'electron',
+                                    device_model: deviceInfo.device_model || (navigator.platform || 'Desktop'),
+                                    device_id: deviceInfo.device_id || undefined,
+                                    app_version: deviceInfo.app_version || '1.0.0'
                                 })
                             });
 

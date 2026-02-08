@@ -1,0 +1,143 @@
+/* ============================================
+ * Floating Tab Bar - iOS-Style Navigation
+ * Replaces sidebar navigation
+ * ============================================ */
+
+/* ========== FLOATING TAB BAR ========== */
+.floating-tab-bar {
+    position: fixed;
+    bottom: 16px;
+    bottom: calc(16px + var(--safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    background: var(--tab-bar-bg);
+    border-radius: var(--radius-tab-bar);
+    box-shadow: var(--shadow-tab-bar);
+    border: 1px solid var(--border-color);
+    z-index: 1000;
+    /* Prevent text selection */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Tab Items */
+.tab-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border-radius: 18px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    min-width: 56px;
+    height: 48px;
+    position: relative;
+}
+
+.tab-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+body.dark-mode .tab-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Active Tab */
+.tab-item.active {
+    color: var(--color-blue);
+    background: rgba(33, 150, 243, 0.12);
+    font-weight: 600;
+    transform: scale(1.05);
+}
+
+body.dark-mode .tab-item.active {
+    background: rgba(33, 150, 243, 0.2);
+}
+
+/* Tab Icon */
+.tab-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* Tab Label */
+.tab-label {
+    font-size: var(--font-size-tab-label);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.tab-item.active .tab-label {
+    font-weight: 600;
+}
+
+/* Tab Badge */
+.tab-badge {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    min-width: 18px;
+    height: 18px;
+    background: var(--color-red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+}
+
+/* Desktop/Tablet only tabs */
+.tab-item.desktop-only {
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .tab-item.desktop-only {
+        display: flex;
+    }
+
+    .tab-item {
+        padding: 6px 16px;
+        min-width: 64px;
+    }
+}
+
+/* Hide tab bar in fullscreen camera */
+body.fullscreen-camera .floating-tab-bar {
+    display: none !important;
+}
+
+/* ========== LEGACY SIDEBAR (hidden, replaced by tab bar) ========== */
+.sidebar {
+    display: none !important;
+}
+
+.sidebar-overlay {
+    display: none !important;
+}
+
+/* Hide sidebar pinned styles */
+body.sidebar-pinned {
+    padding-left: 0 !important;
+}
+
+body.sidebar-pinned .menu-toggle {
+    display: block;
+}
+
+/* Hide menu toggle when tab bar is present */
+.menu-toggle {
+    display: none !important;
+}

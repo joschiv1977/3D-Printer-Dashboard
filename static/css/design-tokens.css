@@ -1,0 +1,128 @@
+/* ============================================
+ * Design Tokens - iOS App Design System
+ * Based on iOS Theme.swift + iPadLayoutHelper.swift
+ * ============================================ */
+
+:root {
+    /* === Safe Area === */
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
+    /* === Farben (Light Mode - Default) === */
+    --bg-primary: #F3F3F7;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-variant: #F5F5F7;
+    --text-primary: #1a1f2e;
+    --text-secondary: #5a6270;
+    --text-placeholder: #8C929A;
+    --border-color: #D3D3D3;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --tab-bar-bg: #FFFFFF;
+    --bg-hover: #f0f0f0;
+    --bg-section: #f9f9f9;
+    --info-bg: #e8f4ff;
+    --input-bg: #ffffff;
+    --input-border: #ddd;
+    --shadow: rgba(0, 0, 0, 0.1);
+
+    /* === Semantische Farben (gleich in Light+Dark) === */
+    --color-blue: #2196F3;
+    --color-green: #4CAF50;
+    --color-orange: #FF9800;
+    --color-red: #F44336;
+    --color-purple: #9C27B0;
+    --color-teal: #009688;
+    --color-yellow: #FFC107;
+
+    /* Accent Aliases */
+    --accent-blue: #2196f3;
+    --accent-green: #4caf50;
+    --accent-red: #f44336;
+    --accent-orange: #ff9800;
+    --accent-yellow: #ffc107;
+
+    /* === Spezielle Farben === */
+    --print-card-bg: #2A5298;
+    --progress-bar-color: #4CAF50;
+
+    /* === Typography === */
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, Roboto, sans-serif;
+    --font-size-large-title: 32px;
+    --font-size-title: 24px;
+    --font-size-headline: 18px;
+    --font-size-body: 16px;
+    --font-size-caption: 14px;
+    --font-size-small: 12px;
+    --font-size-tab-label: 11px;
+
+    /* === Spacing (iOS Theme.Spacing) === */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-xxl: 32px;
+
+    /* === Margins (iPhone) === */
+    --margin-h: 20px;
+    --margin-v: 20px;
+
+    /* === Corner Radius (iPhone) === */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-tab-bar: 24px;
+
+    /* === Shadows === */
+    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-tab-bar: 0 8px 24px rgba(0, 0, 0, 0.15);
+
+    /* === Button Sizes (iPhone) === */
+    --btn-height: 50px;
+    --btn-height-medium: 44px;
+    --btn-radius: var(--radius-lg);
+
+    /* === Transitions === */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-spring: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* === Dark Mode === */
+body.dark-mode {
+    --bg-primary: #0F1419;
+    --bg-secondary: #1A1F2E;
+    --bg-card: #1A1F2E;
+    --bg-card-variant: #2B3D4F;
+    --text-primary: #E8EAED;
+    --text-secondary: #B8BCC8;
+    --text-placeholder: #8C929A;
+    --border-color: #404859;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --tab-bar-bg: #1A1F2E;
+    --bg-hover: #3a4151;
+    --bg-section: #252b3b;
+    --info-bg: #1a2633;
+    --input-bg: #1a1f2e;
+    --input-border: #3a4151;
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
+/* === Tablet/Desktop Overrides (>= 768px) === */
+@media (min-width: 768px) {
+    :root {
+        --margin-h: 40px;
+        --margin-v: 30px;
+        --radius-lg: 16px;
+        --btn-height: 60px;
+        --font-size-title: 28px;
+        --font-size-headline: 22px;
+        --font-size-body: 18px;
+        --font-size-caption: 15px;
+    }
+}

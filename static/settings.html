@@ -33,6 +33,12 @@
     <script src="/static/lang/es.js"></script>
     <script src="/static/lang/it.js"></script>
 
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+
     <style>
         /* CSS Variablen für Themes */
         :root {
@@ -90,15 +96,21 @@
             overflow-x: hidden;
         }
 
+        /* Settings mobile menu toggle - hidden on desktop */
+        .settings-menu-toggle {
+            display: none;
+        }
+
         /* Admin Layout */
         .admin-container {
             display: flex;
-            height: 100vh;
+            height: calc(100vh - 80px); /* Space for floating tab bar */
             overflow: hidden;
         }
 
-        /* Sidebar */
-        .sidebar {
+        /* Settings Sidebar (internal navigation, NOT the main app sidebar) */
+        /* Uses .settings-nav class instead of .sidebar to avoid global hide rule */
+        .settings-nav {
             width: 280px;
             background: var(--bg-sidebar);
             color: var(--text-sidebar);
@@ -113,11 +125,11 @@
             -ms-overflow-style: none; /* IE and Edge */
         }
 
-        .sidebar::-webkit-scrollbar {
+        .settings-nav::-webkit-scrollbar {
             display: none; /* Chrome, Safari, Opera */
         }
 
-        .sidebar-header {
+        .settings-nav-header {
             padding: 20px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
@@ -126,18 +138,18 @@
             color: white;
         }
 
-        .sidebar-header h2 {
+        .settings-nav-header h2 {
             font-size: 20px;
             font-weight: 600;
             color: white;
         }
 
-        .sidebar-menu {
+        .settings-nav-menu {
             padding: 10px 0;
             flex: 1;
         }
 
-        .sidebar-item {
+        .settings-nav-item {
             padding: 12px 20px;
             cursor: pointer;
             display: flex;
@@ -148,28 +160,28 @@
             font-size: 14px;
         }
 
-        .sidebar-item:hover {
+        .settings-nav-item:hover {
             background: rgba(0,0,0,0.05);
         }
 
-        body.dark-mode .sidebar-item:hover {
+        body.dark-mode .settings-nav-item:hover {
             background: rgba(255,255,255,0.05);
         }
 
-        .sidebar-item.active {
+        .settings-nav-item.active {
             background: rgba(102, 126, 234, 0.15);
             border-left-color: var(--sidebar-active);
             font-weight: 600;
         }
 
-        .sidebar-icon {
+        .settings-nav-icon {
             font-size: 18px;
             width: 24px;
             text-align: center;
         }
 
         /* Sidebar Category Header */
-        .sidebar-category {
+        .settings-nav-category {
             padding: 16px 20px 8px 20px;
             font-size: 11px;
             font-weight: 700;
@@ -180,12 +192,12 @@
             margin-top: 8px;
         }
 
-        body.dark-mode .sidebar-category {
+        body.dark-mode .settings-nav-category {
             color: rgba(255, 255, 255, 0.4);
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .sidebar-category:first-child {
+        .settings-nav-category:first-child {
             margin-top: 0;
             border-top: none;
         }
@@ -223,6 +235,7 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px var(--shadow);
+            flex-shrink: 0;
         }
 
         .content-header h1 {
@@ -235,16 +248,18 @@
             gap: 10px;
         }
 
-        .content-body {
+        /* Scroll wrapper fills entire remaining area - scroll works everywhere */
+        .content-scroll-area {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .content-body {
             padding: 30px;
             max-width: 600px;
             margin: 0 auto;
             width: 100%;
-            /* Hide scrollbar for cleaner UI */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE and Edge */
         }
 
         /* Content-Body breiter machen wenn Token-Section aktiv */
@@ -254,9 +269,6 @@
 
         .content-body:has(#section-overview.active) {
             max-width: 1200px;
-        }
-        .content-body::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Opera */
         }
 
         /* Settings Sections */
@@ -1003,7 +1015,7 @@
                 padding-bottom: env(safe-area-inset-bottom, 0px);
             }
 
-            .sidebar-header {
+            .settings-nav-header {
                 padding-top: max(20px, env(safe-area-inset-top, 0px));
                 padding-left: max(20px, env(safe-area-inset-left, 0px));
                 padding-right: max(20px, env(safe-area-inset-right, 0px));
@@ -1023,7 +1035,7 @@
 
         /* Mobile Styles */
         @media (max-width: 768px) {
-            .sidebar {
+            .settings-nav {
                 position: fixed;
                 left: 0;
                 top: 0;
@@ -1033,23 +1045,36 @@
                 transform: translateX(-100%);
             }
 
-            .sidebar.mobile-open {
+            .settings-nav.mobile-open {
                 transform: translateX(0);
             }
 
-            .sidebar-menu {
+            .settings-nav-menu {
                 padding-bottom: calc(20px + var(--safe-area-inset-bottom));
             }
 
-            .menu-toggle {
-                display: block;
+            /* Settings-specific mobile menu toggle (not the main app menu) */
+            .settings-menu-toggle {
+                display: block !important;
+                position: fixed;
+                top: 12px;
+                left: 12px;
+                z-index: 1001;
+                background: var(--bg-card);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                font-size: 22px;
+                padding: 8px 12px;
+                border-radius: 10px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             }
 
-            .sidebar-header {
+            .settings-nav-header {
                 padding: 24px 15px 6px 15px; /* Oben 24px, unten 6px */
             }
 
-            .sidebar-header h2 {
+            .settings-nav-header h2 {
                 padding-left: 55px;
                 font-size: 18px;
                 flex: 1;
@@ -1059,7 +1084,7 @@
                 text-overflow: ellipsis;
             }
 
-            .sidebar-header h2 .menu-toggle {
+            .settings-nav-header h2 .menu-toggle {
                 display: none; /* Versteckt den inneren Button */
                 flex-shrink: 0;
             }
@@ -1389,98 +1414,98 @@
             }
         })();
     </script>
-    <!-- Mobile Menu Toggle -->
-    <button class="menu-toggle" onclick="toggleMobileMenu()" onmouseenter="openSidebarOnHover()">☰</button>
+
+    <!-- Mobile-only settings sidebar toggle (visible only on mobile via CSS media query) -->
+    <button class="settings-menu-toggle" id="settings-menu-toggle" onclick="document.getElementById('settings-nav-panel').classList.toggle('mobile-open')">☰</button>
 
     <div class="admin-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                  <h2 id="sidebar-title" style="display: flex; align-items: center; gap: 15px;">
-                      <button class="menu-toggle" onclick="toggleMobileMenu()" style="margin: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white;">☰</button>
+        <!-- Settings Sidebar (internal navigation) -->
+        <div class="settings-nav" id="settings-nav-panel">
+            <div class="settings-nav-header">
+                  <h2 id="settings-nav-title" style="display: flex; align-items: center; gap: 15px;">
                       Settings
                   </h2>
             </div>
-            <div class="sidebar-menu">
-                <div class="sidebar-item" onclick="window.location.href='/'">
-                    <span class="sidebar-icon">🏠</span>
+            <div class="settings-nav-menu">
+                <div class="settings-nav-item" onclick="window.location.href='/'">
+                    <span class="settings-nav-icon">🏠</span>
                     <span>Dashboard</span>
                 </div>
                 <!-- Basis -->
-                <div class="sidebar-category">📋 Basis</div>
-                <div class="sidebar-item active" onclick="switchSection('overview')">
-                    <span class="sidebar-icon">📊</span>
+                <div class="settings-nav-category">📋 Basis</div>
+                <div class="settings-nav-item active" onclick="switchSection('overview')">
+                    <span class="settings-nav-icon">📊</span>
                     <span>Overview</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('license')">
-                    <span class="sidebar-icon">🔐</span>
+                <div class="settings-nav-item" onclick="switchSection('license')">
+                    <span class="settings-nav-icon">🔐</span>
                     <span>License</span>
                 </div>
 
                 <!-- Drucker & Hardware -->
-                <div class="sidebar-category">🖨️ Drucker & Hardware</div>
-                <div class="sidebar-item" onclick="switchSection('mqtt')">
-                    <span class="sidebar-icon">📡</span>
+                <div class="settings-nav-category">🖨️ Drucker & Hardware</div>
+                <div class="settings-nav-item" onclick="switchSection('mqtt')">
+                    <span class="settings-nav-icon">📡</span>
                     <span>MQTT/Printer</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('camera')">
-                    <span class="sidebar-icon">📷</span>
+                <div class="settings-nav-item" onclick="switchSection('camera')">
+                    <span class="settings-nav-icon">📷</span>
                     <span>Camera</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('print-defaults')">
-                    <span class="sidebar-icon">🖨️</span>
+                <div class="settings-nav-item" onclick="switchSection('print-defaults')">
+                    <span class="settings-nav-icon">🖨️</span>
                     <span>Print Defaults</span>
                 </div>
 
                 <!-- Filament Management -->
-                <div class="sidebar-category">🧵 Filament Management</div>
-                <div class="sidebar-item" onclick="switchSection('filament')">
-                    <span class="sidebar-icon">🧵</span>
+                <div class="settings-nav-category">🧵 Filament Management</div>
+                <div class="settings-nav-item" onclick="switchSection('filament')">
+                    <span class="settings-nav-icon">🧵</span>
                     <span>Filament Management</span>
                 </div>
 
                 <!-- Automatisierung & Smart Home -->
-                <div class="sidebar-category">🤖 Automatisierung</div>
-                <div class="sidebar-item" onclick="switchSection('automation')">
-                    <span class="sidebar-icon">🤖</span>
+                <div class="settings-nav-category">🤖 Automatisierung</div>
+                <div class="settings-nav-item" onclick="switchSection('automation')">
+                    <span class="settings-nav-icon">🤖</span>
                     <span>Automation</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('homeassistant')">
-                    <span class="sidebar-icon">🏠</span>
+                <div class="settings-nav-item" onclick="switchSection('homeassistant')">
+                    <span class="settings-nav-icon">🏠</span>
                     <span>Home Assistant</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('meross')">
-                    <span class="sidebar-icon">🔌</span>
+                <div class="settings-nav-item" onclick="switchSection('meross')">
+                    <span class="settings-nav-icon">🔌</span>
                     <span>Meross</span>
                 </div>
 
                 <!-- Sicherheit & Zugang -->
-                <div class="sidebar-category">🔒 Sicherheit</div>
-                <div class="sidebar-item" onclick="switchSection('security')">
-                    <span class="sidebar-icon">🔒</span>
+                <div class="settings-nav-category">🔒 Sicherheit</div>
+                <div class="settings-nav-item" onclick="switchSection('security')">
+                    <span class="settings-nav-icon">🔒</span>
                     <span>Security & SSH</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('tokens')">
-                    <span class="sidebar-icon">🔑</span>
+                <div class="settings-nav-item" onclick="switchSection('tokens')">
+                    <span class="settings-nav-icon">🔑</span>
                     <span>Token Management</span>
                 </div>
 
                 <!-- System & UI -->
-                <div class="sidebar-category">⚙️ System & UI</div>
-                <div class="sidebar-item" onclick="switchSection('costs')">
-                    <span class="sidebar-icon">💰</span>
+                <div class="settings-nav-category">⚙️ System & UI</div>
+                <div class="settings-nav-item" onclick="switchSection('costs')">
+                    <span class="settings-nav-icon">💰</span>
                     <span>Costs</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('ui')">
-                    <span class="sidebar-icon">🎨</span>
+                <div class="settings-nav-item" onclick="switchSection('ui')">
+                    <span class="settings-nav-icon">🎨</span>
                     <span>UI Preferences</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('debug')">
-                    <span class="sidebar-icon">🐛</span>
+                <div class="settings-nav-item" onclick="switchSection('debug')">
+                    <span class="settings-nav-icon">🐛</span>
                     <span>Debug Tools</span>
                 </div>
-                <div class="sidebar-item" onclick="switchSection('health')">
-                    <span class="sidebar-icon">🩺</span>
+                <div class="settings-nav-item" onclick="switchSection('health')">
+                    <span class="settings-nav-icon">🩺</span>
                     <span>System Health</span>
                 </div>
             </div>
@@ -1492,6 +1517,7 @@
                 <h1 id="content-title">📊 Overview</h1>
             </div>
 
+            <div class="content-scroll-area">
             <div class="content-body">
                 <!-- Overview Section -->
                 <div class="settings-section active" id="section-overview">
@@ -2629,6 +2655,7 @@
                 </div>
 
             </div>
+            </div>
         </div>
     </div>
 
@@ -2644,7 +2671,7 @@
 
     <!-- Theme & Sidebar Modules -->
     <script src="/static/js/modules/theme-manager.js"></script>
-    <script src="/static/js/modules/sidebar-manager.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
 
     <script src="/static/auth-handler.js"></script>
@@ -2678,7 +2705,7 @@
         // Section Switching
         function switchSection(sectionId) {
             // Update sidebar
-            document.querySelectorAll('.sidebar-item').forEach(item => {
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
@@ -2711,6 +2738,10 @@
 
             currentSection = sectionId;
 
+            // Scroll to top of content area
+            const scrollArea = document.querySelector('.content-scroll-area');
+            if (scrollArea) scrollArea.scrollTop = 0;
+
             // Load tokens when Token Management section is opened
             if (sectionId === 'tokens') {
                 loadAllTokens();
@@ -2723,67 +2754,18 @@
 
             // Close mobile menu
             if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('mobile-open');
+                document.getElementById('settings-nav-panel').classList.remove('mobile-open');
             }
         }
 
-        // Mobile Menu Toggle
-        let sidebarHoverTimeout = null;
-        let sidebarCloseTimeout = null;
-
+        // Settings sidebar toggle (internal settings navigation, not main app sidebar)
         function toggleMobileMenu() {
-            document.getElementById('sidebar').classList.toggle('mobile-open');
+            const sidebar = document.getElementById('settings-nav-panel');
+            if (sidebar) sidebar.classList.toggle('mobile-open');
         }
-
-        function openSidebarOnHover() {
-            const sidebar = document.getElementById('sidebar');
-
-            // Don't open if already open or opening
-            if (sidebar.classList.contains('mobile-open') || sidebarHoverTimeout) {
-                return;
-            }
-
-            // Clear any pending close timeout
-            if (sidebarCloseTimeout) {
-                clearTimeout(sidebarCloseTimeout);
-                sidebarCloseTimeout = null;
-            }
-
-            // Open sidebar with slight delay
-            sidebarHoverTimeout = setTimeout(() => {
-                sidebar.classList.add('mobile-open');
-                sidebarHoverTimeout = null; // Reset timeout reference
-            }, 200);
-        }
-
-        function closeSidebarOnLeave() {
-            const sidebar = document.getElementById('sidebar');
-
-            // Don't close if not open or already closing
-            if (!sidebar.classList.contains('mobile-open') || sidebarCloseTimeout) {
-                return;
-            }
-
-            // Clear any pending open timeout
-            if (sidebarHoverTimeout) {
-                clearTimeout(sidebarHoverTimeout);
-                sidebarHoverTimeout = null;
-            }
-
-            // Close sidebar with slight delay
-            sidebarCloseTimeout = setTimeout(() => {
-                sidebar.classList.remove('mobile-open');
-                sidebarCloseTimeout = null; // Reset timeout reference
-            }, 300);
-        }
-
-        function keepSidebarOpen() {
-            // Clear close timeout when hovering over sidebar
-            if (sidebarCloseTimeout) {
-                clearTimeout(sidebarCloseTimeout);
-                sidebarCloseTimeout = null;
-            }
-        }
+        function openSidebarOnHover() { /* No-op: tab bar */ }
+        function closeSidebarOnLeave() { /* No-op: tab bar */ }
+        function keepSidebarOpen() { /* No-op: tab bar */ }
 
         // Dark Mode Toggle (für Kompatibilität mit altem Code)
         function toggleDarkMode() {
@@ -4020,13 +4002,13 @@
                 pageTitle.textContent = getText('settings', 'Settings') + ' - 3D Printer Dashboard';
             }
 
-            const sidebarTitle = document.getElementById('sidebar-title');
+            const sidebarTitle = document.getElementById('settings-nav-title');
             if (sidebarTitle) {
                 sidebarTitle.innerHTML = '⚙️ ' + getText('settings', 'Settings');
             }
 
             // Update Sidebar Categories
-            const categories = document.querySelectorAll('.sidebar-category');
+            const categories = document.querySelectorAll('.settings-nav-category');
             if (categories.length >= 6) {
                 categories[0].innerHTML = '📋 ' + getText('settings_sidebar_category_basis', 'Basis');
                 categories[1].innerHTML = '🖨️ ' + getText('settings_sidebar_category_printer', 'Drucker & Hardware');
@@ -4037,7 +4019,7 @@
             }
 
             // Update Sidebar Items (skip Dashboard item by starting from index 1)
-            const allSidebarItems = document.querySelectorAll('.sidebar-item span:not(.sidebar-icon)');
+            const allSidebarItems = document.querySelectorAll('.settings-nav-item span:not(.settings-nav-icon)');
             const itemKeys = [
                 'settings_overview',
                 'settings_license',
@@ -4543,9 +4525,9 @@
 
         // Android App Back Button Support
         document.addEventListener('DOMContentLoaded', function() {
-            // Render Sidebar
-            if (window.sidebarManager) {
-                window.sidebarManager.render();
+            // Render Tab Bar
+            if (window.tabBarManager) {
+                window.tabBarManager.render();
             }
 
             // Update theme icons to show current state
@@ -5484,7 +5466,7 @@
 
         // Attach sidebar event listeners after functions are defined
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebar = document.getElementById('sidebar');
+            const sidebar = document.getElementById('settings-nav-panel');
             if (sidebar) {
                 sidebar.addEventListener('mouseenter', keepSidebarOpen);
                 sidebar.addEventListener('mouseleave', closeSidebarOnLeave);

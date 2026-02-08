@@ -1,0 +1,874 @@
+/* ============================================
+ * SD Card Modal - File Cards
+ * iOS-Style Compact List Layout
+ * ============================================ */
+
+/* Modal specific overrides */
+.sd-modal-panel {
+    position: absolute;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* SD Card modal needs full height (many files) */
+.sd-modal-panel--full {
+    height: 90vh;
+}
+
+.sd-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.sd-modal-title {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.sd-modal-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Header Action Buttons (Upload, Refresh) */
+.sd-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sd-header-btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.sd-header-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sd-header-btn--upload {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+}
+
+.sd-header-btn--upload:hover {
+    background: rgba(76, 175, 80, 0.22);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .sd-header-btn--upload {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.3);
+    color: #a5d6a7;
+}
+
+body.dark-mode .sd-header-btn--upload:hover {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+.sd-header-btn--refresh {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+}
+
+.sd-header-btn--refresh:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .sd-header-btn--refresh {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #90caf9;
+}
+
+body.dark-mode .sd-header-btn--refresh:hover {
+    background: rgba(33, 150, 243, 0.3);
+    border-color: rgba(33, 150, 243, 0.5);
+}
+
+/* Close Button (inline in header flow) */
+.sd-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+body.dark-mode .sd-close-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sd-close-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .sd-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Loading State */
+.sd-loading-state {
+    text-align: center;
+    padding: 40px;
+}
+
+.sd-loading-state p {
+    color: var(--text-secondary);
+    margin-top: 15px;
+}
+
+/* Error State */
+.sd-error-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--accent-red);
+}
+
+/* ============================================
+ * Sort/Filter Toolbar
+ * ============================================ */
+
+.sd-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.sd-toolbar-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sd-sort-select {
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    transition: all 0.2s;
+}
+
+.sd-sort-select:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sd-sort-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.sd-sort-select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+body.dark-mode .sd-sort-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Search Input */
+.sd-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+    max-width: 280px;
+}
+
+.sd-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.sd-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 32px;
+    font-size: 13px;
+    font-weight: 400;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.sd-search-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.sd-search-input:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sd-search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.sd-search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 2px 6px;
+    border-radius: 50%;
+    display: none;
+    line-height: 1;
+}
+
+.sd-search-clear:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .sd-search-clear:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sd-search-wrap.has-value .sd-search-clear {
+    display: block;
+}
+
+/* File count badge */
+.sd-file-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.sd-filter-check {
+    margin-left: auto;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.sd-filter-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-blue);
+}
+
+/* ============================================
+ * File List Container
+ * ============================================ */
+
+.sd-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ============================================
+ * File Card - Compact Horizontal Layout
+ * ============================================ */
+
+.sd-file-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    transition: all 0.2s;
+    overflow: visible;
+}
+
+.sd-file-card:hover {
+    box-shadow: 0 4px 12px var(--shadow);
+    border-color: rgba(33, 150, 243, 0.15);
+}
+
+/* ============================================
+ * NEW Badge
+ * ============================================ */
+
+.sd-new-badge {
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    background: var(--accent-green);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
+}
+
+/* ============================================
+ * Thumbnail + Hover Zoom
+ * ============================================ */
+
+.sd-file-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-start;
+}
+
+.sd-file-thumb--has-img {
+    cursor: zoom-in;
+}
+
+.sd-file-thumb > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sd-file-thumb-icon {
+    font-size: 24px;
+    opacity: 0.6;
+}
+
+/* Global zoom overlay — appended to <body>, outside scroll containers */
+#sd-thumb-zoom-overlay {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(0.3);
+    transform-origin: top left;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    background: var(--bg-card);
+}
+
+#sd-thumb-zoom-overlay.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+#sd-thumb-zoom-overlay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+body:not(.dark-mode) #sd-thumb-zoom-overlay {
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+/* ============================================
+ * Info Column (middle)
+ * ============================================ */
+
+.sd-file-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sd-file-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.sd-file-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.sd-file-status {
+    font-size: 11px;
+    color: var(--accent-orange);
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+/* ============================================
+ * Metadata Mini-Grid (2 columns)
+ * ============================================ */
+
+.sd-file-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px 12px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sd-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.6;
+}
+
+.sd-meta-icon {
+    flex-shrink: 0;
+    width: 14px;
+    text-align: center;
+    font-size: 11px;
+}
+
+.sd-meta-value {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Filament Color Dot */
+.sd-filament-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .sd-filament-dot {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Multi-Filament Badge */
+.sd-multi-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    font-size: 11px;
+}
+
+/* ============================================
+ * Spoolman Compact Selector
+ * ============================================ */
+
+.sd-spool-row {
+    margin-top: 2px;
+}
+
+.sd-spool-select {
+    width: auto;
+    max-width: 100%;
+    padding: 4px 28px 4px 8px;
+    font-size: 12px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 14px;
+}
+
+/* ============================================
+ * Action Buttons Column (right side)
+ * Labeled buttons with icon + text
+ * ============================================ */
+
+.sd-file-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+    align-items: stretch;
+    position: relative;
+}
+
+.sd-action-btn {
+    min-width: 90px;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    background: none;
+    white-space: nowrap;
+}
+
+.sd-action-btn .sd-btn-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+
+.sd-action-btn .sd-btn-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: inherit;
+}
+
+.sd-action-btn:active {
+    transform: scale(0.95);
+    opacity: 0.7;
+}
+
+/* Print button - green */
+.sd-action-btn--print {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.2);
+    color: #2e7d32;
+}
+
+.sd-action-btn--print:hover {
+    background: rgba(76, 175, 80, 0.25);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .sd-action-btn--print {
+    background: rgba(76, 175, 80, 0.2);
+    color: #a5d6a7;
+}
+
+body.dark-mode .sd-action-btn--print:hover {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+/* Schedule button - blue */
+.sd-action-btn--schedule {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.2);
+    color: #1565c0;
+}
+
+.sd-action-btn--schedule:hover {
+    background: rgba(33, 150, 243, 0.25);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .sd-action-btn--schedule {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+}
+
+body.dark-mode .sd-action-btn--schedule:hover {
+    background: rgba(33, 150, 243, 0.3);
+    border-color: rgba(33, 150, 243, 0.5);
+}
+
+/* Settings button - neutral */
+.sd-action-btn--settings {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+    color: var(--text-secondary);
+}
+
+.sd-action-btn--settings:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .sd-action-btn--settings {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+}
+
+body.dark-mode .sd-action-btn--settings:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Delete button - red */
+.sd-action-btn--delete {
+    background: rgba(244, 67, 54, 0.08);
+    border-color: rgba(244, 67, 54, 0.15);
+    color: #c62828;
+}
+
+.sd-action-btn--delete:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+body.dark-mode .sd-action-btn--delete {
+    background: rgba(244, 67, 54, 0.15);
+    color: #ef9a9a;
+}
+
+body.dark-mode .sd-action-btn--delete:hover {
+    background: rgba(244, 67, 54, 0.25);
+    border-color: rgba(244, 67, 54, 0.3);
+}
+
+/* ============================================
+ * Print Options Popover (replaces <details>)
+ * Default: opens DOWNWARD
+ * Add .sd-popover--up class via JS for upward
+ * ============================================ */
+
+.sd-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    min-width: 220px;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: none;
+    animation: sdPopoverDown 0.15s ease-out;
+}
+
+/* Upward variant (when near bottom) */
+.sd-popover.sd-popover--up {
+    top: auto;
+    bottom: calc(100% + 8px);
+    animation: sdPopoverUp 0.15s ease-out;
+}
+
+body.dark-mode .sd-popover {
+    background: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.sd-popover.active {
+    display: block;
+}
+
+@keyframes sdPopoverDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sdPopoverUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sd-popover-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sd-popover-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.sd-popover-option input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-blue);
+    flex-shrink: 0;
+}
+
+/* ============================================
+ * SD Card — Mobile Responsive
+ * ============================================ */
+
+@media (max-width: 768px) {
+    .sd-modal-panel {
+        width: 95% !important;
+        max-height: 90vh !important;
+        max-width: 100% !important;
+    }
+
+    .sd-modal-panel--full {
+        height: 90vh !important;
+    }
+
+    .sd-modal-header {
+        padding: 15px;
+    }
+
+    .sd-modal-body {
+        padding: 15px;
+    }
+
+    .sd-modal-title {
+        font-size: 18px;
+    }
+
+    .sd-header-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .sd-file-card {
+        padding: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .sd-file-thumb {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* Disable thumbnail zoom on touch/mobile */
+    #sd-thumb-zoom-overlay {
+        display: none !important;
+    }
+
+    .sd-file-thumb-icon {
+        font-size: 20px;
+    }
+
+    .sd-file-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .sd-file-name {
+        font-size: 13px;
+    }
+
+    .sd-action-btn {
+        min-width: auto;
+        padding: 6px 8px;
+    }
+
+    /* Hide button labels on mobile, show only icons */
+    .sd-action-btn .sd-btn-label {
+        display: none;
+    }
+
+    .sd-spool-select {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    /* On mobile: actions wrap to horizontal bottom row */
+    .sd-file-actions {
+        flex-direction: row;
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 6px;
+        border-top: 1px solid var(--border-color);
+        margin-top: 4px;
+    }
+}

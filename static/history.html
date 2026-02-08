@@ -6,7 +6,14 @@
     <title id="page-title">Druck-Historie - 3D Printer Dashboard</title>
 
     <!-- Shared Styles -->
-    <link rel="stylesheet" href="/static/css/shared-styles.css">
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+    <link rel="stylesheet" href="/static/css/modals.css?v=2">
+    <link rel="stylesheet" href="/static/css/sd-card.css?v=4">
+    <link rel="stylesheet" href="/static/css/history.css?v=1">
 
     <!-- Chart.js (local) -->
     <script src="/static/chart.umd.js"></script>
@@ -20,460 +27,8 @@
 
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            margin: 0;
             padding: 0;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .page-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .page-header h1 {
             margin: 0;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-
-        .content-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        /* Tab Navigation */
-        .tab-navigation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            padding: 12px 24px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-
-        .tab-btn.active {
-            color: var(--text-primary);
-            border-bottom-color: var(--accent-blue);
-        }
-
-        .tab-btn:hover:not(.active) {
-            color: var(--text-primary);
-        }
-
-        /* Settings Panel */
-        .settings-panel {
-            display: none;
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .settings-panel.active {
-            display: block;
-        }
-
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .settings-item label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .settings-item input,
-        .settings-item select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .custom-dropdown {
-            padding: 10px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background: var(--input-bg);
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* History Cards - KOMPAKTES horizontales Layout */
-        .history-card {
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s;
-            cursor: pointer;
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .history-card:hover {
-            box-shadow: 0 4px 12px var(--shadow);
-            transform: translateY(-1px);
-        }
-
-        /* Thumbnail links - kompakt */
-        .history-thumbnail {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-            flex-shrink: 0;
-            box-shadow: 0 2px 8px var(--shadow);
-        }
-
-        .history-thumbnail-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            flex-shrink: 0;
-        }
-
-        /* Content Area - wächst */
-        .history-content {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .history-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .history-filename {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-primary);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .history-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            white-space: nowrap;
-        }
-
-        .history-status span:first-child {
-            font-size: 8px;
-        }
-
-        /* Progress Bar - kompakt */
-        .history-progress {
-            width: 100%;
-            height: 4px;
-            background: var(--bg-card);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .history-progress-bar {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        /* Details - horizontal, kompakt */
-        .history-details {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .history-details > span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            white-space: nowrap;
-        }
-
-        /* Action Buttons rechts */
-        .history-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .history-actions .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .history-actions .btn-details {
-            background: var(--accent-blue);
-            color: white;
-        }
-
-        .history-actions .btn-details:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(33, 150, 243, 0.3);
-        }
-
-        .history-actions .btn-delete {
-            background: rgba(255,255,255,0.1);
-            padding: 8px 12px;
-            font-size: 18px;
-        }
-
-        .history-actions .btn-delete:hover {
-            background: rgba(244,67,54,0.2);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid var(--border-color);
-            border-radius: 50%;
-            border-top-color: var(--accent-blue);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-        }
-
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--bg-card);
-            border-radius: 12px;
-            max-height: 90vh;
-            overflow-y: auto;
-            width: 95%;
-            max-width: 1100px;
-            padding: 20px;
-        }
-
-        .modal-close {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            background: rgba(255,255,255,0.1);
-            color: var(--text-primary);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 24px;
-            transition: all 0.2s;
-        }
-
-        .modal-close:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .page-header h1 {
-                font-size: 20px;
-            }
-
-            .header-actions {
-                width: 100%;
-            }
-
-            .header-actions .btn {
-                flex: 1;
-            }
-
-            .tab-btn {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-
-            /* Mobile Optimierung für History Cards */
-            .history-card {
-                padding: 15px;
-            }
-
-            .print-file {
-                font-size: 16px !important;
-            }
-
-            .print-thumbnail,
-            .print-thumbnail-icon {
-                width: 80px !important;
-                height: 80px !important;
-                font-size: 32px !important;
-            }
-
-            .print-percentage {
-                font-size: 36px !important;
-            }
-
-            .print-details {
-                grid-template-columns: 1fr !important;
-                gap: 10px !important;
-            }
-
-            .detail-item {
-                padding: 10px !important;
-            }
-
-            .detail-icon {
-                font-size: 20px !important;
-            }
-
-            .detail-label {
-                font-size: 10px !important;
-            }
-
-            .detail-value {
-                font-size: 13px !important;
-            }
-
-            .action-buttons {
-                flex-direction: row !important;
-            }
-
-            .action-buttons .btn {
-                padding: 10px 16px !important;
-                font-size: 13px !important;
-            }
-
-            .action-buttons .btn-delete {
-                min-width: 48px !important;
-                padding: 10px !important;
-            }
         }
     </style>
 </head>
@@ -493,42 +48,41 @@
     <!-- Shared Module Scripts -->
     <script src="/static/js/modules/theme-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
-    <script src="/static/js/modules/sidebar-manager.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
 
-    <div class="page-container">
+    <div class="hist-container">
         <!-- Header -->
-        <div class="page-header">
-            <button class="menu-toggle" onclick="toggleSidebar()" style="background: none; border: none; color: white; font-size: 24px; cursor: pointer; padding: 8px;">☰</button>
-            <h1>
+        <div class="hist-header">
+            <h1 class="hist-header-title">
                 📊 <span data-i18n="history_modal_title">Druck-Historie</span>
             </h1>
-            <div class="header-actions">
-                <button class="btn" onclick="window.location.reload()">
+            <div class="hist-header-actions">
+                <button class="hist-btn" onclick="window.location.reload()">
                     🔄 <span data-i18n="refresh">Aktualisieren</span>
                 </button>
-                <button class="btn" onclick="toggleHistorySettings()">
+                <button class="hist-btn" onclick="toggleHistorySettings()">
                     ⚙️ <span data-i18n="settings">Einstellungen</span>
                 </button>
             </div>
         </div>
 
         <!-- Main Content Card -->
-        <div class="content-card">
+        <div class="hist-content-card">
             <!-- Settings Panel -->
-            <div id="history-settings-panel" class="settings-panel">
-                <h3 style="margin-top: 0; color: var(--text-primary);" data-i18n="history_settings_title">Einstellungen</h3>
-                <div class="settings-grid">
-                    <div class="settings-item">
+            <div id="history-settings-panel" class="hist-settings">
+                <h3 class="hist-settings-title" data-i18n="history_settings_title">Einstellungen</h3>
+                <div class="hist-settings-grid">
+                    <div class="hist-settings-item">
                         <label for="hist_filament_cost" data-i18n="hist_filament_cost_label">Filament-Kosten (€/kg)</label>
                         <input type="number" id="hist_filament_cost" placeholder="25.00" step="0.01">
                     </div>
-                    <div class="settings-item">
+                    <div class="hist-settings-item">
                         <label for="hist_power_cost" data-i18n="hist_power_cost_label">Stromkosten (€/kWh)</label>
                         <input type="number" id="hist_power_cost" placeholder="0.30" step="0.01">
                     </div>
-                    <div class="settings-item">
+                    <div class="hist-settings-item">
                         <label for="hist_max_current" data-i18n="hist_max_current_label">Max. Aktuelle Drucke</label>
-                        <select id="hist_max_current" class="custom-dropdown">
+                        <select id="hist_max_current" class="hist-dropdown">
                             <option value="5">5</option>
                             <option value="10" selected>10</option>
                             <option value="15">15</option>
@@ -536,29 +90,29 @@
                         </select>
                     </div>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button onclick="saveHistorySettings()" class="btn" style="background: var(--accent-green); color: white;">
+                <div class="hist-settings-footer">
+                    <button onclick="saveHistorySettings()" class="hist-btn hist-btn--success">
                         💾 <span data-i18n="save">Speichern</span>
                     </button>
                 </div>
             </div>
 
             <!-- Tab Navigation -->
-            <div class="tab-navigation">
-                <button id="tab-current" class="tab-btn active" onclick="switchHistoryTab('current')">
+            <div class="hist-tabs">
+                <button id="tab-current" class="hist-tab-btn active" onclick="switchHistoryTab('current')">
                     <span id="history-tab-current-text" data-i18n="history_tab_current">📌 Aktuelle</span>
                 </button>
-                <button id="tab-archive" class="tab-btn" onclick="switchHistoryTab('archive')">
+                <button id="tab-archive" class="hist-tab-btn" onclick="switchHistoryTab('archive')">
                     <span id="history-tab-archive-text" data-i18n="history_tab_archive">📚 Archiv</span>
                 </button>
-                <button id="tab-statistics" class="tab-btn" onclick="switchHistoryTab('statistics')">
+                <button id="tab-statistics" class="hist-tab-btn" onclick="switchHistoryTab('statistics')">
                     <span id="history-tab-statistics-text" data-i18n="history_tab_statistics">📊 Statistiken</span>
                 </button>
             </div>
 
             <!-- Controls -->
-            <div class="controls">
-                <select id="history-filter" class="custom-dropdown" onchange="loadHistory()">
+            <div class="hist-controls">
+                <select id="history-filter" class="hist-dropdown" onchange="loadHistory()">
                     <option value="" data-i18n="history_filter_all">Alle anzeigen</option>
                     <option value="success" data-i18n="history_filter_success">✅ Erfolgreich</option>
                     <option value="failed" data-i18n="history_filter_failed">❌ Fehlgeschlagen</option>
@@ -567,24 +121,24 @@
             </div>
 
             <!-- Current Tab -->
-            <div id="history-list-current" class="tab-content active">
-                <div class="empty-state">
+            <div id="history-list-current" class="hist-tab-content active">
+                <div class="hist-empty">
                     <div class="loading"></div>
                     <p data-i18n="history_loading_current">Lade aktuelle Drucke...</p>
                 </div>
             </div>
 
             <!-- Archive Tab -->
-            <div id="history-list-archive" class="tab-content">
-                <div class="empty-state">
+            <div id="history-list-archive" class="hist-tab-content">
+                <div class="hist-empty">
                     <div class="loading"></div>
                     <p data-i18n="history_loading_archive">Lade Archiv...</p>
                 </div>
             </div>
 
             <!-- Statistics Tab -->
-            <div id="history-list-statistics" class="tab-content">
-                <div class="empty-state">
+            <div id="history-list-statistics" class="hist-tab-content">
+                <div class="hist-empty">
                     <div class="loading"></div>
                     <p data-i18n="history_calculating_stats">Berechne Statistiken...</p>
                 </div>
@@ -593,66 +147,74 @@
     </div>
 
     <!-- Print Detail Modal -->
-    <div id="printDetailModal" class="modal">
-        <div class="modal-content">
-            <button onclick="closePrintDetails()" class="modal-close">×</button>
-
-            <!-- Header with Thumbnail -->
-            <div style="display:flex; gap:20px; margin-bottom:20px;">
-                <img id="detail-thumbnail" src="" style="width:120px; height:120px; border-radius:10px; object-fit:cover; display:none;">
-                <div style="flex:1;">
-                    <h2 id="detail-title" style="color:var(--text-primary); margin-bottom:10px;"></h2>
-                    <div id="detail-info" style="display:flex; gap:20px; flex-wrap:wrap; color:var(--text-secondary); font-size:14px;"></div>
+    <div id="printDetailModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center;">
+        <div class="modal-panel hist-detail-modal">
+            <!-- Fixed Header -->
+            <div class="sd-modal-header">
+                <div class="hist-detail-header" style="flex:1; margin-bottom:0;">
+                    <img id="detail-thumbnail" src="" class="hist-detail-thumb" style="display:none;">
+                    <div class="hist-detail-info">
+                        <h2 id="detail-title" class="hist-detail-title"></h2>
+                        <div id="detail-info" class="hist-detail-meta"></div>
+                    </div>
+                </div>
+                <div class="sd-header-actions">
+                    <button class="sd-close-btn" onclick="closePrintDetails()">&times;</button>
                 </div>
             </div>
 
-            <!-- Tab Navigation -->
-            <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--border-color);">
-                <button class="detail-tab active" onclick="switchDetailTab('overview')" data-tab="overview" style="background:none; border:none; color:var(--text-primary); padding:10px 20px; cursor:pointer; border-bottom:3px solid var(--accent-blue);">
-                    📊 <span id="detail-overview-tab-text" data-i18n="detail_overview_tab">Übersicht</span>
-                </button>
-                <button class="detail-tab" onclick="switchDetailTab('chart')" data-tab="chart" style="background:none; border:none; color:var(--text-secondary); padding:10px 20px; cursor:pointer; border-bottom:3px solid transparent;">
-                    📈 <span id="chart-tab-text" data-i18n="detail_chart_tab">Diagramm</span>
-                </button>
-                <button class="detail-tab" onclick="switchDetailTab('events')" data-tab="events" style="background:none; border:none; color:var(--text-secondary); padding:10px 20px; cursor:pointer; border-bottom:3px solid transparent;">
-                    📅 <span id="detail-events-tab-text" data-i18n="detail_events_tab">Ereignisse</span>
-                </button>
-                <button id="timelapse-tab-btn" class="detail-tab" onclick="switchDetailTab('timelapse')" data-tab="timelapse" style="background:none; border:none; color:var(--text-secondary); padding:10px 20px; cursor:pointer; border-bottom:3px solid transparent; display:none;">
-                    📹 <span id="detail-timelapse-tab-text" data-i18n="detail_timelapse_tab">Timelapse</span>
-                </button>
-            </div>
-
-            <!-- Overview Tab -->
-            <div id="overview-tab" class="detail-tab-content">
-                <div id="detail-stats"></div>
-            </div>
-
-            <!-- Chart Tab -->
-            <div id="chart-tab" class="detail-tab-content" style="display:none;">
-                <div style="background:var(--bg-secondary); border-radius:10px; padding:20px;">
-                    <canvas id="printProgressChart" style="height:400px;"></canvas>
+            <!-- Fixed Tabs -->
+            <div class="hist-detail-tabs-wrap">
+                <div class="hist-detail-tabs">
+                    <button class="hist-detail-tab active" onclick="switchDetailTab('overview')" data-tab="overview">
+                        📊 <span id="detail-overview-tab-text" data-i18n="detail_overview_tab">Übersicht</span>
+                    </button>
+                    <button class="hist-detail-tab" onclick="switchDetailTab('chart')" data-tab="chart">
+                        📈 <span id="chart-tab-text" data-i18n="detail_chart_tab">Diagramm</span>
+                    </button>
+                    <button class="hist-detail-tab" onclick="switchDetailTab('events')" data-tab="events">
+                        📅 <span id="detail-events-tab-text" data-i18n="detail_events_tab">Ereignisse</span>
+                    </button>
+                    <button id="timelapse-tab-btn" class="hist-detail-tab" onclick="switchDetailTab('timelapse')" data-tab="timelapse" style="display:none;">
+                        📹 <span id="detail-timelapse-tab-text" data-i18n="detail_timelapse_tab">Timelapse</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Events Tab -->
-            <div id="events-tab" class="detail-tab-content" style="display:none;">
-                <div id="detail-events" style="background:var(--bg-secondary); border-radius:10px; padding:12px;"></div>
+            <!-- Scrollable Content -->
+            <div class="hist-detail-body">
+                <!-- Overview Tab -->
+                <div id="overview-tab" class="detail-tab-content">
+                    <div id="detail-stats"></div>
+                </div>
+
+                <!-- Chart Tab -->
+                <div id="chart-tab" class="detail-tab-content" style="display:none;">
+                    <div class="hist-chart-wrap">
+                        <canvas id="printProgressChart" style="height:400px;"></canvas>
+                    </div>
+                </div>
+
+                <!-- Events Tab -->
+                <div id="events-tab" class="detail-tab-content" style="display:none;">
+                    <div id="detail-events" class="hist-events-wrap"></div>
+                </div>
+
+                <!-- Timelapse Tab -->
+                <div id="timelapse-tab" class="detail-tab-content" style="display:none;">
+                    <div id="detail-timelapse"></div>
+                </div>
             </div>
 
-            <!-- Timelapse Tab -->
-            <div id="timelapse-tab" class="detail-tab-content" style="display:none;">
-                <div id="detail-timelapse"></div>
-            </div>
-
-            <!-- Footer Buttons -->
-            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px; padding-top:20px; border-top:1px solid var(--border-color); flex-wrap:wrap;">
-                <button onclick="reloadPrintDetails()" class="btn" style="background:var(--border-color); color:var(--text-primary);">
+            <!-- Fixed Footer -->
+            <div class="hist-detail-footer">
+                <button onclick="reloadPrintDetails()" class="hist-btn">
                     🔄 <span id="detail-refresh-text" data-i18n="detail_refresh">Aktualisieren</span>
                 </button>
-                <button onclick="exportPrintData()" class="btn" style="background:var(--border-color); color:var(--text-primary);">
+                <button onclick="exportPrintData()" class="hist-btn">
                     💾 <span id="detail-export-text" data-i18n="detail_export_csv">CSV Export</span>
                 </button>
-                <button onclick="reprintFile()" class="btn" style="background:var(--accent-blue); color:white;">
+                <button onclick="reprintFile()" class="hist-btn hist-btn--primary">
                     🔄 <span id="detail-reprint-text" data-i18n="detail_reprint">Erneut drucken</span>
                 </button>
             </div>
@@ -660,11 +222,15 @@
     </div>
 
     <!-- Day Statistics Modal -->
-    <div id="dayStatisticsModal" class="modal">
-        <div class="modal-content" style="max-width:900px;">
-            <button onclick="closeDayStatistics()" class="modal-close">×</button>
-            <h2 id="day-statistics-title" style="color:var(--text-primary); margin-bottom:20px;"></h2>
-            <div id="day-statistics-content"></div>
+    <div id="dayStatisticsModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:2000; justify-content:center; align-items:center; padding:20px;">
+        <div class="modal-panel sd-modal-panel" style="max-width:900px; max-height:90vh; overflow-y:auto;">
+            <div class="sd-modal-header">
+                <h2 id="day-statistics-title" class="sd-modal-title"></h2>
+                <div class="sd-header-actions">
+                    <button class="sd-close-btn" onclick="closeDayStatistics()">&times;</button>
+                </div>
+            </div>
+            <div id="day-statistics-content" style="padding: 20px 25px;"></div>
         </div>
     </div>
 
@@ -816,31 +382,22 @@
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
-            // Render sidebar
-            if (window.sidebarManager) {
-                window.sidebarManager.render();
+            if (window.tabBarManager) {
+                window.tabBarManager.render();
             }
 
-            // Update texts object with current language
             if (window.i18nManager) {
                 texts = window.i18nManager.getAllTexts();
                 window.i18nManager.applyTranslations();
-                // Update page title
                 document.title = getText('history_modal_title', 'Druck-Historie') + ' - 3D Printer Dashboard';
             }
 
-            // Load settings and history
             loadHistorySettings().then(() => {
                 loadHistory();
             });
         });
 
-        // Toggle sidebar function
-        function toggleSidebar() {
-            if (window.sidebarManager) {
-                window.sidebarManager.toggle();
-            }
-        }
+        function toggleSidebar() {}
 
         // Settings functions
         async function loadHistorySettings() {
@@ -907,10 +464,10 @@
 
         // Tab switching
         function switchHistoryTab(tab) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.hist-tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('tab-' + tab).classList.add('active');
 
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.hist-tab-content').forEach(content => content.classList.remove('active'));
             document.getElementById('history-list-' + tab).classList.add('active');
 
             currentTab = tab;
@@ -940,8 +497,8 @@
                     calculateStatistics(data.prints);
                 } else {
                     document.getElementById('history-list-current').innerHTML = `
-                        <div class="empty-state">
-                            <span class="empty-state-icon">📭</span>
+                        <div class="hist-empty">
+                            <span class="hist-empty-icon">📭</span>
                             <p>${texts.stats_no_prints_history}</p>
                         </div>
                     `;
@@ -952,636 +509,345 @@
             } catch (error) {
                 console.error(texts.console_history_error + ':', error);
                 document.getElementById('history-list-current').innerHTML = `
-                    <div class="empty-state">
+                    <div class="hist-empty">
                         <span style="color: var(--accent-red);">❌ ${texts.console_history_error}</span>
                     </div>
                 `;
             }
         }
 
+        // Render history card HTML (shared by current + archive)
+        function renderHistoryCard(print) {
+            const duration = print.duration_minutes !== null && print.duration_minutes !== undefined ?
+                (print.duration_minutes === 0 ? '< 1m' :
+                 `${Math.floor(print.duration_minutes/60)}h ${print.duration_minutes%60}m`) :
+                (print.status === 'running' ? texts.status_running : texts.unknown);
+
+            const statusIcon = {
+                'success': '✅', 'failed': '❌', 'cancelled': '⚠️', 'running': '🔄'
+            }[print.status] || '❓';
+
+            const statusColor = {
+                'success': '#4caf50', 'failed': '#f44336', 'cancelled': '#ff9800', 'running': '#2196f3'
+            }[print.status] || '#999';
+
+            const statusText = {
+                'success': texts.status_success, 'failed': texts.status_failed,
+                'cancelled': texts.status_cancelled, 'running': texts.status_running
+            }[print.status] || print.status;
+
+            const progress = print.status === 'success' ? 100 :
+                           print.status === 'failed' || print.status === 'cancelled' ?
+                           (print.last_progress || 0) : 0;
+
+            return `
+                <div class="hist-card" onclick="showPrintDetails(${print.id})">
+                    ${print.has_thumbnail ?
+                        `<img src="/api/history/${print.id}/thumbnail" class="hist-thumb"
+                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                         <div class="hist-thumb-icon" style="display:none; background:${statusColor}20;">
+                            ${statusIcon}
+                         </div>` :
+                        `<div class="hist-thumb-icon" style="background:${statusColor}20;">
+                            ${statusIcon}
+                        </div>`
+                    }
+                    <div class="hist-card-content">
+                        <div class="hist-card-header">
+                            <div class="hist-filename">${print.filename}</div>
+                            <div class="hist-status" style="color:${statusColor};">
+                                <span class="hist-status-dot">●</span>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                        <div class="hist-progress">
+                            <div class="hist-progress-bar" style="width:${progress}%; background:${statusColor};"></div>
+                        </div>
+                        <div class="hist-details">
+                            <span>📅 ${new Date(print.start_time).toLocaleDateString('de-DE')}</span>
+                            <span>⏱️ ${duration}</span>
+                            ${print.total_layers ? `<span>📚 ${print.total_layers} Layer</span>` : ''}
+                            ${print.filament_used ? `<span>🧵 ${(print.filament_used/1000).toFixed(1)}m</span>` : ''}
+                            ${print.is_multifilament ?
+                                `<span class="hist-multi-badge">
+                                    🎨 ${texts.multifilament_count.replace('{count}', print.filament_count)}
+                                </span>` :
+                                (print.filament_type ? `<span>🎨 ${print.filament_type}</span>` : '')
+                            }
+                        </div>
+                    </div>
+                    <div class="hist-card-actions">
+                        <button onclick="event.stopPropagation(); showPrintDetails(${print.id})" class="hist-btn hist-btn--primary hist-btn--small">
+                            📊 Details
+                        </button>
+                        <button onclick="event.stopPropagation(); deletePrintHistory(${print.id}, event)" class="hist-btn hist-btn--danger hist-btn--small" title="${texts.delete || 'Löschen'}">
+                            ${texts.delete || 'Löschen'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         // Render current list
         function renderCurrentList(prints) {
             const container = document.getElementById('history-list-current');
-            let html = '';
-
-            prints.forEach(print => {
-                const duration = print.duration_minutes !== null && print.duration_minutes !== undefined ?
-                    (print.duration_minutes === 0 ? '< 1m' :
-                     `${Math.floor(print.duration_minutes/60)}h ${print.duration_minutes%60}m`) :
-                    (print.status === 'running' ? texts.status_running : texts.unknown);
-
-                const statusIcon = {
-                    'success': '✅',
-                    'failed': '❌',
-                    'cancelled': '⚠️',
-                    'running': '🔄'
-                }[print.status] || '❓';
-
-                const statusColor = {
-                    'success': '#4caf50',
-                    'failed': '#f44336',
-                    'cancelled': '#ff9800',
-                    'running': '#2196f3'
-                }[print.status] || '#999';
-
-                const statusText = {
-                    'success': texts.status_success,
-                    'failed': texts.status_failed,
-                    'cancelled': texts.status_cancelled,
-                    'running': texts.status_running
-                }[print.status] || print.status;
-
-                // Progress
-                const progress = print.status === 'success' ? 100 :
-                               print.status === 'failed' || print.status === 'cancelled' ?
-                               (print.last_progress || 0) : 0;
-
-                html += `
-                    <div class="history-card" onclick="showPrintDetails(${print.id})">
-                        <!-- Thumbnail LINKS -->
-                        ${print.has_thumbnail ?
-                            `<img src="/api/history/${print.id}/thumbnail" class="history-thumbnail"
-                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                             <div class="history-thumbnail-icon" style="display:none; background:${statusColor}20;">
-                                ${statusIcon}
-                             </div>` :
-                            `<div class="history-thumbnail-icon" style="background:${statusColor}20;">
-                                ${statusIcon}
-                            </div>`
-                        }
-
-                        <!-- Content Bereich -->
-                        <div class="history-content">
-                            <!-- Header: Dateiname + Status -->
-                            <div class="history-header">
-                                <div class="history-filename">${print.filename}</div>
-                                <div class="history-status" style="color:${statusColor};">
-                                    <span>●</span>
-                                    <span>${statusText}</span>
-                                </div>
-                            </div>
-
-                            <!-- Progress Bar -->
-                            <div class="history-progress">
-                                <div class="history-progress-bar" style="width:${progress}%; background:${statusColor};"></div>
-                            </div>
-
-                            <!-- Details horizontal -->
-                            <div class="history-details">
-                                <span>📅 ${new Date(print.start_time).toLocaleDateString('de-DE')}</span>
-                                <span>⏱️ ${duration}</span>
-                                ${print.total_layers ? `<span>📚 ${print.total_layers} Layer</span>` : ''}
-                                ${print.filament_used ? `<span>🧵 ${(print.filament_used/1000).toFixed(1)}m</span>` : ''}
-                                ${print.is_multifilament ?
-                                    `<span style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:4px 10px; border-radius:12px; color:white; font-weight:500;">
-                                        🎨 ${texts.multifilament_count.replace('{count}', print.filament_count)}
-                                    </span>` :
-                                    (print.filament_type ? `<span>🎨 ${print.filament_type}</span>` : '')
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Buttons RECHTS -->
-                        <div class="history-actions">
-                            <button onclick="event.stopPropagation(); showPrintDetails(${print.id})" class="btn btn-details">
-                                📊 Details
-                            </button>
-                            <button onclick="event.stopPropagation(); deletePrintHistory(${print.id}, event)" class="btn btn-delete" title="${texts.delete || 'Löschen'}">
-                                🚮
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
+            container.innerHTML = prints.map(print => renderHistoryCard(print)).join('');
         }
 
-        // Render archive list - DETAILLIERT WIE AKTUELLE DRUCKE
+        // Render archive list
         function renderArchiveList(prints) {
             const container = document.getElementById('history-list-archive');
-
             if (prints.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state">
-                        <span class="empty-state-icon">📚</span>
+                    <div class="hist-empty">
+                        <span class="hist-empty-icon">📚</span>
                         <p>Noch keine archivierten Drucke</p>
                     </div>
                 `;
                 return;
             }
-
-            let html = '';
-
-            prints.forEach((print) => {
-                const duration = print.duration_minutes !== null && print.duration_minutes !== undefined ?
-                    (print.duration_minutes === 0 ? '< 1m' :
-                     `${Math.floor(print.duration_minutes/60)}h ${print.duration_minutes%60}m`) :
-                    texts.unknown;
-
-                const statusIcon = {
-                    'success': '✅',
-                    'failed': '❌',
-                    'cancelled': '⚠️',
-                    'running': '🔄'
-                }[print.status] || '❓';
-
-                const statusColor = {
-                    'success': '#4caf50',
-                    'failed': '#f44336',
-                    'cancelled': '#ff9800',
-                    'running': '#2196f3'
-                }[print.status] || '#999';
-
-                const statusText = {
-                    'success': texts.status_success,
-                    'failed': texts.status_failed,
-                    'cancelled': texts.status_cancelled,
-                    'running': texts.status_running
-                }[print.status] || print.status;
-
-                // Progress
-                const progress = print.status === 'success' ? 100 :
-                               print.status === 'failed' || print.status === 'cancelled' ?
-                               (print.last_progress || 0) : 0;
-
-                html += `
-                    <div class="history-card" onclick="showPrintDetails(${print.id})">
-                        <!-- Thumbnail LINKS -->
-                        ${print.has_thumbnail ?
-                            `<img src="/api/history/${print.id}/thumbnail" class="history-thumbnail"
-                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                             <div class="history-thumbnail-icon" style="display:none; background:${statusColor}20;">
-                                ${statusIcon}
-                             </div>` :
-                            `<div class="history-thumbnail-icon" style="background:${statusColor}20;">
-                                ${statusIcon}
-                            </div>`
-                        }
-
-                        <!-- Content Bereich -->
-                        <div class="history-content">
-                            <!-- Header: Dateiname + Status -->
-                            <div class="history-header">
-                                <div class="history-filename">${print.filename}</div>
-                                <div class="history-status" style="color:${statusColor};">
-                                    <span>●</span>
-                                    <span>${statusText}</span>
-                                </div>
-                            </div>
-
-                            <!-- Progress Bar -->
-                            <div class="history-progress">
-                                <div class="history-progress-bar" style="width:${progress}%; background:${statusColor};"></div>
-                            </div>
-
-                            <!-- Details horizontal -->
-                            <div class="history-details">
-                                <span>📅 ${new Date(print.start_time).toLocaleDateString('de-DE')}</span>
-                                <span>⏱️ ${duration}</span>
-                                ${print.total_layers ? `<span>📚 ${print.total_layers} Layer</span>` : ''}
-                                ${print.filament_used ? `<span>🧵 ${(print.filament_used/1000).toFixed(1)}m</span>` : ''}
-                                ${print.is_multifilament ?
-                                    `<span style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding:4px 10px; border-radius:12px; color:white; font-weight:500;">
-                                        🎨 ${texts.multifilament_count.replace('{count}', print.filament_count)}
-                                    </span>` :
-                                    (print.filament_type ? `<span>🎨 ${print.filament_type}</span>` : '')
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Buttons RECHTS -->
-                        <div class="history-actions">
-                            <button onclick="event.stopPropagation(); showPrintDetails(${print.id})" class="btn btn-details">
-                                📊 Details
-                            </button>
-                            <button onclick="event.stopPropagation(); deletePrintHistory(${print.id}, event)" class="btn btn-delete" title="${texts.delete || 'Löschen'}">
-                                🚮
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
+            container.innerHTML = prints.map(print => renderHistoryCard(print)).join('');
         }
 
         // Calculate and render statistics
         function calculateStatistics(prints) {
             if (!prints || prints.length === 0) {
                 document.getElementById('history-list-statistics').innerHTML = `
-                    <div style="text-align:center; padding:60px; color:var(--text-secondary);">
-                        <span style="font-size:64px;">📊</span>
-                        <p style="margin-top:20px; font-size:18px;">${texts.stats_no_data}</p>
+                    <div class="hist-empty">
+                        <span class="hist-empty-icon">📊</span>
+                        <p>${texts.stats_no_data}</p>
                     </div>
                 `;
                 return;
             }
-    
-            // Berechne Statistiken
+
             const stats = {
                 total: prints.length,
                 successful: prints.filter(p => p.status === 'success').length,
                 failed: prints.filter(p => p.status === 'failed').length,
                 cancelled: prints.filter(p => p.status === 'cancelled').length,
                 running: prints.filter(p => p.status === 'running').length,
-    
                 totalTime: prints.reduce((sum, p) => sum + (p.duration_minutes || 0), 0),
                 totalFilament: prints.reduce((sum, p) => sum + (p.filament_grams || 0), 0),
                 totalLayers: prints.reduce((sum, p) => sum + (p.total_layers || 0), 0),
-    
-                avgTime: 0,
-                avgFilament: 0,
-                avgLayers: 0,
-    
-                longestPrint: null,
-                shortestPrint: null,
-                mostFilament: null,
-                mostLayers: null,
-    
-                filamentTypes: {},
-                filamentColors: {},
-    
-                // Kosten
-                totalFilamentCost: 0,
-                totalPowerCost: 0,
-                avgCost: 0
+                avgTime: 0, avgFilament: 0, avgLayers: 0,
+                longestPrint: null, shortestPrint: null, mostFilament: null, mostLayers: null,
+                filamentTypes: {}, filamentColors: {},
+                totalFilamentCost: 0, totalPowerCost: 0, avgCost: 0
             };
-    
-            // Zeit-basierte Analysen
+
             const timeAnalysis = {
-                weekdays: [0,0,0,0,0,0,0], // So-Sa
+                weekdays: [0,0,0,0,0,0,0],
                 hours: new Array(24).fill(0),
                 last30Days: [],
-                mostActiveDay: '',
-                mostActiveHour: ''
+                mostActiveDay: '', mostActiveHour: ''
             };
-    
-            // Analysiere Druckzeiten
+
             const now = new Date();
             const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
-    
+
             prints.forEach(p => {
                 const startDate = new Date(p.start_time);
-    
-                // Wochentag (0=Sonntag, 6=Samstag)
-                const weekday = startDate.getDay();
-                timeAnalysis.weekdays[weekday]++;
-    
-                // Stunde (0-23)
-                const hour = startDate.getHours();
-                timeAnalysis.hours[hour]++;
-    
-                // Letzte 30 Tage
+                timeAnalysis.weekdays[startDate.getDay()]++;
+                timeAnalysis.hours[startDate.getHours()]++;
+
                 if (startDate >= thirtyDaysAgo) {
                     const dateStr = startDate.toISOString().split('T')[0];
                     const existing = timeAnalysis.last30Days.find(d => d.date === dateStr);
-                    if (existing) {
-                        existing.count++;
-                    } else {
-                        timeAnalysis.last30Days.push({ date: dateStr, count: 1 });
-                    }
+                    if (existing) existing.count++;
+                    else timeAnalysis.last30Days.push({ date: dateStr, count: 1 });
                 }
             });
-    
-            // Finde aktivsten Tag
+
             const weekdayNames = [
-                texts.stats_weekday_name_sunday,
-                texts.stats_weekday_name_monday,
-                texts.stats_weekday_name_tuesday,
-                texts.stats_weekday_name_wednesday,
-                texts.stats_weekday_name_thursday,
-                texts.stats_weekday_name_friday,
+                texts.stats_weekday_name_sunday, texts.stats_weekday_name_monday,
+                texts.stats_weekday_name_tuesday, texts.stats_weekday_name_wednesday,
+                texts.stats_weekday_name_thursday, texts.stats_weekday_name_friday,
                 texts.stats_weekday_name_saturday
             ];
             const maxWeekday = Math.max(...timeAnalysis.weekdays);
             const maxWeekdayIndex = timeAnalysis.weekdays.indexOf(maxWeekday);
             timeAnalysis.mostActiveDay = weekdayNames[maxWeekdayIndex];
-    
-            // Finde aktivste Stunde
+
             const maxHour = Math.max(...timeAnalysis.hours);
             const maxHourIndex = timeAnalysis.hours.indexOf(maxHour);
             timeAnalysis.mostActiveHour = `${maxHourIndex}:00 - ${maxHourIndex + 1}:00`;
-    
-            // Sortiere last30Days nach Datum
+
             timeAnalysis.last30Days.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-            // Durchschnitte berechnen (nur erfolgreiche Drucke)
+
             const successfulPrints = prints.filter(p => p.status === 'success');
             if (successfulPrints.length > 0) {
                 stats.avgTime = Math.round(stats.totalTime / successfulPrints.length);
-                stats.avgFilament = Math.round(successfulPrints.reduce((sum, p) =>
-                    sum + (p.filament_grams || 0), 0) / successfulPrints.length);
-                stats.avgLayers = Math.round(successfulPrints.reduce((sum, p) =>
-                    sum + (p.total_layers || 0), 0) / successfulPrints.length);
-    
-                // Rekorde finden
-                stats.longestPrint = successfulPrints.reduce((max, p) =>
-                    (!max || (p.duration_minutes || 0) > (max.duration_minutes || 0)) ? p : max, null);
-                stats.shortestPrint = successfulPrints.reduce((min, p) =>
-                    (!min || ((p.duration_minutes || 0) < (min.duration_minutes || 0) && p.duration_minutes > 0)) ? p : min, null);
-                stats.mostFilament = successfulPrints.reduce((max, p) =>
-                    (!max || (p.filament_grams || 0) > (max.filament_grams || 0)) ? p : max, null);
-                stats.mostLayers = successfulPrints.reduce((max, p) =>
-                    (!max || (p.total_layers || 0) > (max.total_layers || 0)) ? p : max, null);
+                stats.avgFilament = Math.round(successfulPrints.reduce((sum, p) => sum + (p.filament_grams || 0), 0) / successfulPrints.length);
+                stats.avgLayers = Math.round(successfulPrints.reduce((sum, p) => sum + (p.total_layers || 0), 0) / successfulPrints.length);
+                stats.longestPrint = successfulPrints.reduce((max, p) => (!max || (p.duration_minutes || 0) > (max.duration_minutes || 0)) ? p : max, null);
+                stats.shortestPrint = successfulPrints.reduce((min, p) => (!min || ((p.duration_minutes || 0) < (min.duration_minutes || 0) && p.duration_minutes > 0)) ? p : min, null);
+                stats.mostFilament = successfulPrints.reduce((max, p) => (!max || (p.filament_grams || 0) > (max.filament_grams || 0)) ? p : max, null);
+                stats.mostLayers = successfulPrints.reduce((max, p) => (!max || (p.total_layers || 0) > (max.total_layers || 0)) ? p : max, null);
             }
-    
-            // Filament-Typen und Farben zählen (mit Multi-Filament Support)
+
             const filamentGramsPerType = {};
             const filamentCountPerType = {};
             prints.forEach(p => {
-                // 🎯 Multi-Filament: Verwende filament_details falls vorhanden
                 if (p.is_multifilament && p.filament_details && p.filament_details.length > 0) {
-                    // Zähle jedes Filament EINZELN nach seinem Namen
                     p.filament_details.forEach(fil => {
                         if (fil.name) {
                             filamentGramsPerType[fil.name] = (filamentGramsPerType[fil.name] || 0) + (fil.used_grams || 0);
                             filamentCountPerType[fil.name] = (filamentCountPerType[fil.name] || 0) + 1;
                         }
                     });
-                } else {
-                    // Single-Filament
-                    if (p.filament_type) {
-                        const grams = p.filament_grams || 0;
-                        filamentGramsPerType[p.filament_type] = (filamentGramsPerType[p.filament_type] || 0) + grams;
-                        filamentCountPerType[p.filament_type] = (filamentCountPerType[p.filament_type] || 0) + 1;
-                    }
+                } else if (p.filament_type) {
+                    filamentGramsPerType[p.filament_type] = (filamentGramsPerType[p.filament_type] || 0) + (p.filament_grams || 0);
+                    filamentCountPerType[p.filament_type] = (filamentCountPerType[p.filament_type] || 0) + 1;
                 }
             });
-    
-            // Für die Anzeige zusammenführen
             stats.filamentTypes = filamentGramsPerType;
-    
-            // Kosten berechnen (mit den globalen costSettings)
+
             if (costSettings) {
-                // Filament in kg * Preis pro kg (filament_grams / 1000 = kg)
                 stats.totalFilamentCost = ((stats.totalFilament / 1000) * costSettings.filament_per_kg).toFixed(2);
-                // Annahme: 200W Drucker * Stunden * Preis pro kWh
                 const totalHours = stats.totalTime / 60;
                 stats.totalPowerCost = ((200 * totalHours / 1000) * costSettings.power_per_kwh).toFixed(2);
                 stats.avgCost = (successfulPrints.length > 0 ?
                     ((parseFloat(stats.totalFilamentCost) + parseFloat(stats.totalPowerCost)) / successfulPrints.length).toFixed(2) : 0);
             }
-    
-            // Erfolgsquote
+
             const successRate = Math.round((stats.successful / stats.total) * 100);
-    
-            // HTML generieren
+
+            // Build HTML with CSS classes
             let html = `
-                <!-- Übersicht -->
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:20px;">
-    
-                    <!-- Gesamt Drucke -->
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                            <span style="font-size:24px;">🖨️</span>
+                <div class="hist-stats-grid">
+                    <div class="hist-stat-card">
+                        <div class="hist-stat-row">
+                            <span class="hist-stat-icon">🖨️</span>
                             <div>
-                                <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_total}</div>
-                                <div style="color:var(--text-primary); font-size:20px; font-weight:600;">
-                                    ${stats.total} ${texts.stats_prints}
-                                </div>
+                                <div class="hist-stat-label">${texts.stats_total}</div>
+                                <div class="hist-stat-value">${stats.total} ${texts.stats_prints}</div>
                             </div>
                         </div>
-                        <div style="display:flex; gap:8px; font-size:11px; color:var(--text-secondary);">
+                        <div class="hist-stat-breakdown">
                             <span>✅ ${stats.successful}</span>
                             <span>❌ ${stats.failed}</span>
                             ${stats.cancelled > 0 ? `<span>⚠️ ${stats.cancelled}</span>` : ''}
                             ${stats.running > 0 ? `<span>🔄 ${stats.running}</span>` : ''}
                         </div>
                     </div>
-    
-                    <!-- Erfolgsquote -->
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
-                            <span style="font-size:24px;">📈</span>
+                    <div class="hist-stat-card">
+                        <div class="hist-stat-row">
+                            <span class="hist-stat-icon">📈</span>
                             <div>
-                                <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_success_rate}</div>
-                                <div style="color:var(--text-primary); font-size:20px; font-weight:600;">
-                                    ${successRate}%
-                                </div>
+                                <div class="hist-stat-label">${texts.stats_success_rate}</div>
+                                <div class="hist-stat-value">${successRate}%</div>
                             </div>
                         </div>
-                        <div style="background:var(--border-color); height:6px; border-radius:3px; overflow:hidden;">
-                            <div style="background:var(--accent-green); height:100%; width:${successRate}%; transition:width 0.5s;"></div>
+                        <div class="hist-rate-bar">
+                            <div class="hist-rate-fill" style="width:${successRate}%;"></div>
                         </div>
                     </div>
-    
-                    <!-- Gesamtzeit -->
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-size:24px;">⏱️</span>
+                    <div class="hist-stat-card">
+                        <div class="hist-stat-row">
+                            <span class="hist-stat-icon">⏱️</span>
                             <div>
-                                <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_total_time}</div>
-                                <div style="color:var(--text-primary); font-size:16px; font-weight:600;">
-                                    ${Math.floor(stats.totalTime/60)}h ${stats.totalTime%60}m
-                                </div>
-                                <div style="color:var(--text-secondary); font-size:11px;">
-                                    ${texts.stats_average_time.replace('{hours}', Math.floor(stats.avgTime/60)).replace('{minutes}', stats.avgTime%60)}
-                                </div>
+                                <div class="hist-stat-label">${texts.stats_total_time}</div>
+                                <div class="hist-stat-value" style="font-size:16px;">${Math.floor(stats.totalTime/60)}h ${stats.totalTime%60}m</div>
+                                <div class="hist-stat-sub">${texts.stats_average_time.replace('{hours}', Math.floor(stats.avgTime/60)).replace('{minutes}', stats.avgTime%60)}</div>
                             </div>
                         </div>
                     </div>
-    
-                    <!-- Filament -->
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="font-size:24px;">🧵</span>
+                    <div class="hist-stat-card">
+                        <div class="hist-stat-row">
+                            <span class="hist-stat-icon">🧵</span>
                             <div>
-                                <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_filament_label}</div>
-                                <div style="color:var(--text-primary); font-size:16px; font-weight:600;">
-                                    ${stats.totalFilament.toFixed(0)}g
-                                </div>
-                                <div style="color:var(--text-secondary); font-size:11px;">
-                                    ${texts.stats_average_filament.replace('{grams}', stats.avgFilament.toFixed(0))}
-                                </div>
+                                <div class="hist-stat-label">${texts.stats_filament_label}</div>
+                                <div class="hist-stat-value" style="font-size:16px;">${stats.totalFilament.toFixed(0)}g</div>
+                                <div class="hist-stat-sub">${texts.stats_average_filament.replace('{grams}', stats.avgFilament.toFixed(0))}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-    
-                <!-- Kosten -->
-                <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-bottom:20px;">
-                    <h4 style="color:var(--text-primary); margin-bottom:12px; font-size:14px;">
-                        💰 ${texts.stats_cost_overview}
-                    </h4>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px;">
+
+                <!-- Costs -->
+                <div class="hist-section">
+                    <h4 class="hist-section-title">💰 ${texts.stats_cost_overview}</h4>
+                    <div class="hist-costs-grid">
                         <div>
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_filament_cost}</div>
-                            <div style="color:var(--text-primary); font-size:18px; font-weight:600;">
-                                €${stats.totalFilamentCost}
-                            </div>
+                            <div class="hist-cost-label">${texts.stats_filament_cost}</div>
+                            <div class="hist-cost-value">€${stats.totalFilamentCost}</div>
                         </div>
                         <div>
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_power_cost}</div>
-                            <div style="color:var(--text-primary); font-size:18px; font-weight:600;">
-                                €${stats.totalPowerCost}
-                            </div>
+                            <div class="hist-cost-label">${texts.stats_power_cost}</div>
+                            <div class="hist-cost-value">€${stats.totalPowerCost}</div>
                         </div>
                         <div>
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_total_cost}</div>
-                            <div style="color:var(--accent-blue); font-size:18px; font-weight:600;">
-                                €${(parseFloat(stats.totalFilamentCost) + parseFloat(stats.totalPowerCost)).toFixed(2)}
-                            </div>
+                            <div class="hist-cost-label">${texts.stats_total_cost}</div>
+                            <div class="hist-cost-value hist-cost-value--accent">€${(parseFloat(stats.totalFilamentCost) + parseFloat(stats.totalPowerCost)).toFixed(2)}</div>
                         </div>
                         <div>
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_avg_per_print}</div>
-                            <div style="color:var(--text-primary); font-size:18px; font-weight:600;">
-                                €${stats.avgCost}
-                            </div>
+                            <div class="hist-cost-label">${texts.stats_avg_per_print}</div>
+                            <div class="hist-cost-value">€${stats.avgCost}</div>
                         </div>
                     </div>
                 </div>
-    
-                <!-- Rekorde -->
-                <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-bottom:20px;">
-                    <h4 style="color:var(--text-primary); margin-bottom:12px; font-size:14px;">
-                        🏆 ${texts.stats_records}
-                    </h4>
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px;">
+
+                <!-- Records -->
+                <div class="hist-section">
+                    <h4 class="hist-section-title">🏆 ${texts.stats_records}</h4>
+                    <div class="hist-records-grid">
             `;
-    
-            // Rekord-Karten
+
             if (stats.longestPrint) {
                 html += `
-                    <div style="background:var(--bg-primary); padding:10px; border-radius:6px;">
-                        <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_longest_print}</div>
-                        <div style="color:var(--text-primary); font-size:13px; font-weight:500;
-                                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                            ${stats.longestPrint.filename || texts.unknown}
-                        </div>
-                        <div style="color:var(--accent-blue); font-size:12px;">
-                            ${Math.floor(stats.longestPrint.duration_minutes/60)}h ${stats.longestPrint.duration_minutes%60}m
-                        </div>
+                    <div class="hist-record-card">
+                        <div class="hist-record-label">${texts.stats_longest_print}</div>
+                        <div class="hist-record-name">${stats.longestPrint.filename || texts.unknown}</div>
+                        <div class="hist-record-value" style="color:var(--accent-blue);">${Math.floor(stats.longestPrint.duration_minutes/60)}h ${stats.longestPrint.duration_minutes%60}m</div>
                     </div>
                 `;
             }
-    
             if (stats.mostFilament) {
                 html += `
-                    <div style="background:var(--bg-primary); padding:10px; border-radius:6px;">
-                        <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_most_filament}</div>
-                        <div style="color:var(--text-primary); font-size:13px; font-weight:500;
-                                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                            ${stats.mostFilament.filename || texts.unknown}
-                        </div>
-                        <div style="color:var(--accent-green); font-size:12px;">
-                            ${stats.mostFilament.filament_grams ? stats.mostFilament.filament_grams.toFixed(1) : '0'}g
-                        </div>
+                    <div class="hist-record-card">
+                        <div class="hist-record-label">${texts.stats_most_filament}</div>
+                        <div class="hist-record-name">${stats.mostFilament.filename || texts.unknown}</div>
+                        <div class="hist-record-value" style="color:var(--accent-green);">${stats.mostFilament.filament_grams ? stats.mostFilament.filament_grams.toFixed(1) : '0'}g</div>
                     </div>
                 `;
             }
-    
             if (stats.mostLayers) {
                 html += `
-                    <div style="background:var(--bg-primary); padding:10px; border-radius:6px;">
-                        <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_highest_layers}</div>
-                        <div style="color:var(--text-primary); font-size:13px; font-weight:500;
-                                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                            ${stats.mostLayers.filename || texts.unknown}
-                        </div>
-                        <div style="color:var(--accent-yellow); font-size:12px;">
-                            ${texts.stats_layers_count.replace('{count}', stats.mostLayers.total_layers)}
-                        </div>
+                    <div class="hist-record-card">
+                        <div class="hist-record-label">${texts.stats_highest_layers}</div>
+                        <div class="hist-record-name">${stats.mostLayers.filename || texts.unknown}</div>
+                        <div class="hist-record-value" style="color:var(--accent-yellow);">${texts.stats_layers_count.replace('{count}', stats.mostLayers.total_layers)}</div>
                     </div>
                 `;
             }
-    
-            html += `
-                    </div>
-                </div>
-            `;
-    
-            // Filament-Typen wenn vorhanden
+
+            html += `</div></div>`;
+
+            // Filament types
             if (Object.keys(stats.filamentTypes).length > 0) {
-                // Sortiere nach Gramm-Verbrauch (für Balkenbreite)
-                const sortedTypes = Object.entries(stats.filamentTypes)
-                    .sort((a, b) => b[1] - a[1]);
-    
-                // Höchster Wert für Skalierung der Balken
+                const sortedTypes = Object.entries(stats.filamentTypes).sort((a, b) => b[1] - a[1]);
                 const maxGrams = sortedTypes[0][1];
-    
+
                 html += `
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <h4 style="color:var(--text-primary); margin-bottom:16px; font-size:14px;">
-                            🧵 ${texts.stats_filament_usage}
-                        </h4>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div class="hist-section">
+                        <h4 class="hist-section-title">🧵 ${texts.stats_filament_usage}</h4>
+                        <div class="hist-filament-list">
                 `;
-    
+
                 sortedTypes.forEach(([type, grams]) => {
                     const count = filamentCountPerType[type] || 0;
-                    // 🎯 PROZENT = ANZAHL DRUCKE, nicht Gewicht!
                     const percentage = Math.round((count / stats.total) * 100);
-                    // Balkenbreite = nach Gewicht skaliert
                     const barWidth = (grams / maxGrams) * 100;
-    
-                    // Farbe basierend auf Farbnamen
-                    let color = '#666';
-                    const typeLower = type.toLowerCase();
-    
-                    if (typeLower.includes('black') || typeLower.includes('schwarz')) {
-                        color = '#2c2c2c';
-                    } else if (typeLower.includes('white') || typeLower.includes('weiß')) {
-                        color = '#e0e0e0';
-                    } else if (typeLower.includes('red') || typeLower.includes('rot')) {
-                        color = '#dc3545';
-                    } else if (typeLower.includes('green') || typeLower.includes('grün')) {
-                        color = '#28a745';
-                    } else if (typeLower.includes('blue') || typeLower.includes('blau')) {
-                        color = '#007bff';
-                    } else if (typeLower.includes('yellow') || typeLower.includes('gelb')) {
-                        color = '#ffc107';
-                    } else if (typeLower.includes('orange')) {
-                        color = '#fd7e14';
-                    } else if (typeLower.includes('purple') || typeLower.includes('violet') || typeLower.includes('lila')) {
-                        color = '#6f42c1';
-                    } else if (typeLower.includes('pink') || typeLower.includes('rosa')) {
-                        color = '#e83e8c';
-                    } else if (typeLower.includes('beige') || typeLower.includes('sand')) {
-                        color = '#c8b88b';
-                    } else if (typeLower.includes('brown') || typeLower.includes('braun')) {
-                        color = '#795548';
-                    } else if (typeLower.includes('grey') || typeLower.includes('gray') || typeLower.includes('grau')) {
-                        color = '#6c757d';
-                    } else if (typeLower.includes('silver') || typeLower.includes('silber')) {
-                        color = '#b8b8b8';
-                    } else if (typeLower.includes('gold')) {
-                        color = '#ffb700';
-                    } else if (typeLower.includes('military')) {
-                        color = '#4b5320';
-                    } else if (typeLower.includes('brick') || typeLower.includes('ziegel')) {
-                        color = '#8b4513';
-                    }
-    
-                    if (typeLower.includes('pastel') || typeLower.includes('pastell')) {
-                        if (typeLower.includes('pink')) {
-                            color = '#ffb3d9';
-                        }
-                    }
-    
-                    // Text immer weiß mit starkem Schatten für Lesbarkeit
-                    const textColor = 'white';
-                    const textShadow = '0 0 4px rgba(0,0,0,0.8), 0 0 8px rgba(0,0,0,0.6), 0 1px 2px rgba(0,0,0,0.9)';
-    
+                    let color = getFilamentColor(type);
                     const printText = count === 1 ? texts.stats_print_singular : texts.stats_prints_plural;
+
                     html += `
                         <div>
-                            <div style="margin-bottom:4px;">
-                                <span style="color:var(--text-primary); font-size:13px; font-weight:600;">
-                                    ${type}
-                                </span>
-                            </div>
-                            <div style="background:var(--bg-primary); height:24px; border-radius:10px; overflow:hidden; position:relative;">
-                                <div style="background:${color};
-                                            height:100%;
-                                            width:${barWidth}%;
-                                            border-radius:10px;
-                                            transition:width 0.3s ease;
-                                            box-shadow:inset 0 1px 2px rgba(0,0,0,0.2);">
-                                </div>
-                                <div style="position:absolute; top:50%; left:10px; transform:translateY(-50%);
-                                            color:${textColor}; font-size:11px; font-weight:700;
-                                            text-shadow:${textShadow};">
+                            <div class="hist-filament-name">${type}</div>
+                            <div class="hist-filament-bar-bg">
+                                <div class="hist-filament-bar" style="background:${color}; width:${barWidth}%;"></div>
+                                <div class="hist-filament-bar-text">
                                     ${texts.stats_percent_grams_prints
                                         .replace('{percent}', percentage)
                                         .replace('{grams}', Math.round(grams))
@@ -1592,209 +858,235 @@
                         </div>
                     `;
                 });
-                html += `
-                        </div>
-                    </div>
-                `;
+                html += `</div></div>`;
             }
-    
-            // Zeit-Analysen
+
+            // Time Analysis
             const isMobile = window.innerWidth <= 768;
-    
+
             html += `
-                <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-top:20px;">
-                    <h4 style="color:var(--text-primary); margin-bottom:15px; font-size:14px;">
-                        📅 ${texts.stats_time_analysis}
-                    </h4>
-    
-                    <!-- Wochentags-Verteilung -->
+                <div class="hist-section">
+                    <h4 class="hist-section-title">📅 ${texts.stats_time_analysis}</h4>
+
                     <div style="margin-bottom:20px;">
-                        <div style="color:var(--text-secondary); font-size:12px; margin-bottom:10px;">
-                            ${texts.stats_prints_per_weekday}
-                        </div>
-                        <div style="display:flex; gap:${isMobile ? '4px' : '8px'}; align-items:flex-end; height:${isMobile ? '60px' : '80px'};">
+                        <div class="hist-stat-sub" style="margin-bottom:10px;">${texts.stats_prints_per_weekday}</div>
+                        <div class="hist-weekday-chart" style="gap:${isMobile ? '4px' : '8px'};">
             `;
-    
-            // Wochentags-Balken
+
             const maxWeekdayCount = Math.max(...timeAnalysis.weekdays);
             const weekdayShort = [
-                texts.stats_weekday_monday,
-                texts.stats_weekday_tuesday,
-                texts.stats_weekday_wednesday,
-                texts.stats_weekday_thursday,
-                texts.stats_weekday_friday,
-                texts.stats_weekday_saturday,
+                texts.stats_weekday_monday, texts.stats_weekday_tuesday, texts.stats_weekday_wednesday,
+                texts.stats_weekday_thursday, texts.stats_weekday_friday, texts.stats_weekday_saturday,
                 texts.stats_weekday_sunday
             ];
             weekdayShort.forEach((day, index) => {
                 const dataIndex = index === 6 ? 0 : index + 1;
                 const count = timeAnalysis.weekdays[dataIndex];
-                const maxHeight = isMobile ? 40 : 60;  // Kleinere Höhe auf Mobile
+                const maxHeight = isMobile ? 40 : 60;
                 const height = maxWeekdayCount > 0 ? (count / maxWeekdayCount) * maxHeight : 2;
                 const isMax = count === maxWeekdayCount && count > 0;
-    
+
                 html += `
-                    <div style="flex:1; display:flex; flex-direction:column; align-items:center;
-                                cursor:${count > 0 ? 'pointer' : 'default'};"
+                    <div class="hist-weekday-col" style="cursor:${count > 0 ? 'pointer' : 'default'};"
                          onclick="${count > 0 ? `showDayStatistics(null, '${weekdayNames[dataIndex]}')` : ''}">
-                        <div style="width:100%; background:${isMax ? 'var(--accent-blue)' : 'var(--accent-green)'};
-                                    height:${height}px; min-height:2px; border-radius:4px 4px 0 0;
-                                    position:relative; transition:all 0.3s;
-                                    margin-top:auto;"
-                             onmouseover="if(${count} > 0) this.style.opacity='0.8'"
-                             onmouseout="this.style.opacity='1'">
-                            ${count > 0 ? `
-                                <span style="position:absolute; top:-18px; left:50%; transform:translateX(-50%);
-                                            color:var(--text-primary); font-size:10px; font-weight:600;">
-                                    ${count}
-                                </span>
-                            ` : ''}
+                        <div class="hist-weekday-bar-wrap">
+                            ${count > 0 ? `<span class="hist-weekday-count">${count}</span>` : ''}
+                            <div class="hist-weekday-bar ${isMax ? 'hist-weekday-bar--max' : 'hist-weekday-bar--normal'}" style="height:${height}px;"
+                                 onmouseover="if(${count} > 0) this.style.opacity='0.8'"
+                                 onmouseout="this.style.opacity='1'"></div>
                         </div>
-                        <div style="color:var(--text-secondary); font-size:11px; margin-top:4px;">
-                            ${day}
-                        </div>
+                        <div class="hist-weekday-label">${day}</div>
                     </div>
                 `;
             });
-    
+
             html += `
                         </div>
                     </div>
-    
-                    <!-- Aktivste Zeiten -->
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
-                        <div style="background:var(--bg-primary); padding:10px; border-radius:6px;">
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_most_active_day}</div>
-                            <div style="color:var(--text-primary); font-size:14px; font-weight:500;">
-                                ${timeAnalysis.mostActiveDay}
-                            </div>
-                            <div style="color:var(--accent-blue); font-size:11px;">
-                                ${maxWeekdayCount} ${maxWeekdayCount === 1 ? texts.stats_print_singular : texts.stats_prints_plural}
-                            </div>
+
+                    <div class="hist-active-grid">
+                        <div class="hist-record-card">
+                            <div class="hist-record-label">${texts.stats_most_active_day}</div>
+                            <div style="color:var(--text-primary); font-size:14px; font-weight:500;">${timeAnalysis.mostActiveDay}</div>
+                            <div class="hist-record-value" style="color:var(--accent-blue);">${maxWeekdayCount} ${maxWeekdayCount === 1 ? texts.stats_print_singular : texts.stats_prints_plural}</div>
                         </div>
-                        <div style="background:var(--bg-primary); padding:10px; border-radius:6px;">
-                            <div style="color:var(--text-secondary); font-size:11px;">${texts.stats_most_active_time}</div>
-                            <div style="color:var(--text-primary); font-size:14px; font-weight:500;">
-                                ${timeAnalysis.mostActiveHour}
-                            </div>
-                            <div style="color:var(--accent-green); font-size:11px;">
-                                ${Math.max(...timeAnalysis.hours)} ${Math.max(...timeAnalysis.hours) === 1 ? texts.stats_print_singular : texts.stats_prints_plural}
-                            </div>
+                        <div class="hist-record-card">
+                            <div class="hist-record-label">${texts.stats_most_active_time}</div>
+                            <div style="color:var(--text-primary); font-size:14px; font-weight:500;">${timeAnalysis.mostActiveHour}</div>
+                            <div class="hist-record-value" style="color:var(--accent-green);">${Math.max(...timeAnalysis.hours)} ${Math.max(...timeAnalysis.hours) === 1 ? texts.stats_print_singular : texts.stats_prints_plural}</div>
                         </div>
                     </div>
-    
-                    <!-- 30 Tage Trend -->
+
                     <div>
-                        <div style="color:var(--text-secondary); font-size:12px; margin-bottom:8px;">
-                            ${texts.stats_trend_30_days}
-                        </div>
-                        <div style="background:var(--bg-primary); padding:10px; padding-bottom:20px; border-radius:6px;
-                                    display:flex; gap:${isMobile ? '1px' : '2px'}; align-items:flex-end;
-                                    height:${isMobile ? '50px' : '80px'};
-                                    overflow:hidden; position:relative;">
+                        <div class="hist-stat-sub" style="margin-bottom:8px;">${texts.stats_trend_30_days}</div>
+                        <div class="hist-trend-wrap" style="gap:${isMobile ? '1px' : '2px'}; height:${isMobile ? '50px' : '80px'};">
                     `;
-    
-                    // Fülle leere Tage auf
-                    const filledDays = [];
-                    for (let i = 29; i >= 0; i--) {
-                        const date = new Date(now - i * 24 * 60 * 60 * 1000);
-                        const dateStr = date.toISOString().split('T')[0];
-                        const dayData = timeAnalysis.last30Days.find(d => d.date === dateStr);
-                        filledDays.push({ date: dateStr, count: dayData ? dayData.count : 0 });
-                    }
-    
-                    const maxDayCount = Math.max(...filledDays.map(d => d.count));
-    
-                    filledDays.forEach(day => {
-                        // WICHTIG: Kleinere maximale Höhe auf Mobile
-                        const maxBarHeight = isMobile ? 30 : 50;  // Reduziert von 35 auf 30
-                        const height = maxDayCount > 0 ? (day.count / maxDayCount) * maxBarHeight : 2;
-                        const date = new Date(day.date);
-                        const dayLabel = date.getDate();
-                        const isToday = day.date === new Date().toISOString().split('T')[0];
-    
-                        html += `
-                            <div style="flex:1; min-width:${isMobile ? '8px' : '10px'};
-                                        display:flex; align-items:flex-end;
-                                        ${isToday ? 'background:var(--border-color); padding:0 1px; border-radius:2px;' : ''}
-                                        cursor:${day.count > 0 ? 'pointer' : 'default'};"
-                                 onclick="${day.count > 0 ? `showDayStatistics('${day.date}')` : ''}">
-                                <div style="background:${day.count > 0 ? 'var(--accent-blue)' : 'var(--border-color)'};
-                                            height:${height}px; min-height:2px; border-radius:2px;
-                                            width:100%;
-                                            transition:all 0.3s;"
-                                     title="${new Date(day.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}: ${day.count} Drucke"
-                                     onmouseover="if(${day.count} > 0) this.style.opacity='0.8'"
-                                     onmouseout="this.style.opacity='1'">
-                                </div>
-                            </div>
-                        `;
-                    });
-    
-                    html += `
+
+            const filledDays = [];
+            for (let i = 29; i >= 0; i--) {
+                const date = new Date(now - i * 24 * 60 * 60 * 1000);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayData = timeAnalysis.last30Days.find(d => d.date === dateStr);
+                filledDays.push({ date: dateStr, count: dayData ? dayData.count : 0 });
+            }
+
+            const maxDayCount = Math.max(...filledDays.map(d => d.count));
+
+            filledDays.forEach(day => {
+                const maxBarHeight = isMobile ? 30 : 50;
+                const height = maxDayCount > 0 ? (day.count / maxDayCount) * maxBarHeight : 2;
+                const isToday = day.date === new Date().toISOString().split('T')[0];
+
+                html += `
+                    <div class="hist-trend-day ${isToday ? 'hist-trend-day--today' : ''}" style="min-width:${isMobile ? '8px' : '10px'}; cursor:${day.count > 0 ? 'pointer' : 'default'};"
+                         onclick="${day.count > 0 ? `showDayStatistics('${day.date}')` : ''}">
+                        <div class="hist-trend-bar ${day.count > 0 ? 'hist-trend-bar--active' : 'hist-trend-bar--empty'}"
+                             style="height:${height}px;"
+                             title="${new Date(day.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}: ${day.count} Drucke"
+                             onmouseover="if(${day.count} > 0) this.style.opacity='0.8'"
+                             onmouseout="this.style.opacity='1'"></div>
+                    </div>
+                `;
+            });
+
+            html += `
                         </div>
-                        <div style="color:var(--text-secondary); font-size:10px; margin-top:20px; text-align:center;">
+                        <div class="hist-trend-total">
                             ${texts.stats_total_30_days.replace('{count}', timeAnalysis.last30Days.reduce((sum, d) => sum + d.count, 0))}
                         </div>
                     </div>
-                    `;
-    
-                    document.getElementById('history-list-statistics').innerHTML = html;
-                }
+                </div>
+            `;
+
+            document.getElementById('history-list-statistics').innerHTML = html;
+        }
+
+        // Get filament color based on name
+        function getFilamentColor(type) {
+            const typeLower = type.toLowerCase();
+            if (typeLower.includes('black') || typeLower.includes('schwarz')) return '#2c2c2c';
+            if (typeLower.includes('white') || typeLower.includes('weiß')) return '#e0e0e0';
+            if (typeLower.includes('red') || typeLower.includes('rot')) return '#dc3545';
+            if (typeLower.includes('green') || typeLower.includes('grün')) return '#28a745';
+            if (typeLower.includes('blue') || typeLower.includes('blau')) return '#007bff';
+            if (typeLower.includes('yellow') || typeLower.includes('gelb')) return '#ffc107';
+            if (typeLower.includes('orange')) return '#fd7e14';
+            if (typeLower.includes('purple') || typeLower.includes('violet') || typeLower.includes('lila')) return '#6f42c1';
+            if (typeLower.includes('pink') || typeLower.includes('rosa')) return '#e83e8c';
+            if (typeLower.includes('beige') || typeLower.includes('sand')) return '#c8b88b';
+            if (typeLower.includes('brown') || typeLower.includes('braun')) return '#795548';
+            if (typeLower.includes('grey') || typeLower.includes('gray') || typeLower.includes('grau')) return '#6c757d';
+            if (typeLower.includes('silver') || typeLower.includes('silber')) return '#b8b8b8';
+            if (typeLower.includes('gold')) return '#ffb700';
+            if (typeLower.includes('military')) return '#4b5320';
+            if (typeLower.includes('brick') || typeLower.includes('ziegel')) return '#8b4513';
+            if (typeLower.includes('pastel') && typeLower.includes('pink')) return '#ffb3d9';
+            return '#666';
+        }
+
+        // Custom Confirm Dialog (gleicher Stil wie index.html)
+        function showConfirmDialog(message, title = 'Bestätigung') {
+            return new Promise((resolve) => {
+                const existing = document.getElementById('customConfirmDialog');
+                if (existing) existing.remove();
+
+                const modal = document.createElement('div');
+                modal.id = 'customConfirmDialog';
+                modal.className = 'modal-overlay';
+                modal.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;';
+
+                modal.innerHTML = `
+                    <div class="modal-panel sd-modal-panel" style="max-width:420px;">
+                        <div class="sd-modal-header">
+                            <h2 class="sd-modal-title">⚠️ ${title}</h2>
+                        </div>
+                        <div class="sd-modal-body">
+                            <div style="color:var(--text-primary); font-size:14px; line-height:1.6;">${message}</div>
+                            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                                <button class="hist-btn" id="confirm-cancel-btn">${texts.cancel || 'Abbrechen'}</button>
+                                <button class="hist-btn hist-btn--danger" id="confirm-ok-btn">${texts.confirm_ok || 'Löschen'}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                const close = (result) => {
+                    modal.remove();
+                    resolve(result);
+                };
+
+                document.getElementById('confirm-ok-btn').addEventListener('click', () => close(true));
+                document.getElementById('confirm-cancel-btn').addEventListener('click', () => close(false));
+                modal.addEventListener('click', (e) => { if (e.target === modal) close(false); });
+            });
+        }
+
+        // Custom Toast (Name showWebToast um Konflikt mit Electron toast.js zu vermeiden)
+        function showWebToast(message, type = 'success') {
+            const existingToasts = document.querySelectorAll('.web-toast');
+            existingToasts.forEach(t => t.remove());
+
+            const isDark = document.body.classList.contains('dark-mode');
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = 'web-toast';
+            toast.style.cssText = `background:${isDark ? 'rgba(26,31,46,0.95)' : 'rgba(255,255,255,0.95)'}; color:${isDark ? '#e2e8f0' : '#1a1f2e'}; border:1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; backdrop-filter:blur(12px);`;
+            toast.textContent = `${icons[type] || ''} ${message}`;
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
         // Delete print from history
         async function deletePrintHistory(printId, event) {
             if (event) event.stopPropagation();
-
-            if (!confirm(texts.confirm_delete_from_history)) {
-                return;
-            }
+            const confirmed = await showConfirmDialog(texts.confirm_delete_from_history, texts.confirm_title || 'Bestätigung');
+            if (!confirmed) return;
 
             try {
-                const response = await apiCall(`/api/history/${printId}`, {
-                    method: 'DELETE'
-                });
-
+                const response = await apiCall(`/api/history/${printId}`, { method: 'DELETE' });
                 if (response.ok) {
-                    alert('✅ ' + texts.toast_print_deleted);
+                    showWebToast(texts.toast_print_deleted, 'success');
                     loadHistory();
                 } else {
-                    alert('❌ ' + texts.toast_error_deleting);
+                    showWebToast(texts.toast_error_deleting, 'error');
                 }
             } catch (error) {
                 console.error(texts.console_delete_error + ':', error);
-                alert('❌ ' + texts.toast_error_deleting);
+                showToast(texts.toast_error_deleting, 'error');
             }
         }
 
         // Show print details
         async function showPrintDetails(printId) {
-            document.getElementById('printDetailModal').style.display = 'block';
+            document.getElementById('printDetailModal').style.display = 'flex';
 
             try {
                 const response = await apiCall(`/api/history/${printId}`);
                 const data = await response.json();
                 currentPrintData = data;
 
-                // Check for timelapse
                 const timelapseBtn = document.getElementById('timelapse-tab-btn');
                 if (timelapseBtn && data.print.status !== 'running' && data.print.timelapse_enabled) {
                     apiCall(`/api/history/${printId}/timelapse_status`)
                         .then(res => res.json())
                         .then(status => {
-                            if (status.available) {
-                                timelapseBtn.style.display = 'block';
-                            }
+                            if (status.available) timelapseBtn.style.display = 'block';
                         })
                         .catch(err => console.error('Timelapse check failed:', err));
                 }
 
-                // Set header info
                 const filename = data.print.filename;
                 document.getElementById('detail-title').textContent =
                     filename.length > 50 ? filename.substring(0, 47) + '...' : filename;
 
-                // Thumbnail
                 const thumbImg = document.getElementById('detail-thumbnail');
                 if (data.print.thumbnail_base64) {
                     thumbImg.src = `/api/history/${printId}/thumbnail`;
@@ -1803,10 +1095,8 @@
                     thumbImg.style.display = 'none';
                 }
 
-                // Show overview
                 showOverviewTab(data);
                 switchDetailTab('overview');
-
             } catch (error) {
                 console.error(texts.console_detail_error + ':', error);
                 alert(texts.alert_error_loading_details);
@@ -1816,327 +1106,178 @@
         // Show overview tab
         function showOverviewTab(data) {
             const printData = data || currentPrintData;
-                    if (!printData) return;
+            if (!printData) return;
 
-        const stats = printData.statistics || {};
-        const print = printData.print;
+            const stats = printData.statistics || {};
+            const print = printData.print;
 
-        let statsHtml = `
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px;">
-
-                <!-- Temperaturen Karte -->
-                <div style="background:var(--bg-secondary); border-radius:16px; padding:24px;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-                            border:1px solid var(--border-color);">
-                    <h4 style="color:var(--text-primary); margin:0 0 20px 0; font-size:18px; font-weight:700;
-                               display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px;">🌡️</span> ${texts.detail_temperatures}
-                    </h4>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_nozzle}
+            let statsHtml = `
+                <div class="hist-detail-grid">
+                    <!-- Temperatures -->
+                    <div class="hist-detail-section">
+                        <h4 class="hist-detail-section-title">
+                            <span class="hist-detail-section-icon">🌡️</span> ${texts.detail_temperatures}
+                        </h4>
+                        <div class="hist-value-grid hist-value-grid--2col">
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_nozzle}</div>
+                                <div class="hist-value-num" style="color:var(--accent-orange);">${stats.avg_nozzle_temp ? Math.round(stats.avg_nozzle_temp) : '--'}</div>
+                                <div class="hist-value-unit">°C</div>
                             </div>
-                            <div style="color:var(--accent-orange); font-size:32px; font-weight:700; line-height:1;">
-                                ${stats.avg_nozzle_temp ? Math.round(stats.avg_nozzle_temp) : '--'}
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_bed}</div>
+                                <div class="hist-value-num" style="color:var(--accent-blue);">${stats.avg_bed_temp ? Math.round(stats.avg_bed_temp) : '--'}</div>
+                                <div class="hist-value-unit">°C</div>
                             </div>
-                            <div style="color:var(--text-secondary); font-size:16px; font-weight:600;">°C</div>
-                        </div>
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_bed}
-                            </div>
-                            <div style="color:var(--accent-blue); font-size:32px; font-weight:700; line-height:1;">
-                                ${stats.avg_bed_temp ? Math.round(stats.avg_bed_temp) : '--'}
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:16px; font-weight:600;">°C</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Verbrauch & Kosten Karte -->
-                <div style="background:var(--bg-secondary); border-radius:16px; padding:24px;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-                            border:1px solid var(--border-color);">
-                    <h4 style="color:var(--text-primary); margin:0 0 20px 0; font-size:18px; font-weight:700;
-                               display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px;">💰</span> ${texts.detail_consumption_costs}
-                    </h4>
-                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;">
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_filament}
+                    <!-- Consumption & Costs -->
+                    <div class="hist-detail-section">
+                        <h4 class="hist-detail-section-title">
+                            <span class="hist-detail-section-icon">💰</span> ${texts.detail_consumption_costs}
+                        </h4>
+                        <div class="hist-value-grid hist-value-grid--3col">
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_filament}</div>
+                                <div class="hist-value-num hist-value-num--md" style="color:var(--accent-green);">${stats.filament_used_grams ? stats.filament_used_grams.toFixed(1) : '~'}</div>
+                                <div class="hist-value-unit">g</div>
                             </div>
-                            <div style="color:var(--accent-green); font-size:24px; font-weight:700; line-height:1;">
-                                ${stats.filament_used_grams ? stats.filament_used_grams.toFixed(1) : '~'}
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_power}</div>
+                                <div class="hist-value-num hist-value-num--md" style="color:var(--accent-orange);">${stats.total_power_kwh ? stats.total_power_kwh.toFixed(3) : '~'}</div>
+                                <div class="hist-value-unit">kWh</div>
                             </div>
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600;">g</div>
-                        </div>
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_power}
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_costs}</div>
+                                <div class="hist-value-num hist-value-num--md" style="color:var(--accent-blue);">${calculateCost(stats)}</div>
+                                <div class="hist-value-unit">€</div>
                             </div>
-                            <div style="color:var(--accent-orange); font-size:24px; font-weight:700; line-height:1;">
-                                ${stats.total_power_kwh ? stats.total_power_kwh.toFixed(3) : '~'}
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600;">kWh</div>
-                        </div>
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_costs}
-                            </div>
-                            <div style="color:var(--accent-blue); font-size:24px; font-weight:700; line-height:1;">
-                                ${calculateCost(stats)}
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600;">€</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Fortschritt Karte -->
-                <div style="background:var(--bg-secondary); border-radius:16px; padding:24px;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-                            border:1px solid var(--border-color);">
-                    <h4 style="color:var(--text-primary); margin:0 0 20px 0; font-size:18px; font-weight:700;
-                               display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px;">📊</span> ${texts.detail_print_progress}
-                    </h4>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_final_progress}
+                    <!-- Progress -->
+                    <div class="hist-detail-section">
+                        <h4 class="hist-detail-section-title">
+                            <span class="hist-detail-section-icon">📊</span> ${texts.detail_print_progress}
+                        </h4>
+                        <div class="hist-value-grid hist-value-grid--2col">
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_final_progress}</div>
+                                <div class="hist-value-num" style="color:var(--accent-green);">${printData.progress && printData.progress.length > 0 ? Math.round(printData.progress[printData.progress.length - 1].progress) : '--'}</div>
+                                <div class="hist-value-unit">%</div>
                             </div>
-                            <div style="color:var(--accent-green); font-size:32px; font-weight:700; line-height:1;">
-                                ${printData.progress && printData.progress.length > 0 ?
-                                    Math.round(printData.progress[printData.progress.length - 1].progress) : '--'}
+                            <div class="hist-value-card">
+                                <div class="hist-value-label">${texts.detail_layers}</div>
+                                <div class="hist-value-num" style="font-size:26px;">${printData.progress && printData.progress.length > 0 ? printData.progress[printData.progress.length - 1].layer : '--'}</div>
+                                <div class="hist-value-unit">/ ${print.total_layers || '--'}</div>
                             </div>
-                            <div style="color:var(--text-secondary); font-size:16px; font-weight:600;">%</div>
-                        </div>
-                        <div style="text-align:center; padding:16px; background:var(--bg-card); border-radius:12px;">
-                            <div style="color:var(--text-secondary); font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
-                                ${texts.detail_layers}
-                            </div>
-                            <div style="color:var(--text-primary); font-size:26px; font-weight:700; line-height:1;">
-                                ${printData.progress && printData.progress.length > 0 ?
-                                    printData.progress[printData.progress.length - 1].layer : '--'}
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:14px; font-weight:600;">/ ${print.total_layers || '--'}</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Filament Karte - SCHÖNE MODERNE DARSTELLUNG -->
-                ${data.filaments && data.filaments.length > 0 ? `
-                <div style="background:var(--bg-secondary); border-radius:16px; padding:24px; grid-column: 1 / -1;
-                            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-                            border:1px solid var(--border-color);">
-                    <h4 style="color:var(--text-primary); margin:0 0 20px 0; font-size:18px; font-weight:700;
-                               display:flex; align-items:center; gap:10px;">
-                        <span style="font-size:24px;">🎨</span> ${data.filaments.length > 1 ? (texts.detail_filaments || 'Filamente') : (texts.detail_filament || 'Filament')}
-                    </h4>
-
-                    <!-- Grid Container für schöne Filament-Karten -->
-                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-                        ${data.filaments.map((fil, idx) => `
-                            <div style="background:linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
-                                        border-radius:14px; padding:20px;
-                                        border:2px solid var(--border-color);
-                                        position:relative;
-                                        overflow:hidden;">
-
-                                <!-- Filament Nummer Badge -->
-                                ${data.filaments.length > 1 ? `
-                                <div style="position:absolute; top:12px; right:12px;
-                                           background:var(--accent-blue); color:white;
-                                           padding:6px 14px; border-radius:20px;
-                                           font-weight:700; font-size:12px;
-                                           box-shadow:0 2px 8px rgba(33,150,243,0.3);">
-                                    #${idx + 1}
-                                </div>` : ''}
-
-                                <!-- Farbkreis groß und prominent -->
-                                ${fil.color ? `
-                                <div style="display:flex; align-items:center; gap:16px; margin-bottom:16px;">
-                                    <div style="width:56px; height:56px; border-radius:50%;
-                                               background:linear-gradient(135deg, ${fil.color} 0%, ${fil.color}dd 100%);
-                                               border:4px solid var(--border-color);
-                                               box-shadow:0 4px 12px rgba(0,0,0,0.15);
-                                               flex-shrink:0;"></div>
-                                    ${fil.name ? `
-                                    <div style="flex:1; min-width:0;">
-                                        <div style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                   text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
-                                            ${texts.detail_name || 'Name'}
-                                        </div>
-                                        <div style="color:var(--text-primary); font-size:18px; font-weight:700;
-                                                   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                            ${fil.name}
-                                        </div>
-                                    </div>` : ''}
+                    <!-- Filaments -->
+                    ${data.filaments && data.filaments.length > 0 ? `
+                    <div class="hist-detail-section hist-detail-section--full">
+                        <h4 class="hist-detail-section-title">
+                            <span class="hist-detail-section-icon">🎨</span> ${data.filaments.length > 1 ? (texts.detail_filaments || 'Filamente') : (texts.detail_filament || 'Filament')}
+                        </h4>
+                        <div class="hist-value-grid hist-value-grid--auto">
+                            ${data.filaments.map((fil, idx) => `
+                                <div class="hist-filament-card">
+                                    ${data.filaments.length > 1 ? `<div class="hist-filament-badge">#${idx + 1}</div>` : ''}
+                                    ${fil.color ? `
+                                    <div class="hist-filament-header">
+                                        <div class="hist-filament-circle" style="background:linear-gradient(135deg, ${fil.color} 0%, ${fil.color}dd 100%);"></div>
+                                        ${fil.name ? `
+                                        <div class="hist-filament-info">
+                                            <div class="hist-filament-detail-label">${texts.detail_name || 'Name'}</div>
+                                            <div class="hist-filament-detail-name">${fil.name}</div>
+                                        </div>` : ''}
+                                    </div>
+                                    ` : (fil.name ? `
+                                    <div style="margin-bottom:16px;">
+                                        <div class="hist-filament-detail-label">${texts.detail_name || 'Name'}</div>
+                                        <div class="hist-filament-detail-name">${fil.name}</div>
+                                    </div>` : '')}
+                                    ${fil.type ? `<div class="hist-filament-type">${fil.type}</div>` : ''}
                                 </div>
-                                ` : (fil.name ? `
-                                <div style="margin-bottom:16px;">
-                                    <div style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                               text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">
-                                        ${texts.detail_name || 'Name'}
-                                    </div>
-                                    <div style="color:var(--text-primary); font-size:18px; font-weight:700;">
-                                        ${fil.name}
-                                    </div>
-                                </div>` : '')}
-
-                                <!-- Material Typ Badge -->
-                                ${fil.type ? `
-                                <div style="display:inline-block; background:var(--accent-green); color:white;
-                                           padding:8px 20px; border-radius:20px;
-                                           font-weight:700; font-size:16px;
-                                           box-shadow:0 2px 8px rgba(76,175,80,0.3);
-                                           margin-top:8px;">
-                                    ${fil.type}
-                                </div>` : ''}
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
+                    ` : ''}
+
+                    <!-- Print Settings -->
+                    ${data.settings && Object.keys(data.settings).length > 0 ? `
+                    <div class="hist-detail-section hist-detail-section--full">
+                        <h4 class="hist-detail-section-title">
+                            <span class="hist-detail-section-icon">⚙️</span> ${texts.detail_print_settings}
+                        </h4>
+                        <div class="hist-value-grid hist-value-grid--auto">
+                            ${data.settings.layer_height ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_layer_height}</div>
+                                <div class="hist-value-num hist-value-num--sm">${data.settings.layer_height} <span class="hist-value-unit">mm</span></div>
+                            </div>` : ''}
+                            ${data.settings.infill_density !== null ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_infill}</div>
+                                <div class="hist-value-num hist-value-num--sm">${data.settings.infill_density}<span class="hist-value-unit">%</span></div>
+                            </div>` : ''}
+                            ${data.settings.wall_loops ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_wall_loops}</div>
+                                <div class="hist-value-num hist-value-num--sm">${data.settings.wall_loops}</div>
+                            </div>` : ''}
+                            ${data.settings.print_speed ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_speed}</div>
+                                <div class="hist-value-num hist-value-num--sm">${data.settings.print_speed} <span class="hist-value-unit">mm/s</span></div>
+                            </div>` : ''}
+                            ${data.settings.nozzle_temp ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_nozzle}</div>
+                                <div class="hist-value-num hist-value-num--sm" style="color:var(--accent-orange);">${data.settings.nozzle_temp}<span class="hist-value-unit">°C</span></div>
+                            </div>` : ''}
+                            ${data.settings.bed_temp ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_bed}</div>
+                                <div class="hist-value-num hist-value-num--sm" style="color:var(--accent-blue);">${data.settings.bed_temp}<span class="hist-value-unit">°C</span></div>
+                            </div>` : ''}
+                            ${data.settings.support_enabled !== null ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_support}</div>
+                                <div style="color:var(--text-primary); font-size:18px; font-weight:700;">
+                                    ${data.settings.support_enabled ? '✅ ' + texts.detail_support_active : '❌ ' + texts.detail_support_off}
+                                </div>
+                            </div>` : ''}
+                            ${data.settings.nozzle_diameter ? `
+                            <div class="hist-settings-card">
+                                <div class="hist-value-label">${texts.detail_nozzle_diameter}</div>
+                                <div class="hist-value-num hist-value-num--sm">${data.settings.nozzle_diameter} <span class="hist-value-unit">mm</span></div>
+                            </div>` : ''}
+                        </div>
+                    </div>` : ''}
                 </div>
-                ` : ''}
+            `;
 
-                                ${data.settings && Object.keys(data.settings).length > 0 ? `
-                                <!-- Druck-Einstellungen -->
-                                <div style="background:var(--bg-secondary); border-radius:16px; padding:24px; grid-column: 1 / -1;
-                                            box-shadow:0 2px 8px rgba(0,0,0,0.08);
-                                            border:1px solid var(--border-color);">
-                                    <h3 style="color:var(--text-primary); margin:0 0 20px 0; font-size:18px; font-weight:700;
-                                               display:flex; align-items:center; gap:10px;">
-                                        <span style="font-size:24px;">⚙️</span> ${texts.detail_print_settings}
-                                    </h3>
-                                    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px;">
-                                        ${data.settings.layer_height ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_layer_height}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:20px; font-weight:700;">
-                                                ${data.settings.layer_height} <span style="font-size:14px; font-weight:600; color:var(--text-secondary);">mm</span>
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.infill_density !== null ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_infill}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:20px; font-weight:700;">
-                                                ${data.settings.infill_density}<span style="font-size:14px; font-weight:600; color:var(--text-secondary);">%</span>
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.wall_loops ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_wall_loops}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:20px; font-weight:700;">
-                                                ${data.settings.wall_loops}
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.print_speed ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_speed}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:20px; font-weight:700;">
-                                                ${data.settings.print_speed} <span style="font-size:14px; font-weight:600; color:var(--text-secondary);">mm/s</span>
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.nozzle_temp ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_nozzle}
-                                            </span>
-                                            <div style="color:var(--accent-orange); font-size:20px; font-weight:700;">
-                                                ${data.settings.nozzle_temp}<span style="font-size:14px; font-weight:600; color:var(--text-secondary);">°C</span>
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.bed_temp ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_bed}
-                                            </span>
-                                            <div style="color:var(--accent-blue); font-size:20px; font-weight:700;">
-                                                ${data.settings.bed_temp}<span style="font-size:14px; font-weight:600; color:var(--text-secondary);">°C</span>
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.support_enabled !== null ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_support}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:18px; font-weight:700;">
-                                                ${data.settings.support_enabled ? '✅ ' + texts.detail_support_active : '❌ ' + texts.detail_support_off}
-                                            </div>
-                                        </div>` : ''}
-
-                                        ${data.settings.nozzle_diameter ? `
-                                        <div style="background:var(--bg-card); border-radius:12px; padding:16px;
-                                                   border:1px solid var(--border-color);">
-                                            <span style="color:var(--text-secondary); font-size:11px; font-weight:600;
-                                                         text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:8px;">
-                                                ${texts.detail_nozzle_diameter}
-                                            </span>
-                                            <div style="color:var(--text-primary); font-size:20px; font-weight:700;">
-                                                ${data.settings.nozzle_diameter} <span style="font-size:14px; font-weight:600; color:var(--text-secondary);">mm</span>
-                                            </div>
-                                        </div>` : ''}
-                                    </div>
-                                </div>` : ''}
-                                `;
-
-                                document.getElementById('detail-stats').innerHTML = statsHtml;
-    }
+            document.getElementById('detail-stats').innerHTML = statsHtml;
+        }
 
         // Switch detail tab
         function switchDetailTab(tab) {
-            document.querySelectorAll('.detail-tab').forEach(btn => {
+            document.querySelectorAll('.hist-detail-tab').forEach(btn => {
                 btn.classList.remove('active');
-                btn.style.borderBottom = '3px solid transparent';
-                btn.style.color = 'var(--text-secondary)';
             });
-
             document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-            document.querySelector(`[data-tab="${tab}"]`).style.borderBottom = '3px solid var(--accent-blue)';
-            document.querySelector(`[data-tab="${tab}"]`).style.color = 'var(--text-primary)';
 
             document.querySelectorAll('.detail-tab-content').forEach(content => {
                 content.style.display = 'none';
             });
-
             document.getElementById(tab + '-tab').style.display = 'block';
 
-            if (tab === 'chart' && currentPrintData) {
-                showProgressChart();
-            } else if (tab === 'events' && currentPrintData) {
-                showEventsTimeline();
-            } else if (tab === 'timelapse' && currentPrintData) {
-                showTimelapse();
-            }
+            if (tab === 'chart' && currentPrintData) showProgressChart();
+            else if (tab === 'events' && currentPrintData) showEventsTimeline();
+            else if (tab === 'timelapse' && currentPrintData) showTimelapse();
         }
 
         // Show progress chart
@@ -2144,18 +1285,11 @@
             if (!currentPrintData || !currentPrintData.progress) return;
 
             const ctx = document.getElementById('printProgressChart').getContext('2d');
-
-            if (printProgressChart) {
-                printProgressChart.destroy();
-            }
+            if (printProgressChart) printProgressChart.destroy();
 
             const labels = currentPrintData.progress.map(p =>
                 new Date(p.time).toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'})
             );
-
-            const progressData = currentPrintData.progress.map(p => p.progress);
-            const nozzleData = currentPrintData.progress.map(p => p.nozzle_temp);
-            const bedData = currentPrintData.progress.map(p => p.bed_temp);
 
             printProgressChart = new Chart(ctx, {
                 type: 'line',
@@ -2164,59 +1298,39 @@
                     datasets: [
                         {
                             label: texts.chart_label_progress,
-                            data: progressData,
+                            data: currentPrintData.progress.map(p => p.progress),
                             borderColor: 'rgb(75, 192, 192)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            yAxisID: 'y-percent',
-                            tension: 0.1
+                            yAxisID: 'y-percent', tension: 0.1
                         },
                         {
                             label: texts.chart_label_nozzle,
-                            data: nozzleData,
+                            data: currentPrintData.progress.map(p => p.nozzle_temp),
                             borderColor: 'rgb(255, 99, 132)',
                             backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                            yAxisID: 'y-temp',
-                            tension: 0.1
+                            yAxisID: 'y-temp', tension: 0.1
                         },
                         {
                             label: texts.chart_label_bed,
-                            data: bedData,
+                            data: currentPrintData.progress.map(p => p.bed_temp),
                             borderColor: 'rgb(54, 162, 235)',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            yAxisID: 'y-temp',
-                            tension: 0.1
+                            yAxisID: 'y-temp', tension: 0.1
                         }
                     ]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        x: {
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                            ticks: { color: '#999', maxTicksLimit: 10 }
-                        },
-                        'y-percent': {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            min: 0,
-                            max: 100,
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#999', maxTicksLimit: 10 } },
+                        'y-percent': { type: 'linear', display: true, position: 'left', min: 0, max: 100,
                             title: { display: true, text: texts.chart_label_progress, color: '#999' },
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            ticks: { color: '#999' }
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#999' }
                         },
-                        'y-temp': {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
+                        'y-temp': { type: 'linear', display: true, position: 'right',
                             title: { display: true, text: texts.chart_axis_temperature, color: '#999' },
-                            grid: { drawOnChartArea: false },
-                            ticks: { color: '#999' }
+                            grid: { drawOnChartArea: false }, ticks: { color: '#999' }
                         }
                     }
                 }
@@ -2227,24 +1341,18 @@
         function showEventsTimeline() {
             if (!currentPrintData || !currentPrintData.events) return;
 
-            let html = `<h4 style="color:var(--text-primary); margin-bottom:10px;">📅 ${texts.events_header}</h4>`;
+            let html = `<h4 class="hist-section-title">📅 ${texts.events_header}</h4>`;
 
             if (currentPrintData.events.length === 0) {
                 html += `<p style="color:var(--text-secondary);">${texts.events_no_events}</p>`;
             } else {
                 currentPrintData.events.forEach(event => {
                     const time = new Date(event.time).toLocaleTimeString('de-DE', {hour: '2-digit', minute: '2-digit'});
-                    const icon = '📌';
-
                     html += `
-                        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border-color);">
-                            <span style="font-size:16px;">${icon}</span>
-                            <div style="flex:1;">
-                                <span style="color:var(--text-primary); font-size:13px;">${event.details}</span>
-                            </div>
-                            <span style="color:var(--text-secondary); font-size:11px; white-space:nowrap;">
-                                ${time}
-                            </span>
+                        <div class="hist-event-item">
+                            <span class="hist-event-icon">📌</span>
+                            <span class="hist-event-text">${event.details}</span>
+                            <span class="hist-event-time">${time}</span>
                         </div>
                     `;
                 });
@@ -2276,8 +1384,8 @@
                         `;
                     } else {
                         container.innerHTML = `
-                            <div class="empty-state">
-                                <div style="font-size:48px; margin-bottom:10px;">📹</div>
+                            <div class="hist-empty">
+                                <span class="hist-empty-icon">📹</span>
                                 <p>${texts.timelapse_no_video}</p>
                             </div>
                         `;
@@ -2286,8 +1394,8 @@
                 .catch(error => {
                     console.error(texts.console_error_loading_timelapse + ':', error);
                     container.innerHTML = `
-                        <div class="empty-state" style="color:var(--accent-red);">
-                            <div style="font-size:48px; margin-bottom:10px;">❌</div>
+                        <div class="hist-empty">
+                            <span class="hist-empty-icon">❌</span>
                             <p>Fehler beim Laden des Videos</p>
                         </div>
                     `;
@@ -2303,208 +1411,140 @@
             }
         }
 
-            // Zeige Tagesstatistiken für einen spezifischen Tag
-            function showDayStatistics(date, dayName = null) {
-                const modal = document.getElementById('dayStatisticsModal');
-                const title = document.getElementById('day-statistics-title');
-                const content = document.getElementById('day-statistics-content');
-        
-                // Titel setzen
-                if (dayName) {
-                    title.innerHTML = `📅 ${texts.stats_for_all_weekday.replace('{weekday}', dayName)}`;
-                } else {
-                    // Datumsformat
-                    const dateObj = new Date(date + 'T12:00:00'); // Fix für Safari
-                    const day = String(dateObj.getDate()).padStart(2, '0');
-                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const year = dateObj.getFullYear();
-                    const dateStr = `${day}.${month}.${year}`;
-                    title.innerHTML = `📅 ${texts.stats_prints_for_date.replace('{date}', dateStr)}`;
-                }
-        
-                // Hole alle Drucke
-                apiCall('/api/history')
-                    .then(response => response.json())
-                    .then(data => {
-                        let filteredPrints = [];
-        
+        // Show day statistics
+        function showDayStatistics(date, dayName = null) {
+            const modal = document.getElementById('dayStatisticsModal');
+            const title = document.getElementById('day-statistics-title');
+            const content = document.getElementById('day-statistics-content');
+
+            if (dayName) {
+                title.innerHTML = `📅 ${texts.stats_for_all_weekday.replace('{weekday}', dayName)}`;
+            } else {
+                const dateObj = new Date(date + 'T12:00:00');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const year = dateObj.getFullYear();
+                title.innerHTML = `📅 ${texts.stats_prints_for_date.replace('{date}', `${day}.${month}.${year}`)}`;
+            }
+
+            apiCall('/api/history')
+                .then(response => response.json())
+                .then(data => {
+                    let filteredPrints = [];
+
+                    if (dayName) {
+                        const weekdayNames = [
+                            texts.stats_weekday_name_sunday, texts.stats_weekday_name_monday,
+                            texts.stats_weekday_name_tuesday, texts.stats_weekday_name_wednesday,
+                            texts.stats_weekday_name_thursday, texts.stats_weekday_name_friday,
+                            texts.stats_weekday_name_saturday
+                        ];
+                        const targetWeekday = weekdayNames.indexOf(dayName);
+                        filteredPrints = data.prints.filter(print => new Date(print.start_time).getDay() === targetWeekday);
+                    } else {
+                        filteredPrints = data.prints.filter(print => new Date(print.start_time).toISOString().split('T')[0] === date);
+                    }
+
+                    if (filteredPrints.length === 0) {
+                        content.innerHTML = `
+                            <div class="hist-empty">
+                                <span class="hist-empty-icon">📭</span>
+                                <p>${texts.stats_no_prints_day}</p>
+                            </div>
+                        `;
+                    } else {
+                        let dateLabel;
                         if (dayName) {
-                            // Filter nach Wochentag
-                            const weekdayNames = [
-                                texts.stats_weekday_name_sunday,
-                                texts.stats_weekday_name_monday,
-                                texts.stats_weekday_name_tuesday,
-                                texts.stats_weekday_name_wednesday,
-                                texts.stats_weekday_name_thursday,
-                                texts.stats_weekday_name_friday,
-                                texts.stats_weekday_name_saturday
-                            ];
-                            const targetWeekday = weekdayNames.indexOf(dayName);
-        
-                            filteredPrints = data.prints.filter(print => {
-                                const printDate = new Date(print.start_time);
-                                return printDate.getDay() === targetWeekday;
-                            });
+                            dateLabel = texts.stats_all_weekdays.replace('{weekday}', dayName);
                         } else {
-                            // Filter nach spezifischem Datum
-                            filteredPrints = data.prints.filter(print => {
-                                const printDate = new Date(print.start_time).toISOString().split('T')[0];
-                                return printDate === date;
-                            });
+                            const d = new Date(date + 'T12:00:00');
+                            dateLabel = `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
                         }
-        
-                        // Zeige Statistiken
-                        if (filteredPrints.length === 0) {
-                            content.innerHTML = `
-                                <div style="text-align:center; padding:40px; color:var(--text-secondary);">
-                                    <span style="font-size:48px;">📭</span>
-                                    <p style="margin-top:20px;">${texts.stats_no_prints_day}</p>
-                                </div>
-                            `;
-                        } else {
-                            // Setze dateLabel für die Druckliste-Überschrift
-                            let dateLabel;
-                            if (dayName) {
-                                // Für Wochentage: nur "alle Montage" ohne "Statistik für"
-                                dateLabel = texts.stats_all_weekdays.replace('{weekday}', dayName);
-                            } else {
-                                // Für Datum: konvertiere zu DD.MM.YYYY Format
-                                const d = new Date(date + 'T12:00:00');
-                                const day = String(d.getDate()).padStart(2, '0');
-                                const month = String(d.getMonth() + 1).padStart(2, '0');
-                                const year = d.getFullYear();
-                                dateLabel = `${day}.${month}.${year}`;
-                            }
-                            renderDayStatistics(filteredPrints, dateLabel);
-                        }
-        
-                        modal.style.display = 'block';
-                    })
-                    .catch(error => {
-                        console.error(texts.console_error_loading_daily_stats + ':', error);
-                        content.innerHTML = `<p style="color:var(--accent-red);">${texts.stats_error_loading_data}</p>`;
-                        modal.style.display = 'block';
-                    });
-            }
-        
-            // Rendere Tagesstatistiken
-            function renderDayStatistics(prints, dateLabel) {
-                const content = document.getElementById('day-statistics-content');
-        
-                // Berechne Statistiken
-                const stats = {
-                    total: prints.length,
-                    successful: prints.filter(p => p.status === 'success').length,
-                    failed: prints.filter(p => p.status === 'failed').length,
-                    cancelled: prints.filter(p => p.status === 'cancelled').length,
-                    totalTime: prints.reduce((sum, p) => sum + (p.duration_minutes || 0), 0),
-                    totalFilament: prints.reduce((sum, p) => sum + (p.filament_grams || 0), 0)
-                };
-        
-                // Ändere diese Zeile:
-                let html = `
-                    <!-- Übersicht -->
-                    <div class="stats-overview-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:15px; margin-bottom:20px;">
-                        <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; text-align:center;">
-                            <div style="font-size:32px;">🖨️</div>
-                            <div style="color:var(--text-primary); font-size:24px; font-weight:bold;">${stats.total}</div>
-                            <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_total_label}</div>
-                        </div>
-        
-                        <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; text-align:center;">
-                            <div style="font-size:32px;">✅</div>
-                            <div style="color:var(--accent-green); font-size:24px; font-weight:bold;">${stats.successful}</div>
-                            <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_successful}</div>
-                        </div>
-        
-                        <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; text-align:center;">
-                            <div style="font-size:32px;">⏱️</div>
-                            <div style="color:var(--accent-blue); font-size:24px; font-weight:bold;">
-                                ${Math.floor(stats.totalTime / 60)}h ${stats.totalTime % 60}m
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:12px;">${texts.stats_print_time}</div>
-                        </div>
-        
-                        <div style="background:var(--bg-secondary); padding:15px; border-radius:10px; text-align:center;">
-                            <div style="font-size:32px;">🧵</div>
-                            <div style="color:var(--accent-purple); font-size:24px; font-weight:bold;">
-                                ${stats.totalFilament >= 1000 ?
-                                    `${(stats.totalFilament / 1000).toFixed(1)}kg` :
-                                    `${stats.totalFilament.toFixed(1)}g`
-                                }
-                            </div>
-                            <div style="color:var(--text-secondary); font-size:12px;">Filament</div>
-                        </div>
-                    </div>
-        
-                    <!-- Druckliste -->
-                    <div style="background:var(--bg-secondary); border-radius:10px; padding:15px;">
-                        <h4 style="color:var(--text-primary); margin-bottom:15px;">
-                            📋 ${texts.stats_prints_list_for.replace('{date}', dateLabel)}
-                        </h4>
-                        <div style="max-height:400px; overflow-y:auto;">
-                `;
-        
-                // Sortiere nach Startzeit (neueste zuerst)
-                prints.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
-        
-                prints.forEach(print => {
-                    const startTime = new Date(print.start_time);
-                    const timeStr = startTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-                    const day = String(startTime.getDate()).padStart(2, '0');
-                    const month = String(startTime.getMonth() + 1).padStart(2, '0');
-                    const year = startTime.getFullYear();
-                    const dateStr = `${day}.${month}.${year}`;
-                    const duration = print.duration_minutes || 0;
-        
-                    const statusIcon = print.status === 'success' ? '✅' :
-                                     print.status === 'failed' ? '❌' :
-                                     print.status === 'cancelled' ? '🚫' : '⏸️';
-        
-                    html += `
-                        <div style="display:flex; justify-content:space-between; align-items:center;
-                                    padding:10px; margin-bottom:8px; background:var(--bg-primary);
-                                    border-radius:8px; cursor:pointer;"
-                             onclick="closeDayStatistics(); setTimeout(() => showPrintDetails(${print.id}), 100)">
-        
-                            <div style="display:flex; align-items:center; gap:10px;">
-                                <span style="font-size:20px;">${statusIcon}</span>
-                                <div>
-                                    <div style="color:var(--text-primary); font-weight:500;">
-                                        ${print.filename || 'Unbekannt'}
-                                    </div>
-                                    <div style="color:var(--text-secondary); font-size:12px;">
-                                        ${dateLabel.includes('alle') ? `${dateStr} • ` : ''}${timeStr} Uhr • ${Math.floor(duration/60)}h ${duration%60}m
-                                    </div>
-                                </div>
-                            </div>
-        
-                            <div style="text-align:right;">
-                                <div style="color:var(--accent-blue); font-size:12px;">
-                                    ${print.filament_grams || 0}g
-                                </div>
-                                ${print.total_layers ? `
-                                    <div style="color:var(--text-secondary); font-size:11px;">
-                                        ${print.total_layers} Layer
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
+                        renderDayStatistics(filteredPrints, dateLabel);
+                    }
+
+                    modal.style.display = 'flex';
+                })
+                .catch(error => {
+                    console.error(texts.console_error_loading_daily_stats + ':', error);
+                    content.innerHTML = `<p style="color:var(--accent-red);">${texts.stats_error_loading_data}</p>`;
+                    modal.style.display = 'flex';
                 });
-        
+        }
+
+        // Render day statistics
+        function renderDayStatistics(prints, dateLabel) {
+            const content = document.getElementById('day-statistics-content');
+
+            const stats = {
+                total: prints.length,
+                successful: prints.filter(p => p.status === 'success').length,
+                failed: prints.filter(p => p.status === 'failed').length,
+                cancelled: prints.filter(p => p.status === 'cancelled').length,
+                totalTime: prints.reduce((sum, p) => sum + (p.duration_minutes || 0), 0),
+                totalFilament: prints.reduce((sum, p) => sum + (p.filament_grams || 0), 0)
+            };
+
+            let html = `
+                <div class="hist-day-stats-grid">
+                    <div class="hist-day-stat">
+                        <div class="hist-day-stat-icon">🖨️</div>
+                        <div class="hist-day-stat-value" style="color:var(--text-primary);">${stats.total}</div>
+                        <div class="hist-day-stat-label">${texts.stats_total_label}</div>
+                    </div>
+                    <div class="hist-day-stat">
+                        <div class="hist-day-stat-icon">✅</div>
+                        <div class="hist-day-stat-value" style="color:var(--accent-green);">${stats.successful}</div>
+                        <div class="hist-day-stat-label">${texts.stats_successful}</div>
+                    </div>
+                    <div class="hist-day-stat">
+                        <div class="hist-day-stat-icon">⏱️</div>
+                        <div class="hist-day-stat-value" style="color:var(--accent-blue);">${Math.floor(stats.totalTime / 60)}h ${stats.totalTime % 60}m</div>
+                        <div class="hist-day-stat-label">${texts.stats_print_time}</div>
+                    </div>
+                    <div class="hist-day-stat">
+                        <div class="hist-day-stat-icon">🧵</div>
+                        <div class="hist-day-stat-value" style="color:var(--accent-purple, #9c27b0);">${stats.totalFilament >= 1000 ? `${(stats.totalFilament / 1000).toFixed(1)}kg` : `${stats.totalFilament.toFixed(1)}g`}</div>
+                        <div class="hist-day-stat-label">Filament</div>
+                    </div>
+                </div>
+
+                <div class="hist-section">
+                    <h4 class="hist-section-title">📋 ${texts.stats_prints_list_for.replace('{date}', dateLabel)}</h4>
+                    <div class="hist-day-print-list">
+            `;
+
+            prints.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
+
+            prints.forEach(print => {
+                const startTime = new Date(print.start_time);
+                const timeStr = startTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = `${String(startTime.getDate()).padStart(2, '0')}.${String(startTime.getMonth() + 1).padStart(2, '0')}.${startTime.getFullYear()}`;
+                const duration = print.duration_minutes || 0;
+                const statusIcon = print.status === 'success' ? '✅' : print.status === 'failed' ? '❌' : print.status === 'cancelled' ? '🚫' : '⏸️';
+
                 html += `
+                    <div class="hist-day-print-item" onclick="closeDayStatistics(); setTimeout(() => showPrintDetails(${print.id}), 100)">
+                        <div class="hist-day-print-left">
+                            <span class="hist-day-print-icon">${statusIcon}</span>
+                            <div>
+                                <div class="hist-day-print-name">${print.filename || 'Unbekannt'}</div>
+                                <div class="hist-day-print-meta">
+                                    ${dateLabel.includes('alle') ? `${dateStr} • ` : ''}${timeStr} Uhr • ${Math.floor(duration/60)}h ${duration%60}m
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hist-day-print-right">
+                            <div class="hist-day-print-grams">${print.filament_grams || 0}g</div>
+                            ${print.total_layers ? `<div class="hist-day-print-layers">${print.total_layers} Layer</div>` : ''}
                         </div>
                     </div>
                 `;
-        
-                content.innerHTML = html;
-            }
-        
-            // Modal schließen
-            function closeDayStatistics() {
-                document.getElementById('dayStatisticsModal').style.display = 'none';
-            }
+            });
+
+            html += `</div></div>`;
+            content.innerHTML = html;
+        }
 
         function closeDayStatistics() {
             document.getElementById('dayStatisticsModal').style.display = 'none';
@@ -2513,8 +1553,7 @@
         // Reload print details
         function reloadPrintDetails() {
             if (currentPrintData) {
-                const printId = currentPrintData.print.id;
-                showPrintDetails(printId);
+                showPrintDetails(currentPrintData.print.id);
             }
         }
 
@@ -2522,27 +1561,19 @@
         function calculateCost(stats) {
             const filamentPerKg = costSettings.filament_per_kg || 25;
             const powerPerKwh = costSettings.power_per_kwh || 0.30;
-
             const filamentGrams = parseFloat(stats.filament_used_grams) || 0;
             const powerKwh = parseFloat(stats.total_power_kwh) || 0;
-
-            const filamentCost = (filamentGrams / 1000) * filamentPerKg;
-            const powerCost = powerKwh * powerPerKwh;
-
-            const total = filamentCost + powerCost;
-
+            const total = (filamentGrams / 1000) * filamentPerKg + powerKwh * powerPerKwh;
             return isNaN(total) ? "0.00" : total.toFixed(2);
         }
 
         // Export print data
         function exportPrintData() {
             if (!currentPrintData) return;
-
             let csv = 'Zeit,Fortschritt %,Düse °C,Bett °C,Schicht\n';
             currentPrintData.progress.forEach(p => {
                 csv += `${p.time},${p.progress},${p.nozzle_temp},${p.bed_temp},${p.layer}\n`;
             });
-
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2559,7 +1590,7 @@
 
         // Close modals when clicking outside
         window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
+            if (event.target.classList.contains('modal-overlay')) {
                 event.target.style.display = 'none';
                 if (printProgressChart) {
                     printProgressChart.destroy();

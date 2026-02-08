@@ -63,7 +63,7 @@ class ThemeManager {
         const labelText = this.theme === 'auto' ? 'Auto (System)' : (this.theme === 'dark' ? 'Dark Mode' : 'Light Mode');
 
         const headerIcon = document.getElementById('theme-icon');
-        const sidebarIcon = document.getElementById('theme-icon-sidebar');
+        const sidebarIcon = document.getElementById('theme-icon-sidebar'); // Legacy
         const settingsIcon = document.getElementById('theme-icon-settings');
         const settingsLabel = document.getElementById('theme-label-settings');
 
@@ -71,6 +71,12 @@ class ThemeManager {
         if (sidebarIcon) sidebarIcon.textContent = iconText;
         if (settingsIcon) settingsIcon.textContent = iconText;
         if (settingsLabel) settingsLabel.textContent = `Aktuell: ${labelText}`;
+
+        // Update meta theme-color for PWA
+        const darkMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');
+        const lightMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: light)"]');
+        if (darkMeta) darkMeta.content = '#0F1419';
+        if (lightMeta) lightMeta.content = '#F3F3F7';
     }
 
     /**

@@ -1,0 +1,714 @@
+/* ============================================
+ * Printer Control Modal (Drucker Steuerung)
+ * ============================================ */
+
+/* Camera Preview */
+.ctrl-camera-wrap {
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 auto 16px;
+    max-width: 380px;
+    position: relative;
+}
+
+.ctrl-camera-wrap img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.ctrl-camera-source-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.15s;
+    display: none;
+}
+
+.ctrl-camera-source-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Tab Navigation */
+.ctrl-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.ctrl-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: -2px;
+}
+
+.ctrl-tab:hover {
+    color: var(--text-primary);
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.ctrl-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-blue);
+}
+
+body.dark-mode .ctrl-tab:hover {
+    background: rgba(33, 150, 243, 0.08);
+}
+
+/* Control Panels (sections within tabs) */
+.ctrl-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.ctrl-panel-title {
+    text-align: center;
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Movement Grid Layout */
+.ctrl-movement-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* XY D-Pad Grid */
+.ctrl-dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 56px);
+    gap: 6px;
+    justify-content: center;
+}
+
+/* Move Buttons (arrows, home) */
+.ctrl-move-btn {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+}
+
+.ctrl-move-btn:active {
+    transform: scale(0.95);
+}
+
+/* Blue direction buttons */
+.ctrl-move-btn--dir {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+    padding: 12px 8px;
+}
+
+.ctrl-move-btn--dir:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-move-btn--dir {
+    background: rgba(33, 150, 243, 0.18);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-move-btn--dir:hover {
+    background: rgba(33, 150, 243, 0.28);
+    border-color: rgba(33, 150, 243, 0.45);
+}
+
+/* Orange home button */
+.ctrl-move-btn--home {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.25);
+    color: #e65100;
+    padding: 12px 8px;
+}
+
+.ctrl-move-btn--home:hover {
+    background: rgba(255, 152, 0, 0.22);
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+body.dark-mode .ctrl-move-btn--home {
+    background: rgba(255, 152, 0, 0.18);
+    border-color: rgba(255, 152, 0, 0.3);
+    color: #ffb74d;
+}
+
+body.dark-mode .ctrl-move-btn--home:hover {
+    background: rgba(255, 152, 0, 0.28);
+    border-color: rgba(255, 152, 0, 0.45);
+}
+
+/* Green Z buttons */
+.ctrl-move-btn--z {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+    padding: 16px 32px;
+    font-size: 15px;
+}
+
+.ctrl-move-btn--z:hover {
+    background: rgba(76, 175, 80, 0.22);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .ctrl-move-btn--z {
+    background: rgba(76, 175, 80, 0.18);
+    border-color: rgba(76, 175, 80, 0.3);
+    color: #a5d6a7;
+}
+
+body.dark-mode .ctrl-move-btn--z:hover {
+    background: rgba(76, 175, 80, 0.28);
+    border-color: rgba(76, 175, 80, 0.45);
+}
+
+/* Z Column layout */
+.ctrl-z-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Step size selectors */
+.ctrl-step-row {
+    margin-top: 12px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ctrl-step-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.ctrl-step-select {
+    padding: 5px 28px 5px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 14px;
+}
+
+.ctrl-step-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+/* Quick Actions Bar */
+.ctrl-quick-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ctrl-quick-btn {
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+
+.ctrl-quick-btn:active {
+    transform: scale(0.96);
+}
+
+.ctrl-quick-btn--home {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.25);
+    color: #e65100;
+}
+
+.ctrl-quick-btn--home:hover {
+    background: rgba(255, 152, 0, 0.22);
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+body.dark-mode .ctrl-quick-btn--home {
+    background: rgba(255, 152, 0, 0.18);
+    border-color: rgba(255, 152, 0, 0.3);
+    color: #ffb74d;
+}
+
+body.dark-mode .ctrl-quick-btn--home:hover {
+    background: rgba(255, 152, 0, 0.28);
+}
+
+.ctrl-quick-btn--action {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+}
+
+.ctrl-quick-btn--action:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-quick-btn--action {
+    background: rgba(33, 150, 243, 0.18);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-quick-btn--action:hover {
+    background: rgba(33, 150, 243, 0.28);
+}
+
+/* Extruder Tab — Temp Display */
+.ctrl-temp-display {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.ctrl-temp-current {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent-red, #ef5350);
+}
+
+.ctrl-temp-target {
+    color: var(--text-secondary);
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+/* Extruder Temp Presets */
+.ctrl-temp-presets {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.ctrl-preset-btn {
+    border: 1px solid transparent;
+    padding: 10px 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+}
+
+.ctrl-preset-btn:active {
+    transform: scale(0.95);
+}
+
+/* Off preset */
+.ctrl-preset-btn--off {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.ctrl-preset-btn--off:hover {
+    background: var(--bg-secondary);
+    border-color: var(--text-secondary);
+}
+
+/* PLA preset - blue */
+.ctrl-preset-btn--pla {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+}
+
+.ctrl-preset-btn--pla:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-preset-btn--pla {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-preset-btn--pla:hover {
+    background: rgba(33, 150, 243, 0.28);
+}
+
+/* PETG preset - green */
+.ctrl-preset-btn--petg {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+}
+
+.ctrl-preset-btn--petg:hover {
+    background: rgba(76, 175, 80, 0.22);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .ctrl-preset-btn--petg {
+    background: rgba(76, 175, 80, 0.18);
+    color: #a5d6a7;
+}
+
+body.dark-mode .ctrl-preset-btn--petg:hover {
+    background: rgba(76, 175, 80, 0.28);
+}
+
+/* ABS preset - orange */
+.ctrl-preset-btn--abs {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.25);
+    color: #e65100;
+}
+
+.ctrl-preset-btn--abs:hover {
+    background: rgba(255, 152, 0, 0.22);
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+body.dark-mode .ctrl-preset-btn--abs {
+    background: rgba(255, 152, 0, 0.18);
+    color: #ffb74d;
+}
+
+body.dark-mode .ctrl-preset-btn--abs:hover {
+    background: rgba(255, 152, 0, 0.28);
+}
+
+/* Custom Temp Row */
+.ctrl-custom-temp {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-custom-temp-input {
+    width: 80px;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.ctrl-custom-temp-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.ctrl-custom-temp-unit {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.ctrl-custom-temp-set {
+    background: rgba(33, 150, 243, 0.12);
+    border: 1px solid rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.ctrl-custom-temp-set:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-custom-temp-set {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-custom-temp-set:hover {
+    background: rgba(33, 150, 243, 0.28);
+}
+
+/* Extruder Movement Section */
+.ctrl-section-divider {
+    text-align: center;
+    margin: 20px 0 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ctrl-extrude-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* Extrude button - green */
+.ctrl-extrude-btn {
+    border: 1px solid transparent;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+}
+
+.ctrl-extrude-btn:active {
+    transform: scale(0.96);
+}
+
+.ctrl-extrude-btn--push {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+}
+
+.ctrl-extrude-btn--push:hover {
+    background: rgba(76, 175, 80, 0.22);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .ctrl-extrude-btn--push {
+    background: rgba(76, 175, 80, 0.18);
+    color: #a5d6a7;
+}
+
+body.dark-mode .ctrl-extrude-btn--push:hover {
+    background: rgba(76, 175, 80, 0.28);
+}
+
+/* Retract button - red */
+.ctrl-extrude-btn--pull {
+    background: rgba(244, 67, 54, 0.08);
+    border-color: rgba(244, 67, 54, 0.2);
+    color: #c62828;
+}
+
+.ctrl-extrude-btn--pull:hover {
+    background: rgba(244, 67, 54, 0.18);
+    border-color: rgba(244, 67, 54, 0.35);
+}
+
+body.dark-mode .ctrl-extrude-btn--pull {
+    background: rgba(244, 67, 54, 0.15);
+    color: #ef9a9a;
+}
+
+body.dark-mode .ctrl-extrude-btn--pull:hover {
+    background: rgba(244, 67, 54, 0.25);
+}
+
+/* Filament Tab — Action Cards */
+.ctrl-filament-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.ctrl-filament-btn {
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 80px;
+    transition: all 0.15s;
+}
+
+.ctrl-filament-btn:active {
+    transform: scale(0.96);
+}
+
+.ctrl-filament-icon {
+    font-size: 22px;
+}
+
+.ctrl-filament-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Load - green */
+.ctrl-filament-btn--load {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #2e7d32;
+}
+
+.ctrl-filament-btn--load:hover {
+    background: rgba(76, 175, 80, 0.22);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+body.dark-mode .ctrl-filament-btn--load {
+    background: rgba(76, 175, 80, 0.18);
+    color: #a5d6a7;
+}
+
+body.dark-mode .ctrl-filament-btn--load:hover {
+    background: rgba(76, 175, 80, 0.28);
+}
+
+/* Unload - orange */
+.ctrl-filament-btn--unload {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.25);
+    color: #e65100;
+}
+
+.ctrl-filament-btn--unload:hover {
+    background: rgba(255, 152, 0, 0.22);
+    border-color: rgba(255, 152, 0, 0.4);
+}
+
+body.dark-mode .ctrl-filament-btn--unload {
+    background: rgba(255, 152, 0, 0.18);
+    color: #ffb74d;
+}
+
+body.dark-mode .ctrl-filament-btn--unload:hover {
+    background: rgba(255, 152, 0, 0.28);
+}
+
+/* Change - blue */
+.ctrl-filament-btn--change {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+}
+
+.ctrl-filament-btn--change:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-filament-btn--change {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-filament-btn--change:hover {
+    background: rgba(33, 150, 243, 0.28);
+}
+
+/* Purge - red */
+.ctrl-filament-btn--purge {
+    background: rgba(244, 67, 54, 0.08);
+    border-color: rgba(244, 67, 54, 0.2);
+    color: #c62828;
+}
+
+.ctrl-filament-btn--purge:hover {
+    background: rgba(244, 67, 54, 0.18);
+    border-color: rgba(244, 67, 54, 0.35);
+}
+
+body.dark-mode .ctrl-filament-btn--purge {
+    background: rgba(244, 67, 54, 0.15);
+    color: #ef9a9a;
+}
+
+body.dark-mode .ctrl-filament-btn--purge:hover {
+    background: rgba(244, 67, 54, 0.25);
+}
+
+/* Filament Tip Box */
+.ctrl-tip-box {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ============================================
+ * Printer Control — Mobile Responsive
+ * ============================================ */
+@media (max-width: 768px) {
+    .ctrl-movement-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ctrl-dpad {
+        grid-template-columns: repeat(3, 52px);
+    }
+
+    .ctrl-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .ctrl-temp-presets {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .ctrl-quick-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}

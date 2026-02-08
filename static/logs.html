@@ -6,7 +6,11 @@
     <title id="page-title">System Logs - 3D Printer Dashboard</title>
 
     <!-- Shared Styles -->
-    <link rel="stylesheet" href="/static/css/shared-styles.css">
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
 
     <!-- Sprachdateien laden -->
     <script src="/static/lang/de.js"></script>
@@ -20,114 +24,205 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
-            padding: 5px;
+            padding: 0;
+            padding-bottom: 90px; /* Space for tab bar */
+            margin: 0;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .container { max-width: 100%; margin: 0; padding: 8px; }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            min-height: 100vh;
+        }
+
+        /* ========== HEADER ========== */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 8px 8px 0 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
-        .header h1 { margin: 0; font-size: 22px; flex: 1; }
+        body.dark-mode .header {
+            background: rgba(26, 31, 46, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
 
         .header-actions {
-            display: flex;
-            gap: 10px;
+            display: flex !important;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
         }
 
+        /* ========== BUTTONS ========== */
         .btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: var(--bg-section);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
 
+        body.dark-mode .btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .btn:hover {
-            background: rgba(255,255,255,0.3);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            background: var(--bg-hover, rgba(255, 255, 255, 0.1));
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn-danger {
-            background: var(--accent-red);
-            border-color: transparent;
+            background: rgba(220, 53, 69, 0.12);
+            color: #ff6b7a;
+            border-color: rgba(220, 53, 69, 0.2);
         }
 
         .btn-danger:hover {
-            background: #b91c1c;
+            background: rgba(220, 53, 69, 0.25);
+            border-color: rgba(220, 53, 69, 0.4);
         }
 
+        /* ========== CONTENT ========== */
         .content {
             background: var(--bg-card);
+            border: 1px solid var(--border-color);
             padding: 20px;
-            border-radius: 0 0 8px 8px;
+            border-radius: 12px;
         }
 
+        body.dark-mode .content {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ========== STATS BAR ========== */
         .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .stat-card {
             background: var(--bg-section);
-            padding: 15px;
+            padding: 8px 14px;
             border-radius: 8px;
-            border-left: 4px solid;
-            transition: all 0.2s;
+            border: 1px solid transparent;
+            border-left: 3px solid;
+            transition: all 0.2s ease;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        body.dark-mode .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-left: 3px solid;
         }
 
         .stat-card:hover {
-            box-shadow: 0 4px 12px var(--shadow);
+            transform: translateY(-1px);
         }
 
-        .stat-card.error { border-left-color: var(--accent-red); }
-        .stat-card.warning { border-left-color: var(--accent-orange); }
-        .stat-card.info { border-left-color: var(--accent-blue); }
-        .stat-card.debug { border-left-color: var(--accent-green); }
+        body.dark-mode .stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .stat-card.error { border-left-color: #ff4d6a; }
+        .stat-card.warning { border-left-color: #ffb020; }
+        .stat-card.info { border-left-color: #4da6ff; }
+        .stat-card.debug { border-left-color: #50d17c; }
 
         .stat-card.active {
-            background: var(--bg-hover);
-            box-shadow: 0 0 0 2px var(--accent-blue);
+            border: 1px solid rgba(102, 126, 234, 0.4);
+            border-left: 3px solid var(--accent-blue);
+            background: rgba(102, 126, 234, 0.08);
         }
+
+        .stat-card.active.error { border-left-color: #ff4d6a; border-color: rgba(255, 77, 106, 0.3); background: rgba(255, 77, 106, 0.08); }
+        .stat-card.active.warning { border-left-color: #ffb020; border-color: rgba(255, 176, 32, 0.3); background: rgba(255, 176, 32, 0.08); }
+        .stat-card.active.info { border-left-color: #4da6ff; border-color: rgba(77, 166, 255, 0.3); background: rgba(77, 166, 255, 0.08); }
+        .stat-card.active.debug { border-left-color: #50d17c; border-color: rgba(80, 209, 124, 0.3); background: rgba(80, 209, 124, 0.08); }
 
         .stat-label {
             font-size: 12px;
+            font-weight: 500;
             color: var(--text-secondary);
-            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .stat-value {
-            font-size: 24px;
+            font-size: 18px;
             font-weight: 700;
             color: var(--text-primary);
+            letter-spacing: -0.5px;
         }
 
+        .stat-card.error .stat-value { color: #ff4d6a; }
+        .stat-card.warning .stat-value { color: #ffb020; }
+        .stat-card.info .stat-value { color: #4da6ff; }
+        .stat-card.debug .stat-value { color: #50d17c; }
+
+        /* ========== CONTROLS ========== */
         .controls {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
             align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-section);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .controls {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .control-group {
@@ -141,81 +236,159 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            font-size: 14px;
-            color: var(--text-primary);
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .control-group input[type="checkbox"] {
             cursor: pointer;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-blue);
         }
 
-        .control-group select {
-            padding: 8px 12px;
+        .control-group select,
+        .search-input {
+            padding: 7px 12px;
             border: 1px solid var(--input-border);
-            border-radius: 6px;
+            border-radius: 8px;
             background: var(--input-bg);
             color: var(--text-primary);
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
+            transition: border-color 0.2s ease;
         }
 
+        body.dark-mode .control-group select,
+        body.dark-mode .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .control-group select:focus,
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .search-input {
+            min-width: 220px;
+            cursor: text;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .control-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        body.dark-mode .control-divider {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ========== LOG CONTAINER ========== */
         .log-container {
             background: var(--bg-section);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 15px;
-            max-height: calc(100vh - 400px);
+            border-radius: 10px;
+            padding: 4px;
+            max-height: calc(100vh - 360px);
             min-height: 400px;
             overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
+            font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
         }
 
+        body.dark-mode .log-container {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Scrollbar */
+        .log-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ========== LOG LINES ========== */
         .log-line {
-            margin-bottom: 4px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            transition: background 0.1s;
+            margin: 0;
+            padding: 4px 12px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+            display: flex;
+            align-items: baseline;
+            gap: 0;
         }
 
         .log-line:hover {
-            background: var(--bg-hover);
+            background: rgba(255, 255, 255, 0.03);
         }
 
-        .log-line.error { color: #ff4444; }
-        .log-line.warning { color: #ffaa00; }
+        .log-line.error { color: #ff6b7a; }
+        .log-line.warning { color: #ffcc4d; }
         .log-line.info { color: var(--text-primary); }
-        .log-line.debug { color: #00aaff; }
+        .log-line.debug { color: #5eead4; }
 
-        /* Dark Mode: Info Logs grün */
-        body.dark-mode .log-line.info { color: #00ff00; }
+        body.dark-mode .log-line.info { color: #7ee787; }
 
         .log-timestamp {
             color: var(--text-secondary);
-            margin-right: 10px;
+            opacity: 0.5;
+            margin-right: 12px;
+            font-size: 12px;
+            flex-shrink: 0;
         }
 
         .log-level {
-            display: inline-block;
-            padding: 2px 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 7px;
             border-radius: 4px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            margin-right: 10px;
+            margin-right: 12px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            min-width: 48px;
+            text-align: center;
         }
 
-        .log-level.error { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
-        .log-level.warning { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
-        .log-level.info { background: rgba(0, 170, 255, 0.15); color: var(--text-primary); }
-        .log-level.debug { background: rgba(0, 170, 255, 0.2); color: #00aaff; }
+        .log-level.error { background: rgba(255, 77, 106, 0.15); color: #ff6b7a; }
+        .log-level.warning { background: rgba(255, 176, 32, 0.15); color: #ffcc4d; }
+        .log-level.info { background: rgba(77, 166, 255, 0.12); color: #7ea8d1; }
+        .log-level.debug { background: rgba(80, 209, 124, 0.12); color: #5eead4; }
 
-        /* Dark Mode: Info Badge grün */
-        body.dark-mode .log-level.info { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
+        body.dark-mode .log-level.info { background: rgba(126, 231, 135, 0.12); color: #7ee787; }
 
+        .log-message {
+            word-break: break-word;
+            flex: 1;
+        }
+
+        /* ========== EMPTY STATE ========== */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -223,20 +396,36 @@
         }
 
         .empty-state-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-            opacity: 0.5;
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
         }
 
-        /* Mobile */
-        @media (max-width: 768px) {
-            .header h1 { font-size: 18px; }
-            .header-actions { width: 100%; justify-content: stretch; }
-            .header-actions .btn { flex: 1; }
-            .stats-bar { grid-template-columns: 1fr 1fr; }
-            .controls { flex-direction: column; align-items: stretch; }
-            .control-group { justify-content: space-between; }
+        .empty-state p {
+            font-size: 14px;
+            opacity: 0.6;
         }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 768px) {
+            .container { padding: 8px; }
+            .header { padding: 12px 16px; border-radius: 10px; }
+            .header h1 { font-size: 17px; }
+            .header-actions { width: 100%; }
+            .header-actions .btn { flex: 1; justify-content: center; }
+            .content { padding: 12px; border-radius: 10px; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-card { flex: 1 1 calc(50% - 4px); min-width: 0; }
+            .controls { flex-direction: column; align-items: stretch; padding: 10px 12px; }
+            .control-group { justify-content: space-between; }
+            .control-divider { display: none; }
+            .search-input { min-width: unset; width: 100%; }
+            .log-container { font-size: 11.5px; max-height: calc(100vh - 420px); }
+        }
+
+        /* ========== BG HOVER FALLBACK ========== */
+        :root { --bg-hover: rgba(0, 0, 0, 0.05); }
+        body.dark-mode { --bg-hover: rgba(255, 255, 255, 0.06); }
     </style>
 </head>
 <body>
@@ -255,12 +444,13 @@
     <!-- Shared Module Scripts -->
     <script src="/static/js/modules/theme-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
-    <script src="/static/js/modules/sidebar-manager.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
 
     <div class="container">
         <div class="header">
-            <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
-            <h1>📋 <span data-i18n="system_logs">System Logs</span></h1>
+            <div class="header-left">
+                <h1>📋 <span data-i18n="system_logs">System Logs</span></h1>
+            </div>
             <div class="header-actions">
                 <button class="btn" onclick="refreshLogs()">
                     🔄 <span data-i18n="refresh">Aktualisieren</span>
@@ -304,6 +494,8 @@
                     </label>
                 </div>
 
+                <div class="control-divider"></div>
+
                 <div class="control-group">
                     <label for="lines-select" data-i18n="show_lines">Zeilen:</label>
                     <select id="lines-select" onchange="refreshLogs()">
@@ -315,11 +507,12 @@
                     </select>
                 </div>
 
-                <div class="control-group">
-                    <label for="search-input" data-i18n="search">Suche:</label>
-                    <input type="text" id="search-input" placeholder="Filter logs..."
-                           style="padding: 8px 12px; border: 1px solid var(--input-border); border-radius: 6px; background: var(--input-bg); color: var(--text-primary); font-size: 14px; min-width: 200px;"
-                           oninput="filterLogs()">
+                <div class="control-divider"></div>
+
+                <div class="control-group" style="flex: 1;">
+                    <label for="search-input">🔍</label>
+                    <input type="text" id="search-input" class="search-input" placeholder="Filter logs..."
+                           oninput="filterLogs()" style="flex: 1;">
                 </div>
             </div>
 
@@ -347,8 +540,8 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             // Render sidebar
-            if (window.sidebarManager) {
-                window.sidebarManager.render();
+            if (window.tabBarManager) {
+                window.tabBarManager.render();
             }
 
             // Apply translations
@@ -479,7 +672,7 @@
                 const levelBadge = `<span class="log-level ${log.level}">${log.level}</span>`;
                 const timestampStr = log.timestamp ? `<span class="log-timestamp">${log.timestamp}</span>` : '';
 
-                return `<div class="log-line ${log.level}">${timestampStr}${levelBadge}${escapeHtml(log.message)}</div>`;
+                return `<div class="log-line ${log.level}">${timestampStr}${levelBadge}<span class="log-message">${escapeHtml(log.message)}</span></div>`;
             }).join('');
 
             container.innerHTML = html;
@@ -543,10 +736,72 @@
             }
         }
 
+        // Custom Confirm Dialog
+        function showConfirmDialog(message, title = 'Bestätigung') {
+            return new Promise((resolve) => {
+                const existing = document.getElementById('customConfirmDialog');
+                if (existing) existing.remove();
+
+                const modal = document.createElement('div');
+                modal.id = 'customConfirmDialog';
+                modal.className = 'modal-overlay';
+                modal.style.cssText = 'display:flex; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;';
+
+                modal.innerHTML = `
+                    <div style="background:var(--bg-card, #1a1f2e); border:1px solid var(--border-color, rgba(255,255,255,0.08)); border-radius:16px; max-width:420px; width:90%; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+                        <div style="padding:16px 20px; border-bottom:1px solid var(--border-color, rgba(255,255,255,0.08));">
+                            <h2 style="margin:0; color:var(--text-primary); font-size:18px; font-weight:700; display:flex; align-items:center; gap:8px;">⚠️ ${title}</h2>
+                        </div>
+                        <div style="padding:20px;">
+                            <div style="color:var(--text-primary); font-size:14px; line-height:1.6;">${message}</div>
+                            <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">
+                                <button class="btn" id="confirm-cancel-btn">${getText('cancel', 'Abbrechen')}</button>
+                                <button class="btn btn-danger" id="confirm-ok-btn">${getText('confirm_ok', 'Löschen')}</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(modal);
+
+                const close = (result) => {
+                    modal.remove();
+                    resolve(result);
+                };
+
+                document.getElementById('confirm-ok-btn').addEventListener('click', () => close(true));
+                document.getElementById('confirm-cancel-btn').addEventListener('click', () => close(false));
+                modal.addEventListener('click', (e) => { if (e.target === modal) close(false); });
+            });
+        }
+
+        // Custom Toast (Name showWebToast um Konflikt mit Electron toast.js zu vermeiden)
+        function showWebToast(message, type = 'success') {
+            const existingToasts = document.querySelectorAll('.web-toast');
+            existingToasts.forEach(t => t.remove());
+
+            const isDark = document.body.classList.contains('dark-mode');
+            const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+            const toast = document.createElement('div');
+            toast.className = 'web-toast';
+            toast.style.cssText = `background:${isDark ? 'rgba(26,31,46,0.95)' : 'rgba(255,255,255,0.95)'}; color:${isDark ? '#e2e8f0' : '#1a1f2e'}; border:1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}; backdrop-filter:blur(12px);`;
+            toast.textContent = `${icons[type] || ''} ${message}`;
+            document.body.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
         async function clearLogs() {
-            if (!confirm(getText('confirm_clear_logs', 'Möchten Sie wirklich alle Logs löschen?'))) {
-                return;
-            }
+            const confirmed = await showConfirmDialog(
+                getText('confirm_clear_logs', 'Möchten Sie wirklich alle Logs löschen?'),
+                getText('confirm_title', 'Bestätigung')
+            );
+            if (!confirmed) return;
 
             try {
                 const response = await apiCall('/api/logs', {
@@ -557,12 +812,13 @@
                     allLogs = [];
                     renderLogs();
                     updateStats();
+                    showWebToast(getText('logs_cleared', 'Logs gelöscht'), 'success');
                 } else {
-                    alert(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'));
+                    showWebToast(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'), 'error');
                 }
             } catch (error) {
                 console.error('Error clearing logs:', error);
-                alert(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'));
+                showWebToast(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'), 'error');
             }
         }
 
