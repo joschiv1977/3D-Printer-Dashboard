@@ -6,3 +6,6 @@ static/_mockup_*.html
 
 # macOS modules have no business in a Linux distribution
 *-darwin.so
+
+# Server code, ships compiled -- the source stays in the private repo
+static/lang/translator.py
