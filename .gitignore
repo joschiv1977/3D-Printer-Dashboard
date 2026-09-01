@@ -3,3 +3,6 @@ __pycache__/
 
 # Internal design drafts -- never part of a release
 static/_mockup_*.html
+
+# macOS modules have no business in a Linux distribution
+*-darwin.so
