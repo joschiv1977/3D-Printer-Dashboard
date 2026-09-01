@@ -1,0 +1,44 @@
+/* Vergroesserte Thumbnail-Vorschau beim Ueberfahren mit der Maus.
+   Liegt ueber allem und faengt selbst keine Mausereignisse ab, sonst wuerde
+   sie unter dem Zeiger sofort ihr eigenes mouseleave ausloesen. */
+.thumb-preview {
+    position: fixed;
+    z-index: 10000;
+    pointer-events: none;
+    padding: 8px;
+    border-radius: 14px;
+    background: rgba(24, 24, 27, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity 120ms ease, transform 120ms ease;
+}
+
+body:not(.dark-mode) .thumb-preview {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(0, 0, 0, 0.10);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+.thumb-preview.is-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.thumb-preview img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    /* Freigestellte Vorschauen sind transparent — ein Schachbrett waere
+       unruhig, ein neutraler Grund zeigt helle wie dunkle Modelle. */
+    background: rgba(127, 127, 127, 0.10);
+}
+
+/* Zeigt an, dass es etwas zu vergroessern gibt. */
+.thumb-preview-source {
+    cursor: zoom-in;
+}

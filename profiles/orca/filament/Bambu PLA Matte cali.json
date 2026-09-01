@@ -1,0 +1,14 @@
+{
+    "type": "filament",
+    "filament_max_volumetric_speed": [
+        "31"
+    ],
+    "filament_settings_id": [
+        "Bambu PLA Matte cali"
+    ],
+    "from": "User",
+    "inherits": "Bambu PLA Matte @BBL X1C",
+    "is_custom_defined": "0",
+    "name": "Bambu PLA Matte cali",
+    "version": "2.2.0.3"
+}

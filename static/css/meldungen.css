@@ -1,0 +1,140 @@
+/* ==========================================================================
+   Drucker-Meldungen — der Stapel, auf JEDER Seite.
+   --------------------------------------------------------------------------
+   Stand bis 29aug26 in components.css, und die laedt nur ein Teil der
+   Seiten. Wer von der Startseite auf die Konsole ging, verlor die Meldung
+   damit still — sie war nicht weggeklickt, sie hatte dort nur keine Form
+   und keinen Knoten. Eigene Datei, weil sie auf jeder Seite gebraucht wird
+   und sonst halb so viel CSS mitkommen muesste.
+   ========================================================================== */
+.mld-stapel {
+    position: fixed;
+    top: 18px; right: 18px;
+    z-index: 1100;
+    display: flex; flex-direction: column; gap: 9px;
+    width: min(380px, calc(100vw - 36px));
+    pointer-events: none;
+}
+
+.mld {
+    pointer-events: auto;
+    position: relative;
+    display: none;                 /* .active blendet ein */
+    gap: 11px; align-items: flex-start;
+    padding: 11px 12px;
+    border-radius: 11px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.18);
+    opacity: 0; transform: translateX(14px);
+    transition: opacity 0.18s, transform 0.18s;
+}
+.mld.active { display: flex; }
+.mld.mld-an { opacity: 1; transform: translateX(0); }
+.mld::before {
+    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 11px 0 0 11px;
+    background: var(--mld-strich);
+}
+.mld--fehler  { --mld-strich: var(--color-red); }
+.mld--warnung { --mld-strich: var(--color-orange); }
+.mld--info    { --mld-strich: var(--color-blue); }
+.mld--laeuft  { --mld-strich: var(--color-green); }
+/* Wartung wird rot, sobald sie ueberfaellig ist (Klasse setzt app-init.js). */
+.mld.overdue  { --mld-strich: var(--color-red); }
+
+.mld-ic {
+    width: 26px; height: 26px; border-radius: 50%; flex: none;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--mld-strich) 16%, transparent);
+    color: var(--mld-strich);
+}
+.mld-ic svg {
+    width: 14px; height: 14px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+}
+.mld-t { flex: 1; min-width: 0; }
+.mld-titel { font-weight: 640; font-size: 13.5px; word-break: break-word; }
+.mld-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; word-break: break-word; }
+/* Der Fehlercode gehoert unter die Meldung, nicht in die Ueberschrift:
+   "HMS Fehler 0700-2000-0002-0001" als Titel war der Code, nicht das Problem. */
+.mld-code {
+    font-size: 11px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    margin-top: 3px;
+}
+.mld-code:empty { display: none; }
+
+.mld-akt { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.mld-akt button,
+.mld-akt a {
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    border-radius: 7px; padding: 5px 11px;
+    font: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; text-decoration: none;
+}
+.mld-akt .mld-haupt {
+    background: var(--mld-strich); border-color: var(--mld-strich); color: #fff;
+}
+.mld-zu {
+    border: 0; background: none; color: var(--text-secondary);
+    cursor: pointer; font-size: 19px; line-height: 1;
+    padding: 0 2px; flex: none;
+}
+.mld-zu:hover { color: var(--text-primary); }
+
+/* Zustaende beschreiben, was der Drucker gerade TUT — Wegklicken waere
+   falsch, der Zustand liefe ja weiter. Statt eines Kreuzes ein Punkt, der
+   mitlaeuft; die Meldung geht von selbst, wenn der Zustand endet. */
+.mld--zustand .mld-zu { display: none; }
+.mld-puls {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--mld-strich); flex: none; margin-top: 9px;
+    animation: mld-puls 1.6s ease-in-out infinite;
+}
+@keyframes mld-puls { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) { .mld-puls { animation: none; } }
+
+/* Der Griff zum Beiseiteschieben.
+   ---------------------------------------------------------------------------
+   Absolut gesetzt statt als Flex-Kind: auf dem Handy laeuft der Stapel
+   umgekehrt (column-reverse, siehe unten), ein Kind waere dort unten
+   gelandet. So sitzt er in beiden Faellen ueber der obersten Karte.
+
+   Der Stapel selbst hat pointer-events: none — der Griff muss sie sich
+   also zurueckholen, wie die Meldungen auch. */
+.mld-griff {
+    position: absolute;
+    top: -13px; left: 50%; transform: translateX(-50%);
+    width: 46px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: auto; cursor: grab;
+    touch-action: none;          /* sonst scrollt das Handy statt zu schieben */
+}
+.mld-griff::before {
+    content: ""; width: 34px; height: 4px; border-radius: 2px;
+    background: var(--text-secondary); opacity: 0.35;
+}
+.mld-griff:hover::before { opacity: 0.6; }
+.mld-stapel--zieht .mld-griff { cursor: grabbing; }
+.mld-stapel--zieht .mld-griff::before { opacity: 0.75; }
+
+/* Sammelzeile, wenn mehr als drei Meldungen anliegen. */
+.mld-sammel { cursor: pointer; }
+.mld-sammel .mld-titel { font-weight: 600; }
+.mld-mehr { font-size: 12px; color: var(--color-blue); font-weight: 600; margin-top: 3px; }
+
+/* Auf dem Handy volle Breite und unten — oben klebt der Systembalken. */
+@media (max-width: 600px) {
+    .mld-stapel {
+        top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 92px);
+        left: 10px; right: 10px; width: auto;
+        flex-direction: column-reverse;
+    }
+}
+

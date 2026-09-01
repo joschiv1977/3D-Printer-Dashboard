@@ -1,0 +1,193 @@
+          <!-- Control Card (Mobile only) -->
+          <div class="grid-stack-item control-card-mobile" gs-w="12" gs-h="4" gs-x="0" gs-y="10" id="control-card-mobile">
+              <div class="grid-stack-item-content">
+                  <div class="card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
+                              <span id="controls-title-mobile"></span>
+                          </h3>
+                      </div>
+                      <div class="control-grid">
+                          <button class="control-btn" id="switch-btn-mobile" onclick="toggleSwitch()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v9"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+                              <span id="printer-text-mobile"></span>
+                          </button>
+                          <button class="control-btn" data-bambu-only id="mqtt-btn-mobile" onclick="toggleMQTT()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M4.9 19.1a10 10 0 0 1 0-14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
+                              <span id="mqtt-text-mobile"></span>
+                          </button>
+                          <button class="control-btn" id="verlauf-btn" onclick="showAllCharts()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20v-4M12 20V10M18 20V4"/></svg>
+                              <span id="charts-text-mobile"></span>
+                          </button>
+                          <button class="control-btn primary" id="scheduled-btn-mobile" onclick="openScheduleManager()" style="position:relative;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                              <span id="scheduled-text-mobile"></span>
+                              <span id="scheduled-badge-mobile" style="position:absolute; top:-8px; right:-8px; background:var(--accent-red); color:white; border-radius:50%; min-width:22px; min-height:22px; display:none; align-items:center; justify-content:center; font-size:12px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.3); padding:2px;"></span>
+                          </button>
+                          <button class="control-btn primary" onclick="showSDFiles()" id="sd-btn-mobile" style="visibility:hidden">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-6h8v6"/></svg>
+                              <span id="sdcard-text-controls-mobile"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Developer Control Card (Mobile only, initial versteckt) -->
+          <div class="grid-stack-item control-card-mobile" gs-w="12" gs-h="4" gs-x="0" gs-y="14" id="dev-control-card-mobile" style="display: none;">
+              <div class="grid-stack-item-content">
+                  <div class="card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.5a5 5 0 0 0-6.4 6.4L3 16v5h5l6.1-6.1a5 5 0 0 0 6.4-6.4l-3 3-2.8-2.8z"/></svg>
+                              <span id="dev-controls-title-mobile">Schnellzugriff</span>
+                          </h3>
+                      </div>
+                      <div class="control-grid">
+                          <button class="control-btn warning" onclick="pausePrint()" id="pause-btn-mobile">
+                              <span id="pause-icon-mobile"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg></span>
+                              <span id="pause-text-mobile"></span>
+                          </button>
+                          <button class="control-btn success" onclick="resumePrint()" id="resume-btn-mobile" style="display:none;">
+                              <span id="resume-icon-mobile"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg></span>
+                              <span id="resume-text-mobile"></span>
+                          </button>
+                          <!-- Filament-Change Retry (nur in Phase 2 sichtbar) -->
+                          <button class="control-btn warning" onclick="window.filamentChangeAction('retry')" id="fc-retry-btn-mobile" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                              <span id="fc-retry-text-mobile"></span>
+                          </button>
+                          <!-- Einzelne Teile fallen lassen statt den ganzen
+                               Druck abzubrechen (skip_objects, fun-Bit 49).
+                               Sichtbarkeit steuert die Faehigkeitsabfrage. -->
+                          <button class="control-btn warning" onclick="teileUeberspringenOeffnen()" id="skip-btn-mobile" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 4v16"/></svg>
+                              <span id="skip-text-mobile"></span>
+                          </button>
+                          <button class="control-btn danger" onclick="stopPrint()" id="stop-btn-mobile">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                              <span id="stop-text-mobile"></span>
+                          </button>
+                          <button class="control-btn success" onclick="startHoming()" id="homing-btn-mobile">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg>
+                              <span id="homing-text-mobile"></span>
+                          </button>
+                          <button class="control-btn info" onclick="openPrinterControl()" id="control-btn">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
+                              <span id="printer-control-text-mobile"></span>
+                          </button>
+                          <button class="control-btn warning" onclick="openSpeedControl()">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+                              <span id="speed-text-mobile"></span>
+                          </button>
+                          <button class="control-btn info" onclick="openTempControl()" id="temp-btn-mobile">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/><path d="M12 9v6"/></svg>
+                              <span id="temp-text-mobile"></span>
+                          </button>
+                          <button class="control-btn info direct-only" onclick="openFanControl()" id="fan-btn-mobile" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5c0-3 1-6 3.5-6 2 0 2.5 2.5 0 4-1.5.9-3.5 2-3.5 2z"/><path d="M14.5 12c3 0 6 1 6 3.5 0 2-2.5 2.5-4 0-.9-1.5-2-3.5-2-3.5z"/><path d="M9.5 12c-3 0-6-1-6-3.5 0-2 2.5-2.5 4 0 .9 1.5 2 3.5 2 3.5z"/><path d="M12 14.5c0 3-1 6-3.5 6-2 0-2.5-2.5 0-4 1.5-.9 3.5-2 3.5-2z"/></svg>
+                              <span id="fan-text-mobile"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Control Card (Desktop only) -->
+          <div class="grid-stack-item control-card-desktop" gs-w="3" gs-h="10" gs-x="5" gs-y="0" gs-min-w="3" gs-min-h="4" gs-max-w="6" gs-max-h="20" id="control-card-desktop">
+              <div class="grid-stack-item-content">
+                  <div class="card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
+                              <span id="controls-title-desktop"></span>
+                          </h3>
+                      </div>
+                      <div class="control-grid">
+                          <button class="control-btn" id="switch-btn" onclick="toggleSwitch()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v9"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/></svg>
+                              <span id="switch-text-desktop"></span>
+                          </button>
+                          <button class="control-btn" data-bambu-only id="mqtt-btn" onclick="toggleMQTT()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M7.8 16.2a6 6 0 0 1 0-8.4"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4"/><path d="M4.9 19.1a10 10 0 0 1 0-14.2"/><path d="M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
+                              <span id="mqtt-text-desktop"></span>
+                          </button>
+                          <button class="control-btn" id="verlauf-btn-mobile" onclick="showAllCharts()" style="visibility: hidden;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20v-4M12 20V10M18 20V4"/></svg>
+                              <span id="charts-text-desktop"></span>
+                          </button>
+                          <button class="control-btn primary" id="scheduled-btn-desktop" onclick="openScheduleManager()" style="position:relative;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                              <span id="scheduled-text-desktop"></span>
+                              <span id="scheduled-badge-desktop" style="position:absolute; top:-5px; right:-5px; background:var(--accent-red); color:white; border-radius:50%; width:20px; height:20px; display:none; align-items:center; justify-content:center; font-size:11px; font-weight:bold; box-shadow:0 2px 4px rgba(0,0,0,0.3);"></span>
+                          </button>
+                          <button class="control-btn primary" onclick="showSDFiles()" id="sd-btn-desktop" style="visibility:hidden">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-6h8v6"/></svg>
+                              <span id="sdcard-text-controls-desktop"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <!-- Developer Control Card (Desktop only, initial versteckt) -->
+          <div class="grid-stack-item control-card-desktop" gs-w="4" gs-h="12" gs-x="8" gs-y="0" gs-min-w="3" gs-min-h="4" gs-max-w="6" gs-max-h="20" id="dev-control-card-desktop" style="display: none;">
+              <div class="grid-stack-item-content">
+                  <div class="card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.5 3.5a5 5 0 0 0-6.4 6.4L3 16v5h5l6.1-6.1a5 5 0 0 0 6.4-6.4l-3 3-2.8-2.8z"/></svg>
+                              <span id="dev-controls-title-desktop"></span>
+                          </h3>
+                      </div>
+                      <div class="control-grid">
+                          <button class="control-btn warning" onclick="pausePrint()" id="pause-btn-desktop">
+                              <span id="pause-icon-desktop"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg></span>
+                              <span id="pause-text-desktop"></span>
+                          </button>
+                          <button class="control-btn success" onclick="resumePrint()" id="resume-btn-desktop" style="display:none;">
+                              <span id="resume-icon-desktop"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg></span>
+                              <span id="resume-text-desktop"></span>
+                          </button>
+                          <!-- Filament-Change Retry (nur in Phase 2 sichtbar) -->
+                          <button class="control-btn warning" onclick="window.filamentChangeAction('retry')" id="fc-retry-btn-desktop" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                              <span id="fc-retry-text-desktop"></span>
+                          </button>
+                          <!-- Einzelne Teile fallen lassen statt den ganzen
+                               Druck abzubrechen (skip_objects, fun-Bit 49).
+                               Sichtbarkeit steuert die Faehigkeitsabfrage. -->
+                          <button class="control-btn warning" onclick="teileUeberspringenOeffnen()" id="skip-btn-desktop" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 4v16"/></svg>
+                              <span id="skip-text-desktop"></span>
+                          </button>
+                          <button class="control-btn danger" onclick="stopPrint()" id="stop-btn-desktop">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                              <span id="stop-text-desktop"></span>
+                          </button>
+                          <button class="control-btn success" onclick="startHoming()" id="homing-btn-desktop">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg>
+                              <span id="homing-text-desktop"></span>
+                          </button>
+                          <button class="control-btn info" onclick="openPrinterControl()" id="control-btn">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>
+                              <span id="printer-control-text-desktop"></span>
+                          </button>
+                          <button class="control-btn warning" onclick="openSpeedControl()">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
+                              <span id="speed-text-desktop"></span>
+                          </button>
+                          <button class="control-btn info" onclick="openTempControl()" id="temp-btn-desktop">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/><path d="M12 9v6"/></svg>
+                              <span id="temp-text-desktop"></span>
+                          </button>
+                          <button class="control-btn info direct-only" onclick="openFanControl()" id="fan-btn-desktop" style="display:none;">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5c0-3 1-6 3.5-6 2 0 2.5 2.5 0 4-1.5.9-3.5 2-3.5 2z"/><path d="M14.5 12c3 0 6 1 6 3.5 0 2-2.5 2.5-4 0-.9-1.5-2-3.5-2-3.5z"/><path d="M9.5 12c-3 0-6-1-6-3.5 0-2 2.5-2.5 4 0 .9 1.5 2 3.5 2 3.5z"/><path d="M12 14.5c0 3-1 6-3.5 6-2 0-2.5-2.5 0-4 1.5-.9 3.5-2 3.5-2z"/></svg>
+                              <span id="fan-text-desktop"></span>
+                          </button>
+                      </div>
+                  </div>
+              </div>
+          </div>

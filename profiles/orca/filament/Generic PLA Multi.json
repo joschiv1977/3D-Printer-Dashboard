@@ -1,0 +1,13 @@
+{
+    "filament_end_gcode": [
+        "; filament end gcode \nM400 U1\n"
+    ],
+    "filament_settings_id": [
+        "Generic PLA Multi"
+    ],
+    "from": "User",
+    "inherits": "Generic PLA",
+    "is_custom_defined": "0",
+    "name": "Generic PLA Multi",
+    "version": "2.1.0.19"
+}

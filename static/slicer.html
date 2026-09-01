@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Slicer - 3D Printer Dashboard</title>
+
+    <!-- Sprachdateien laden -->
+    <script src="/static/lang/de.js"></script>
+    <script src="/static/lang/en.js"></script>
+    <script src="/static/lang/fr.js"></script>
+    <script src="/static/lang/es.js"></script>
+    <script src="/static/lang/it.js"></script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/components.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+    <link rel="stylesheet" href="/static/css/slicer.css?v=1">
+    <link rel="stylesheet" href="/static/css/meldungen.css">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 5px;
+            padding-bottom: 90px; /* Space for tab bar */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 8px 20px; }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .header-nav { display: flex; gap: 10px; flex-wrap: wrap; }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .content { background: var(--bg-card); padding: 20px; border-radius: 0 0 8px 8px; }
+        .section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-section);
+            border-radius: 8px;
+        }
+        .section h2 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .form-group { margin-bottom: 15px; }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        input[type="file"],
+        input[type="number"],
+        select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .btn-success {
+            background: #4caf50;
+        }
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+        .alert-info { background: #d1ecf1; color: #0c5460; }
+        body.dark-mode .alert-success { background: #1a3622; color: #4caf50; border: 1px solid #4caf50; }
+        body.dark-mode .alert-error { background: #3a1a1a; color: #f44336; border: 1px solid #f44336; }
+        body.dark-mode .alert-info { background: #1a2733; color: #3498db; border: 1px solid #3498db; }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: var(--input-bg);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: #667eea;
+            background: var(--bg-section);
+        }
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+        .file-info {
+            background: var(--info-bg);
+            padding: 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--bg-section);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 15px;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Grid Layout für Settings */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 768px) {
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .back-btn {
+            display: none !important;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Slicing Status Block */
+        .slicing-status-container {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            display: none;
+        }
+        .slicing-status-container.active {
+            display: block;
+        }
+        .slicing-status-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .slicing-status-icon {
+            font-size: 48px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .slicing-status-text h2 {
+            margin: 0 0 5px 0;
+            color: #667eea;
+            font-size: 22px;
+        }
+        .slicing-status-text p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .slicing-steps {
+            margin-top: 20px;
+        }
+        .slicing-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-section);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        .slicing-step.active {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+        }
+        .slicing-step.completed {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4caf50;
+        }
+        .slicing-step-icon {
+            font-size: 24px;
+            width: 30px;
+            text-align: center;
+        }
+        .slicing-step-text {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .slicing-step-status {
+            font-size: 20px;
+        }
+
+        .slicing-progress-bar {
+            width: 100%;
+            height: 40px;
+            background: var(--bg-section);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .slicing-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Apply dark mode immediately to prevent white flash -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <div class="container">
+        <!-- Kopf: eine Zeile statt lila Farbverlauf-Balken. Die seltenen
+             Sachen (Profile, Updates, Sicherung) stecken hinter „Verwalten". -->
+        <div class="sl-kopf">
+            <h1 class="sl-kopf-titel">
+                <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+                <span id="header-title">Slicer</span>
+            </h1>
+            <span class="sl-kopf-luft"></span>
+        </div>
+
+        <div class="content">
+            <div id="successAlert" class="alert alert-success"></div>
+            <div id="errorAlert" class="alert alert-error"></div>
+            <div id="infoAlert" class="alert alert-info"></div>
+
+            <!-- Modell links, Einstellungen rechts. Vorher lagen vier Bloecke
+                 untereinander und man musste fuer die sechs Auswahlfelder
+                 unter eine 300px hohe Ablageflaeche scrollen. -->
+            <div class="sl-rahmen">
+
+                <div class="sl-karte" id="uploadSection">
+                    <div class="sl-karte-kopf">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+                        <span id="sl-datei-titel">Modell</span>
+                    </div>
+
+                    <!-- Ohne Datei: Ablageflaeche. -->
+                    <div class="sl-ablage" id="uploadArea" onclick="document.getElementById('stlFile').click()">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+                        <b id="sl-ablage-titel">Datei hierher ziehen oder klicken</b>
+                        <span id="sl-ablage-formate">STL, STEP oder STP</span>
+                    </div>
+                    <input type="file" id="stlFile" accept=".stl,.step,.stp" style="display:none;" onchange="handleFileSelect(event)">
+
+                    <!-- Mit Datei: die Flaeche schrumpft zur Zeile. -->
+                    <div class="sl-datei" id="fileInfo">
+                        <span class="sl-datei-bild">
+                            <svg viewBox="0 0 88 88" aria-hidden="true">
+                                <g fill="none" stroke="currentColor" stroke-width="2" opacity=".55">
+                                    <path d="M20 34l24-13 24 13v20L44 67 20 54z"/>
+                                    <path d="M20 34l24 13 24-13M44 47v20"/>
+                                </g>
+                            </svg>
+                        </span>
+                        <span class="sl-datei-t">
+                            <span class="sl-datei-name" id="fileName">-</span>
+                            <span class="sl-datei-meta"><span id="fileSize">-</span></span>
+                        </span>
+                        <button class="sl-datei-weg" onclick="dateiEntfernen()"
+                                id="sl-datei-weg" title="Datei entfernen">&times;</button>
+                    </div>
+
+                    <!-- Beim Slicen: die vier Schritte stehen HIER, wo vorher
+                         die Datei stand — kein zusaetzlicher Block, der die
+                         Seite nach unten schiebt. -->
+                    <div class="sl-schritte-wrap" id="slicingStatus">
+                        <div class="sl-schritte">
+                            <div class="sl-schritt" id="step-upload">
+                                <span class="sl-schritt-ic"></span>
+                                <span class="sl-schritt-t slicing-step-text">Datei hochladen</span>
+                                <span class="sl-schritt-zeit slicing-step-status"></span>
+                            </div>
+                            <div class="sl-schritt" id="step-slicing">
+                                <span class="sl-schritt-ic"></span>
+                                <span class="sl-schritt-t slicing-step-text">Modell schneiden</span>
+                                <span class="sl-schritt-zeit slicing-step-status"></span>
+                            </div>
+                            <div class="sl-schritt" id="step-thumbnail">
+                                <span class="sl-schritt-ic"></span>
+                                <span class="sl-schritt-t slicing-step-text">Vorschaubild erzeugen</span>
+                                <span class="sl-schritt-zeit slicing-step-status"></span>
+                            </div>
+                            <div class="sl-schritt" id="step-saving">
+                                <span class="sl-schritt-ic"></span>
+                                <span class="sl-schritt-t slicing-step-text">3MF auf SD-Karte legen</span>
+                                <span class="sl-schritt-zeit slicing-step-status"></span>
+                            </div>
+                        </div>
+                        <div class="sl-bahn"><i id="slicingProgressFill" style="width:0%"></i></div>
+                    </div>
+                </div>
+
+                <div class="sl-karte" id="settingsSection">
+                    <div class="sl-karte-kopf">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+                        <span id="sl-einst-titel">Einstellungen</span>
+                    </div>
+                    <div class="sl-felder">
+                        <div class="sl-feld">
+                            <label for="printerSelect" id="sl-l-drucker">Drucker</label>
+                            <select id="printerSelect"><option value="">Lade Profile...</option></select>
+                        </div>
+                        <div class="sl-feld">
+                            <label for="nozzleSize" id="sl-l-duese">Düse</label>
+                            <select id="nozzleSize">
+                                <option value="0.4">0,4 mm</option>
+                                <option value="0.2">0,2 mm</option>
+                                <option value="0.6">0,6 mm</option>
+                                <option value="0.8">0,8 mm</option>
+                            </select>
+                        </div>
+                        <div class="sl-feld">
+                            <label for="bedType" id="sl-l-bett">Druckbett</label>
+                            <select id="bedType">
+                                <option value="Cool Plate">Cool Plate</option>
+                                <option value="Textured Cool Plate">Textured Cool Plate</option>
+                                <option value="Textured PEI Plate">Textured PEI Plate</option>
+                                <option value="Smoothie High Temp Plate">Smoothie High Temp Plate</option>
+                                <option value="Engineering Plate">Engineering Plate</option>
+                                <option value="Smoothie Cool Plate">Smoothie Cool Plate</option>
+                            </select>
+                        </div>
+                        <div class="sl-feld">
+                            <label for="processSelect" id="sl-l-qualitaet">Qualität</label>
+                            <select id="processSelect"><option value="">Lade Profile...</option></select>
+                        </div>
+                        <div class="sl-feld">
+                            <label for="filamentTypeSelect" id="sl-l-material">Material</label>
+                            <select id="filamentTypeSelect"><option value="">Typ wählen...</option></select>
+                        </div>
+                        <div class="sl-feld">
+                            <label for="filamentSelect" id="sl-l-filament">Filament</label>
+                            <select id="filamentSelect"><option value="">Erst Typ wählen...</option></select>
+                        </div>
+                    </div>
+                    <div class="sl-hinweis">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg>
+                        <span><span id="infoHinweisLabel" style="display:none;"></span><span id="infoProcessProfile">Schichthöhe, Füllung und Stützen kommen aus dem gewählten Qualitätsprofil.</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Startleiste: sagt, was noch fehlt, statt nur grau zu sein. -->
+            <div class="sl-start" id="actionSection">
+                <span class="sl-start-t">
+                    <b id="sl-start-titel">Noch keine Datei</b>
+                    <span id="sl-start-text">Lade ein Modell hoch, um zu beginnen.</span>
+                </span>
+                <button class="sl-btn sl-btn--gut" id="sliceBtn" onclick="startSlicing()" disabled>
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+                    <span id="sl-slice-text">Slicen und auf SD-Karte legen</span>
+                </button>
+                <div class="progress-bar" id="progressBar" style="display:none;">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+            </div>
+
+            <!-- Profile: unter dem Arbeitsablauf, nicht in einem Overlay —
+                 der Platz ist da, und so sieht man den Stand ohne Klick. -->
+            <div class="sl-karte sl-profile">
+                <div class="sl-karte-kopf">
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
+                    <span id="profileManagementTitle">Profile</span>
+                    <span class="sl-karte-luft"></span>
+                    <span class="sl-p-akt">
+                        <button class="sl-btn sl-btn--klein" id="checkUpdatesBtn" onclick="checkProfileUpdates()">
+                            <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                            <span id="slicer-check-updates">Auf Updates prüfen</span>
+                        </button>
+                        <button class="sl-btn sl-btn--klein" id="updateProfilesBtn" onclick="updateProfiles()" style="display:none;">
+                            <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+                            <span id="slicer-update-profiles">Profile aktualisieren</span>
+                        </button>
+                        <button class="sl-btn sl-btn--klein" id="restoreBackupBtn" onclick="restoreBackup()" style="display:none;">
+                            <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 3v6h6"/></svg>
+                            <span id="slicer-restore-backup">Backup wiederherstellen</span>
+                        </button>
+                    </span>
+                </div>
+
+                <div class="sl-werte">
+                    <span class="sl-wert"><span id="localProfilesLabel">Lokale Profile</span><b id="profileCount">–</b></span>
+                    <span class="sl-wert" id="backupInfo" style="display:none;"><span id="backupLabel">Sicherung</span><b id="backupDate">–</b></span>
+                    <span class="sl-wert" id="lastCheckInfo" style="display:none;"><span id="lastUpdateCheckLabel">Letzte Prüfung</span><b id="lastCheckDate">–</b></span>
+                </div>
+                <div class="sl-wert" style="margin-top:9px;">
+                    <span id="supportedPrintersLabel">Unterstützte Drucker</span>
+                    <b id="supportedPrinters" style="font-size:12.5px;font-weight:500;">–</b>
+                </div>
+
+                <div id="updateResult" style="display:none; margin-top:11px;"></div>
+
+                <details class="sl-aufklapp" id="githubTokenSettings" style="margin-top:12px;">
+                    <summary onclick="setTimeout(() =&gt; loadGithubTokenSettings(), 0)">
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                        <span id="githubSettingsLabel">GitHub-Zugriff</span>
+                        <span id="githubTokenBadge" class="sl-marke" style="display:none;">Token aktiv</span>
+                    </summary>
+                    <div id="githubTokenContent">
+                        <p id="githubRateLimitInfo">Ohne Token erlaubt GitHub 60 Anfragen pro Stunde, mit Token 5000. Nur zum Abholen der Profile — es werden keine Berechtigungen gebraucht.</p>
+                        <label class="sl-schalter">
+                            <input type="checkbox" id="githubTokenEnabled" onchange="toggleGithubTokenInput()">
+                            <span id="githubUseTokenLabel">GitHub-Token verwenden</span>
+                        </label>
+                        <div id="githubTokenInputContainer" style="display:none; margin-top:9px;">
+                            <div style="display:flex; gap:8px; max-width:460px;">
+                                <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxx" style="flex:1;">
+                                <button class="sl-btn sl-btn--klein" id="githubSaveBtn" onclick="saveGithubToken()">
+                                    <span id="sl-save-text">Speichern</span>
+                                </button>
+                            </div>
+                            <p style="font-size:11.5px; margin:8px 0 0;">
+                                <span id="githubCreateTokenLabel">Token erstellen unter</span>
+                                <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>
+                                <span id="githubNoPermissionsLabel"></span>
+                            </p>
+                        </div>
+                        <div id="githubTokenStatus" style="margin-top:10px; font-size:12px; display:none;"></div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Handler -->
+    <script src="/static/auth-handler.js"></script>
+
+    <!-- Shared Modules -->
+    <script src="/static/js/modules/icons.js"></script>
+    <script src="/static/js/modules/theme-manager.js"></script>
+    <script src="/static/js/modules/i18n-manager.js"></script>
+    <script src="/static/js/modules/confirm-dialog.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
+
+    <!-- Page-specific JavaScript -->
+    <script>
+        let selectedFile = null;
+        let allFilaments = []; // Cache für alle Filamente
+        let allProcesses = []; // Cache für alle Process Profiles
+        let filamentTypes = []; // Extrahierte Filament-Typen (PLA, PETG, etc.)
+
+        // Helper function to get translation (uses global i18nManager)
+        // Fehlt ein Schluessel, kommt LEER zurueck — sonst liefert t() den
+        // Schluessel selbst, der ist truthy, und jedes `t('x') || 'Rueckfall'`
+        // im Code greift nie. So stand im Ergebniskasten "49 slicer_new"
+        // statt "49 neu".
+        function t(key, replacements = {}) {
+            if (!window.i18nManager) return '';
+            let text = window.i18nManager.getText(key) || '';
+            if (!text) return '';
+            // Replace placeholders like {nozzleSize}, {printer}, etc.
+            Object.keys(replacements).forEach(placeholder => {
+                text = text.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), replacements[placeholder]);
+            });
+            return text;
+        }
+
+        // Apply translations to the page
+        function applyTranslations() {
+            const setz = (id, key, rueck) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = t(key) || rueck;
+            };
+
+            document.getElementById('page-title').textContent = t('slicer_page_title') || 'Slicer - 3D Printer Dashboard';
+            setz('header-title', 'slicer_title_plain', 'Slicer');
+
+            // Ablauf beim Slicen
+            setz('sl-datei-titel-laeuft', 'slicer_processing_file', 'Wird verarbeitet');
+            document.querySelector('#step-upload .slicing-step-text').textContent = t('slicer_step_upload') || 'Datei hochladen';
+            document.querySelector('#step-slicing .slicing-step-text').textContent = t('slicer_step_slicing') || 'Modell schneiden';
+            document.querySelector('#step-thumbnail .slicing-step-text').textContent = t('slicer_step_thumbnail') || 'Vorschaubild erzeugen';
+            document.querySelector('#step-saving .slicing-step-text').textContent = t('slicer_step_saving') || '3MF auf SD-Karte legen';
+
+            // Modell
+            setz('sl-datei-titel', 'slicer_model', 'Modell');
+            setz('sl-ablage-titel', 'slicer_click_or_drag', 'Datei hierher ziehen oder klicken');
+            setz('sl-ablage-formate', 'slicer_supported_formats', 'STL, STEP oder STP');
+            const weg = document.getElementById('sl-datei-weg');
+            if (weg) weg.title = t('slicer_remove_file') || 'Datei entfernen';
+
+            // Einstellungen
+            setz('sl-einst-titel', 'slicer_settings_short', 'Einstellungen');
+            setz('sl-l-drucker',  'slicer_printer_short',  'Drucker');
+            setz('sl-l-duese',    'slicer_nozzle_short',   'Düse');
+            setz('sl-l-bett',     'slicer_bed_short',      'Druckbett');
+            setz('sl-l-qualitaet','slicer_quality_short',  'Qualität');
+            setz('sl-l-material', 'slicer_material_short', 'Material');
+            setz('sl-l-filament', 'slicer_filament_short', 'Filament');
+            setz('infoProcessProfile', 'slicer_info_process_short',
+                 'Schichthöhe, Füllung und Stützen kommen aus dem gewählten Qualitätsprofil.');
+
+            // Startleiste
+            setz('sl-slice-text', 'slicer_btn_slice_short', 'Slicen und auf SD-Karte legen');
+
+            // Profil-Karte
+            setz('profileManagementTitle','slicer_profiles',        'Profile');
+            setz('slicer-check-updates',  'slicer_check_updates',   'Auf Updates prüfen');
+            setz('slicer-update-profiles','slicer_update_profiles', 'Profile aktualisieren');
+            setz('slicer-restore-backup', 'slicer_restore_backup',  'Backup wiederherstellen');
+            setz('localProfilesLabel',    'slicer_local_profiles',  'Lokale Profile');
+            setz('backupLabel',           'slicer_backup',          'Sicherung');
+            setz('lastUpdateCheckLabel',  'slicer_last_update_check','Letzte Prüfung');
+            setz('supportedPrintersLabel','slicer_supported_printers','Unterstützte Drucker');
+
+            // GitHub
+            setz('githubSettingsLabel',    'slicer_github_short',        'GitHub-Zugriff');
+            setz('githubTokenBadge',       'slicer_github_token_active', 'Token aktiv');
+            setz('githubRateLimitInfo',    'slicer_github_rate_short',
+                 'Ohne Token erlaubt GitHub 60 Anfragen pro Stunde, mit Token 5000. Nur zum Abholen der Profile — es werden keine Berechtigungen gebraucht.');
+            setz('githubUseTokenLabel',    'slicer_github_use_token',    'GitHub-Token verwenden');
+            setz('sl-save-text',           'save',                       'Speichern');
+            setz('githubCreateTokenLabel', 'slicer_github_create_short', 'Token erstellen unter');
+        }
+
+        // Datei wieder loswerden, ohne die Seite neu zu laden.
+        function dateiEntfernen() {
+            selectedFile = null;
+            const f = document.getElementById('stlFile');
+            if (f) f.value = '';
+            document.getElementById('fileInfo').classList.remove('sl-datei--an');
+            document.getElementById('uploadArea').style.display = '';
+            validateSliceButton();
+        }
+
+        // ========== LOCALSTORAGE PERSISTENCE ==========
+        const STORAGE_KEY = 'slicerSettings';
+
+        function saveSlicerSettings() {
+            const settings = {
+                printer: document.getElementById('printerSelect').value,
+                nozzleSize: document.getElementById('nozzleSize').value,
+                bedType: document.getElementById('bedType').value,
+                processProfile: document.getElementById('processSelect').value,
+                filamentType: document.getElementById('filamentTypeSelect').value,
+                filament: document.getElementById('filamentSelect').value
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        }
+
+        function loadSlicerSettings() {
+            const savedSettings = localStorage.getItem(STORAGE_KEY);
+            if (savedSettings) {
+                try {
+                    const settings = JSON.parse(savedSettings);
+
+                    // Restore settings after profiles are loaded
+                    if (settings.nozzleSize) {
+                        document.getElementById('nozzleSize').value = settings.nozzleSize;
+                    }
+                    if (settings.bedType) {
+                        document.getElementById('bedType').value = settings.bedType;
+                    }
+
+                    // Store for later restoration
+                    window.savedSlicerSettings = settings;
+                } catch (e) {
+                    console.error('Error loading slicer settings:', e);
+                }
+            }
+        }
+
+        function restoreSelectionsAfterLoad() {
+            if (window.savedSlicerSettings) {
+                const settings = window.savedSlicerSettings;
+
+                if (settings.printer) {
+                    const printerSelect = document.getElementById('printerSelect');
+                    if (printerSelect.querySelector(`option[value="${settings.printer}"]`)) {
+                        printerSelect.value = settings.printer;
+                        updateProcessList(); // Update process list based on printer
+                    }
+                }
+
+                if (settings.processProfile) {
+                    setTimeout(() => {
+                        const processSelect = document.getElementById('processSelect');
+                        if (processSelect.querySelector(`option[value="${settings.processProfile}"]`)) {
+                            processSelect.value = settings.processProfile;
+                        }
+                        validateSliceButton();
+                    }, 100);
+                }
+
+                // Restore filament type first, then specific filament
+                if (settings.filamentType) {
+                    setTimeout(() => {
+                        const filamentTypeSelect = document.getElementById('filamentTypeSelect');
+                        if (filamentTypeSelect.querySelector(`option[value="${settings.filamentType}"]`)) {
+                            filamentTypeSelect.value = settings.filamentType;
+                            updateFilamentList(); // Update specific filaments based on type
+                        }
+
+                        // Then restore specific filament
+                        if (settings.filament) {
+                            setTimeout(() => {
+                                const filamentSelect = document.getElementById('filamentSelect');
+                                if (filamentSelect.querySelector(`option[value="${settings.filament}"]`)) {
+                                    filamentSelect.value = settings.filament;
+                                }
+                                validateSliceButton();
+                            }, 50);
+                        }
+                    }, 100);
+                }
+            }
+        }
+
+        // Drag & Drop
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            const fileName = file.name.toLowerCase();
+            const validExtensions = ['.stl', '.step', '.stp'];
+            const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
+            if (!hasValidExtension) {
+                showError(t('slicer_error_select_3d_file') || 'Bitte wähle eine STL- oder STEP-Datei');
+                return;
+            }
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            // Die Ablageflaeche weicht der Datei-Zeile — vorher blieb der leere
+            // 300px-Kasten stehen und die Angaben standen als Text darunter.
+            document.getElementById('fileInfo').classList.add('sl-datei--an');
+            document.getElementById('uploadArea').style.display = 'none';
+
+
+            validateSliceButton();
+        }
+
+        // Validate that all required fields are filled before enabling slice button
+        function validateSliceButton() {
+            const hasFile = selectedFile !== null;
+            const felder = [
+                ['printerSelect',      t('slicer_printer_short')  || 'Drucker'],
+                ['processSelect',      t('slicer_quality_short')  || 'Qualität'],
+                ['filamentTypeSelect', t('slicer_material_short') || 'Material'],
+                ['filamentSelect',     t('slicer_filament_short') || 'Filament']
+            ];
+            const fehlt = felder.filter(([id]) => !document.getElementById(id).value);
+            felder.forEach(([id]) => {
+                const el = document.getElementById(id);
+                el.classList.toggle('sl-fehlt', hasFile && !el.value);
+            });
+
+            const bereit = hasFile && !fehlt.length;
+            document.getElementById('sliceBtn').disabled = !bereit;
+
+            // Statt eines grauen Knopfes ohne Begruendung steht daneben, was
+            // noch fehlt — oder womit gleich geschnitten wird.
+            const titel = document.getElementById('sl-start-titel');
+            const text = document.getElementById('sl-start-text');
+            if (!titel || !text) return;
+
+            if (!hasFile) {
+                titel.textContent = t('slicer_no_file') || 'Noch keine Datei';
+                text.textContent = t('slicer_no_file_hint') || 'Lade ein Modell hoch, um zu beginnen.';
+            } else if (fehlt.length) {
+                titel.textContent = t('slicer_missing') || 'Es fehlt noch etwas';
+                text.textContent = fehlt.map(f => f[1]).join(', ');
+            } else {
+                titel.textContent = t('slicer_ready') || 'Bereit';
+                const w = id => {
+                    const el = document.getElementById(id);
+                    return el.options[el.selectedIndex] ? el.options[el.selectedIndex].textContent : '';
+                };
+                text.textContent = [w('printerSelect'),
+                    document.getElementById('nozzleSize').value + ' mm',
+                    w('processSelect'), w('filamentSelect')].filter(Boolean).join(' · ');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            // Deutsches Dezimalkomma statt Punkt — toFixed liefert immer "4.20".
+            const zahl = n => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return zahl(bytes / 1024) + ' KB';
+            return zahl(bytes / (1024 * 1024)) + ' MB';
+        }
+
+        // Load Profiles
+        async function loadProfiles() {
+            try {
+                const response = await apiCall('/api/slicer/profiles');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Populate printers
+                    const printerSelect = document.getElementById('printerSelect');
+                    printerSelect.innerHTML = `<option value="">${t('slicer_select_printer') || 'Drucker wählen...'}</option>`;
+                    data.printers.forEach(p => {
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.textContent = p.name;
+                        printerSelect.appendChild(option);
+                    });
+
+                    // Cache all filaments and process profiles
+                    allFilaments = data.filaments;
+                    allProcesses = data.processes;
+
+                    // Initial population (with default nozzle size)
+                    updateFilamentTypeList(); // Fills type dropdown, which triggers updateFilamentList
+                    updateProcessList();
+
+                    // Der in den Einstellungen gewaehlte Drucker steht in
+                    // data.current_printer. Er wird nur VORgewaehlt — eine
+                    // eigene Wahl aus dem letzten Besuch schlaegt ihn
+                    // (restoreSelectionsAfterLoad laeuft danach).
+                    if (data.current_printer) {
+                        printerSelect.value = data.current_printer;
+                        updateProcessList();
+                    }
+
+                    // Restore saved settings after profiles are loaded
+                    restoreSelectionsAfterLoad();
+                } else {
+                    showError(t('slicer_error_loading_profiles') || 'Fehler beim Laden der Profile');
+                }
+            } catch (error) {
+                console.error('Error loading profiles:', error);
+                showError(t('slicer_error_network') || 'Netzwerkfehler');
+            }
+        }
+
+        // Bekannte Filament-Typen mit Priorität (Reihenfolge)
+        const FILAMENT_TYPE_ORDER = ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'PA', 'PC', 'PVA', 'HIPS', 'PET', 'PP', 'PPS'];
+
+        // Extrahiert den Filament-Typ aus dem Namen
+        function extractFilamentType(name) {
+            const upperName = name.toUpperCase();
+
+            // Spezielle Patterns für Typen
+            const patterns = [
+                { type: 'PLA', regex: /\bPLA\b|PLA[-+\s]?(?:HT|HS|CF|GF|Silk|Pro|Basic|Matte)?/i },
+                { type: 'PETG', regex: /\bPETG\b|\bPET[-]?G\b|easyPETG/i },
+                { type: 'PET', regex: /\bPET\b(?!G)/i },
+                { type: 'ABS', regex: /\bABS\b|ABS[-+]?(?:GF|CF)?/i },
+                { type: 'ASA', regex: /\bASA\b/i },
+                { type: 'TPU', regex: /\bTPU\b|\bTPE\b|\bFlex\b/i },
+                { type: 'PA', regex: /\bPA\b|\bPA[-]?\d+|\bNylon\b/i },
+                { type: 'PC', regex: /\bPC\b(?!I)|\bPolycarbonat/i },
+                { type: 'PVA', regex: /\bPVA\b/i },
+                { type: 'HIPS', regex: /\bHIPS\b/i },
+                { type: 'PP', regex: /\bPP\b(?!S)|\bPolypropylen/i },
+                { type: 'PPS', regex: /\bPPS\b|\bPPS[-]?CF/i },
+                { type: 'Support', regex: /\bSupport\b/i }
+            ];
+
+            for (const p of patterns) {
+                if (p.regex.test(name)) {
+                    return p.type;
+                }
+            }
+
+            return 'Andere'; // Fallback für unbekannte Typen
+        }
+
+        // Extrahiert alle einzigartigen Filament-Typen aus den Profilen
+        function extractFilamentTypes() {
+            const nozzleSize = document.getElementById('nozzleSize').value;
+
+            // Filter filaments based on nozzle size first
+            const filteredFilaments = filterFilamentsByNozzle(allFilaments, nozzleSize);
+
+            // Extract types
+            const typesSet = new Set();
+            filteredFilaments.forEach(f => {
+                const type = extractFilamentType(f.name);
+                typesSet.add(type);
+            });
+
+            // Sort by defined order, then alphabetically for unknown types
+            const types = Array.from(typesSet).sort((a, b) => {
+                const indexA = FILAMENT_TYPE_ORDER.indexOf(a);
+                const indexB = FILAMENT_TYPE_ORDER.indexOf(b);
+
+                if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+                if (indexA !== -1) return -1;
+                if (indexB !== -1) return 1;
+                return a.localeCompare(b);
+            });
+
+            return types;
+        }
+
+        // Filter filaments by nozzle size
+        function filterFilamentsByNozzle(filaments, nozzleSize) {
+            return filaments.filter(f => {
+                const name = f.name.toLowerCase();
+                const id = f.id.toLowerCase();
+
+                const has02 = name.includes('0.2 nozzle') || id.includes('0.2 nozzle');
+                const has04 = name.includes('0.4 nozzle') || id.includes('0.4 nozzle');
+                const has06 = name.includes('0.6 nozzle') || id.includes('0.6 nozzle');
+                const has08 = name.includes('0.8 nozzle') || id.includes('0.8 nozzle');
+
+                const hasNoNozzleSize = !has02 && !has04 && !has06 && !has08;
+
+                if (nozzleSize === '0.2') return has02 || hasNoNozzleSize;
+                if (nozzleSize === '0.4') return has04 || hasNoNozzleSize;
+                if (nozzleSize === '0.6') return has06 || hasNoNozzleSize;
+                if (nozzleSize === '0.8') return has08 || hasNoNozzleSize;
+
+                return hasNoNozzleSize;
+            });
+        }
+
+        // Update filament type dropdown
+        function updateFilamentTypeList() {
+            const filamentTypeSelect = document.getElementById('filamentTypeSelect');
+            const currentSelection = filamentTypeSelect.value;
+
+            filamentTypes = extractFilamentTypes();
+
+            filamentTypeSelect.innerHTML = `<option value="">${t('slicer_select_filament_type') || 'Typ wählen...'}</option>`;
+
+            filamentTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                filamentTypeSelect.appendChild(option);
+            });
+
+            // Restore selection if still available
+            if (currentSelection && filamentTypes.includes(currentSelection)) {
+                filamentTypeSelect.value = currentSelection;
+            }
+
+            // Update specific filament list based on current type selection
+            updateFilamentList();
+        }
+
+        // Filter and update filament list based on selected type and nozzle size
+        function updateFilamentList() {
+            const nozzleSize = document.getElementById('nozzleSize').value;
+            const selectedType = document.getElementById('filamentTypeSelect').value;
+            const filamentSelect = document.getElementById('filamentSelect');
+            const currentSelection = filamentSelect.value;
+
+            // If no type selected, show placeholder
+            if (!selectedType) {
+                filamentSelect.innerHTML = `<option value="">${t('slicer_select_type_first') || 'Erst Typ wählen...'}</option>`;
+                validateSliceButton();
+                return;
+            }
+
+            filamentSelect.innerHTML = `<option value="">${t('slicer_select_filament') || 'Filament wählen...'}</option>`;
+
+            // Filter by nozzle size first
+            const nozzleFiltered = filterFilamentsByNozzle(allFilaments, nozzleSize);
+
+            // Then filter by type
+            const filteredFilaments = nozzleFiltered.filter(f => {
+                const type = extractFilamentType(f.name);
+                return type === selectedType;
+            });
+
+            // Sort alphabetically by name
+            filteredFilaments.sort((a, b) => a.name.localeCompare(b.name));
+
+            // Populate filtered filaments
+            filteredFilaments.forEach(f => {
+                const option = document.createElement('option');
+                option.value = f.id;
+                // Remove redundant type info from display name
+                let displayName = f.name;
+                option.textContent = displayName;
+                filamentSelect.appendChild(option);
+            });
+
+            // Restore selection if still available
+            if (currentSelection && filteredFilaments.find(f => f.id === currentSelection)) {
+                filamentSelect.value = currentSelection;
+            }
+
+            // Show info message if no filaments available
+            if (filteredFilaments.length === 0) {
+                showInfo(t('slicer_no_filament_for_type', { type: selectedType, nozzleSize }) ||
+                    `Keine ${selectedType} Profile für ${nozzleSize}mm Düse gefunden`);
+            }
+
+            validateSliceButton();
+        }
+
+        // Filter and update process list based on printer and nozzle size
+        function updateProcessList() {
+            const printer = document.getElementById('printerSelect').value;
+            const nozzleSize = document.getElementById('nozzleSize').value;
+            const processSelect = document.getElementById('processSelect');
+            const currentSelection = processSelect.value; // Remember current selection
+
+            processSelect.innerHTML = `<option value="">${t('slicer_select_layer_height') || 'Layer Height wählen...'}</option>`;
+
+            if (!printer) {
+                // No printer selected yet - show all processes
+                validateSliceButton();
+                return;
+            }
+
+            // Build the expected machine profile name (e.g., "Bambu Lab P1S 0.6 nozzle")
+            const machineProfileName = `${printer} ${nozzleSize} nozzle`;
+
+            // Filter process profiles based on compatible_printers
+            const filteredProcesses = allProcesses.filter(p => {
+                const compatiblePrinters = p.compatible_printers || [];
+                return compatiblePrinters.includes(machineProfileName);
+            });
+
+            // Populate filtered process profiles
+            filteredProcesses.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name;
+                processSelect.appendChild(option);
+            });
+
+            // Restore selection if still available
+            if (currentSelection && filteredProcesses.find(p => p.id === currentSelection)) {
+                processSelect.value = currentSelection;
+            }
+
+            // Show info message if no process profiles available
+            if (filteredProcesses.length === 0) {
+                showInfo(t('slicer_no_process_profiles', { printer, nozzleSize }) || `Keine Process-Profile für ${printer} ${nozzleSize}mm gefunden`);
+            }
+
+            // Re-validate after updating list
+            validateSliceButton();
+        }
+
+        // Helper functions for slicing status
+        function showSlicingStatus() {
+            document.getElementById('slicingStatus').classList.add('active');
+            const t2 = document.getElementById('sl-datei-titel');
+            if (t2) t2.textContent = t('slicer_processing_file') || 'Wird verarbeitet';
+        }
+
+        function hideSlicingStatus() {
+            document.getElementById('slicingStatus').classList.remove('active');
+            const t2 = document.getElementById('sl-datei-titel');
+            if (t2) t2.textContent = t('slicer_model') || 'Modell';
+        }
+
+        // Linien-Icons statt Sanduhr- und Haken-Emoji, und die tatsaechliche
+        // Dauer je Schritt: bei "Modell schneiden" sieht man dann, ob 40
+        // Sekunden normal sind oder ob etwas haengt.
+        const SL_ICONS = {
+            offen:  '<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+            laeuft: '<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/></svg>',
+            fertig: '<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>'
+        };
+        const _slStart = {};
+
+        function updateSlicingStep(stepId, status) {
+            const step = document.getElementById(stepId);
+            if (!step) return;
+            const ic = step.querySelector('.sl-schritt-ic');
+            const zeit = step.querySelector('.slicing-step-status');
+
+            step.classList.remove('sl-schritt--laeuft', 'sl-schritt--fertig');
+
+            if (status === 'active') {
+                step.classList.add('sl-schritt--laeuft');
+                ic.innerHTML = SL_ICONS.laeuft;
+                zeit.textContent = '';
+                _slStart[stepId] = Date.now();
+            } else if (status === 'completed') {
+                step.classList.add('sl-schritt--fertig');
+                ic.innerHTML = SL_ICONS.fertig;
+                if (_slStart[stepId]) {
+                    const sek = (Date.now() - _slStart[stepId]) / 1000;
+                    zeit.textContent = sek < 10
+                        ? sek.toFixed(1).replace('.', ',') + ' s'
+                        : Math.round(sek) + ' s';
+                }
+            } else {
+                ic.innerHTML = SL_ICONS.offen;
+                zeit.textContent = '';
+                delete _slStart[stepId];
+            }
+        }
+
+        function updateSlicingProgress(percent, title, subtitle) {
+            const fill = document.getElementById('slicingProgressFill');
+            fill.style.width = percent + '%';
+
+            // Titel und Untertitel stehen jetzt in der Startleiste, wo vorher
+            // der Slice-Knopf war — der Ablauf bleibt an einer Stelle.
+            const st = document.getElementById('sl-start-titel');
+            const sx = document.getElementById('sl-start-text');
+            if (title && st) st.textContent = title;
+            if (subtitle && sx) sx.textContent = subtitle;
+        }
+
+        function resetSlicingStatus() {
+            // Reset all steps
+            updateSlicingStep('step-upload', 'pending');
+            updateSlicingStep('step-slicing', 'pending');
+            updateSlicingStep('step-thumbnail', 'pending');
+            updateSlicingStep('step-saving', 'pending');
+            updateSlicingProgress(0, t('slicer_processing_file') || 'Datei wird verarbeitet...', t('slicer_please_wait') || 'Bitte warten...');
+        }
+
+        // Hide upload UI elements during processing
+        // Waehrend des Slicens bleibt das Bild ruhig: nur der Inhalt der
+        // linken Karte wechselt, die Einstellungen bleiben stehen. Vorher
+        // verschwand die halbe Seite und ein neuer Block schob alles nach unten.
+        function hideUploadUI() {
+            document.getElementById('uploadArea').style.display = 'none';
+            document.getElementById('fileInfo').classList.remove('sl-datei--an');
+            document.getElementById('settingsSection').classList.add('sl-karte--ruht');
+        }
+
+        // Show upload UI elements after processing
+        function showUploadUI() {
+            document.getElementById('settingsSection').classList.remove('sl-karte--ruht');
+            if (selectedFile) document.getElementById('fileInfo').classList.add('sl-datei--an');
+            else document.getElementById('uploadArea').style.display = '';
+        }
+
+        // Start Slicing with improved progress tracking
+        async function startSlicing() {
+            if (!selectedFile) {
+                showError(t('slicer_error_select_file_first') || 'Bitte wähle zuerst eine Datei');
+                return;
+            }
+
+            const printer = document.getElementById('printerSelect').value;
+            const filament = document.getElementById('filamentSelect').value;
+            const nozzleSize = document.getElementById('nozzleSize').value;
+            const bedType = document.getElementById('bedType').value;
+            const processProfile = document.getElementById('processSelect').value;
+
+            if (!printer) {
+                showError(t('slicer_error_select_printer') || 'Bitte wähle einen Drucker');
+                return;
+            }
+            if (!processProfile) {
+                showError(t('slicer_error_select_layer_height') || 'Bitte wähle eine Layer Height');
+                return;
+            }
+            if (!filament) {
+                showError(t('slicer_error_select_filament') || 'Bitte wähle ein Filament');
+                return;
+            }
+
+            // Show prominent status block and disable button
+            document.getElementById('sliceBtn').disabled = true;
+            resetSlicingStatus();
+            showSlicingStatus();
+            hideUploadUI();
+
+            // Hide old progress bar
+            document.getElementById('progressBar').style.display = 'none';
+
+            try {
+                // Step 1: Upload (0-10%)
+                updateSlicingStep('step-upload', 'active');
+                updateSlicingProgress(5, t('slicer_uploading_file') || 'Datei wird hochgeladen...', t('slicer_file_transferring') || 'Datei wird übertragen');
+
+                const formData = new FormData();
+                formData.append('stl_file', selectedFile);
+                formData.append('printer', printer);
+                formData.append('filament', filament);
+                formData.append('nozzle_size', nozzleSize);
+                formData.append('bed_type', bedType);
+                formData.append('process_profile', processProfile);
+
+                updateSlicingProgress(10, t('slicer_upload_complete') || 'Upload abgeschlossen', t('slicer_preparing_slice') || 'Slicing wird vorbereitet');
+                updateSlicingStep('step-upload', 'completed');
+
+                // Step 2: Slicing + Thumbnail (10-90%)
+                updateSlicingStep('step-slicing', 'active');
+                updateSlicingProgress(15, t('slicer_slicing_stl') || 'STL wird gesliced', t('slicer_orcaslicer_processing') || 'OrcaSlicer verarbeitet');
+
+                // Simulate progress during entire backend process (slicing + thumbnail)
+                let progressSimulationTime = 0;
+                const slicingInterval = setInterval(() => {
+                    progressSimulationTime += 1500; // 1.5 seconds per tick
+                    const currentProgress = parseFloat(document.getElementById('slicingProgressFill').style.width) || 15;
+
+                    if (currentProgress < 90) {
+                        const newProgress = currentProgress + 2; // +2% every 1.5 seconds
+
+                        // Switch from slicing to thumbnail step at 40%
+                        if (currentProgress >= 40 && !document.getElementById('step-thumbnail').classList.contains('active')) {
+                            updateSlicingStep('step-slicing', 'completed');
+                            updateSlicingStep('step-thumbnail', 'active');
+                            updateSlicingProgress(newProgress, t('slicer_generating_thumbnail') || 'Thumbnail wird generiert', t('slicer_creating_preview') || 'Vorschau wird erstellt');
+                        } else if (currentProgress < 40) {
+                            updateSlicingProgress(newProgress, t('slicer_slicing_stl') || 'STL wird gesliced', t('slicer_orcaslicer_processing') || 'OrcaSlicer verarbeitet');
+                        } else {
+                            updateSlicingProgress(newProgress, t('slicer_generating_thumbnail') || 'Thumbnail wird generiert', t('slicer_creating_preview') || 'Vorschau wird erstellt');
+                        }
+                    }
+                }, 1500); // Update every 1.5 seconds
+
+                // Send request to backend
+                const response = await apiCall('/api/slicer/slice', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Stop simulated progress
+                clearInterval(slicingInterval);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        // Backend is done - ensure we're at least at 90%
+                        const currentProgress = parseFloat(document.getElementById('slicingProgressFill').style.width) || 90;
+                        if (currentProgress < 90) {
+                            updateSlicingProgress(90, t('slicer_thumbnail_complete') || 'Thumbnail fertig', t('slicer_thumbnail_created') || 'Thumbnail erstellt');
+                        }
+
+                        // Mark thumbnail as completed if not already
+                        if (document.getElementById('step-thumbnail').classList.contains('active')) {
+                            updateSlicingStep('step-thumbnail', 'completed');
+                        }
+
+                        // Ensure slicing is marked completed
+                        if (!document.getElementById('step-slicing').classList.contains('completed')) {
+                            updateSlicingStep('step-slicing', 'completed');
+                        }
+
+                        // Step 5: Saving (90-100%)
+                        updateSlicingStep('step-saving', 'active');
+                        updateSlicingProgress(95, t('slicer_saving_file') || 'Datei wird gespeichert', t('slicer_writing_to_sd') || 'Schreibe auf SD-Karte');
+
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        updateSlicingProgress(100, t('slicer_complete') || 'Fertig!', t('slicer_file_created', { filename: result.filename }) || `Datei erstellt: ${result.filename}`);
+                        updateSlicingStep('step-saving', 'completed');
+
+                        // Show success message
+                        showSuccess(t('slicer_success_message', { filename: result.filename, size: formatFileSize(result.size) }) || `Erfolgreich! Datei: ${result.filename} (${formatFileSize(result.size)})`);
+
+                        // Reset form after 3 seconds
+                        setTimeout(() => {
+                            hideSlicingStatus();
+                            showUploadUI();
+                            resetForm();
+                        }, 3000);
+                    } else {
+                        throw new Error(result.error || t('slicer_error_failed') || 'Slicing fehlgeschlagen');
+                    }
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || t('slicer_error_failed') || 'Slicing fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('Slicing error:', error);
+                showError(t('slicer_error_slicing', { error: error.message }) || `Fehler: ${error.message}`);
+                hideSlicingStatus();
+                showUploadUI();
+                document.getElementById('sliceBtn').disabled = false;
+            }
+        }
+
+        function updateProgress(percent, message) {
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = message || (percent + '%');
+        }
+
+        function resetForm() {
+            selectedFile = null;
+            document.getElementById('stlFile').value = '';
+            document.getElementById('fileInfo').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'none';
+            validateSliceButton(); // Will disable button since no file selected
+        }
+
+        // Gemeinsamer Toast-Stapel oben rechts — siehe skHinweis in
+        // confirm-dialog.js. Die Pruefung auf eine bereits vorhandene
+        // window.showSuccess entfaellt: in Electron gewann je nach
+        // Ladereihenfolge mal die eine, mal die andere Fassung.
+        window.showSuccess = (msg) => window.skHinweis.erfolg(msg);
+        window.showError   = (msg) => window.skHinweis.fehler(msg);
+        window.showInfo    = (msg) => window.skHinweis.info(msg);
+        // Use window.* directly throughout code - no local const needed
+
+        // ========== PROFILE MANAGEMENT ==========
+
+        async function loadProfileStatus() {
+            try {
+                const response = await apiCall('/api/slicer/profiles/status');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // Update profile count
+                    const total = data.local_profiles?.total || 0;
+                    const machine = data.local_profiles?.machine || 0;
+                    const filament = data.local_profiles?.filament || 0;
+                    const process = data.local_profiles?.process || 0;
+                    document.getElementById('profileCount').textContent =
+                        `${total} (${machine} Drucker, ${filament} Filamente, ${process} Prozess)`;
+
+                    // Update supported printers
+                    if (data.supported_printers) {
+                        document.getElementById('supportedPrinters').textContent =
+                            data.supported_printers.join(', ');
+                    }
+
+                    // Show backup info if exists
+                    if (data.backup?.exists) {
+                        document.getElementById('backupInfo').style.display = 'flex';
+                        if (data.backup.created) {
+                            // Ohne Sekunden und in der Sprache des Nutzers —
+                            // 'de-DE' war fest verdrahtet, die Sekunde sagt nichts.
+                            document.getElementById('backupDate').textContent =
+                                new Date(data.backup.created).toLocaleString(undefined,
+                                    { day: '2-digit', month: '2-digit', year: 'numeric',
+                                      hour: '2-digit', minute: '2-digit' });
+                        } else {
+                            document.getElementById('backupDate').textContent = 'Vorhanden';
+                        }
+                        document.getElementById('restoreBackupBtn').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('backupInfo').style.display = 'none';
+                        document.getElementById('restoreBackupBtn').style.display = 'none';
+                    }
+
+                    // Show last update check time if exists
+                    if (data.last_update_check) {
+                        document.getElementById('lastCheckInfo').style.display = 'flex';
+                        document.getElementById('lastCheckDate').textContent =
+                            new Date(data.last_update_check).toLocaleString(undefined,
+                                { day: '2-digit', month: '2-digit', year: 'numeric',
+                                  hour: '2-digit', minute: '2-digit' });
+                    } else {
+                        document.getElementById('lastCheckInfo').style.display = 'none';
+                    }
+
+                    // Prüfe ob Update läuft und stelle Fortschrittsanzeige wieder her
+                    if (data.update_in_progress && data.current_progress) {
+                        reconnectToUpdateStream(data.current_progress);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading profile status:', error);
+                document.getElementById('profileCount').textContent = 'Fehler beim Laden';
+            }
+        }
+
+        // Verbindet sich wieder mit laufendem Update-Stream
+        function reconnectToUpdateStream(initialProgress) {
+            const btn = document.getElementById('updateProfilesBtn');
+            const checkBtn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            // UI in Update-Modus setzen
+            btn.disabled = true;
+            checkBtn.disabled = true;
+            btn.innerHTML = '⏳ Aktualisiere...';
+            btn.style.display = 'inline-block';
+
+            // Progress-HTML mit aktuellem Stand
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
+            resultDiv.innerHTML = updateFortschrittHtml(true);
+
+            // Zeige initialen Fortschritt sofort an
+            if (initialProgress.phase) {
+                updateProgressUI(initialProgress);
+            }
+
+            // Mit SSE-Stream verbinden
+            connectToUpdateStream(btn, checkBtn, resultDiv);
+        }
+
+        // Verbindet sich mit dem Update-Stream
+        async function connectToUpdateStream(btn, checkBtn, resultDiv) {
+            // Hole Token vom Server für EventSource (HttpOnly Cookie kann nicht in JS gelesen werden)
+            // Der Server gibt den Token zurück wenn der User über Cookie authentifiziert ist
+            let tokenParam = '';
+            try {
+                const tokenResponse = await fetch('/api/auth/sse-token', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (tokenResponse.ok) {
+                    const tokenData = await tokenResponse.json();
+                    if (tokenData.token) {
+                        tokenParam = `?token=${encodeURIComponent(tokenData.token)}`;
+                    }
+                }
+            } catch (e) {
+                console.warn('Could not get SSE token, trying without:', e);
+            }
+
+            const eventSource = new EventSource(`/api/slicer/profiles/update-stream${tokenParam}`);
+
+            eventSource.onmessage = function(event) {
+                const msg = JSON.parse(event.data);
+
+                if (msg.type === 'progress') {
+                    updateProgressUI(msg.data);
+                } else if (msg.type === 'result') {
+                    eventSource.close();
+                    handleUpdateResult(msg.data, btn, checkBtn, resultDiv);
+                }
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('EventSource error:', error);
+                eventSource.close();
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>${t('slicer_connection_error') || 'Verbindungsfehler'}</strong><br><br>${t('slicer_connection_lost') || 'Die Verbindung zum Server wurde unterbrochen.'}<br><br>
+                    <button class="btn" onclick="updateProfiles()" style="background: #2196f3;">
+                        ${t('slicer_retry') || 'Erneut versuchen'}
+                    </button>`;
+                btn.disabled = false;
+                checkBtn.disabled = false;
+                btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
+            };
+        }
+
+        // Aktualisiert die Fortschritts-UI
+        // Ein Bauplan fuer die Fortschrittsanzeige. Vorher stand dasselbe
+        // Markup zweimal im Code — inklusive des lila Farbverlaufs und der
+        // fest verdrahteten Farben, die im dunklen Design nicht lesbar waren.
+        function updateFortschrittHtml(wiederverbunden) {
+            const zusatz = wiederverbunden
+                ? ` <span class="sl-fort-zusatz">${t('slicer_reconnected') || '(wieder verbunden)'}</span>` : '';
+            return `
+                <div id="updateProgressContainer" class="sl-fortschritt">
+                    <div class="sl-fort-kopf">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+                        <span>${t('slicer_update_running') || 'Profile werden geladen'}</span>${zusatz}
+                        <b class="sl-fort-prozent" id="updateProgressText">0 %</b>
+                    </div>
+                    <div id="updatePhase" class="sl-fort-phase">${t('slicer_update_starting') || 'Starte…'}</div>
+                    <div class="sl-fort-bahn"><i id="updateProgressBar" style="width:0%"></i></div>
+                    <div id="updateCurrentFile" class="sl-fort-datei">–</div>
+                </div>`;
+        }
+
+        function updateProgressUI(data) {
+            const phaseNames = {
+                'backup':   t('slicer_phase_backup')   || 'Sicherung',
+                'machine':  t('slicer_phase_machine')  || 'Drucker-Profile',
+                'filament': t('slicer_phase_filament') || 'Filament-Profile',
+                'process':  t('slicer_phase_process')  || 'Prozess-Profile',
+                'done':     t('slicer_phase_done')     || 'Fertig'
+            };
+
+            const phaseEl = document.getElementById('updatePhase');
+            if (phaseEl) phaseEl.textContent = phaseNames[data.phase] || data.phase;
+
+            // Gesamtfortschritt berechnen
+            let progress = 0;
+            if (data.phase === 'backup') {
+                progress = data.current * 5;
+            } else if (data.phase === 'machine') {
+                progress = 5 + (data.total > 0 ? (data.current / data.total) * 15 : 0);
+            } else if (data.phase === 'filament') {
+                progress = 20 + (data.total > 0 ? (data.current / data.total) * 30 : 0);
+            } else if (data.phase === 'process') {
+                progress = 50 + (data.total > 0 ? (data.current / data.total) * 50 : 0);
+            } else if (data.phase === 'done') {
+                progress = 100;
+            }
+
+            const progressBar = document.getElementById('updateProgressBar');
+            if (progressBar) progressBar.style.width = progress + '%';
+            // Die Zahl steht neben der Ueberschrift, nicht im Balken: der ist
+            // acht Pixel hoch, da passt keine Schrift hinein.
+            const prozentEl = document.getElementById('updateProgressText');
+            if (prozentEl) prozentEl.textContent = Math.round(progress) + ' %';
+
+            const currentFile = document.getElementById('updateCurrentFile');
+            if (currentFile) {
+                currentFile.textContent = data.message;
+            }
+        }
+
+        // Verarbeitet das Update-Ergebnis
+        function handleUpdateResult(data, btn, checkBtn, resultDiv) {
+            if (data.success) {
+                resultDiv.style.background = '#d4edda';
+                resultDiv.style.color = '#155724';
+                resultDiv.innerHTML = `<strong>${t('slicer_update_success') || 'Update erfolgreich!'}</strong><br><br>
+                    <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
+                    • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
+                    • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
+                    • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
+                    <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
+                    ${data.backup_created ? (t('slicer_backup_created') || 'Backup wurde erstellt') : (t('slicer_backup_failed') || 'Backup konnte nicht erstellt werden')}`;
+
+                loadProfileStatus();
+                loadProfiles();
+            } else {
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+
+                let errorMsg = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong><br><br>`;
+                if (data.error) {
+                    errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
+                }
+                if (data.total_errors > 0) {
+                    errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
+                    data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                }
+                resultDiv.innerHTML = errorMsg;
+            }
+
+            btn.disabled = false;
+            checkBtn.disabled = false;
+            btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
+        }
+
+        async function checkProfileUpdates() {
+            const btn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            btn.disabled = true;
+            btn.innerHTML = t('slicer_checking_updates') || 'Prüfe...';
+            resultDiv.style.display = 'none';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/check-updates');
+                const data = await response.json();
+
+                if (data.error) {
+                    resultDiv.style.display = 'block';
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+                    resultDiv.innerHTML = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong> ${data.error}<br><br>
+                        <button class="btn" onclick="checkProfileUpdates()" style="background: #2196f3;">
+                            ${t('slicer_retry') || 'Erneut versuchen'}
+                        </button>`;
+                    document.getElementById('updateProfilesBtn').style.display = 'none';
+                } else {
+                    const totalNew = (data.machine?.new || 0) + (data.filament?.new || 0) + (data.process?.new || 0);
+                    const machineFiles = data.machine?.files?.length || 0;
+                    const filamentFiles = data.filament?.files?.length || 0;
+                    const processFiles = data.process?.files?.length || 0;
+
+                    resultDiv.style.display = 'block';
+
+                    // Ergebnis in der Kartensprache statt gruener Vollflaeche
+                    // mit Aufzaehlungspunkten: drei Zahlen sind eine Tabelle,
+                    // kein Fliesstext.
+                    const zeile = (name, wert) =>
+                        `<span class="sl-erg-zeile"><span>${name}</span><b>${wert}</b></span>`;
+
+                    if (totalNew > 0) {
+                        resultDiv.className = 'sl-ergebnis sl-ergebnis--neu';
+                        resultDiv.innerHTML = `
+                            <div class="sl-erg-kopf">
+                                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
+                                ${t('slicer_updates_available') || 'Updates verfügbar'}
+                                <b class="sl-erg-zahl">${totalNew}</b>
+                            </div>
+                            <div class="sl-erg-tabelle">
+                                ${zeile(t('slicer_machine_profiles_count') || 'Drucker-Profile',
+                                        `${data.machine?.new || 0} / ${machineFiles}`)}
+                                ${zeile(t('slicer_filament_profiles_count') || 'Filament-Profile',
+                                        `${data.filament?.new || 0} / ${filamentFiles}`)}
+                                ${zeile(t('slicer_process_profiles_count') || 'Prozess-Profile',
+                                        `${data.process?.new || 0} / ${processFiles}`)}
+                            </div>
+                            <div class="sl-erg-fuss">${t('slicer_update_hint')
+                                || 'Über „Profile aktualisieren" werden sie heruntergeladen.'}
+                                <span class="sl-erg-legende">${t('slicer_erg_legende')
+                                    || 'neu / auf GitHub'}</span></div>`;
+                        document.getElementById('updateProfilesBtn').style.display = 'inline-flex';
+                    } else {
+                        resultDiv.className = 'sl-ergebnis sl-ergebnis--ok';
+                        const gesamt = machineFiles + filamentFiles + processFiles;
+                        resultDiv.innerHTML = `
+                            <div class="sl-erg-kopf">
+                                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                                ${t('slicer_up_to_date') || 'Alles aktuell'}
+                            </div>
+                            <div class="sl-erg-fuss">${
+                                t('slicer_all_profiles_present', { count: gesamt })
+                                || `Alle ${gesamt} verfügbaren Profile sind bereits vorhanden.`}</div>`;
+                        document.getElementById('updateProfilesBtn').style.display = 'inline-flex';
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking updates:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = t('slicer_check_updates') || 'Auf Updates prüfen';
+            }
+        }
+
+        async function updateProfiles() {
+            const btn = document.getElementById('updateProfilesBtn');
+            const checkBtn = document.getElementById('checkUpdatesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            if (!await window.skConfirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            checkBtn.disabled = true;
+            btn.innerHTML = t('slicer_updating_profiles') || 'Aktualisiere...';
+
+            // Progress-HTML vorbereiten
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
+            resultDiv.innerHTML = updateFortschrittHtml(false);
+
+            // Mit Update-Stream verbinden (verwendet gemeinsame Funktionen)
+            connectToUpdateStream(btn, checkBtn, resultDiv);
+        }
+
+        // Alte updateProfiles Funktion als Fallback (ohne SSE)
+        async function updateProfilesFallback() {
+            const btn = document.getElementById('updateProfilesBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            if (!await window.skConfirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = t('slicer_updating_profiles') || 'Aktualisiere...';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ create_backup: true })
+                });
+                const data = await response.json();
+
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    resultDiv.style.background = '#d4edda';
+                    resultDiv.style.color = '#155724';
+                    resultDiv.innerHTML = `<strong>${t('slicer_update_success') || 'Update erfolgreich!'}</strong><br><br>
+                        <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
+                        • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
+                        • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
+                        • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
+                        <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
+                        ${data.backup_created ? (t('slicer_backup_created') || 'Backup wurde erstellt') : (t('slicer_backup_failed') || 'Backup konnte nicht erstellt werden')}`;
+
+                    // Reload profile status and profiles list
+                    loadProfileStatus();
+                    loadProfiles();
+                } else {
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+
+                    let errorMsg = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong><br><br>`;
+                    if (data.error) {
+                        errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
+                    }
+                    if (data.total_errors > 0) {
+                        errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
+                        data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                        data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                        data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
+                    }
+                    resultDiv.innerHTML = errorMsg;
+                }
+            } catch (error) {
+                console.error('Error updating profiles:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
+            }
+        }
+
+        async function restoreBackup() {
+            if (!await window.skConfirm(t('slicer_confirm_restore') || 'Backup wiederherstellen?\n\nDie aktuellen Profile werden durch das Backup ersetzt.')) {
+                return;
+            }
+
+            const btn = document.getElementById('restoreBackupBtn');
+            const resultDiv = document.getElementById('updateResult');
+
+            btn.disabled = true;
+            btn.innerHTML = t('slicer_restoring_backup') || 'Wiederherstellen...';
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/restore', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                resultDiv.style.display = 'block';
+
+                if (data.success) {
+                    resultDiv.style.background = '#d4edda';
+                    resultDiv.style.color = '#155724';
+                    resultDiv.innerHTML = `<strong>${t('slicer_restore_success') || 'Backup wiederhergestellt!'}</strong><br><br>${data.message}`;
+
+                    // Reload profile status and profiles list
+                    loadProfileStatus();
+                    loadProfiles();
+                } else {
+                    resultDiv.style.background = '#f8d7da';
+                    resultDiv.style.color = '#721c24';
+                    resultDiv.innerHTML = `<strong>${t('slicer_restore_failed') || 'Wiederherstellung fehlgeschlagen'}</strong><br><br>${data.message || data.error}`;
+                }
+            } catch (error) {
+                console.error('Error restoring backup:', error);
+                resultDiv.style.display = 'block';
+                resultDiv.style.background = '#f8d7da';
+                resultDiv.style.color = '#721c24';
+                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = t('slicer_restore_backup') || 'Backup wiederherstellen';
+            }
+        }
+
+        // ========== GITHUB TOKEN SETTINGS ==========
+
+        // Auf- und Zuklappen macht das <details> selbst. Nur beim Seitenaufbau
+        // entscheidet der Serverstand, ob der Abschnitt offen startet — danach
+        // laeuft loadGithubTokenSettings() bei jedem Klick auf die Zeile und
+        // duerfte den Nutzer sonst gegen seinen Willen wieder aufklappen.
+        function githubKarteOeffnen(auf) {
+            const karte = document.getElementById('githubTokenSettings');
+            if (karte) karte.open = auf;
+        }
+
+        async function loadGithubTokenSettings(beimStart = false) {
+            try {
+                const response = await apiCall('/api/slicer/profiles/settings');
+                if (response.ok) {
+                    const data = await response.json();
+
+                    const checkbox = document.getElementById('githubTokenEnabled');
+                    const container = document.getElementById('githubTokenInputContainer');
+                    const statusDiv = document.getElementById('githubTokenStatus');
+                    const badge = document.getElementById('githubTokenBadge');
+
+                    checkbox.checked = data.github_token_enabled;
+                    container.style.display = data.github_token_enabled ? 'block' : 'none';
+
+                    // Show badge and collapse if token is set
+                    if (data.github_token_enabled && data.github_token_set) {
+                        badge.style.display = 'inline';
+                        if (beimStart) githubKarteOeffnen(false);   // Token laeuft — nichts zu tun
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerHTML = '<span style="color: #4caf50;">Token ist gespeichert und aktiv</span>';
+                    } else if (data.github_token_enabled && !data.github_token_set) {
+                        badge.style.display = 'none';
+                        if (beimStart) githubKarteOeffnen(true);    // Token fehlt noch
+                        statusDiv.style.display = 'block';
+                        statusDiv.innerHTML = '<span style="color: #ff9800;">Bitte Token eingeben</span>';
+                    } else {
+                        badge.style.display = 'none';
+                        if (beimStart) githubKarteOeffnen(false);   // gar nicht eingeschaltet
+                        statusDiv.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading GitHub token settings:', error);
+                if (beimStart) githubKarteOeffnen(true);
+            }
+        }
+
+        function toggleGithubTokenInput() {
+            const checkbox = document.getElementById('githubTokenEnabled');
+            const container = document.getElementById('githubTokenInputContainer');
+            const statusDiv = document.getElementById('githubTokenStatus');
+            const badge = document.getElementById('githubTokenBadge');
+
+            container.style.display = checkbox.checked ? 'block' : 'none';
+
+            // Wenn deaktiviert, Token auch im Backend deaktivieren
+            if (!checkbox.checked) {
+                badge.style.display = 'none';
+                saveGithubToken(false);
+            }
+        }
+
+        async function saveGithubToken(showAlert = true) {
+            const checkbox = document.getElementById('githubTokenEnabled');
+            const tokenInput = document.getElementById('githubTokenInput');
+            const statusDiv = document.getElementById('githubTokenStatus');
+
+            const enabled = checkbox.checked;
+            const token = tokenInput.value.trim();
+
+            // Validierung
+            if (enabled && !token) {
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_github_token_enter') || 'Bitte Token eingeben'}</span>`;
+                return;
+            }
+
+            try {
+                const response = await apiCall('/api/slicer/profiles/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        github_token_enabled: enabled,
+                        github_token: enabled ? token : null
+                    })
+                });
+
+                const data = await response.json();
+
+                statusDiv.style.display = 'block';
+                if (data.success) {
+                    if (enabled) {
+                        statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || 'Token ist gespeichert und aktiv'}</span>`;
+                        tokenInput.value = ''; // Token aus Input löschen (Sicherheit)
+                        tokenInput.placeholder = '••••••••••••••••';
+                    } else {
+                        statusDiv.innerHTML = `<span style="color: var(--text-secondary);">${t('slicer_github_token_deactivated') || 'Token deaktiviert'}</span>`;
+                    }
+                    if (showAlert) {
+                        showSuccess(enabled ? (t('slicer_github_token_success') || 'GitHub Token gespeichert!') : (t('slicer_github_token_disabled') || 'GitHub Token deaktiviert'));
+                    }
+                } else {
+                    statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_error') || 'Fehler:'} ${data.error}</span>`;
+                    if (showAlert) {
+                        showError(`${t('slicer_error') || 'Fehler:'} ${data.error}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error saving GitHub token:', error);
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_network_error') || 'Netzwerkfehler:'}</span>`;
+                if (showAlert) {
+                    showError(t('slicer_network_error') || 'Netzwerkfehler beim Speichern');
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render Sidebar
+            if (window.tabBarManager) {
+                window.tabBarManager.render();
+            }
+
+            // Apply translations
+            applyTranslations();
+
+            // Load saved settings
+            loadSlicerSettings();
+
+            // Load profiles from server
+            loadProfiles();
+
+            // Load profile management status
+            loadProfileStatus();
+
+            // Load GitHub token settings
+            loadGithubTokenSettings(true);
+
+            // Add event listener for nozzle size change
+            document.getElementById('nozzleSize').addEventListener('change', () => {
+                updateFilamentTypeList(); // Update types first, which triggers updateFilamentList
+                updateProcessList();
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            // Add event listeners for printer selection
+            document.getElementById('printerSelect').addEventListener('change', () => {
+                updateProcessList();
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            // Add event listeners for process and filament selection
+            document.getElementById('processSelect').addEventListener('change', () => {
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            // Add event listener for filament type selection
+            document.getElementById('filamentTypeSelect').addEventListener('change', () => {
+                updateFilamentList(); // Update specific filaments based on selected type
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            document.getElementById('filamentSelect').addEventListener('change', () => {
+                validateSliceButton();
+                saveSlicerSettings();
+            });
+
+            // Add event listener for bed type
+            document.getElementById('bedType').addEventListener('change', () => {
+                saveSlicerSettings();
+            });
+        });
+    </script>
+    <script src="/static/js/modules/hms-severity.js"></script>
+    <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/hms-overlay.js"></script>
+</body>
+</html>

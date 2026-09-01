@@ -1,0 +1,399 @@
+{
+  "notifications": {
+    "print_started": {
+      "title": "🚀 Impression démarrée !",
+      "body": "'{filename}' a démarré. Live Activity lancée."
+    },
+    "print_finished": {
+      "title": "✅ Impression terminée !",
+      "body": "'{filename}' a été imprimé avec succès.\nDurée d'impression : {duration}"
+    },
+    "print_cancelled": {
+      "title": "🛑 Impression annulée",
+      "body": "'{filename}' a été annulé."
+    },
+    "print_failed": {
+      "title": "❌ Erreur d'impression !",
+      "body": "'{filename}' a échoué."
+    },
+    "filament_change_required": {
+      "title": "📥 Changement de filament requis !",
+      "body": "'{filename}' attend du filament : {filament_info} ({progress}%)"
+    },
+    "ams_filament_change": {
+      "title": "🔄 Changement de filament AMS",
+      "body": "Source du filament : {from_slot} → {to_slot}"
+    },
+    "filament_change_completed": {
+      "title": "✅ Changement de filament terminé",
+      "body": "Le changement de filament est terminé"
+    },
+    "filament_change_phase1": {
+      "title": "🎨 Changer le filament",
+      "body": "Changement #{change_count} : {spool_info}"
+    },
+    "filament_change_phase2": {
+      "title": "✅ Filament chargé ?",
+      "body": "Confirmez dans l'app : 'Terminé' si ça a extrudé, sinon 'Réessayer'."
+    },
+    "filament_change_retry": {
+      "title": "🔁 Recharger le filament",
+      "body": "Dernier essai refusé — veuillez réessayer : {spool_info}"
+    },
+    "milestone_25": {
+      "title": "📊 25% atteints",
+      "body": "'{filename}' est terminé à 25%"
+    },
+    "milestone_50": {
+      "title": "📊 Mi-parcours !",
+      "body": "'{filename}' est à moitié terminé"
+    },
+    "milestone_75": {
+      "title": "📊 75% atteints",
+      "body": "'{filename}' est terminé à 75%"
+    },
+    "print_resumed": {
+      "title": "▶️ Impression reprise",
+      "body": "L'impression a repris"
+    },
+    "print_paused": {
+      "title": "⏸️ Impression en pause",
+      "body": "L'impression a été mise en pause"
+    },
+    "printer_power_on": {
+      "title": "🟢 Imprimante allumée",
+      "body": "{printer_name} a été allumée"
+    },
+    "printer_power_on_scheduled": {
+      "title": "⏰ Impression programmée - Imprimante allumée",
+      "body": "{printer_name} a été allumée pour impression programmée"
+    },
+    "printer_power_off": {
+      "title": "🔴 Imprimante éteinte",
+      "body": "{printer_name} a été éteinte"
+    },
+    "auto_shutdown": {
+      "title": "⏰ Extinction auto. dans {minutes} min",
+      "body": "L'imprimante s'éteindra automatiquement ({reason})"
+    },
+    "drying_started": {
+      "title": "🌡️ Séchage filament démarré",
+      "body": "{material} est en séchage à {temp}°C pour {duration}h"
+    },
+    "drying_completed": {
+      "title": "✅ Séchage filament terminé",
+      "body": "{material} a fini de sécher"
+    },
+    "drying_cancelled": {
+      "title": "🚫 Séchage filament annulé",
+      "body": "Le séchage de {material} a été arrêté"
+    },
+    "drying_reminder": {
+      "title": "🔄 Retourner la bobine de filament !",
+      "body": "{material} : Veuillez retourner la bobine - Encore {hours}h restantes"
+    },
+    "scheduled_print_failed_filament": {
+      "title": "❌ Impression programmée annulée",
+      "body": "'{filename}' n'a pas pu être démarré - filament insuffisant"
+    },
+    "test": {
+      "test_started": {
+        "title": "🧪 Test d'impression démarré !",
+        "body": "Le test '{filename}' a commencé."
+      },
+      "test_completed": {
+        "title": "🧪 Test terminé !",
+        "body": "Le test '{filename}' a été imprimé avec succès."
+      },
+      "test_cancelled": {
+        "title": "🧪 Test annulé",
+        "body": "Le test a été annulé à {progress}%."
+      },
+      "milestone_25": {
+        "title": "🧪 Test 25% atteints",
+        "body": "'{filename}' est terminé à 25%"
+      },
+      "milestone_50": {
+        "title": "🧪 Test 50% atteints",
+        "body": "'{filename}' est à moitié terminé"
+      },
+      "milestone_75": {
+        "title": "🧪 Test 75% atteints",
+        "body": "'{filename}' est presque terminé !"
+      },
+      "progress": {
+        "title": "Progrès du Test",
+        "body": "Test {progress}%"
+      }
+    },
+    "dry_pre_started_title": "🌡️ Séchage préalable démarré",
+    "dry_pre_started_body": "Séchage du filament avant « {filename} »",
+    "dry_pre_failed_title": "⚠️ Séchage préalable échoué",
+    "dry_pre_failed_body": "L'imprimante n'a pas démarré. « {filename} » sera imprimé sans séchage.",
+    "calibration_started": {
+      "title": "🔧 Calibration démarrée",
+      "body": "L'imprimante se calibre ({name}). Ce n'est pas une impression."
+    },
+    "calibration_finished": {
+      "title": "🔧 Calibration terminée",
+      "body": "{name} est terminée.\nDurée : {duration}"
+    },
+    "sources": {
+      "tray": "Bac {slot}",
+      "ams_ht": "Bac AMS HT {slot}",
+      "external_left": "Bobine externe gauche",
+      "external_right": "Bobine externe droite"
+    },
+    "drying_run_started": {
+      "title": "🌡️ Séchage démarré",
+      "body": "L'imprimante sèche ({name}). Ce n'est pas une impression."
+    },
+    "drying_run_finished": {
+      "title": "🌡️ Séchage terminé",
+      "body": "{name} est terminé.\nDurée : {duration}"
+    },
+    "drying_run_cancelled": {
+      "title": "🌡️ Séchage annulé",
+      "body": "{name} a été annulé."
+    },
+    "calibration_cancelled": {
+      "title": "🔧 Calibration annulée",
+      "body": "{name} a été annulée."
+    }
+  },
+  "status": {
+    "ready": "Prêt",
+    "printing": "Impression:",
+    "preparing": "Préparation...",
+    "starting_print": "Démarrage impression...",
+    "print_completed": "Impression terminée",
+    "print_failed": "Impression échouée",
+    "paused": "En pause",
+    "no_print_active": "Pas d'impression active",
+    "no_filament": "Pas de filament",
+    "filament_loading": "Chargement filament...",
+    "filament_unloading": "Déchargement filament...",
+    "filament_positioning": "Positionnement filament...",
+    "ams_ready": "AMS prêt",
+    "offline": "Hors ligne",
+    "cancelled": "Annulé"
+  },
+  "general": {
+    "print_job": "Travail d'impression"
+  },
+  "pause_reasons": {
+    "filament_end": "Pause (fin de filament)",
+    "heating": "Pause pendant la chauffe",
+    "ams_error": "Pause (erreur AMS)",
+    "filament_break": "Pause (rupture filament)",
+    "user_pause": "Pause manuelle",
+    "generic": "En pause"
+  },
+  "power_off": {
+    "reason_print_finished": "Impression terminée",
+    "reason_idle": "Inactivité ({minutes} min)",
+    "banner_title": "⏰ Arrêt Automatique Actif",
+    "banner_countdown": "Arrêt dans {time}",
+    "banner_cancel": "Annuler"
+  },
+  "hms": {
+    "0700-0300-0002-0002": "Erreur 1ère couche détectée - Problèmes d'adhérence possibles",
+    "0700-0300-0002-0007": "Défauts possibles 1ère couche",
+    "0C00-0300-0003-0008": "Défauts 'spaghetti' possibles détectés",
+    "0300-8013": "Changement filament requis pour impression multi-couleurs - veuillez changer manuellement",
+    "0300-8004": "Filament épuisé - veuillez charger un nouveau filament",
+    "fallback": "Erreur HMS {code}",
+    "ohne_text": "Message de l'imprimante sans texte enregistré — {modul}, {stufe}. Code {code}",
+    "stufe": {
+      "fatal": "critique",
+      "ernst": "sérieux",
+      "normal": "normal",
+      "Hinweis": "information",
+      "unbekannt": "gravité inconnue"
+    },
+    "filament": {
+      "kammer_zu_heiss": "La chambre est trop chaude — le filament risque de ramollir dans le tube. Température : {temp} °C.",
+      "ams_zu_heiss": "L'AMS est trop chaud — le filament risque de ramollir. Température : {temp} °C."
+    },
+    "speicher": {
+      "speicher_knapp": "Peu de place pour les timelapses sur {ort} : {frei} libres, de quoi enregistrer environ {anzahl} fois.",
+      "speicher_ort_intern": "le stockage interne",
+      "speicher_ort_extern": "la clé USB"
+    },
+    "spule": {
+      "zuruecksetzen_links": "Le filament est sorti. Réinitialiser la bobine gauche ?",
+      "zuruecksetzen_rechts": "Le filament est sorti. Réinitialiser la bobine droite ?"
+    }
+  },
+  "hms_notification_titles": {
+    "printer_info": "ℹ️ Info Imprimante",
+    "printer_error": "⚠️ Erreur Imprimante",
+    "info_prefix": "ℹ️ Info",
+    "hms_error_prefix": "Erreur HMS",
+    "new_hms_errors": "nouvelles erreurs HMS",
+    "new_infos": "nouvelles infos",
+    "new_printer_infos": "nouvelles infos imprimante"
+  },
+  "events": {
+    "pause": "⏸️ Impression en pause",
+    "resume": "▶️ Impression reprise",
+    "printing_started": "🖨️ Impression démarrée",
+    "filament_change": "📥 Changement de filament : {filament_info}",
+    "stage_change": "{icon} {stage_desc}",
+    "start": "Impression démarrée : {filename}",
+    "heating": "🔥 Chauffage en cours",
+    "preparation": "⚙️ Préparation en cours",
+    "bed_leveling": "📐 Nivellement du lit en cours",
+    "manual_stop": "⏹️ Impression arrêtée manuellement",
+    "finish_success": "Impression réussie",
+    "finish_failed": "Impression échouée",
+    "auto_power_off_scheduled": "⏰ Extinction auto. dans {minutes} minutes...",
+    "idle_power_off_scheduled": "⏰ Extinction auto. dans {minutes} minutes (inactivité)",
+    "auto_power_off_executed": "🔌 Imprimante éteinte automatiquement",
+    "power_off_cancelled": "⏹️ Extinction automatique annulée",
+    "upload_start": "📤 Téléchargement fichier démarré",
+    "upload_complete": "✅ Téléchargement fichier terminé",
+    "upload_failed": "❌ Téléchargement fichier échoué",
+    "print_error": "❌ Erreur : {reason}",
+    "server_restart": "🔄 Serveur redémarré",
+    "paused": "⏸️ En pause (couche {layer})",
+    "resumed": "▶️ Repris (couche {layer})",
+    "error": "❌ Erreur : {message}",
+    "prepare_start": "⚙️ Préparation démarrée (lit {bed}°C, buse {hotend}°C)",
+    "prepare_end": "✅ Préparation terminée",
+    "heat_soak_start": "🌡️ Heat-soak démarré ({target}°C, tolérance {tolerance}mm)",
+    "heat_soak_end": "✅ Heat-soak terminé (stable : {stable})",
+    "qgl_start": "📐 Quad-Gantry-Level démarré",
+    "qgl_end": "✅ Quad-Gantry-Level terminé",
+    "bed_mesh_start": "🗺️ Mesh du lit démarré (mode={mode})",
+    "bed_mesh_end": "✅ Mesh du lit terminé",
+    "purge_start": "🧹 Purge démarrée ({temp}°C, {filament})",
+    "purge_end": "✅ Purge terminée",
+    "printing_start": "🖨️ Impression",
+    "pause_print": "⏸️ Macro de pause ({mode})",
+    "resume_print": "▶️ Macro de reprise ({mode})",
+    "cancel_print": "🛑 Impression annulée",
+    "end_print_start": "🏁 Séquence de fin démarrée",
+    "end_print_done": "✅ Terminé",
+    "printing_finished": "✅ Impression terminée ({duration_minutes} min, couche {layers_done}/{total_layers})",
+    "printing_cancelled": "🛑 Impression annulée ({duration_minutes} min, couche {layers_done}/{total_layers})",
+    "printing_failed": "❌ Impression échouée ({duration_minutes} min, couche {layers_done}/{total_layers})",
+    "dry_started": "🌡️ Séchage filament démarré ({material} {temp}°C, {hours}h)",
+    "dry_stopped": "⏹️ Séchage filament arrêté ({material})",
+    "dry_complete": "✅ Séchage filament terminé ({material})"
+  },
+  "stages": {
+    "0": "Impression",
+    "1": "Nivellement auto. du lit",
+    "2": "Préchauffage lit chauffant",
+    "3": "Mode mécanique XY",
+    "4": "Changement filament",
+    "5": "Pause M400",
+    "6": "Pause - filament épuisé",
+    "7": "Chauffage hotend",
+    "8": "Calibrage extrusion",
+    "9": "Scan surface du lit",
+    "10": "Inspection première couche",
+    "11": "Identification plateau",
+    "12": "Calibrage Micro Lidar",
+    "13": "Homing tête d'impression",
+    "14": "Nettoyage pointe buse",
+    "15": "Vérif. température extrudeur",
+    "16": "Pause par utilisateur",
+    "17": "Pause - couvercle avant ouvert",
+    "18": "Calibrage Micro Lidar",
+    "19": "Calibrage flux extrusion",
+    "20": "Pause - erreur temp. buse",
+    "21": "Pause - erreur temp. lit",
+    "22": "Déchargement filament",
+    "23": "Pause - étape sautée",
+    "24": "Chargement filament",
+    "25": "Calibrage bruit moteur",
+    "26": "Pause - AMS perdu",
+    "27": "Pause - vitesse ventilateur basse",
+    "28": "Pause - erreur temp. chambre",
+    "29": "Refroidissement chambre",
+    "30": "Pause par GCode",
+    "31": "Test bruit moteur",
+    "32": "Pause - buse couverte de filament",
+    "33": "Pause - erreur cutter",
+    "34": "Pause - erreur première couche",
+    "35": "Pause - buse bouchée",
+    "36": "Vérif. précision avant calibrage",
+    "37": "Calibrage précision absolue",
+    "38": "Vérif. précision après calibrage",
+    "39": "Calibrage décalage buse",
+    "40": "Nivellement lit haute temp.",
+    "41": "Vérif. libération rapide",
+    "42": "Vérif. porte et couvercle",
+    "43": "Calibrage laser",
+    "44": "Vérif. plateau",
+    "45": "Vérif. position caméra",
+    "46": "Calibrage caméra",
+    "47": "Nivellement lit phase 1",
+    "48": "Nivellement lit phase 2",
+    "49": "Chauffage chambre",
+    "50": "Refroidissement lit chauffant",
+    "51": "Impression lignes calibrage",
+    "52": "Vérification du matériau",
+    "53": "Calibrage caméra live",
+    "54": "Chauffage",
+    "55": "Vérification position matériau",
+    "56": "Calibrage décalage du cutter",
+    "57": "Mesure de la surface",
+    "58": "Préconditionnement thermique",
+    "59": "Référencement porte-lame",
+    "60": "Calibrage décalage caméra",
+    "61": "Calibrage position porte-lame",
+    "62": "Test de changement de hotend",
+    "63": "Égalisation de la température de la chambre",
+    "64": "Préparation du hotend",
+    "65": "Calibrage détection d'accumulation buse",
+    "66": "Purification de l'air de la chambre",
+    "67": "Mesure de l'accessoire rotatif",
+    "68": "Déplacement de la tête au-dessus de la goulotte",
+    "69": "Refroidissement de la buse",
+    "70": "Déplacement de la tête au centre du lit",
+    "71": "Ajustement d'arcs actif",
+    "72": "Détection du type de hotend",
+    "73": "Détection de l'alignement du plateau",
+    "74": "Détection de corps étrangers sur le plateau",
+    "75": "Détection de corps étrangers sous le plateau",
+    "76": "Pré-extrusion avant impression",
+    "77": "Préparation de l'AMS",
+    "completed": "Terminé",
+    "unknown": "Étape inconnue {stage}"
+  },
+  "filament": {
+    "check": {
+      "no_spool_assigned": "Filament [{filament_index}] : Aucune bobine assignée ! Nécessite {required_weight}g",
+      "spool_not_found": "Filament [{filament_index}] : Bobine #{spool_id} introuvable !",
+      "no_filament_left": "Filament [{filament_index}] ({spool_name}) : Vide ! Nécessite {required_weight}g",
+      "insufficient_filament": "Filament [{filament_index}] ({spool_name}) : {available_weight}g disponible, {required_weight}g nécessaire (manquent {shortage}g)",
+      "critical_error_scheduling": "Impossible de programmer l'impression - erreurs critiques de filament présentes"
+    }
+  },
+  "maintenance": {
+    "overdue": {
+      "title": "⚠️ Maintenance en retard",
+      "body": "{task_name}",
+      "body_days": "{task_name} - en retard de {days} jour(s)"
+    },
+    "due_today": {
+      "title": "🔧 Maintenance aujourd'hui",
+      "body": "{task_name}"
+    },
+    "due_tomorrow": {
+      "title": "🔔 Maintenance demain",
+      "body": "{task_name}"
+    },
+    "due_soon": {
+      "title": "🔔 Maintenance bientôt",
+      "body": "{task_name} - dans {days} jour(s)"
+    },
+    "planned": {
+      "title": "📅 Maintenance planifiée",
+      "body": "{task_name} - dans {days} jour(s)"
+    }
+  }
+}

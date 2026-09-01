@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebRTC Camera</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+video {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    background: #000;
+}
+/* Bis das erste Bild da ist, stand hier nur Schwarz. Beim ersten Aufruf
+   nach dem Einschalten waehlt go2rtc den Drucker erst in diesem Moment —
+   das dauert und sah nach "kaputt" aus (27aug26). */
+#warte {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    flex-wrap: wrap; text-align: center; padding: 0 14px;
+    color: #b8bcc8; font: 500 13px/1.4 -apple-system, BlinkMacSystemFont,
+        "Segoe UI", system-ui, sans-serif;
+    background: #000;
+    transition: opacity 0.25s;
+}
+#warte.weg { opacity: 0; pointer-events: none; }
+#warte svg { width: 15px; height: 15px; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; }
+#warte .dreh { animation: dreh 1.1s linear infinite; transform-origin: 50% 50%; }
+#warte-grund {
+    display: none; width: 100%; margin-top: 6px;
+    font-size: 11px; color: #f0a0a0; word-break: break-word;
+}
+@keyframes dreh { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { #warte .dreh { animation: none; } }
+</style>
+</head>
+<body>
+<video id="v" autoplay muted playsinline></video>
+<div id="warte">
+    <svg class="dreh" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3a9 9 0 1 0 9 9"/>
+    </svg>
+    <span id="warte-text"></span>
+    <span id="warte-grund"></span>
+</div>
+<script>
+(function() {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token') || '';
+    const zoom = params.get('zoom') === '1';
+    const video = document.getElementById('v');
+
+    // Diese Seite laedt static/lang/*.js nicht (sie haengt in einem
+    // WKWebView und soll nichts nachladen) — deshalb die eine Zeile hier,
+    // wie es custom-notification.html in der Electron-App auch macht.
+    const TEXTE = {
+        de: 'Verbinde mit der Kamera …', en: 'Connecting to the camera …',
+        es: 'Conectando con la cámara …', fr: 'Connexion à la caméra …',
+        it: 'Connessione alla telecamera …',
+    };
+    const sprache = (params.get('lang') || 'de').slice(0, 2);
+    const warte = document.getElementById('warte');
+    document.getElementById('warte-text').textContent =
+        TEXTE[sprache] || TEXTE.de;
+
+    // Weg, sobald wirklich Bild da ist — nicht schon beim Verbinden.
+    video.addEventListener('playing', function() { warte.classList.add('weg'); });
+    video.addEventListener('loadeddata', function() { warte.classList.add('weg'); });
+    function wiederZeigen() { warte.classList.remove('weg'); }
+
+    // Der Grund gehoert auf den Schirm, nicht in eine Konsole, die im
+    // WKWebView niemand sieht. Ohne das steht dort nur "Verbinde …" —
+    // egal ob das Zertifikat abgelehnt wurde, die Signalisierung 503
+    // meldet oder einfach kein Medienweg zustande kommt (27aug26 eine
+    // Stunde im Kreis gesucht).
+    const grundZeile = document.getElementById('warte-grund');
+    let versuche = 0;
+    function sagWarum(text) {
+        versuche += 1;
+        grundZeile.textContent = versuche > 1
+            ? text + ' (' + versuche + '. Versuch)'
+            : text;
+        grundZeile.style.display = 'block';
+    }
+
+    if (zoom) {
+        video.style.objectFit = 'cover';
+    }
+
+    let pc = null;
+    let stopped = false;
+
+    // Alles, was AUSSERHALB des try unten schiefgeht, verschwand bisher
+    // spurlos — im WKWebView gibt es keine Konsole zum Nachsehen. Beides
+    // hier abfangen und auf den Schirm schreiben.
+    window.addEventListener('error', function (e) {
+        sagWarum('Skriptfehler: ' + (e.message || 'unbekannt'));
+    });
+    window.addEventListener('unhandledrejection', function (e) {
+        sagWarum('Abgelehnt: ' + String((e.reason && e.reason.message) || e.reason));
+    });
+
+    async function start() {
+        if (stopped) return;
+        if (pc) { pc.close(); pc = null; }
+
+        // Gibt es WebRTC in diesem Motor ueberhaupt? Der Konstruktor stand
+        // vorher vor dem try — schlug er fehl, brach das Skript ab und die
+        // Seite blieb ohne ein Wort auf "Verbinde" stehen.
+        if (typeof RTCPeerConnection !== 'function') {
+            sagWarum('Dieser Browser kennt kein WebRTC (RTCPeerConnection fehlt)');
+            return;
+        }
+        try {
+            pc = new RTCPeerConnection({iceServers: []});
+        } catch (e) {
+            sagWarum('RTCPeerConnection: ' + String((e && e.message) || e));
+            return;
+        }
+
+        pc.ontrack = function(e) {
+            video.srcObject = e.streams[0];
+            video.play().catch(function() {});
+        };
+
+        pc.oniceconnectionstatechange = function() {
+            if (pc && pc.iceConnectionState === 'failed') {
+                sagWarum('ICE fehlgeschlagen — kein Medienweg zu go2rtc');
+            }
+        };
+
+        pc.onconnectionstatechange = function() {
+            if (pc && (pc.connectionState === 'failed' || pc.connectionState === 'disconnected')) {
+                console.log('WebRTC lost, reconnecting...');
+                wiederZeigen();
+                setTimeout(start, 2000);
+            }
+        };
+
+        pc.addTransceiver('video', {direction: 'recvonly'});
+
+        try {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+
+            await new Promise(function(resolve) {
+                if (pc.iceGatheringState === 'complete') return resolve();
+                pc.onicegatheringstatechange = function() {
+                    if (pc.iceGatheringState === 'complete') resolve();
+                };
+                setTimeout(resolve, 2000);
+            });
+
+            const base = location.origin;
+            const resp = await fetch(base + '/api/camera/webrtc', {
+                method: 'POST',
+                body: pc.localDescription.sdp,
+                headers: {
+                    'Content-Type': 'application/sdp',
+                    'X-Device-Token': token
+                }
+            });
+
+            if (!resp.ok) throw new Error('HTTP ' + resp.status + ' bei /api/camera/webrtc');
+
+            const answer = await resp.text();
+            await pc.setRemoteDescription({type: 'answer', sdp: answer});
+            console.log('WebRTC connected');
+
+            // Angebot angenommen, aber nach zehn Sekunden immer noch kein
+            // Bild? Dann steht die Signalisierung und es fehlt der
+            // Medienweg — genau der Fall, den ICE-ueber-TCP in WebKit
+            // erzeugt. Auch das gehoert auf den Schirm.
+            setTimeout(function () {
+                if (!stopped && video.readyState < 2) {
+                    sagWarum('Verbunden, aber kein Bild — Medienweg blockiert?');
+                }
+            }, 10000);
+        } catch (e) {
+            console.error('WebRTC error:', e);
+            if (pc) { pc.close(); pc = null; }
+            wiederZeigen();
+            sagWarum(String((e && e.message) || e));
+            setTimeout(start, 3000);
+        }
+    }
+
+    // Sauberer Cleanup beim Seitenwechsel (verhindert grüne Frames + Overlay)
+    function cleanup() {
+        stopped = true;
+        if (pc) {
+            pc.ontrack = null;
+            pc.onconnectionstatechange = null;
+            pc.close();
+            pc = null;
+        }
+        video.srcObject = null;
+        video.load();
+    }
+
+    window.addEventListener('pagehide', cleanup);
+    window.addEventListener('beforeunload', cleanup);
+
+    // Globale Cleanup-Funktion für Aufruf aus der App via evaluateJavaScript
+    window.cleanupWebRTC = cleanup;
+
+    start();
+})();
+</script>
+</body>
+</html>

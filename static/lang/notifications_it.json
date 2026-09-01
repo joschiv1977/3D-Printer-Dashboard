@@ -1,0 +1,399 @@
+{
+  "notifications": {
+    "print_started": {
+      "title": "🚀 Stampa iniziata!",
+      "body": "'{filename}' è iniziata. Live Activity avviata."
+    },
+    "print_finished": {
+      "title": "✅ Stampa completata!",
+      "body": "'{filename}' è stata stampata con successo.\nDurata stampa: {duration}"
+    },
+    "print_cancelled": {
+      "title": "🛑 Stampa annullata",
+      "body": "'{filename}' è stata annullata."
+    },
+    "print_failed": {
+      "title": "❌ Errore di stampa!",
+      "body": "'{filename}' è fallita."
+    },
+    "filament_change_required": {
+      "title": "📥 Cambio filamento richiesto!",
+      "body": "'{filename}' in attesa di filamento: {filament_info} ({progress}%)"
+    },
+    "ams_filament_change": {
+      "title": "🔄 Cambio filamento AMS",
+      "body": "Origine del filamento: {from_slot} → {to_slot}"
+    },
+    "filament_change_completed": {
+      "title": "✅ Cambio filamento completato",
+      "body": "Il cambio filamento è completato"
+    },
+    "filament_change_phase1": {
+      "title": "🎨 Cambia filamento",
+      "body": "Cambio #{change_count}: {spool_info}"
+    },
+    "filament_change_phase2": {
+      "title": "✅ Filamento caricato?",
+      "body": "Conferma nell'app: 'Fatto' se ha estruso, altrimenti 'Riprova'."
+    },
+    "filament_change_retry": {
+      "title": "🔁 Ricarica filamento",
+      "body": "Ultimo tentativo non accettato — riprova: {spool_info}"
+    },
+    "milestone_25": {
+      "title": "📊 25% raggiunto",
+      "body": "'{filename}' è al 25% completato"
+    },
+    "milestone_50": {
+      "title": "📊 A metà strada!",
+      "body": "'{filename}' è a metà"
+    },
+    "milestone_75": {
+      "title": "📊 75% raggiunto",
+      "body": "'{filename}' è al 75% completato"
+    },
+    "print_resumed": {
+      "title": "▶️ Stampa ripresa",
+      "body": "La stampa è stata ripresa"
+    },
+    "print_paused": {
+      "title": "⏸️ Stampa in pausa",
+      "body": "La stampa è stata messa in pausa"
+    },
+    "printer_power_on": {
+      "title": "🟢 Stampante accesa",
+      "body": "{printer_name} è stata accesa"
+    },
+    "printer_power_on_scheduled": {
+      "title": "⏰ Stampa programmata - Stampante accesa",
+      "body": "{printer_name} è stata accesa per stampa programmata"
+    },
+    "printer_power_off": {
+      "title": "🔴 Stampante spenta",
+      "body": "{printer_name} è stata spenta"
+    },
+    "auto_shutdown": {
+      "title": "⏰ Spegn. auto. tra {minutes} min",
+      "body": "La stampante si spegnerà automaticamente ({reason})"
+    },
+    "drying_started": {
+      "title": "🌡️ Asciugatura filamento iniziata",
+      "body": "{material} in asciugatura a {temp}°C per {duration}h"
+    },
+    "drying_completed": {
+      "title": "✅ Asciugatura filamento completata",
+      "body": "{material} ha terminato l'asciugatura"
+    },
+    "drying_cancelled": {
+      "title": "🚫 Asciugatura filamento annullata",
+      "body": "L'asciugatura di {material} è stata interrotta"
+    },
+    "drying_reminder": {
+      "title": "🔄 Girare la bobina di filamento!",
+      "body": "{material}: Si prega di girare la bobina - Rimangono {hours}h"
+    },
+    "scheduled_print_failed_filament": {
+      "title": "❌ Stampa programmata annullata",
+      "body": "'{filename}' non può essere avviata - filamento insufficiente"
+    },
+    "test": {
+      "test_started": {
+        "title": "🧪 Test di stampa iniziato!",
+        "body": "Il test '{filename}' è iniziato."
+      },
+      "test_completed": {
+        "title": "🧪 Test completato!",
+        "body": "Il test '{filename}' è stato stampato con successo."
+      },
+      "test_cancelled": {
+        "title": "🧪 Test annullato",
+        "body": "Il test è stato annullato al {progress}%."
+      },
+      "milestone_25": {
+        "title": "🧪 Test 25% raggiunto",
+        "body": "'{filename}' è al 25% completato"
+      },
+      "milestone_50": {
+        "title": "🧪 Test 50% raggiunto",
+        "body": "'{filename}' è a metà"
+      },
+      "milestone_75": {
+        "title": "🧪 Test 75% raggiunto",
+        "body": "'{filename}' è quasi finito!"
+      },
+      "progress": {
+        "title": "Progresso del Test",
+        "body": "Test {progress}%"
+      }
+    },
+    "dry_pre_started_title": "🌡️ Asciugatura preliminare avviata",
+    "dry_pre_started_body": "Asciugatura del filamento prima di «{filename}»",
+    "dry_pre_failed_title": "⚠️ Asciugatura preliminare fallita",
+    "dry_pre_failed_body": "La stampante non si è avviata. «{filename}» verrà stampato senza asciugatura.",
+    "calibration_started": {
+      "title": "🔧 Calibrazione avviata",
+      "body": "La stampante si sta calibrando ({name}). Non è una stampa."
+    },
+    "calibration_finished": {
+      "title": "🔧 Calibrazione completata",
+      "body": "{name} è terminata.\nDurata: {duration}"
+    },
+    "sources": {
+      "tray": "Vano {slot}",
+      "ams_ht": "Vano AMS HT {slot}",
+      "external_left": "Bobina esterna sinistra",
+      "external_right": "Bobina esterna destra"
+    },
+    "drying_run_started": {
+      "title": "🌡️ Asciugatura avviata",
+      "body": "La stampante sta asciugando ({name}). Non è una stampa."
+    },
+    "drying_run_finished": {
+      "title": "🌡️ Asciugatura completata",
+      "body": "{name} è terminata.\nDurata: {duration}"
+    },
+    "drying_run_cancelled": {
+      "title": "🌡️ Asciugatura annullata",
+      "body": "{name} è stata annullata."
+    },
+    "calibration_cancelled": {
+      "title": "🔧 Calibrazione annullata",
+      "body": "{name} è stata annullata."
+    }
+  },
+  "status": {
+    "ready": "Pronto",
+    "printing": "Stampa:",
+    "preparing": "Preparazione...",
+    "starting_print": "Avvio stampa...",
+    "print_completed": "Stampa completata",
+    "print_failed": "Stampa fallita",
+    "paused": "In pausa",
+    "no_print_active": "Nessuna stampa attiva",
+    "no_filament": "Senza filamento",
+    "filament_loading": "Caricamento filamento...",
+    "filament_unloading": "Scaricamento filamento...",
+    "filament_positioning": "Posizionamento filamento...",
+    "ams_ready": "AMS pronto",
+    "offline": "Offline",
+    "cancelled": "Annullato"
+  },
+  "general": {
+    "print_job": "Lavoro di stampa"
+  },
+  "pause_reasons": {
+    "filament_end": "Pausa (fine filamento)",
+    "heating": "Pausa durante il riscaldamento",
+    "ams_error": "Pausa (errore AMS)",
+    "filament_break": "Pausa (rottura filamento)",
+    "user_pause": "Pausa manuale",
+    "generic": "In pausa"
+  },
+  "power_off": {
+    "reason_print_finished": "Stampa completata",
+    "reason_idle": "Inattività ({minutes} min)",
+    "banner_title": "⏰ Spegnimento Automatico Attivo",
+    "banner_countdown": "Spegnimento tra {time}",
+    "banner_cancel": "Annulla"
+  },
+  "hms": {
+    "0700-0300-0002-0002": "Errore primo strato rilevato - Possibili problemi di adesione",
+    "0700-0300-0002-0007": "Possibili difetti del primo strato",
+    "0C00-0300-0003-0008": "Possibili difetti 'spaghetti' rilevati",
+    "0300-8013": "Cambio filamento richiesto per stampa multicolore - si prega di cambiare manualmente",
+    "0300-8004": "Filamento esaurito - si prega di caricare un nuovo filamento",
+    "fallback": "Errore HMS {code}",
+    "ohne_text": "Messaggio della stampante senza testo registrato — {modul}, {stufe}. Codice {code}",
+    "stufe": {
+      "fatal": "grave",
+      "ernst": "serio",
+      "normal": "normale",
+      "Hinweis": "avviso",
+      "unbekannt": "gravità sconosciuta"
+    },
+    "filament": {
+      "kammer_zu_heiss": "La camera è troppo calda: il filamento potrebbe ammorbidirsi nel tubo. Temperatura: {temp} °C.",
+      "ams_zu_heiss": "L'AMS è troppo caldo: il filamento potrebbe ammorbidirsi. Temperatura: {temp} °C."
+    },
+    "speicher": {
+      "speicher_knapp": "Poco spazio per i timelapse su {ort}: {frei} liberi, bastano per circa {anzahl} registrazioni.",
+      "speicher_ort_intern": "la memoria interna",
+      "speicher_ort_extern": "la chiavetta USB"
+    },
+    "spule": {
+      "zuruecksetzen_links": "Il filamento è fuori. Azzerare la bobina sinistra?",
+      "zuruecksetzen_rechts": "Il filamento è fuori. Azzerare la bobina destra?"
+    }
+  },
+  "hms_notification_titles": {
+    "printer_info": "ℹ️ Info Stampante",
+    "printer_error": "⚠️ Errore Stampante",
+    "info_prefix": "ℹ️ Info",
+    "hms_error_prefix": "Errore HMS",
+    "new_hms_errors": "nuovi errori HMS",
+    "new_infos": "nuove info",
+    "new_printer_infos": "nuove info stampante"
+  },
+  "events": {
+    "pause": "⏸️ Stampa in pausa",
+    "resume": "▶️ Stampa ripresa",
+    "printing_started": "🖨️ Stampa iniziata",
+    "filament_change": "📥 Cambio filamento: {filament_info}",
+    "stage_change": "{icon} {stage_desc}",
+    "start": "Stampa iniziata: {filename}",
+    "heating": "🔥 Riscaldamento in corso",
+    "preparation": "⚙️ Preparazione in corso",
+    "bed_leveling": "📐 Livellamento piatto in corso",
+    "manual_stop": "⏹️ Stampa fermata manualmente",
+    "finish_success": "Stampa riuscita",
+    "finish_failed": "Stampa fallita",
+    "auto_power_off_scheduled": "⏰ Spegnimento auto. tra {minutes} minuti...",
+    "idle_power_off_scheduled": "⏰ Spegnimento auto. tra {minutes} minuti (inattività)",
+    "auto_power_off_executed": "🔌 Stampante spenta automaticamente",
+    "power_off_cancelled": "⏹️ Spegnimento automatico annullato",
+    "upload_start": "📤 Caricamento file iniziato",
+    "upload_complete": "✅ Caricamento file completato",
+    "upload_failed": "❌ Caricamento file fallito",
+    "print_error": "❌ Errore: {reason}",
+    "server_restart": "🔄 Server riavviato",
+    "paused": "⏸️ In pausa (layer {layer})",
+    "resumed": "▶️ Ripreso (layer {layer})",
+    "error": "❌ Errore: {message}",
+    "prepare_start": "⚙️ Preparazione avviata (piatto {bed}°C, hotend {hotend}°C)",
+    "prepare_end": "✅ Preparazione completata",
+    "heat_soak_start": "🌡️ Heat-soak avviato ({target}°C, tolleranza {tolerance}mm)",
+    "heat_soak_end": "✅ Heat-soak completato (stabile: {stable})",
+    "qgl_start": "📐 Quad-Gantry-Level avviato",
+    "qgl_end": "✅ Quad-Gantry-Level completato",
+    "bed_mesh_start": "🗺️ Bed-mesh avviato (modo={mode})",
+    "bed_mesh_end": "✅ Bed-mesh completato",
+    "purge_start": "🧹 Purge avviato ({temp}°C, {filament})",
+    "purge_end": "✅ Purge completato",
+    "printing_start": "🖨️ In stampa",
+    "pause_print": "⏸️ Macro di pausa ({mode})",
+    "resume_print": "▶️ Macro di ripresa ({mode})",
+    "cancel_print": "🛑 Stampa annullata",
+    "end_print_start": "🏁 Sequenza di fine avviata",
+    "end_print_done": "✅ Completato",
+    "printing_finished": "✅ Stampa completata ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "printing_cancelled": "🛑 Stampa annullata ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "printing_failed": "❌ Stampa fallita ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "dry_started": "🌡️ Asciugatura filamento avviata ({material} {temp}°C, {hours}h)",
+    "dry_stopped": "⏹️ Asciugatura filamento fermata ({material})",
+    "dry_complete": "✅ Asciugatura filamento completata ({material})"
+  },
+  "stages": {
+    "0": "Stampa",
+    "1": "Livellamento auto. piatto",
+    "2": "Preriscaldamento piatto",
+    "3": "Modalità meccanica XY",
+    "4": "Cambio filamento",
+    "5": "Pausa M400",
+    "6": "Pausa - filamento esaurito",
+    "7": "Riscaldamento hotend",
+    "8": "Calibrazione estrusione",
+    "9": "Scansione superficie piatto",
+    "10": "Ispezione primo strato",
+    "11": "Identificazione piatto",
+    "12": "Calibrazione Micro Lidar",
+    "13": "Homing testina",
+    "14": "Pulizia punta ugello",
+    "15": "Verifica temp. estrusore",
+    "16": "Pausa da utente",
+    "17": "Pausa - coperchio anteriore aperto",
+    "18": "Calibrazione Micro Lidar",
+    "19": "Calibrazione flusso estrusione",
+    "20": "Pausa - errore temp. ugello",
+    "21": "Pausa - errore temp. piatto",
+    "22": "Scaricamento filamento",
+    "23": "Pausa - passo saltato",
+    "24": "Caricamento filamento",
+    "25": "Calibrazione rumore motore",
+    "26": "Pausa - AMS perso",
+    "27": "Pausa - velocità ventola bassa",
+    "28": "Pausa - errore temp. camera",
+    "29": "Raffreddamento camera",
+    "30": "Pausa da GCode",
+    "31": "Test rumore motore",
+    "32": "Pausa - ugello coperto filamento",
+    "33": "Pausa - errore cutter",
+    "34": "Pausa - errore primo strato",
+    "35": "Pausa - ugello intasato",
+    "36": "Verifica precisione pre-calibraz.",
+    "37": "Calibrazione precisione assoluta",
+    "38": "Verifica precisione post-calibraz.",
+    "39": "Calibrazione offset ugello",
+    "40": "Livellamento piatto alta temp.",
+    "41": "Verifica sgancio rapido",
+    "42": "Verifica porta e coperchio",
+    "43": "Calibrazione laser",
+    "44": "Verifica piattaforma",
+    "45": "Verifica posizione fotocamera",
+    "46": "Calibrazione fotocamera",
+    "47": "Livellamento piatto fase 1",
+    "48": "Livellamento piatto fase 2",
+    "49": "Riscaldamento camera",
+    "50": "Raffreddamento piatto",
+    "51": "Stampa linee calibrazione",
+    "52": "Verifica materiale",
+    "53": "Calibrazione fotocamera live",
+    "54": "Riscaldamento",
+    "55": "Verifica posizione materiale",
+    "56": "Calibrazione offset taglierina",
+    "57": "Misurazione superficie",
+    "58": "Precondizionamento termico",
+    "59": "Azzeramento portalama",
+    "60": "Calibrazione offset fotocamera",
+    "61": "Calibrazione posizione portalama",
+    "62": "Test cambio hotend",
+    "63": "Attesa equilibrio temperatura camera",
+    "64": "Preparazione hotend",
+    "65": "Calibrazione rilevamento accumulo ugello",
+    "66": "Purificazione aria camera",
+    "67": "Misurazione accessorio rotante",
+    "68": "Spostamento testa sopra lo scivolo di spurgo",
+    "69": "Raffreddamento ugello",
+    "70": "Spostamento testa al centro del piatto",
+    "71": "Adattamento archi attivo",
+    "72": "Rilevamento tipo hotend",
+    "73": "Rilevamento allineamento piatto",
+    "74": "Rilevamento corpi estranei sul piatto",
+    "75": "Rilevamento corpi estranei sotto il piatto",
+    "76": "Preestrusione prima della stampa",
+    "77": "Preparazione AMS",
+    "completed": "Completato",
+    "unknown": "Fase sconosciuta {stage}"
+  },
+  "filament": {
+    "check": {
+      "no_spool_assigned": "Filamento [{filament_index}]: Nessuna bobina assegnata! Richiede {required_weight}g",
+      "spool_not_found": "Filamento [{filament_index}]: Bobina #{spool_id} non trovata!",
+      "no_filament_left": "Filamento [{filament_index}] ({spool_name}): Vuoto! Richiede {required_weight}g",
+      "insufficient_filament": "Filamento [{filament_index}] ({spool_name}): {available_weight}g disponibile, {required_weight}g richiesto (mancano {shortage}g)",
+      "critical_error_scheduling": "Impossibile programmare la stampa - errori critici di filamento presenti"
+    }
+  },
+  "maintenance": {
+    "overdue": {
+      "title": "⚠️ Manutenzione in ritardo",
+      "body": "{task_name}",
+      "body_days": "{task_name} - in ritardo di {days} giorno/i"
+    },
+    "due_today": {
+      "title": "🔧 Manutenzione oggi",
+      "body": "{task_name}"
+    },
+    "due_tomorrow": {
+      "title": "🔔 Manutenzione domani",
+      "body": "{task_name}"
+    },
+    "due_soon": {
+      "title": "🔔 Manutenzione prossima",
+      "body": "{task_name} - tra {days} giorno/i"
+    },
+    "planned": {
+      "title": "📅 Manutenzione pianificata",
+      "body": "{task_name} - tra {days} giorno/i"
+    }
+  }
+}

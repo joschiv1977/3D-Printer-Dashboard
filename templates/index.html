@@ -1,0 +1,244 @@
+{% include 'partials/_head.html' %}
+<body class="page-loading" data-active-printer="{{ active_printer_type | default('bambu') }}">
+<script>
+  // Multi-Printer Phase 3: Server-Side gerenderter Default — bevor irgendein
+  // JS-Modul laed. Ohne das wuerden alle bambu-only-Elemente initial sichtbar
+  // bleiben (CSS-Selektor matcht nicht ohne data-attr) und z.B. der
+  // CameraManager wuerde den falschen Init-Pfad nehmen.
+  window.activePrinter = window.activePrinter || {
+    type: '{{ active_printer_type | default("bambu") }}',
+    capabilities: [],
+    klipperId: null,
+  };
+  // Robuste Type-Check-Helper: lesen aus body.dataset — IMMER verfuegbar,
+  // auch bevor printer-adapter.js geladen ist. Frueher haben wir auf
+  // window.printerAdapter.isKlipper gecheckt — der ist beim CameraManager-
+  // Constructor noch undefined, also fiel der Code in den Bambu-Pfad und
+  // startete Snapshot-Polling, was BambuCameraClient-Errors erzeugte.
+  window.isKlipperMode = function () {
+    return (document.body && document.body.dataset.activePrinter) === 'klipper';
+  };
+  window.isBambuMode = function () {
+    var t = document.body && document.body.dataset.activePrinter;
+    return !t || t === 'bambu';
+  };
+</script>
+    <!-- Disable transitions during page load to prevent animation flash -->
+    <style>
+        body.page-loading,
+        body.page-loading .floating-tab-bar,
+        body.page-loading * {
+            transition: none !important;
+        }
+    </style>
+    <script>
+        // Remove page-loading class after page is fully loaded
+        window.addEventListener('load', function() {
+            // Small delay to ensure everything is rendered
+            setTimeout(function() {
+                document.body.classList.remove('page-loading');
+            }, 50);
+        });
+    </script>
+
+    <!-- Shared Modules - Load BEFORE body content so tab bar renders -->
+    <!-- Ein Buendel statt 27 Einzeldateien: ueber HTTP/1.1 laufen nur
+         ~6 Verbindungen parallel (je ~200 ms TLS), der Rest stand bis zu
+         2 s in der Warteschlange (gemessen 20aug26). Inhalt + Reihenfolge
+         kommen aus dieser Datei selbst (services/asset_bundle.py), ein
+         Build-Schritt entfaellt. -->
+    <script defer src="/static/js/app-bundle.js"></script>
+
+    <!-- Die Drucker-Meldung liegt bewusst NEBEN dem Buendel: sie gehoert auf
+         jede Seite, und die uebrigen Seiten haben kein Buendel. Eine Quelle
+         fuer alle neun statt zwei Fassungen, die auseinanderlaufen.
+         hms-overlay.js merkt selbst, dass es hier den Stapel schon gibt, und
+         faengt hier gar nicht erst an zu fragen — hier fuellt der Socket. -->
+    <script defer src="/static/js/modules/hms-banner.js"></script>
+    <script defer src="/static/js/modules/hms-overlay.js"></script>
+
+    <!-- Jinja2 Config for JS modules (decoupled from inline JS) -->
+    <script>
+        window.JINJA_CONFIG = {
+            ustreamerEnabled: {{ 'true' if ustreamer_enabled else 'false' }},
+            vapidPublicKey: '{{ vapid_public_key }}'
+        };
+    </script>
+
+
+    {% include 'partials/_banners.html' %}
+
+    {% include 'partials/modals/_chart.html' %}
+    {% include 'partials/modals/_sd-card.html' %}
+    {% include 'partials/modals/_schedule.html' %}
+    {% include 'partials/modals/_spool-picker.html' %}
+    {% include 'partials/modals/_plate-select.html' %}
+    {% include 'partials/modals/_print-prepare.html' %}
+    {% include 'partials/modals/_speed.html' %}
+    {% include 'partials/modals/_fans.html' %}
+    {% include 'partials/modals/_temperature.html' %}
+    {% include 'partials/modals/_printer-control.html' %}
+
+    <div class="container">
+      <div class="grid-stack">
+          {% include 'partials/cards/_camera.html' %}
+          {% include 'partials/cards/_controls.html' %}
+          {% include 'partials/cards/_progress.html' %}
+          {% include 'partials/cards/_zones.html' %}
+          {% if active_printer_type == 'klipper' %}
+          {% include 'partials/cards/_spoolman.html' %}
+          {% endif %}
+          {% include 'partials/cards/_filament-drying.html' %}
+          {% include 'partials/cards/_hotend-rack.html' %}
+      </div>
+    </div>
+
+    <!-- Language, auth, translations — must run before any module loads -->
+    <script>
+        // ===== Language Setup (must run before any module loads) =====
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang');
+        let currentLang = urlLang || localStorage.getItem('language') || 'de';
+
+        // ===== AUTH FETCH HELPER =====
+        const deviceToken = urlParams.get('device_token');
+        window.authFetch = function(url, options = {}) {
+            options = { credentials: 'include', ...options };
+            options.headers = options.headers || {};
+            if (deviceToken) {
+                options.headers['X-Device-Token'] = deviceToken;
+            }
+            return fetch(url, options).then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    console.error('🔒 Authentication failed (401/403) - Token invalid');
+                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.authFailed) {
+                        window.webkit.messageHandlers.authFailed.postMessage({});
+                    } else {
+                        window.location.href = '/login';
+                    }
+                }
+                return response;
+            });
+        };
+        // ===== END AUTH FETCH HELPER =====
+
+        // Wenn URL lang Parameter vorhanden, speichere in localStorage
+        if (urlLang && urlLang !== localStorage.getItem('language')) {
+            console.log(`🔄 URL lang parameter: ${urlLang}, updating localStorage`);
+            localStorage.setItem('language', urlLang);
+        }
+
+        // Synchronisiere Backend-Sprache mit Frontend beim Laden
+        (async function syncLanguageOnLoad() {
+            try {
+                const response = await authFetch('/api/auth/language', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const backendLang = data.language;
+                    if (backendLang && backendLang !== currentLang && !urlLang) {
+                        console.log(`🔄 Syncing language: localStorage(${currentLang}) → Backend(${backendLang})`);
+                        localStorage.setItem('language', backendLang);
+                        currentLang = backendLang;
+                        location.reload();
+                    }
+                }
+            } catch (error) {
+                console.log('ℹ️ Language sync skipped (not logged in or error)');
+            }
+        })();
+
+        // Richtige Uebersetzung waehlen
+        const translationsMap = {
+            'de': typeof translations_de !== 'undefined' ? translations_de : {},
+            'en': typeof translations_en !== 'undefined' ? translations_en : {},
+            'fr': typeof translations_fr !== 'undefined' ? translations_fr : {},
+            'es': typeof translations_es !== 'undefined' ? translations_es : {},
+            'it': typeof translations_it !== 'undefined' ? translations_it : {}
+        };
+        const texts = translationsMap[currentLang] || translationsMap['en'] || {};
+
+        // Expose to extracted JS modules
+        window.texts = texts;
+        window.currentLang = currentLang;
+
+        // Helper: Sicherer Zugriff auf Uebersetzungen
+        function getText(key, fallback = '') {
+            return texts && texts[key] ? texts[key] : fallback;
+        }
+
+        function switchLanguage(lang) {
+            localStorage.setItem('language', lang);
+            location.reload();
+        }
+
+        // Helper: Get cookie value
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return '';
+        }
+    </script>
+
+    <!-- Extracted JS Modules -->
+    <!-- Multi-Printer-Adapter: setzt body[data-active-printer], mappt
+         klipper_state → print_progress, routet pause/resume/stop -->
+    <style>
+      /* Multi-Printer-CSS-Schalter: Elemente, die nur fuer Bambu Sinn
+         machen (AMS-Slot-Widget, HMS-Banner, Bambu-Cloud-Spezifika),
+         im Klipper-Mode komplett ausblenden. Markierung am Element:
+         class="bambu-only" oder data-bambu-only. */
+      body[data-active-printer="klipper"] .bambu-only,
+      body[data-active-printer="klipper"] [data-bambu-only] {
+        display: none !important;
+      }
+      /* Klipper: Card-Header klickbar (oeffnet Mainsail). Bambu hat
+         keine local-Web-UI — kein Cursor, kein Hover. */
+      body[data-active-printer="klipper"] [data-printer-web] {
+        cursor: pointer;
+      }
+      body[data-active-printer="klipper"] [data-printer-web]:hover {
+        opacity: 0.85;
+      }
+      body[data-active-printer="klipper"] [data-printer-web]::after {
+        content: ' ↗';
+        font-size: 0.8em;
+        opacity: 0.6;
+      }
+    </style>
+
+    <!-- iOS Push → moved to /static/js/modules/ios-push.js -->
+
+    <!-- Filament Drying → moved to /static/js/modules/filament-drying.js -->
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register Service Worker for PWA support
+        // Only register the service worker where the browser calls the origin
+        // secure. A host allowlist stood here and named one installation's
+        // domain -- it shipped that address to every reader and refused the
+        // service worker to LAN users whose browser trusts the app's own CA.
+        if ('serviceWorker' in navigator) {
+            if (window.isSecureContext) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/static/sw.js')
+                        .then(registration => {
+                            console.log('✅ Service Worker registered successfully:', registration.scope);
+                        })
+                        .catch(error => {
+                            console.log('❌ Service Worker registration failed:', error);
+                        });
+                });
+            }
+        }
+
+        // iOS PWA: Handle standalone mode
+        if (window.navigator.standalone) {
+            console.log('📱 Running as iOS PWA in standalone mode');
+        }
+    </script>
+</body>
+</html>

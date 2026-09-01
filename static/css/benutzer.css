@@ -1,0 +1,154 @@
+/* ==========================================================================
+   Benutzer  (21aug26)
+   --------------------------------------------------------------------------
+   Vorher drei gleichrangige Formularkarten nebeneinander (Benutzername,
+   Passwort, Sprache), darunter die Geräte als Kachelraster mit ungleichen
+   Höhen, dann die Benutzerverwaltung und ganz unten „Abmelden" als eigener
+   Abschnitt mit Überschrift — so groß wie die Geräteliste darüber.
+
+   Jetzt: „Mein Konto" mit drei Aufklappern links, Geräte als Zeilenliste
+   rechts, Abmelden im Kopf.
+   ========================================================================== */
+.container { --linie: rgba(0, 0, 0, 0.08); max-width: 1080px; padding-top: 14px; padding-bottom: 90px; }
+[data-theme="dark"] .container, body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
+
+/* ---- Kopf ---- */
+.bn-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
+.bn-kopf-titel {
+    margin: 0; font-size: 17px; font-weight: 650;
+    display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+}
+.bn-kopf-luft { flex: 1; }
+.bn-ich {
+    display: flex; align-items: center; gap: 9px;
+    padding: 4px 12px 4px 5px; border-radius: 999px;
+    border: 1px solid var(--border-color); background: var(--bg-card);
+}
+.bn-ich-kreis {
+    width: 28px; height: 28px; border-radius: 50%; flex: none;
+    background: var(--color-blue); color: #fff;
+    display: grid; place-items: center; font-size: 12px; font-weight: 700;
+}
+.bn-ich-t { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.bn-ich-t b { font-size: 13px; font-weight: 640; color: var(--text-primary); }
+.bn-ich-t span { font-size: 11px; color: var(--text-secondary); }
+
+.bn-btn {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-primary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster); min-height: var(--knopf-hoehe); justify-content: center;
+    font: inherit; font-size: var(--knopf-schrift); font-weight: 600;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.bn-btn:hover { border-color: var(--color-blue); }
+/* Getoenter Grund, blaue Schrift — dieselbe Bauform wie der Hauptknopf
+   in allen Dialogen (.modal-btn-primary) und in der Wartung. */
+.bn-btn--haupt {
+    background: rgba(33, 150, 243, 0.15); border-color: rgba(33, 150, 243, 0.3);
+    color: #1565c0; font-weight: 600;
+}
+.bn-btn--haupt:hover {
+    background: rgba(33, 150, 243, 0.25); border-color: rgba(33, 150, 243, 0.4);
+    color: #1565c0;
+}
+body.dark-mode .bn-btn--haupt {
+    background: rgba(33, 150, 243, 0.3); border-color: rgba(33, 150, 243, 0.4);
+    color: #90caf9;
+}
+body.dark-mode .bn-btn--haupt:hover {
+    background: rgba(33, 150, 243, 0.45); border-color: rgba(33, 150, 243, 0.5);
+    color: #90caf9;
+}
+.bn-btn--weg { background: var(--bg-card); color: var(--color-red); border-color: rgba(229, 83, 75, 0.3); }
+.bn-btn--weg:hover { border-color: var(--color-red); }
+.bn-btn--klein { padding: var(--knopf-polster-klein); font-size: var(--knopf-schrift-klein); }
+
+/* ---- Zwei Spalten ---- */
+.bn-rahmen {
+    display: grid; grid-template-columns: minmax(300px, 1fr) 1.3fr;
+    gap: 12px; align-items: start;
+}
+@media (max-width: 860px) { .bn-rahmen { grid-template-columns: 1fr; } }
+.bn-karte {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px); box-shadow: var(--shadow-card);
+    padding: 13px 14px; margin-bottom: 12px;
+}
+.bn-karte-kopf {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 11px;
+    font-size: 12px; font-weight: 640; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--text-secondary);
+}
+.bn-karte-luft { flex: 1; }
+
+/* ---- Aufklapper ---- */
+.bn-zeile { display: flex; align-items: center; gap: 11px; padding: 10px 2px; cursor: pointer; }
+.bn-zeile + .bn-zeile, .bn-auf + .bn-zeile { border-top: 1px solid var(--linie); }
+.bn-zeile:hover .bn-z-t b { color: var(--color-blue); }
+.bn-z-ic {
+    width: 28px; height: 28px; border-radius: 8px; flex: none;
+    display: grid; place-items: center;
+    background: var(--bg-card-variant); border: 1px solid var(--linie);
+    color: var(--text-secondary);
+}
+.bn-z-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bn-z-t b { font-size: 13.5px; font-weight: 620; color: var(--text-primary); }
+.bn-z-t > span { font-size: 11.5px; color: var(--text-secondary); }
+.bn-z-pfeil { color: var(--text-secondary); transition: transform 0.15s; flex: none; }
+.bn-zeile.bn-auf-an .bn-z-pfeil { transform: rotate(180deg); }
+.bn-auf { display: none; padding: 4px 2px 12px; }
+.bn-zeile.bn-auf-an + .bn-auf { display: block; }
+.bn-feld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 9px; }
+.bn-feld label { font-size: 11.5px; color: var(--text-secondary); margin: 0; }
+.bn-feld input, .bn-feld select {
+    width: 100%; border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-primary); border-radius: 9px; padding: 8px 10px; font: inherit; font-size: 13px;
+}
+.bn-hinweis { font-size: 11.5px; color: var(--text-secondary); margin: 0 0 9px; }
+
+/* ---- Sitzungen und Benutzer als Zeilen ---- */
+.bn-liste { display: flex; flex-direction: column; }
+.bn-sitz {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 2px; border-left: 3px solid transparent;
+}
+.bn-sitz + .bn-sitz { border-top: 1px solid var(--linie); }
+/* Die eigene Sitzung traegt einen Streifen statt eines CURRENT-Chips neben
+   einem ausgegrauten Knopf. */
+.bn-sitz--ich { border-left-color: var(--color-green); padding-left: 8px; }
+.bn-s-ic {
+    width: 32px; height: 32px; border-radius: 9px; flex: none;
+    display: grid; place-items: center;
+    background: var(--bg-card-variant); border: 1px solid var(--linie);
+    color: var(--text-secondary);
+}
+.bn-s-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.bn-s-name {
+    font-weight: 620; font-size: 13.5px; color: var(--text-primary);
+    display: flex; align-items: center; gap: 7px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.bn-s-meta {
+    font-size: 11.5px; color: var(--text-secondary); margin-top: 2px;
+    display: flex; gap: 9px; flex-wrap: wrap;
+}
+.bn-art, .bn-jetzt, .bn-rolle {
+    font-size: 10.5px; font-weight: 640; padding: 1px 7px; border-radius: 999px; flex: none;
+}
+.bn-art { background: rgba(128, 128, 128, 0.14); color: var(--text-secondary); }
+.bn-jetzt { background: rgba(76, 175, 80, 0.14); color: #2e7d32; }
+.bn-rolle--admin { background: rgba(33, 150, 243, 0.14); color: #1565c0; }
+.bn-rolle--user { background: rgba(128, 128, 128, 0.14); color: var(--text-secondary); }
+[data-theme="dark"] .bn-jetzt, body.dark-mode .bn-jetzt { color: #81c784; }
+[data-theme="dark"] .bn-rolle--admin, body.dark-mode .bn-rolle--admin { color: #64b5f6; }
+
+/* Rot war fuenfmal auf einem Bildschirm. Es bleibt dem einen Knopf im Kopf
+   vorbehalten; die Zeilen-Knoepfe faerben sich erst beim Ueberfahren. */
+.bn-s-weg {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-secondary); border-radius: 8px;
+    padding: 5px 11px; font: inherit; font-size: 12px; cursor: pointer; flex: none;
+}
+.bn-s-weg:hover { color: var(--color-red); border-color: rgba(229, 83, 75, 0.4); }
+.bn-s-aktiv { font-size: 11.5px; color: var(--text-secondary); flex: none; padding-right: 4px; }
+.bn-leer { color: var(--text-secondary); font-size: 13px; }

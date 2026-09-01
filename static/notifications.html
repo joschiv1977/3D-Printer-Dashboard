@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Benachrichtigungen - 3D Printer Dashboard</title>
+
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+    <link rel="stylesheet" href="/static/css/benachrichtigungen.css?v=2">
+    <link rel="stylesheet" href="/static/css/meldungen.css">
+
+    <script src="/static/lang/de.js"></script>
+    <script src="/static/lang/en.js"></script>
+    <script src="/static/lang/fr.js"></script>
+    <script src="/static/lang/es.js"></script>
+    <script src="/static/lang/it.js"></script>
+
+</head>
+<body>
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            if (theme === 'dark' || (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <script src="/static/js/modules/icons.js"></script>
+    <script src="/static/js/modules/theme-manager.js"></script>
+    <script src="/static/js/modules/i18n-manager.js"></script>
+    <script src="/static/auth-handler.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
+    <script src="/static/js/modules/benachrichtigungen-liste.js"></script>
+
+    <div class="nb-huelle">
+        <div class="nb-kopf">
+            <h1 class="nb-kopf-titel">
+                <svg class="nb-ic nb-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                <span data-i18n="nb_titel">Benachrichtigungen</span>
+            </h1>
+            <span class="nb-kopf-luft"></span>
+            <button class="nb-btn" onclick="loadNotifications()">
+                <svg class="nb-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                <span data-i18n="refresh">Aktualisieren</span>
+            </button>
+        </div>
+
+        <div class="nb-filter">
+            <button id="filter-all" class="an" onclick="setFilter('all')">
+                <span data-i18n="nb_filter_alle">Alle</span> <b id="zahl-alle"></b>
+            </button>
+            <button id="filter-unread" onclick="setFilter('unread')">
+                <span data-i18n="nb_filter_ungelesen">Ungelesen</span> <b id="zahl-neu"></b>
+            </button>
+        </div>
+
+        <div id="notif-list" class="nb-liste"></div>
+    </div>
+
+    <script>
+        let allNotifications = [];
+        let currentFilter = 'all';
+
+        function t(key, rueckfall) {
+            return (window.texts && window.texts[key]) || rueckfall;
+        }
+
+        async function loadNotifications() {
+            try {
+                const resp = await fetch('/api/notifications/recent?limit=100', {
+                    credentials: 'include'
+                });
+                if (!resp.ok) {
+                    document.getElementById('notif-list').innerHTML =
+                        '<div class="nb-leer">' + escapeHtml(t('nb_fehler', 'Fehler beim Laden')) + '</div>';
+                    return;
+                }
+                const data = await resp.json();
+                allNotifications = data.notifications || [];
+                render();
+            } catch (e) {
+                document.getElementById('notif-list').innerHTML =
+                    '<div class="nb-leer">' + escapeHtml(t('nb_fehler', 'Fehler beim Laden')) + '</div>';
+            }
+        }
+
+        function setFilter(f) {
+            currentFilter = f;
+            document.getElementById('filter-all').classList.toggle('an', f === 'all');
+            document.getElementById('filter-unread').classList.toggle('an', f === 'unread');
+            render();
+        }
+
+        function render() {
+            const list = document.getElementById('notif-list');
+            const ungelesen = allNotifications.filter(n => !window.nbListe.erledigt(n)).length;
+            document.getElementById('zahl-alle').textContent = allNotifications.length || '';
+            document.getElementById('zahl-neu').textContent = ungelesen || '';
+            window.nbListe.zeichne(list, allNotifications, {
+                filter: currentFilter,
+                aufWeg: dismissOne,
+            });
+        }
+
+        async function dismissOne(id) {
+            try {
+                // apiCall setzt automatisch X-CSRF-Token + Cookie-Refresh
+                const call = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
+                await call(`/api/notifications/${encodeURIComponent(id)}/dismiss`, {
+                    method: 'POST'
+                });
+                const n = allNotifications.find(x => x.id === id);
+                if (n) {
+                    n.is_dismissed_here = true;
+                    n.dismissed_by = n.dismissed_by || {};
+                    n.dismissed_by['_self'] = Date.now() / 1000;
+                }
+                render();
+            } catch (e) {
+                console.error('Dismiss failed', e);
+            }
+        }
+
+        function escapeHtml(s) {
+            if (s === undefined || s === null) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        function escapeJs(s) {
+            return String(s).replace(/'/g, "\\'");
+        }
+
+        // WebSocket-Echo: andere Clients haben etwas dismissed
+        try {
+            const socket = io({ transports: ['websocket', 'polling'] });
+            socket.on('notification_dismissed', data => {
+                if (!data || !data.id) return;
+                const n = allNotifications.find(x => x.id === data.id);
+                if (n) {
+                    n.dismissed_by = n.dismissed_by || {};
+                    n.dismissed_by[data.device_id || '_other'] = Date.now() / 1000;
+                    render();
+                }
+            });
+            socket.on('notification_read', data => {
+                if (!data || !data.id) return;
+                const n = allNotifications.find(x => x.id === data.id);
+                if (n) {
+                    n.read_by = n.read_by || {};
+                    n.read_by[data.device_id || '_other'] = Date.now() / 1000;
+                    render();
+                }
+            });
+        } catch (_) {}
+
+        if (window.tabBarManager) window.tabBarManager.render();
+        loadNotifications();
+        setInterval(loadNotifications, 30000);
+    </script>
+    <script src="/static/socket.io.js"></script>
+    <script src="/static/js/modules/hms-severity.js"></script>
+    <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/hms-overlay.js"></script>
+</body>
+</html>

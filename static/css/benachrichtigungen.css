@@ -1,0 +1,122 @@
+/* ==========================================================================
+   Benachrichtigungen  (21aug26)
+   --------------------------------------------------------------------------
+   Vorher: Emoji im Titel, Emoji je Eintrag, jede Meldung in einem eigenen
+   Kasten mit farbigem Balken links. Jetzt dieselbe Bauform wie Historie und
+   Benutzer — eine Karte, Zeilen durch duenne Linien getrennt, Strichsymbole,
+   ungelesen als Punkt vor dem Titel statt als Rahmen.
+   ========================================================================== */
+
+.nb-huelle { max-width: 860px; margin: 0 auto; padding: 16px 20px 90px; }
+
+/* --- Kopfzeile: gleiche Masse wie Historie, Wartung, Slicer, Benutzer --- */
+.nb-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
+.nb-kopf-titel {
+    margin: 0; font-size: 17px; font-weight: 650;
+    display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+}
+.nb-kopf-luft { flex: 1; }
+
+.nb-ic {
+    width: 17px; height: 17px; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto;
+}
+.nb-ic--lg { width: 18px; height: 18px; }
+
+.nb-btn {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-primary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster); min-height: var(--knopf-hoehe);
+    font: inherit; font-size: var(--knopf-schrift); font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px; white-space: nowrap;
+}
+.nb-btn:hover { border-color: var(--color-blue, #2196F3); }
+
+/* --- Filter: zwei Schalter mit Anzahl --- */
+.nb-filter { display: flex; gap: 7px; margin-bottom: 12px; }
+.nb-filter button {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-secondary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster); min-height: var(--knopf-hoehe);
+    font: inherit; font-size: var(--knopf-schrift); font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+}
+.nb-filter button.an {
+    background: rgba(33, 150, 243, 0.12); border-color: rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+}
+body.dark-mode .nb-filter button.an {
+    background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.35); color: #90caf9;
+}
+.nb-filter b { font-weight: 700; }
+
+/* --- Liste: eine Karte, Zeilen durch Linien getrennt --- */
+.nb-liste {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; overflow: hidden;
+}
+.nb-zeile {
+    display: flex; gap: 11px; align-items: flex-start;
+    padding: 11px 13px; border-bottom: 1px solid var(--border-color);
+}
+.nb-liste .nb-zeile:last-child { border-bottom: 0; }
+.nb-zeile:hover { background: var(--bg-hover, rgba(128, 128, 128, 0.05)); }
+
+.nb-zeichen {
+    width: 30px; height: 30px; border-radius: 9px; flex: none;
+    display: grid; place-items: center;
+    background: var(--nb-flaeche, rgba(128, 128, 128, 0.12));
+    color: var(--nb-ton, var(--text-secondary));
+}
+.nb-zeichen svg {
+    width: 16px; height: 16px; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+
+.nb-text { flex: 1; min-width: 0; }
+.nb-titel {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13.5px; font-weight: 640; color: var(--text-primary);
+}
+/* Ungelesen: ein Punkt vor dem Titel. Der Rahmen um die ganze Zeile
+   liess jede Meldung wie eine eigene Karte aussehen. */
+.nb-neu-punkt {
+    width: 7px; height: 7px; border-radius: 50%; flex: none;
+    background: var(--color-blue, #2196F3);
+}
+.nb-satz {
+    font-size: 12.5px; color: var(--text-secondary); margin-top: 2px;
+    white-space: pre-wrap; word-wrap: break-word;
+}
+.nb-fuss {
+    margin-top: 5px; font-size: 11.5px; color: var(--text-secondary);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center; opacity: 0.85;
+}
+.nb-marke {
+    background: var(--bg-card-variant); border: 1px solid var(--border-color);
+    color: var(--text-secondary); padding: 1px 7px; border-radius: 999px; font-size: 10.5px;
+}
+.nb-kanaele { display: inline-flex; gap: 4px; }
+
+.nb-tat { display: flex; align-items: center; gap: 6px; flex: none; }
+.nb-weg {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-secondary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster-klein); font: inherit;
+    font-size: var(--knopf-schrift-klein); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.nb-weg:hover { color: var(--text-primary); border-color: var(--text-secondary); }
+.nb-gelesen { font-size: 11.5px; color: var(--text-secondary); opacity: 0.8; }
+
+.nb-leer {
+    text-align: center; padding: 44px 20px; color: var(--text-secondary);
+    display: flex; flex-direction: column; align-items: center; gap: 9px;
+}
+.nb-leer svg { width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 1.6; opacity: 0.5; }
+
+@media (max-width: 560px) {
+    .nb-huelle { padding: 12px 12px 90px; }
+    .nb-fuss { font-size: 11px; }
+}

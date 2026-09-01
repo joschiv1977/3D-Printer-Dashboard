@@ -1,0 +1,1171 @@
+{
+  "stand": "c3c391af",
+  "anzahl": 188,
+  "zum_ansehen": [
+    {
+      "name": "bidict",
+      "version": "0.23.1",
+      "lizenz": "MPL 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "certifi",
+      "version": "2025.10.5",
+      "lizenz": "MPL-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "chardet",
+      "version": "5.2.0",
+      "lizenz": "LGPL",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "ffmpeg",
+      "version": "8.1",
+      "lizenz": "LGPL (ohne --enable-gpl)",
+      "bereich": "Mitgeliefertes Programm"
+    }
+  ],
+  "server_python": [
+    {
+      "name": "aiodns",
+      "version": "4.0.4",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "aiohappyeyeballs",
+      "version": "2.7.1",
+      "lizenz": "PSF-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "aiohttp",
+      "version": "3.14.3",
+      "lizenz": "Apache-2.0 AND MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "aiosignal",
+      "version": "1.4.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "anyio",
+      "version": "4.11.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "APScheduler",
+      "version": "3.10.4",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "async-timeout",
+      "version": "5.0.1",
+      "lizenz": "Apache 2",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "attrs",
+      "version": "26.1.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "backports.zstd",
+      "version": "1.7.0",
+      "lizenz": "PSF-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "bcrypt",
+      "version": "5.0.0",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "bidict",
+      "version": "0.23.1",
+      "lizenz": "MPL 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "bleach",
+      "version": "6.3.0",
+      "lizenz": "Apache Software License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "blinker",
+      "version": "1.9.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "brotli",
+      "version": "1.2.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "CacheControl",
+      "version": "0.14.3",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "cachetools",
+      "version": "6.2.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "certifi",
+      "version": "2025.10.5",
+      "lizenz": "MPL-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "cffi",
+      "version": "2.0.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "chardet",
+      "version": "5.2.0",
+      "lizenz": "LGPL",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.4.4",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "click",
+      "version": "8.3.0",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "contourpy",
+      "version": "1.3.3",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "cryptography",
+      "version": "46.0.3",
+      "lizenz": "Apache-2.0 OR BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "cycler",
+      "version": "0.12.1",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Cython",
+      "version": "3.3.0",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Deprecated",
+      "version": "1.3.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "firebase-admin",
+      "version": "6.3.0",
+      "lizenz": "Apache License 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Flask",
+      "version": "3.0.0",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "flask-cors",
+      "version": "6.0.1",
+      "lizenz": "unbekannt",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Flask-Limiter",
+      "version": "4.0.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Flask-SocketIO",
+      "version": "5.3.5",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "fonttools",
+      "version": "4.63.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "frozenlist",
+      "version": "1.8.0",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-api-core",
+      "version": "2.28.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-api-python-client",
+      "version": "2.186.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-auth",
+      "version": "2.42.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-auth-httplib2",
+      "version": "0.2.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-cloud-core",
+      "version": "2.5.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-cloud-firestore",
+      "version": "2.21.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-cloud-storage",
+      "version": "3.4.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-crc32c",
+      "version": "1.7.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "google-resumable-media",
+      "version": "2.7.2",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "googleapis-common-protos",
+      "version": "1.71.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "grpcio",
+      "version": "1.76.0",
+      "lizenz": "Apache License 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "grpcio-status",
+      "version": "1.76.0",
+      "lizenz": "Apache License 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "h11",
+      "version": "0.16.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "h2",
+      "version": "4.4.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "hpack",
+      "version": "4.2.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "httpcore",
+      "version": "1.0.9",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "httplib2",
+      "version": "0.31.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "httpx",
+      "version": "0.28.1",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "hyperframe",
+      "version": "6.1.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "idna",
+      "version": "3.11",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "invoke",
+      "version": "2.2.1",
+      "lizenz": "BSD",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "itsdangerous",
+      "version": "2.2.0",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "kiwisolver",
+      "version": "1.5.0",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "limits",
+      "version": "5.6.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.0.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.3",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "matplotlib",
+      "version": "3.9.2",
+      "lizenz": "Python Software Foundation License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "meross_iot",
+      "version": "0.4.10.3",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "msgpack",
+      "version": "1.1.2",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "multidict",
+      "version": "6.7.1",
+      "lizenz": "Apache License 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "numpy",
+      "version": "2.5.2",
+      "lizenz": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "opencv-python",
+      "version": "5.0.0.93",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "ordered-set",
+      "version": "4.1.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "packaging",
+      "version": "25.0",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "paho-mqtt",
+      "version": "2.1.0",
+      "lizenz": "EPL-2.0 OR BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pillow",
+      "version": "12.3.0",
+      "lizenz": "MIT-CMU",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pip",
+      "version": "26.2.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "plyer",
+      "version": "2.1.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "propcache",
+      "version": "0.5.2",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "proto-plus",
+      "version": "1.26.1",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "protobuf",
+      "version": "6.33.0",
+      "lizenz": "3-Clause BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "psutil",
+      "version": "7.2.2",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyasn1",
+      "version": "0.6.1",
+      "lizenz": "BSD-2-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyasn1_modules",
+      "version": "0.4.2",
+      "lizenz": "BSD",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pycares",
+      "version": "5.0.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pycparser",
+      "version": "2.23",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pycryptodomex",
+      "version": "3.23.0",
+      "lizenz": "BSD, Public Domain",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyglet",
+      "version": "1.5.31",
+      "lizenz": "BSD",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Pygments",
+      "version": "2.19.2",
+      "lizenz": "BSD-2-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "PyJWT",
+      "version": "2.10.1",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "PyNaCl",
+      "version": "1.6.0",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyobjc-core",
+      "version": "12.2.2",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyobjc-framework-Cocoa",
+      "version": "12.2.2",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pyparsing",
+      "version": "3.2.5",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "lizenz": "Dual License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.1",
+      "lizenz": "BSD-3-Clause",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "python-engineio",
+      "version": "4.12.3",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "python-socketio",
+      "version": "5.10.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "pytz",
+      "version": "2025.2",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "reportlab",
+      "version": "4.2.5",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "requests",
+      "version": "2.31.0",
+      "lizenz": "Apache 2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "rich",
+      "version": "14.2.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "rsa",
+      "version": "4.9.1",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "rumps",
+      "version": "0.4.0",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "setuptools",
+      "version": "84.0.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "simple-websocket",
+      "version": "1.1.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "six",
+      "version": "1.17.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "sniffio",
+      "version": "1.3.1",
+      "lizenz": "MIT OR Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "trimesh",
+      "version": "4.9.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.15.0",
+      "lizenz": "PSF-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "tzlocal",
+      "version": "5.4.4",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "uritemplate",
+      "version": "4.2.0",
+      "lizenz": "BSD 3-Clause OR Apache-2.0",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "urllib3",
+      "version": "2.5.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "webencodings",
+      "version": "0.5.1",
+      "lizenz": "BSD",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "Werkzeug",
+      "version": "3.1.3",
+      "lizenz": "BSD License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "wheel",
+      "version": "0.48.0",
+      "lizenz": "MIT",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "wrapt",
+      "version": "2.0.0",
+      "lizenz": "unbekannt",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "wsproto",
+      "version": "1.2.0",
+      "lizenz": "MIT License",
+      "bereich": "Server (Python)"
+    },
+    {
+      "name": "yarl",
+      "version": "1.24.5",
+      "lizenz": "Apache-2.0",
+      "bereich": "Server (Python)"
+    }
+  ],
+  "android": [
+    {
+      "name": "androidx.activity:activity-compose",
+      "version": "1.8.2",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.appcompat:appcompat",
+      "version": "1.6.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.camera:camera-camera2",
+      "version": "1.4.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.camera:camera-core",
+      "version": "1.4.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.camera:camera-lifecycle",
+      "version": "1.4.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.camera:camera-view",
+      "version": "1.4.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.compose.material3:material3",
+      "version": "(BOM)",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.compose.material:material-icons-extended",
+      "version": "(BOM)",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.compose.ui:ui",
+      "version": "(BOM)",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.compose.ui:ui-tooling-preview",
+      "version": "(BOM)",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.constraintlayout:constraintlayout",
+      "version": "2.1.4",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.core:core-ktx",
+      "version": "1.12.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.core:core-splashscreen",
+      "version": "1.0.1",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.datastore:datastore-preferences",
+      "version": "1.0.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-process",
+      "version": "2.7.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-runtime-compose",
+      "version": "2.7.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.lifecycle:lifecycle-viewmodel-compose",
+      "version": "2.7.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "androidx.media3:media3-datasource-okhttp",
+      "version": "1.2.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.media3:media3-exoplayer",
+      "version": "1.2.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.media3:media3-ui",
+      "version": "1.2.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.navigation:navigation-compose",
+      "version": "2.7.7",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.security:security-crypto",
+      "version": "1.1.0-alpha06",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "androidx.wear.compose:compose-foundation",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.compose:compose-material",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.compose:compose-navigation",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.protolayout:protolayout",
+      "version": "1.1.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.protolayout:protolayout-expression",
+      "version": "1.1.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.protolayout:protolayout-material",
+      "version": "1.1.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.tiles:tiles",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.tiles:tiles-material",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.watchface:watchface-complications-data-source",
+      "version": "1.2.1",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear.watchface:watchface-complications-data-source-ktx",
+      "version": "1.2.1",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear:wear",
+      "version": "1.3.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "androidx.wear:wear-ongoing",
+      "version": "1.0.0",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "com.github.PhilJay:MPAndroidChart",
+      "version": "v3.1.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.google.android.gms:play-services-base",
+      "version": "18.3.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.google.android.gms:play-services-wearable",
+      "version": "18.1.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "com.google.android.horologist:horologist-compose-layout",
+      "version": "0.5.28",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "com.google.android.horologist:horologist-compose-material",
+      "version": "0.5.28",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "com.google.firebase:firebase-messaging",
+      "version": "23.4.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.google.guava:guava",
+      "version": "32.1.3-android",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "com.google.mlkit:barcode-scanning",
+      "version": "17.3.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.jcraft:jsch",
+      "version": "0.1.55",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.patrykandpatrick.vico:compose",
+      "version": "1.16.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.patrykandpatrick.vico:compose-m3",
+      "version": "1.16.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.patrykandpatrick.vico:core",
+      "version": "1.16.1",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "com.squareup.okhttp3:logging-interceptor",
+      "version": "4.12.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.12.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "com.squareup.retrofit2:converter-gson",
+      "version": "2.9.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "com.squareup.retrofit2:retrofit",
+      "version": "2.9.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "com.wireguard.android:tunnel",
+      "version": "1.0.20260102",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "io.coil-kt:coil-compose",
+      "version": "2.5.0",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "io.github.webrtc-sdk:android",
+      "version": "125.6422.07",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "io.socket:socket.io-client",
+      "version": "2.1.0",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "org.eclipse.paho:org.eclipse.paho.client.mqttv3",
+      "version": "1.2.5",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    },
+    {
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "2.0.21",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-android",
+      "version": "1.8.1",
+      "lizenz": "",
+      "bereich": "Android (app), wear"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-guava",
+      "version": "1.7.3",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-coroutines-play-services",
+      "version": "1.7.3",
+      "lizenz": "",
+      "bereich": "Android (wear)"
+    },
+    {
+      "name": "org.jetbrains.kotlinx:kotlinx-serialization-json",
+      "version": "1.6.2",
+      "lizenz": "",
+      "bereich": "Android (app)"
+    }
+  ],
+  "ios": [
+    {
+      "name": "Charts",
+      "version": "",
+      "lizenz": "",
+      "bereich": "iOS",
+      "quelle": "https://github.com/danielgindi/Charts.git"
+    },
+    {
+      "name": "firebase-ios-sdk",
+      "version": "",
+      "lizenz": "",
+      "bereich": "iOS",
+      "quelle": "https://github.com/firebase/firebase-ios-sdk"
+    },
+    {
+      "name": "socket.io-client-swift",
+      "version": "",
+      "lizenz": "",
+      "bereich": "iOS",
+      "quelle": "https://github.com/socketio/socket.io-client-swift"
+    }
+  ],
+  "electron": [
+    {
+      "name": "@eneris/push-receiver",
+      "version": "4.3.0",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "electron-store",
+      "version": "^8.1.0",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "express",
+      "version": "^4.21.2",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "firebase",
+      "version": "^10.7.1",
+      "lizenz": "Apache-2.0",
+      "bereich": "Electron"
+    },
+    {
+      "name": "meross-cloud",
+      "version": "^3.1.2",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "nunjucks",
+      "version": "^3.2.4",
+      "lizenz": "BSD-2-Clause",
+      "bereich": "Electron"
+    },
+    {
+      "name": "socket.io",
+      "version": "^4.8.1",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "uuid",
+      "version": "^9.0.0",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    },
+    {
+      "name": "ws",
+      "version": "^8.18.0",
+      "lizenz": "MIT",
+      "bereich": "Electron"
+    }
+  ],
+  "programme": [
+    {
+      "name": "ffmpeg",
+      "version": "8.1",
+      "lizenz": "LGPL (ohne --enable-gpl)",
+      "bereich": "Mitgeliefertes Programm"
+    },
+    {
+      "name": "go2rtc",
+      "version": "1.9.14",
+      "lizenz": "MIT",
+      "bereich": "Mitgeliefertes Programm"
+    }
+  ]
+}

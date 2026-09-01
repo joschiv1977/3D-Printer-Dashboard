@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Lizenz</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- The same look as everything else. Until 01sep26 this page carried 420
+         lines of its own CSS with hard-coded gradients and Courier New, and
+         not one house component -- the first screen a new installation shows
+         looked like a different application. Same story as setup.html before
+         31aug26. -->
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=3">
+    <link rel="stylesheet" href="/static/css/base.css?v=3">
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=3">
+    <link rel="stylesheet" href="/static/css/components.css?v=3">
+    <link rel="stylesheet" href="/static/css/einstellungen.css?v=3">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <style>
+        /* Page shell only. Everything inside a card comes from the house
+           stylesheets -- es-karte, es-zeile, es-knopf and friends. */
+        .lz-huelle { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+
+        .lz-kopf { display: flex; align-items: center; justify-content: space-between;
+                   gap: 12px; margin-bottom: 4px; }
+        .lz-kopf h1 { font-size: 22px; margin: 0; }
+        .lz-unterzeile { color: var(--text-secondary); font-size: 13px; margin-bottom: 20px; }
+
+        .lz-hinweis { display: none; border-radius: 8px; padding: 10px 12px;
+                      font-size: 13px; margin-bottom: 16px; }
+        .lz-hinweis.zeig { display: block; }
+        .lz-hinweis.gut  { background: color-mix(in srgb, var(--accent-green) 14%, transparent);
+                           color: var(--accent-green); }
+        .lz-hinweis.fehl { background: color-mix(in srgb, var(--accent-red) 14%, transparent);
+                           color: var(--accent-red); }
+
+        /* The hardware id is read off the screen and typed into an e-mail.
+           Monospace with wide tracking, and it wraps instead of scrolling. */
+        .lz-kennung { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                      font-size: 12px; letter-spacing: .5px; word-break: break-all;
+                      color: var(--text-primary); }
+
+        .lz-datei { display: none; }
+        .lz-fuss { display: flex; gap: 8px; justify-content: flex-end;
+                   flex-wrap: wrap; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="lz-huelle">
+
+    <div class="lz-kopf">
+        <h1 data-i18n="lizenz_titel">Lizenz</h1>
+        <button type="button" class="es-knopf" title="Hell / Dunkel / Automatisch"
+                onclick="window.themeManager && window.themeManager.toggleTheme()">
+            <span id="theme-icon"></span>
+        </button>
+    </div>
+    <div class="lz-unterzeile" data-i18n="lizenz_unterzeile">
+        Der Server braucht eine Lizenz, bevor es weitergeht.
+    </div>
+
+    <div id="hinweis" class="lz-hinweis"></div>
+
+    {% if license_info.valid %}
+    <div class="es-karte">
+        <div class="es-karte-kopf">
+            <i class="fa fa-check-circle"></i>
+            <span data-i18n="lizenz_aktiv">Lizenz aktiv</span>
+        </div>
+        <div class="es-zeile">
+            <div class="es-zeile-name"><span data-i18n="lizenz_typ">Art</span></div>
+            <div class="es-zeile-wert">{{ license_info.license_type }}</div>
+        </div>
+        <div class="es-zeile">
+            <div class="es-zeile-name"><span data-i18n="lizenz_kunde">Kunde</span></div>
+            <div class="es-zeile-wert">{{ license_info.customer_name }}</div>
+        </div>
+        <div class="es-zeile">
+            <div class="es-zeile-name"><span data-i18n="lizenz_gueltig">Gültig</span></div>
+            <div class="es-zeile-wert">
+                {% if license_info.days_remaining != None %}
+                    {{ license_info.days_remaining }} <span data-i18n="lizenz_tage">Tage</span>
+                {% else %}
+                    <span data-i18n="lizenz_unbegrenzt">Unbegrenzt</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="lz-fuss">
+        <button type="button" class="es-knopf" onclick="lizenzLoesen()"
+                data-i18n="lizenz_loesen">Lizenz lösen</button>
+        <a href="/" class="es-knopf es-knopf--haupt"
+           data-i18n="lizenz_weiter">Weiter zum Dashboard</a>
+    </div>
+
+    {% else %}
+    <div class="es-karte">
+        <div class="es-karte-kopf">
+            <i class="fa fa-key"></i>
+            <span data-i18n="lizenz_eingeben">Lizenzschlüssel eingeben</span>
+        </div>
+
+        <form id="lizenz-form" onsubmit="lizenzAktivieren(event)">
+            <div class="es-zeile">
+                <div class="es-zeile-name">
+                    <label for="lizenz-schluessel" data-i18n="lizenz_schluessel">Schlüssel</label>
+                    <span data-i18n="lizenz_schluessel_hinweis">Steht in der E-Mail zum Kauf</span>
+                </div>
+                <div class="es-zeile-wert">
+                    <input type="text" id="lizenz-schluessel" class="es-breit es-feld--code"
+                           placeholder="XXXXX-XXXXX-XXXXX-XXXXX"
+                           autocomplete="off" autocapitalize="characters"
+                           spellcheck="false" required>
+                </div>
+            </div>
+
+            <div class="es-zeile">
+                <div class="es-zeile-name">
+                    <span data-i18n="lizenz_datei">Oder eine Lizenzdatei</span>
+                    <span data-i18n="lizenz_datei_hinweis">license.json, falls du eine bekommen hast</span>
+                </div>
+                <div class="es-zeile-wert">
+                    <input type="file" id="lizenz-datei" class="lz-datei" accept=".json"
+                           onchange="lizenzDatei(event)">
+                    <button type="button" class="es-knopf"
+                            onclick="document.getElementById('lizenz-datei').click()"
+                            data-i18n="lizenz_datei_waehlen">Datei wählen</button>
+                </div>
+            </div>
+
+            <div class="lz-fuss">
+                <button type="submit" class="es-knopf es-knopf--haupt" id="lizenz-knopf"
+                        data-i18n="lizenz_aktivieren">Aktivieren</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="es-karte">
+        <div class="es-karte-kopf">
+            <i class="fa fa-fingerprint"></i>
+            <span data-i18n="lizenz_kennung">Hardware-Kennung dieses Rechners</span>
+        </div>
+        <div class="es-zeile">
+            <div class="es-zeile-name">
+                <span data-i18n="lizenz_kennung_hinweis">Die brauchst du beim Anfordern einer Lizenz</span>
+            </div>
+            <div class="es-zeile-wert">
+                <div class="lz-kennung" id="lizenz-kennung">…</div>
+            </div>
+        </div>
+        <div class="lz-fuss">
+            <button type="button" class="es-knopf" onclick="kennungKopieren()"
+                    data-i18n="lizenz_kopieren">Kopieren</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Dieselbe Themenverwaltung wie ueberall, und am ENDE geladen: ihr
+     Konstruktor greift auf #theme-icon zu und wirft, wenn das Element noch
+     nicht steht (31aug26 auf setup.html genau so gemessen). -->
+<script src="/static/js/modules/icons.js"></script>
+<script src="/static/js/modules/theme-manager.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// Sprache
+// ─────────────────────────────────────────────────────────────────────
+let texte = {};
+const sprache = localStorage.getItem('language') || 'de';
+
+function t(schluessel, ersatz) {
+    return texte[schluessel] || ersatz || schluessel;
+}
+
+function texteSetzen() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        const wert = texte[el.getAttribute('data-i18n')];
+        if (wert) el.textContent = wert;
+    });
+}
+
+(function ladeSprache() {
+    const s = document.createElement('script');
+    s.src = '/static/lang/' + sprache + '.js';
+    s.onload = function () {
+        texte = window['translations_' + sprache]
+             || window.translations_en || window.translations_de || {};
+        texteSetzen();
+    };
+    // Faellt die Datei aus, bleiben die deutschen Vorgaben im HTML stehen.
+    s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
+    document.head.appendChild(s);
+})();
+
+function melde(text, art) {
+    const el = document.getElementById('hinweis');
+    el.textContent = text;
+    el.className = 'lz-hinweis zeig ' + (art || 'gut');
+    if (art === 'gut') setTimeout(function () { el.className = 'lz-hinweis'; }, 4000);
+}
+
+function arbeitet(knopf, ja, ruhe) {
+    if (!knopf) return;
+    knopf.disabled = ja;
+    knopf.textContent = ja ? t('lizenz_arbeitet', 'Einen Moment …') : ruhe;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Hardware-Kennung
+// ─────────────────────────────────────────────────────────────────────
+let kennungWert = '';
+
+(async function kennungLaden() {
+    const feld = document.getElementById('lizenz-kennung');
+    try {
+        const a = await fetch('/license/api/hardware-id');
+        const d = await a.json();
+        // Der Server nennt sie je nach Plattform verschieden -- auf macOS
+        // fuehrt sie der Swift-Launcher und Python meldet 'managed_by_app'.
+        kennungWert = d.hardware_id || d.hardwareId || '';
+        feld.textContent = kennungWert || t('lizenz_kennung_fehlt', 'nicht ermittelbar');
+    } catch (e) {
+        feld.textContent = t('lizenz_kennung_fehlt', 'nicht ermittelbar');
+    }
+})();
+
+async function kennungKopieren() {
+    if (!kennungWert) return;
+    try {
+        await navigator.clipboard.writeText(kennungWert);
+        melde(t('lizenz_kopiert', 'Kennung kopiert.'), 'gut');
+    } catch (e) {
+        // Ohne Zwischenablage -- etwa ueber http statt https -- markieren wir
+        // sie wenigstens, dann reicht Strg+C.
+        const bereich = document.createRange();
+        bereich.selectNodeContents(document.getElementById('lizenz-kennung'));
+        const wahl = window.getSelection();
+        wahl.removeAllRanges();
+        wahl.addRange(bereich);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Aktivieren
+// ─────────────────────────────────────────────────────────────────────
+async function lizenzAktivieren(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('lizenz-knopf');
+    const ruhe = knopf.textContent;
+    const schluessel = document.getElementById('lizenz-schluessel').value.trim().toUpperCase();
+    if (!schluessel) {
+        melde(t('lizenz_leer', 'Bitte einen Schlüssel eingeben.'), 'fehl');
+        return;
+    }
+    arbeitet(knopf, true, ruhe);
+    try {
+        const a = await fetch('/license/api/activate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ license_key: schluessel })
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok || !d.success) {
+            throw new Error(d.message || d.error || t('lizenz_fehl', 'Aktivierung abgelehnt.'));
+        }
+        melde(t('lizenz_gut', 'Lizenz aktiviert.'), 'gut');
+        setTimeout(function () { window.location.reload(); }, 1200);
+    } catch (err) {
+        melde(err.message, 'fehl');
+        arbeitet(knopf, false, ruhe);
+    }
+}
+
+async function lizenzDatei(e) {
+    const datei = e.target.files && e.target.files[0];
+    if (!datei) return;
+    const daten = new FormData();
+    daten.append('file', datei);
+    try {
+        const a = await fetch('/license/api/upload', {
+            method: 'POST', credentials: 'include', body: daten
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok || !d.success) {
+            throw new Error(d.message || d.error || t('lizenz_fehl', 'Aktivierung abgelehnt.'));
+        }
+        melde(t('lizenz_gut', 'Lizenz aktiviert.'), 'gut');
+        setTimeout(function () { window.location.reload(); }, 1200);
+    } catch (err) {
+        melde(err.message, 'fehl');
+    } finally {
+        // Zuruecksetzen, sonst loest dieselbe Datei kein change mehr aus.
+        e.target.value = '';
+    }
+}
+
+async function lizenzLoesen() {
+    if (!window.confirm(t('lizenz_loesen_frage',
+        'Die Lizenz von diesem Rechner lösen? Danach läuft der Server nicht mehr, bis eine neue aktiviert ist.'))) {
+        return;
+    }
+    try {
+        const a = await fetch('/license/api/deactivate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok || !d.success) {
+            throw new Error(d.message || d.error || t('lizenz_fehl', 'Fehlgeschlagen.'));
+        }
+        window.location.reload();
+    } catch (err) {
+        melde(err.message, 'fehl');
+    }
+}
+</script>
+</body>
+</html>

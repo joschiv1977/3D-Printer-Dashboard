@@ -1,0 +1,20 @@
+{
+    "type": "filament",
+    "filament_flow_ratio": [
+        "0.76"
+    ],
+    "filament_max_volumetric_speed": [
+        "16"
+    ],
+    "filament_settings_id": [
+        "Bambu PETG-CF Flow Rate Calibrated"
+    ],
+    "from": "User",
+    "inherits": "Bambu PETG-CF @BBL X1C",
+    "is_custom_defined": "0",
+    "name": "Bambu PETG-CF Flow Rate Calibrated",
+    "slow_down_layer_time": [
+        "0"
+    ],
+    "version": "2.2.0.3"
+}

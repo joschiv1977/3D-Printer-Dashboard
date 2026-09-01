@@ -1,0 +1,69 @@
+/**
+ * Shared Styles - Gemeinsame CSS-Variablen und Komponenten
+ * Wird von allen Seiten genutzt
+ * Note: design-tokens.css overrides these variables on pages that import it
+ */
+
+/* CSS Variablen für Themes (legacy - kept for sub-page compatibility) */
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-section: #f9f9f9;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #e0e0e0;
+    --shadow: rgba(0,0,0,0.1);
+    --info-bg: #e8f4ff;
+    --input-bg: #ffffff;
+    --input-border: #ddd;
+    --accent-blue: #667eea;
+    --accent-green: #4caf50;
+    --accent-red: #dc3545;
+    --accent-orange: #ff9800;
+}
+
+body.dark-mode {
+    --bg-primary: #0f1419;
+    --bg-secondary: #1a1f2e;
+    --bg-card: #1a1f2e;
+    --bg-section: #252b3b;
+    --text-primary: #e8eaed;
+    --text-secondary: #b8bcc8;
+    --border-color: #2c3340;
+    --shadow: rgba(0,0,0,0.3);
+    --info-bg: #1a2633;
+    --input-bg: #1a1f2e;
+    --input-border: #3a4151;
+}
+
+.sidebar {
+    display: none !important;
+}
+
+.web-toast.hide {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.95);
+}
+
+/* Toast in Modals */
+.modal .web-toast {
+    position: absolute;
+    bottom: 50px;
+    z-index: 999999;
+}
+
+/* Mobile Anpassungen */
+@media (max-width: 768px) {
+    .web-toast {
+        bottom: 90px; /* Above floating tab bar */
+        max-width: 85%;
+        font-size: 13px;
+        padding: 10px 20px;
+    }
+}

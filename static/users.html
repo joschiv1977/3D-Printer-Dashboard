@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Benutzer - 3D Printer Dashboard</title>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+    <link rel="stylesheet" href="/static/css/components.css?v=2">
+    <link rel="stylesheet" href="/static/css/sd-card.css?v=4">
+    <link rel="stylesheet" href="/static/css/benutzer.css?v=1">
+    <link rel="stylesheet" href="/static/css/meldungen.css">
+
+    <!-- Sprachdateien laden -->
+    <script src="/static/lang/de.js"></script>
+    <script src="/static/lang/en.js"></script>
+    <script src="/static/lang/fr.js"></script>
+    <script src="/static/lang/es.js"></script>
+    <script src="/static/lang/it.js"></script>
+
+    <style>
+        /* Die Optik der Seite steckt in benutzer.css. Hier bleibt nur, was
+           die geteilten Bausteine (Alerts, Formulare) noch brauchen — das
+           alte Kachelraster fuer #devicesList und die drei .section-Karten
+           sind ersatzlos weg. */
+        .alert {
+            display: none;
+            padding: 11px 13px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            border-left: 3px solid var(--strich);
+            background: var(--bg-card);
+        }
+        .alert.show { display: block; }
+        .alert-success { --strich: var(--color-green); }
+        .alert-error   { --strich: var(--color-red); }
+
+        .loading {
+            display: inline-block;
+            width: 15px; height: 15px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--color-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: -2px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+    <script>
+        // Hide header if embedded in iframe
+        if (window.location.search.includes('embedded=true')) {
+            document.addEventListener('DOMContentLoaded', function() {
+                const header = document.querySelector('.header');
+                if (header) header.style.display = 'none';
+                const container = document.querySelector('.container');
+                if (container) container.style.padding = '0';
+                const content = document.querySelector('.content');
+                if (content) {
+                    content.style.borderRadius = '0';
+                    content.style.padding = '20px';
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Apply dark mode immediately to prevent white flash -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <!-- Shared Module Scripts -->
+    <script src="/static/js/modules/icons.js"></script>
+    <script src="/static/js/modules/theme-manager.js"></script>
+    <script src="/static/js/modules/i18n-manager.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
+
+    <div class="container">
+        <!-- Kopf: eine Zeile. Der Benutzer steht als Chip rechts, "Abmelden"
+             daneben — vorher war das ein eigener Abschnitt mit Ueberschrift
+             ganz unten, so gross wie die Geraeteliste darueber. -->
+        <div class="bn-kopf">
+            <h1 class="bn-kopf-titel">
+                <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+                <span id="header-title">Benutzer</span>
+            </h1>
+            <span class="bn-kopf-luft"></span>
+            <span class="bn-ich">
+                <span class="bn-ich-kreis" id="bn-initialen">–</span>
+                <span class="bn-ich-t">
+                    <b id="username">–</b>
+                    <span id="role">–</span>
+                </span>
+            </span>
+            <button class="bn-btn bn-btn--weg" onclick="logout()" id="logout-btn">
+                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
+                <span id="logout-text">Abmelden</span>
+            </button>
+        </div>
+
+        <div id="successAlert" class="alert alert-success"></div>
+        <div id="errorAlert" class="alert alert-error"></div>
+
+        <div class="bn-rahmen">
+            <div>
+                <!-- Benutzername, Passwort und Sprache sind Einstellungen, die
+                     man selten anfasst — als Aufklapper in einer Karte statt
+                     drei nebeneinanderstehender Formulare, von denen das
+                     dritte halb leer war. -->
+                <div class="bn-karte">
+                    <div class="bn-karte-kopf">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
+                        <span id="bn-konto-titel">Mein Konto</span>
+                    </div>
+
+                    <div class="bn-zeile" onclick="bnKlapp(this)">
+                        <span class="bn-z-ic"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg></span>
+                        <span class="bn-z-t"><b id="bn-l-benutzername">Benutzername</b><span id="bn-aktueller-name">–</span></span>
+                        <svg class="hd-ic hd-ic--xs bn-z-pfeil" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="bn-auf">
+                        <form id="usernameForm">
+                            <div class="bn-feld">
+                                <label for="newUsername" id="new-username-label">Neuer Benutzername</label>
+                                <input type="text" id="newUsername" minlength="3" required>
+                            </div>
+                            <div class="bn-feld">
+                                <label for="currentPasswordForUname" id="current-password-confirm-label">Aktuelles Passwort zur Bestätigung</label>
+                                <input type="password" id="currentPasswordForUname" required>
+                            </div>
+                            <button type="submit" class="bn-btn bn-btn--haupt bn-btn--klein" id="save-username-btn">Benutzernamen speichern</button>
+                        </form>
+                    </div>
+
+                    <div class="bn-zeile" onclick="bnKlapp(this)">
+                        <span class="bn-z-ic"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3"/></svg></span>
+                        <span class="bn-z-t"><b id="bn-l-passwort">Passwort</b><span id="bn-passwort-hinweis">mindestens 8 Zeichen</span></span>
+                        <svg class="hd-ic hd-ic--xs bn-z-pfeil" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="bn-auf">
+                        <form id="passwordForm">
+                            <div class="bn-feld">
+                                <label for="oldPassword" id="old-password-label">Aktuelles Passwort</label>
+                                <input type="password" id="oldPassword" required>
+                            </div>
+                            <div class="bn-feld">
+                                <label for="newPassword" id="new-password-label">Neues Passwort</label>
+                                <input type="password" id="newPassword" minlength="8" required>
+                            </div>
+                            <div class="bn-feld">
+                                <label for="confirmPassword" id="confirm-password-label">Neues Passwort wiederholen</label>
+                                <input type="password" id="confirmPassword" minlength="8" required>
+                            </div>
+                            <button type="submit" class="bn-btn bn-btn--haupt bn-btn--klein" id="save-password-btn">Passwort speichern</button>
+                        </form>
+                    </div>
+
+                    <div class="bn-zeile" onclick="bnKlapp(this)">
+                        <span class="bn-z-ic"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15 0 18M12 3c-2.5 2.7-2.5 15 0 18"/></svg></span>
+                        <span class="bn-z-t"><b id="language-title">Sprache</b><span id="bn-sprache-aktuell">–</span></span>
+                        <svg class="hd-ic hd-ic--xs bn-z-pfeil" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="bn-auf">
+                        <form id="languageForm">
+                            <div class="bn-feld">
+                                <label for="bn-sprache" id="language-label">App-Sprache</label>
+                                <input type="hidden" id="languageSelect" value="de">
+                                <select id="bn-sprache" onchange="selectLang(this.value)">
+                                    <option value="de">Deutsch</option>
+                                    <option value="en">English</option>
+                                    <option value="fr">Français</option>
+                                    <option value="es">Español</option>
+                                    <option value="it">Italiano</option>
+                                </select>
+                            </div>
+                            <p class="bn-hinweis" id="language-description">Gilt auch für Push-Nachrichten.</p>
+                            <button type="submit" class="bn-btn bn-btn--haupt bn-btn--klein" id="save-language-btn">Sprache speichern</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Nur fuer Administratoren -->
+                <div class="bn-karte" id="user-management-section" style="display:none;">
+                    <div class="bn-karte-kopf">
+                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5"/><path d="M17 11h5M19.5 8.5v5"/></svg>
+                        <span id="user-management-title">Benutzerverwaltung</span>
+                    </div>
+                    <div class="bn-liste" id="usersList">
+                        <div class="loading"></div> <span id="loading-users-text">Lade Benutzer...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bn-karte">
+                <div class="bn-karte-kopf">
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="14" height="10" rx="2"/><path d="M2 18h20"/><rect x="17" y="8" width="5" height="9" rx="1"/></svg>
+                    <span id="devices-sessions-title">Angemeldete Geräte</span>
+                    <span class="bn-karte-luft"></span>
+                    <!-- Fuenf Sitzungen einzeln wegzuklicken ist genau der Fall,
+                         den man will, wenn ein Geraet verloren ging. -->
+                    <button class="bn-btn bn-btn--klein bn-btn--weg" id="bn-alle-weg"
+                            onclick="alleAnderenAbmelden()" style="display:none;">
+                        <span id="bn-alle-weg-text">Alle anderen abmelden</span>
+                    </button>
+                </div>
+                <div class="bn-liste" id="devicesList">
+                    <div class="loading"></div> <span id="loading-text">Lade...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/auth-handler.js"></script>
+    <script src="/static/js/modules/confirm-dialog.js"></script>
+    <script>
+        // Get translations from i18nManager
+        function getTexts() {
+            return window.i18nManager ? window.i18nManager.getAllTexts() : {};
+        }
+
+        // Get current language
+        const currentLang = window.i18nManager ? window.i18nManager.getCurrentLang() : 'de';
+
+        // Apply translations when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Render sidebar using shared module
+            if (window.tabBarManager) {
+                window.tabBarManager.render();
+            }
+
+            updateTexts();
+        });
+
+        // Aufklapper in „Mein Konto".
+        function bnKlapp(el) { el.classList.toggle('bn-auf-an'); }
+
+        function updateTexts() {
+            const texts = getTexts();
+
+            // Helper function to safely update element
+            const updateEl = (id, text) => {
+                const el = document.getElementById(id);
+                if (el && text) el.textContent = text;
+            };
+
+            // Update all static texts
+            updateEl('page-title', texts.users_page_title);
+            updateEl('header-title', texts.users_settings);
+            updateEl('sidebar-title', texts.users_settings);
+            updateEl('logout-text', texts.users_logout_this_device || texts.users_logout);
+
+            // Sidebar Menu
+            const sidebarItems = document.querySelectorAll('.sidebar-item span[data-i18n]');
+            sidebarItems.forEach(item => {
+                const key = item.getAttribute('data-i18n');
+                if (key && texts[key]) {
+                    item.textContent = texts[key];
+                }
+            });
+
+            // Mein Konto
+            updateEl('bn-konto-titel', texts.users_my_account);
+            updateEl('bn-l-benutzername', texts.users_username_label);
+            updateEl('bn-l-passwort', texts.users_password_label);
+            updateEl('bn-passwort-hinweis', texts.users_password_hint);
+            updateEl('bn-alle-weg-text', texts.users_logout_all_others);
+            updateEl('new-username-label', texts.users_new_username);
+            updateEl('current-password-confirm-label', texts.users_current_password_confirm);
+            updateEl('save-username-btn', texts.users_save_username);
+
+            // Change Password Section
+            updateEl('change-password-title', texts.users_change_password);
+            updateEl('old-password-label', texts.users_current_password);
+            updateEl('new-password-label', texts.users_new_password);
+            updateEl('confirm-password-label', texts.users_confirm_password);
+            updateEl('save-password-btn', texts.users_save_password);
+
+            // Language Section
+            updateEl('language-title', texts.users_language_title);
+            updateEl('language-description', texts.users_language_description);
+            updateEl('language-label', texts.users_language_label);
+            updateEl('language-german-option', texts.users_language_german);
+            updateEl('language-english-option', texts.users_language_english);
+            updateEl('language-french-option', texts.users_language_french);
+            updateEl('language-spanish-option', texts.users_language_spanish);
+            updateEl('language-italian-option', texts.users_language_italian);
+            updateEl('save-language-btn', texts.users_save_language);
+
+            // Devices & Sessions Section
+            updateEl('devices-sessions-title', texts.users_devices_sessions);
+            updateEl('loading-text', texts.users_loading);
+
+            // User Management Section
+            updateEl('user-management-title', texts.user_management_title);
+            updateEl('user-management-description', texts.user_management_description);
+            updateEl('loading-users-text', texts.users_loading_users);
+
+            const usernameEl = document.getElementById('username');
+            const roleEl = document.getElementById('role');
+            if (usernameEl && usernameEl.textContent === '–') usernameEl.textContent = texts.users_unknown || '?';
+            if (roleEl && roleEl.textContent === '–') roleEl.textContent = texts.users_unknown || '?';
+
+            // Load devices/sessions after translations are ready
+            loadDevicesAndSessions();
+        }
+
+        const texts = getTexts();
+        const bnName = localStorage.getItem('username') || texts.users_unknown || '?';
+        const bnRolle = localStorage.getItem('role') || '';
+        document.getElementById('username').textContent = bnName;
+        // Rolle im Klartext statt "admin" — die Kopfzeile ist keine Datenbank.
+        document.getElementById('role').textContent = bnRolle === 'admin'
+            ? (texts.users_role_admin || 'Administrator')
+            : (texts.users_role_user || 'Benutzer');
+        document.getElementById('bn-initialen').textContent =
+            bnName.replace(/[^\p{L}\p{N}]/gu, '').slice(0, 2).toUpperCase() || '?';
+        document.getElementById('bn-aktueller-name').textContent = bnName;
+
+        // Benutzerverwaltung nur für Admins anzeigen
+        const currentRole = localStorage.getItem('role');
+        if (currentRole === 'admin') {
+            document.getElementById('user-management-section').style.display = 'block';
+            loadAllUsers();
+        }
+
+        // NEU: Handler für Benutzernamen-Änderung
+        document.getElementById('usernameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUsername = document.getElementById('newUsername').value;
+            const password = document.getElementById('currentPasswordForUname').value;
+
+            if (newUsername.length < 3) {
+                return showError(texts.users_username_min_length);
+            }
+
+            try {
+                const response = await apiCall('/api/auth/change-username', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ new_username: newUsername, password: password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showSuccess(texts.users_username_changed);
+                    setTimeout(() => authHandler.logout(), 3000);
+                } else {
+                    showError(data.error || texts.users_error_change_username);
+                }
+            } catch (error) {
+                showError(texts.users_network_error);
+            }
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) return showError(texts.users_passwords_no_match);
+
+            try {
+                const response = await apiCall('/api/auth/change-password', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ old_password: oldPassword, new_password: newPassword })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    showSuccess(texts.users_password_changed);
+                    setTimeout(() => authHandler.logout(), 2000);
+                } else {
+                    showError(data.error || texts.users_error_change_password);
+                }
+            } catch (error) {
+                showError(texts.users_network_error);
+            }
+        });
+
+        async function loadDevicesAndSessions() {
+            const listContainer = document.getElementById('devicesList');
+            const loadingText = texts.users_loading_devices || 'Loading devices and sessions...';
+            listContainer.innerHTML = `<div class="loading"></div> ${loadingText}`;
+            try {
+                // Nur /api/auth/sessions nutzen - enthält bereits alle Sessions!
+                const sessionsRes = await apiCall('/api/auth/sessions');
+
+                if (sessionsRes.status === 401) return authHandler.redirectToLogin();
+
+                const allSessions = sessionsRes.ok ? await sessionsRes.json() : [];
+
+                // ID für jeden Eintrag setzen
+                allSessions.forEach(s => {
+                    s.id = s.session_id || s.device_id;
+                });
+
+                // KEINE Deduplizierung mehr — Admin sieht jede Session wie
+                // sie gespeichert ist, konsistent zur macOS-Server-App.
+                // Wenn ein Electron-Client zusätzlich eine Web-Session hat
+                // (z.B. frische Registrierung vor Device-Token-Issue),
+                // werden beide gezeigt damit der Admin sie einzeln
+                // ausloggen kann.
+                allSessions.sort((a, b) => new Date(b.last_used) - new Date(a.last_used));
+                window._bnEintraege = allSessions;
+                displayEntries(allSessions);
+            } catch (error) {
+                console.error('loadDevicesAndSessions error:', error);
+                const errorText = texts.users_error_loading_list || 'Error loading list.';
+                listContainer.innerHTML = `<p style="color: #999;">${errorText}</p>`;
+            }
+        }
+
+        // Linien-Icons statt Emoji, die je nach System anders aussehen.
+        const BN_ICONS = {
+            desktop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+            laptop:  '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
+            handy:   '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+            tablet:  '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/>',
+            web:     '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15 0 18M12 3c-2.5 2.7-2.5 15 0 18"/>',
+            person:  '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>'
+        };
+        const bnIcon = (art) =>
+            `<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true">${BN_ICONS[art] || BN_ICONS.web}</svg>`;
+
+        function getEntryIcon(entry) {
+            const { type, device_type, device_name, device_model } = entry;
+            const text = ((device_name || '') + ' ' + (device_model || '')).toLowerCase();
+            if (type === 'web') return bnIcon('web');
+            if (device_type === 'android' || device_type === 'ios') {
+                return bnIcon(/tab|pad/.test(text) ? 'tablet' : 'handy');
+            }
+            if (/macbook|laptop|notebook/.test(text)) return bnIcon('laptop');
+            if (/mac mini|imac|studio|win|desktop|pc/.test(text)) return bnIcon('desktop');
+            return bnIcon('desktop');
+        }
+
+        /**
+         * "vor 2 Minuten" statt "21.8.2026, 11:20:19". Wer eine Sitzung
+         * beendet, will wissen wie lange sie her ist — nicht die Sekunde. Der
+         * genaue Zeitpunkt steht im Tooltip. Ausserdem stand vor dem
+         * Zeitstempel das englische "Last active:".
+         */
+        function bnHer(datum) {
+            const t = new Date(datum).getTime();
+            if (isNaN(t)) return '';
+            const min = Math.max(0, Math.round((Date.now() - t) / 60000));
+            const T = texts;
+            if (min < 1) return T.users_just_now || 'gerade eben';
+            if (min < 60) return (T.users_minutes_ago || 'vor {n} Minuten').replace('{n}', min);
+            if (min < 1440) {
+                const h = Math.floor(min / 60);
+                return h === 1 ? (T.users_hour_ago || 'vor einer Stunde')
+                               : (T.users_hours_ago || 'vor {n} Stunden').replace('{n}', h);
+            }
+            const d = Math.floor(min / 1440);
+            return d === 1 ? (T.users_yesterday || 'gestern')
+                           : (T.users_days_ago || 'vor {n} Tagen').replace('{n}', d);
+        }
+        function bnGenau(datum) {
+            const d = new Date(datum);
+            return isNaN(d) ? '' : d.toLocaleString(undefined,
+                { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        function displayEntries(entries) {
+            const container = document.getElementById('devicesList');
+            const alleWeg = document.getElementById('bn-alle-weg');
+            if (!entries || entries.length === 0) {
+                container.innerHTML = `<p class="bn-leer">${
+                    texts.users_no_devices_found || 'Keine angemeldeten Geräte.'}</p>`;
+                if (alleWeg) alleWeg.style.display = 'none';
+                return;
+            }
+
+            const escJsStr = (v) => String(v).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+            const escAttr = (v) => String(v)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+            const escHtml = (v) => String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            // Eigene Sitzung nach oben, der Rest nach letzter Aktivitaet.
+            const sortiert = entries.slice().sort((a, b) => {
+                if (a.is_current !== b.is_current) return a.is_current ? -1 : 1;
+                return new Date(b.last_used || b.last_activity || 0) - new Date(a.last_used || a.last_activity || 0);
+            });
+
+            if (alleWeg) alleWeg.style.display = sortiert.length > 1 ? 'inline-flex' : 'none';
+
+            container.innerHTML = sortiert.map(entry => {
+                const { type, device_name, device_model, last_used, last_activity,
+                        is_current, id, session_id, device_id, app_version, device_type } = entry;
+
+                // "Electron App auf macOS" und "Mac mini (M4, 2024)" waren
+                // dieselbe App auf demselben System, nur unterschiedlich
+                // benannt: der Modellname gewinnt, die Plattform steht als
+                // Chip daneben. Nur wenn Electron ein generisches
+                // "darwin-arm64" schickt, ist der Hostname aussagekraeftiger.
+                const generisch = device_model && /^(darwin|win32|linux)-(arm64|x64|ia32)$/i.test(device_model);
+                const name = type === 'web'
+                    ? (device_name || device_model || '?')
+                    : (generisch ? (device_name || device_model || '?')
+                                 : (device_model || device_name || '?'));
+
+                const artNamen = { web: 'Web', electron: 'Electron', ios: 'iOS',
+                                   ipados: 'iPadOS', macos: 'macOS', android: 'Android' };
+                const artKey = device_type || (type === 'web' ? 'web' : 'unknown');
+                const art = artNamen[artKey] || artKey.toUpperCase();
+
+                const kennung = id || session_id || device_id;
+                const aktion = type === 'web'
+                    ? `revokeSession('${escJsStr(kennung)}', '${escJsStr(name)}')`
+                    : `revokeDevice('${escJsStr(kennung)}', '${escJsStr(name)}')`;
+
+                const wann = last_used || last_activity;
+
+                return `
+                    <div class="bn-sitz${is_current ? ' bn-sitz--ich' : ''}">
+                        <span class="bn-s-ic">${getEntryIcon(entry)}</span>
+                        <span class="bn-s-t">
+                            <span class="bn-s-name">${escHtml(name)}
+                                <span class="bn-art">${escHtml(art)}</span>
+                                ${is_current ? `<span class="bn-jetzt">${
+                                    escHtml(texts.users_this_device || 'Dieses Gerät')}</span>` : ''}</span>
+                            <span class="bn-s-meta">
+                                <span title="${escAttr(bnGenau(wann))}">${escHtml(bnHer(wann))}</span>
+                                ${app_version ? `<span>${escHtml(texts.users_version || 'Version')} ${escHtml(app_version)}</span>` : ''}
+                            </span>
+                        </span>
+                        ${is_current
+                            ? `<span class="bn-s-aktiv">${escHtml(texts.users_active || 'aktiv')}</span>`
+                            : `<button class="bn-s-weg" onclick="${escAttr(aktion)}">${
+                                escHtml(texts.users_logout_button || 'Abmelden')}</button>`}
+                    </div>`;
+            }).join('');
+        }
+
+        // Fuenf Sitzungen einzeln wegzuklicken ist genau der Fall, den man
+        // will, wenn ein Geraet verloren ging.
+        async function alleAnderenAbmelden() {
+            const frage = texts.users_confirm_logout_all
+                || 'Alle anderen Geräte und Sitzungen abmelden?';
+            const ok = await showConfirmDialog(frage, texts.users_logout_all_others || 'Alle anderen abmelden');
+            if (!ok) return;
+            const alle = (window._bnEintraege || []).filter(e => !e.is_current);
+            let fehler = 0;
+            for (const e of alle) {
+                const kennung = e.id || e.session_id || e.device_id;
+                const pfad = e.type === 'web'
+                    ? `/api/auth/session/${kennung}` : `/api/auth/device/${kennung}`;
+                try {
+                    const r = await apiCall(pfad, { method: 'DELETE' });
+                    if (!r.ok) fehler++;
+                } catch (_) { fehler++; }
+            }
+            if (fehler) showError((texts.users_logout_all_partial
+                || '{n} Geräte konnten nicht abgemeldet werden.').replace('{n}', fehler));
+            else showSuccess(texts.users_logout_all_done || 'Alle anderen Geräte wurden abgemeldet.');
+            loadDevicesAndSessions();
+        }
+
+        async function revokeSession(sessionId, deviceName) {
+            const confirmMsg = texts.users_confirm_end_session ? texts.users_confirm_end_session.replace('{name}', deviceName) : `Really end web session "${deviceName}"?`;
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Session beenden');
+            if (!confirmed) return;
+            const successMsg = texts.users_session_ended ? texts.users_session_ended.replace('{name}', deviceName) : `Session "${deviceName}" has been ended.`;
+            await revokeEntry(`/api/auth/session/${sessionId}`, successMsg);
+        }
+
+        async function revokeDevice(deviceId, deviceName) {
+            const confirmMsg = texts.users_confirm_logout_device ? texts.users_confirm_logout_device.replace('{name}', deviceName) : `Really log out device "${deviceName}"?`;
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Gerät abmelden');
+            if (!confirmed) return;
+            const successMsg = texts.users_device_logged_out ? texts.users_device_logged_out.replace('{name}', deviceName) : `Device "${deviceName}" has been logged out.`;
+            await revokeEntry(`/api/auth/device/${deviceId}`, successMsg);
+        }
+
+        async function revokeEntry(url, successMessage) {
+            try {
+                const response = await apiCall(url, { method: 'DELETE' });
+                if (response.ok) {
+                    showSuccess(successMessage);
+                    loadDevicesAndSessions();
+                } else if (response.status === 401 || response.status === 403) {
+                    // Abmelden braucht einen CSRF-Token, und den gibt es nur
+                    // mit gueltiger Sitzung. Ist die abgelaufen, scheitert
+                    // auch der Nachhol-Versuch — dann half die Meldung
+                    // „Aktion fehlgeschlagen" nicht weiter (26aug26: ein
+                    // Geraet blieb in der Liste stehen, ohne dass klar war,
+                    // warum).
+                    showError(texts.users_session_expired
+                        || 'Session expired — please sign in again.');
+                } else {
+                    showError(texts.users_action_failed || 'Action failed');
+                }
+            } catch (error) {
+                showError(texts.users_network_error || 'Network error');
+            }
+        }
+
+        async function loadAllUsers() {
+            const listContainer = document.getElementById('usersList');
+            const loadingText = texts.users_loading_users || 'Lade Benutzer...';
+            listContainer.innerHTML = `<div class="loading"></div> ${loadingText}`;
+
+            try {
+                const response = await apiCall('/api/users');
+
+                if (response.status === 401) return authHandler.redirectToLogin();
+                if (response.status === 403) {
+                    listContainer.innerHTML = `<p style="color: #999;">${texts.users_no_permission || 'Keine Berechtigung'}</p>`;
+                    return;
+                }
+
+                const data = await response.json();
+                const users = data.users || [];
+
+                if (users.length === 0) {
+                    listContainer.innerHTML = `<p style="color: #999;">${texts.users_no_users_found || 'Keine Benutzer gefunden'}</p>`;
+                    return;
+                }
+
+                const currentUsername = localStorage.getItem('username');
+                const locale = currentLang === 'de' ? 'de-DE' : 'en-US';
+                const deleteBtn = texts.users_delete_button || 'Löschen';
+                const roleLabel = texts.users_role || 'Rolle:';
+                const createdLabel = texts.users_created || 'Erstellt:';
+                const languageLabel = texts.users_language_short || 'Sprache:';
+
+                // Zähle wie viele Admins es gibt
+                const adminCount = users.filter(u => u.role === 'admin').length;
+
+                listContainer.innerHTML = users.map(user => {
+                    const isCurrentUser = user.username === currentUsername;
+                    const isAdmin = user.role === 'admin';
+
+                    // Loeschen erlauben wenn: nicht man selbst UND entweder
+                    // kein Admin ODER es gibt mehr als einen Admin.
+                    const canDelete = !isCurrentUser && (!isAdmin || adminCount > 1);
+
+                    const escHtml = (v) => String(v == null ? '' : v)
+                        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    const langNamen = { de: 'Deutsch', en: 'English', fr: 'Français',
+                                        es: 'Español', it: 'Italiano' };
+                    const sprache = langNamen[user.language] || user.language || '';
+                    const seit = user.created
+                        ? new Date(user.created).toLocaleDateString(undefined,
+                            { day: '2-digit', month: '2-digit', year: 'numeric' })
+                        : '';
+                    const rolleText = isAdmin
+                        ? (texts.users_role_admin || 'Administrator')
+                        : (texts.users_role_user || 'Benutzer');
+
+                    return `
+                        <div class="bn-sitz">
+                            <span class="bn-s-ic">${bnIcon('person')}</span>
+                            <span class="bn-s-t">
+                                <span class="bn-s-name">${escHtml(user.username)}
+                                    <span class="bn-rolle bn-rolle--${isAdmin ? 'admin' : 'user'}">${escHtml(rolleText)}</span>
+                                    ${isCurrentUser ? `<span class="bn-jetzt">${escHtml(texts.users_you || 'Du')}</span>` : ''}</span>
+                                <span class="bn-s-meta">
+                                    ${seit ? `<span>${escHtml(texts.users_since || 'seit')} ${escHtml(seit)}</span>` : ''}
+                                    ${sprache ? `<span>${escHtml(sprache)}</span>` : ''}
+                                </span>
+                            </span>
+                            ${canDelete ? `<button class="bn-s-weg" onclick="deleteUser('${escHtml(user.username)}')">${
+                                escHtml(deleteBtn)}</button>` : ''}
+                        </div>`;
+                }).join('');
+
+            } catch (error) {
+                console.error('loadAllUsers error:', error);
+                const errorText = texts.users_error_loading_users || 'Fehler beim Laden der Benutzer.';
+                listContainer.innerHTML = `<p style="color: #999;">${errorText}</p>`;
+            }
+        }
+
+        async function deleteUser(username) {
+            const confirmMsg = texts.users_confirm_delete_user
+                ? texts.users_confirm_delete_user.replace('{username}', username)
+                : `Möchtest du den Benutzer "${username}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!`;
+
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_delete_title || 'Benutzer löschen');
+            if (!confirmed) return;
+
+            try {
+                const response = await apiCall(`/api/users/${username}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    const successMsg = texts.users_user_deleted
+                        ? texts.users_user_deleted.replace('{username}', username)
+                        : `Benutzer "${username}" wurde erfolgreich gelöscht.`;
+                    showSuccess(successMsg);
+                    loadAllUsers();
+                } else {
+                    showError(data.error || texts.users_action_failed || 'Aktion fehlgeschlagen');
+                }
+            } catch (error) {
+                console.error('deleteUser error:', error);
+                showError(texts.users_network_error || 'Netzwerkfehler');
+            }
+        }
+
+        const logout = () => authHandler.logout();
+
+        // Gemeinsamer Toast-Stapel oben rechts — siehe skHinweis in
+        // confirm-dialog.js. Vorher: ein Balken im Seitenfluss, der den
+        // Inhalt verschob, und in Electron ein Dialog mitten im Bild.
+        function showSuccess(msg) { window.skHinweis.erfolg(msg); }
+        function showError(msg)   { window.skHinweis.fehler(msg); }
+
+        // Wrapper für confirm() - nutzt Electron showConfirm oder native confirm
+        async function showConfirmDialog(message, title = 'Bestätigung') {
+            if (window.electronAPI && window.showConfirm) {
+                return await window.showConfirm({ title: title, message: message, type: 'warning' });
+            } else if (window.skConfirm) {
+                return await window.skConfirm(message, { title });
+            } else {
+                return confirm(message);
+            }
+        }
+
+        const langNames = { de: 'Deutsch', en: 'English', fr: 'Français', es: 'Español', it: 'Italiano' };
+
+        // Das Eigenbau-Dropdown mit Flaggen-SVGs ist einem <select> gewichen:
+        // dasselbe in fuenf Zeilen, mit Tastaturbedienung und ohne
+        // Aussenklick-Behandlung.
+        function selectLang(lang) {
+            document.getElementById('languageSelect').value = lang;
+            const sel = document.getElementById('bn-sprache');
+            if (sel) sel.value = lang;
+            const anzeige = document.getElementById('bn-sprache-aktuell');
+            if (anzeige) anzeige.textContent = langNames[lang] || lang;
+        }
+
+        // Language change functionality
+        async function loadUserLanguage() {
+            try {
+                const response = await apiCall('/api/auth/language', { method: 'GET' });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.language) {
+                        document.getElementById('languageSelect').value = data.language;
+                        selectLang(data.language);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user language:', error);
+            }
+        }
+
+        // Load user language when page loads
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadUserLanguage);
+        } else {
+            loadUserLanguage();
+        }
+
+        // Handle language form submission
+        document.addEventListener('DOMContentLoaded', () => {
+            const languageForm = document.getElementById('languageForm');
+            if (languageForm) {
+                languageForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const languageSelect = document.getElementById('languageSelect');
+                    const selectedLanguage = languageSelect.value;
+
+                    try {
+                        const response = await apiCall('/api/auth/language', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ language: selectedLanguage })
+                        });
+
+                        if (response.ok) {
+                            // Update localStorage
+                            localStorage.setItem('language', selectedLanguage);
+
+                            // Show success message
+                            showSuccess(texts.users_language_changed || 'Language successfully changed!');
+
+                            // Reload page to apply new language
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1500);
+                        } else {
+                            const errorData = await response.json();
+                            showError(errorData.error || texts.users_error_change_language || 'Error changing language.');
+                        }
+                    } catch (error) {
+                        console.error('Language change error:', error);
+                        showError(texts.users_network_error || 'Network error');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Prüfe, ob wir uns in der Android App befinden
+            if (urlParams.get('app') === 'android') {
+                const backButton = document.getElementById('back-to-dashboard');
+                if (backButton) {
+                    // Wandle den Link in einen Button um, der die native Java-Funktion aufruft.
+                    backButton.href = "javascript:void(0);"; // Verhindert die Standard-Navigation
+
+                    backButton.onclick = function(event) {
+                        event.preventDefault(); // Stoppt das Link-Verhalten sicher
+
+                        // Prüfe, ob die Bridge-Funktion existiert
+                        if (window.Android && typeof window.Android.goBackToDashboard === 'function') {
+                            // Rufe die native Funktion in MainActivity.java auf
+                            window.Android.goBackToDashboard();
+                        } else {
+                            // Fallback, falls die Bridge nicht da ist
+                            console.error("Android Bridge nicht gefunden!");
+                            window.location.href = '/?app=android';
+                        }
+                    };
+                }
+            }
+        });
+    </script>
+
+    <script>
+        // Periodic license status checking
+        // Check every 60 seconds if license is still valid
+        let licenseCheckInterval = null;
+
+        function checkLicenseStatus() {
+            fetch('/license/api/check', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    console.warn('License became invalid - redirecting to activation page');
+                    // Clear interval before redirect
+                    if (licenseCheckInterval) {
+                        clearInterval(licenseCheckInterval);
+                    }
+                    // Redirect to license activation
+                    window.location.href = '/license/activate';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking license status:', error);
+            });
+        }
+
+        // Start periodic checking when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initial check after 5 seconds
+            setTimeout(checkLicenseStatus, 5000);
+
+            // Then check every 60 seconds
+            licenseCheckInterval = setInterval(checkLicenseStatus, 60000);
+        });
+
+        // Clean up interval when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (licenseCheckInterval) {
+                clearInterval(licenseCheckInterval);
+            }
+        });
+    </script>
+    <script src="/static/js/modules/hms-severity.js"></script>
+    <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/hms-overlay.js"></script>
+</body>
+</html>

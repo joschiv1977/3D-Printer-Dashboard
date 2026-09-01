@@ -1,0 +1,14 @@
+{
+    "type": "filament",
+    "filament_flow_ratio": [
+        "0.9604"
+    ],
+    "filament_settings_id": [
+        "Extrudr PLA HighSpeed Flow Rate"
+    ],
+    "from": "User",
+    "inherits": "Extrudr PLA HighSpeed @Bambu Lab P1S 0.6 nozzle",
+    "is_custom_defined": "0",
+    "name": "Extrudr PLA HighSpeed Flow Rate",
+    "version": "2.0.0.90"
+}

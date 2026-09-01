@@ -1,0 +1,832 @@
+/* ============================================
+ * Components - Cards, Buttons, Badges, Banners
+ * iOS-Style with Press Animation
+ * ============================================ */
+
+/* ========== CARDS ========== */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+    /* GPU acceleration without expensive blur */
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+body.dark-mode .card {
+    background: rgba(26, 31, 46, 0.95);
+    border-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-card-hover);
+}
+
+body.dark-mode .card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px;
+    margin: -8px -8px 10px -8px;
+    border-radius: 8px;
+    transition: background-color var(--transition-fast);
+}
+
+/* Desktop: Drag handle */
+@media (min-width: 769px) {
+    .card-header {
+        cursor: grab;
+    }
+
+    .card-header:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+
+    body.dark-mode .card-header:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .card-header:active {
+        cursor: grabbing;
+    }
+
+    .card-title::before {
+        content: '\22EE\22EE';
+        font-size: 18px;
+        color: rgba(0, 0, 0, 0.2);
+        margin-right: -4px;
+        letter-spacing: -2px;
+    }
+
+    body.dark-mode .card-title::before {
+        color: rgba(255, 255, 255, 0.3);
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header {
+        cursor: default;
+    }
+}
+
+.card-title {
+    font-size: var(--font-size-body);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+}
+
+.card-action {
+    color: var(--color-blue);
+    font-size: var(--font-size-caption);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ========== CONTROL BUTTONS (iOS-Style) ========== */
+.control-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.control-btn {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    /* iOS Press Animation */
+    transition: transform var(--transition-fast), opacity var(--transition-fast), background var(--transition-fast);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+}
+
+body.dark-mode .control-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* iOS Press Animation - subtiles Scale damit der Cursor beim Klick
+   nicht außerhalb des geschrumpften Buttons landet (sonst kommt kein
+   click-Event mehr bei nicht-mittigen Klicks, z.B. Licht-Button). */
+.control-btn:active {
+    transform: scale(0.96) translateZ(0) !important;
+    opacity: 0.7;
+    transition: transform 0.08s;
+}
+
+.control-btn:hover {
+    transform: translateY(-1px) translateZ(0);
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.control-btn.disabled {
+    background: var(--bg-card);
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+body.dark-mode .control-btn.disabled {
+    background: #1a1f2e;
+}
+
+/* === Colored Button Variants (Dark Mode) === */
+body.dark-mode .control-btn.active {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #64b5f6;
+}
+body.dark-mode .control-btn.danger {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.3);
+    color: #ef9a9a;
+}
+body.dark-mode .control-btn.warning {
+    background: rgba(255, 152, 0, 0.2);
+    border-color: rgba(255, 152, 0, 0.3);
+    color: #ffcc80;
+}
+body.dark-mode .control-btn.success {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.3);
+    color: #a5d6a7;
+}
+body.dark-mode .control-btn.primary {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #64b5f6;
+}
+body.dark-mode .control-btn.info {
+    background: rgba(156, 39, 176, 0.2);
+    border-color: rgba(156, 39, 176, 0.3);
+    color: #ce93d8;
+}
+
+/* === Colored Button Hover (Dark Mode) === */
+body.dark-mode .control-btn.active:hover { background: rgba(33, 150, 243, 0.3); border-color: rgba(33, 150, 243, 0.5); color: #90caf9; }
+body.dark-mode .control-btn.danger:hover { background: rgba(244, 67, 54, 0.3); border-color: rgba(244, 67, 54, 0.5); color: #ef9a9a; }
+body.dark-mode .control-btn.warning:hover { background: rgba(255, 152, 0, 0.3); border-color: rgba(255, 152, 0, 0.5); color: #ffcc80; }
+body.dark-mode .control-btn.success:hover { background: rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.5); color: #a5d6a7; }
+body.dark-mode .control-btn.primary:hover { background: rgba(33, 150, 243, 0.3); border-color: rgba(33, 150, 243, 0.5); color: #90caf9; }
+body.dark-mode .control-btn.info:hover { background: rgba(156, 39, 176, 0.3); border-color: rgba(156, 39, 176, 0.5); color: #ce93d8; }
+
+/* === Colored Button Variants (Light Mode) === */
+.control-btn.active {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #1565c0;
+}
+.control-btn.danger {
+    background: rgba(244, 67, 54, 0.12);
+    border-color: rgba(244, 67, 54, 0.3);
+    color: #c62828;
+}
+.control-btn.warning {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.3);
+    color: #e65100;
+}
+.control-btn.success {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.3);
+    color: #2e7d32;
+}
+.control-btn.primary {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #1565c0;
+}
+.control-btn.info {
+    background: rgba(156, 39, 176, 0.12);
+    border-color: rgba(156, 39, 176, 0.3);
+    color: #7b1fa2;
+}
+
+/* === Colored Button Hover (Light Mode) === */
+.control-btn.active:hover { background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4); }
+.control-btn.danger:hover { background: rgba(244, 67, 54, 0.2); border-color: rgba(244, 67, 54, 0.4); }
+.control-btn.warning:hover { background: rgba(255, 152, 0, 0.2); border-color: rgba(255, 152, 0, 0.4); }
+.control-btn.success:hover { background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); }
+.control-btn.primary:hover { background: rgba(33, 150, 243, 0.2); border-color: rgba(33, 150, 243, 0.4); }
+.control-btn.info:hover { background: rgba(156, 39, 176, 0.2); border-color: rgba(156, 39, 176, 0.4); }
+
+/* Switch button: No color transition (instant green/red) */
+#switch-btn, #switch-btn-mobile {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+@media (max-width: 768px) {
+    .control-btn {
+        min-height: var(--btn-height);
+        font-size: 13px;
+        padding: 12px 10px;
+    }
+
+    .control-btn span:first-child {
+        font-size: 20px;
+    }
+}
+
+/* ========== STATUS CARDS ========== */
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+    grid-auto-rows: min-content;
+}
+
+.status-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-lg);
+    padding: 4px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 52px;
+    transition: all var(--transition-fast);
+}
+
+body.dark-mode .status-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.status-card:hover {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .status-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.status-icon {
+    font-size: 24px;
+    opacity: 0.8;
+}
+
+.status-info {
+    flex: 1;
+}
+
+.status-label {
+    font-size: 15px;
+    opacity: 0.7;
+    margin-bottom: 2px;
+}
+
+.status-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .status-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .status-card {
+        padding: 12px;
+    }
+
+    .status-icon {
+        font-size: 24px;
+    }
+
+    .status-value {
+        font-size: 16px;
+    }
+}
+
+/* ========== SPOOLMAN CARD ========== */
+.spoolman-status.connected {
+    background-color: var(--color-green);
+}
+
+.spoolman-status.disconnected {
+    background-color: var(--color-red);
+}
+
+.spool-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+    cursor: pointer;
+    transition: transform var(--transition-fast), background var(--transition-fast);
+    text-align: center;
+}
+
+body.dark-mode .spool-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.spool-card:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .spool-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.spool-card.active {
+    border-color: rgba(76, 175, 80, 0.4);
+    background: rgba(76, 175, 80, 0.08);
+}
+
+body.dark-mode .spool-card.active {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.spool-color-indicator {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin: 0 auto 5px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+
+body.dark-mode .spool-color-indicator {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.spool-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 3px;
+}
+
+.spool-weight {
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.spool-percentage {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-green);
+    margin-top: 3px;
+}
+
+/* ========== DEVELOPER CONTROLS ========== */
+#dev-control-card {
+    border: 1px solid rgba(255, 152, 0, 0.25);
+    background: rgba(255, 152, 0, 0.05);
+    transition: max-height var(--transition-normal), opacity var(--transition-normal), margin var(--transition-normal);
+}
+
+/* ========== POWER-OFF HEADER ========== */
+#power-off-header {
+    cursor: pointer;
+    animation: pulse-header 2s ease-in-out infinite;
+}
+
+#power-off-header:hover {
+    text-decoration: underline;
+}
+
+/* ========== SENSOR CHART ========== */
+#sensorChart {
+    height: 300px !important;
+}
+
+/* ========== SPOOL SELECTOR ========== */
+#spool-selector {
+    width: 100%;
+    padding: 12px 40px 12px 15px;
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    font-family: var(--font-family);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s;
+}
+
+#spool-selector:hover {
+    transform: translateY(-1px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+#spool-selector:focus {
+    outline: none;
+    border: 1px solid var(--color-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+#spool-selector option {
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    padding: 10px;
+}
+
+body.dark-mode #spool-selector {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Duesenwahl im Filament-Tab — nur bei Doppelduesen-Geraeten sichtbar
+   (X2D, H2D, H2D Pro, H2C). Waehlt die externe Spule der jeweiligen Duese. */
+.ctrl-nozzle-select {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.ctrl-nozzle-select label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+.ctrl-nozzle-select select {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+/* --- Geraet-Tab (Doppelduese, Kammer, Luefter, Luftfuehrung) ------------- */
+.dev-nozzle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.dev-nozzle {
+    padding: 10px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+}
+.dev-nozzle-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+.dev-nozzle-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+/* Punkt markiert die gerade aktive Duese; per visibility geschaltet, damit
+   die Zeile nicht springt. */
+.dev-nozzle-active { color: #51cf66; font-size: 12px; visibility: hidden; }
+.dev-nozzle-temp { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+.dev-nozzle-target { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
+.dev-nozzle-hw { margin-top: 4px; font-size: 11px; color: var(--text-secondary); }
+
+.dev-select {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 13px;
+}
+
+.dev-fan-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.dev-fan-label { flex: 0 0 40%; font-size: 13px; color: var(--text-secondary); }
+.dev-fan-slider { flex: 1; }
+.dev-fan-value { flex: 0 0 42px; text-align: right; font-size: 13px; font-weight: 600; }
+
+.dev-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+.dev-row strong { color: var(--text-primary); }
+
+/* Right-hand end of a monitoring row: sensitivity picker plus switch. */
+.dev-row__end {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.dev-sel {
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+/* --- AMS im Geraet-Tab --------------------------------------------------- */
+.ams-card {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+}
+.ams-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+.ams-env { font-size: 12px; color: var(--text-secondary); }
+.ams-trays { display: flex; flex-direction: column; gap: 4px; }
+.ams-tray {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+/* Farbpunkt des Fachs; gestrichelt = leer/keine Farbe gemeldet */
+.ams-tray-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    flex: 0 0 auto;
+}
+.ams-tray-type { flex: 1; color: var(--text-primary); }
+.ams-tray-remain { color: var(--text-secondary); }
+.ams-rfid-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 1px 6px;
+    font-size: 12px;
+}
+.ams-dry { margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 8px; }
+.ams-dry-state { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.ams-dry-controls { display: flex; gap: 6px; align-items: center; }
+.ams-dry-controls input {
+    width: 64px;
+    padding: 5px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg, var(--input-bg));
+    color: var(--text-primary);
+    font-size: 12px;
+}
+.ams-dry-controls button {
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Filament-Editor eines AMS-Fachs (fuer Rollen ohne Bambu-RFID) */
+.ams-edit {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin: 4px 0 8px 22px;
+}
+.ams-edit select {
+    flex: 1;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 12px;
+}
+.ams-edit input[type="color"] {
+    width: 32px; height: 26px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: none;
+}
+.ams-edit button {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+/* ======================================================================
+   Planen-Dialog — Aufbau vom 21aug26
+   Vier gleich gebaute Karten statt vier verschiedener Bauarten. Alles hier
+   traegt das Praefix sp-, damit es sich nicht mit den alten sched-form-*
+   Regeln beisst (die noch andere Dialoge bedienen).
+   ====================================================================== */
+.ui-koerper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ui-karte {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 14px 15px;
+}
+
+.ui-karte-kopf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 640;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.ui-karte-kopf .hd-ic { opacity: 0.75; }
+
+/* Eine Zeile = ein Bedienelement. Trennlinie statt Kasten je Zeile. */
+.ui-zeile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 40px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+}
+
+.ui-zeile + .ui-zeile { border-top: 1px solid var(--border-color); }
+.ui-zeile--klick { cursor: pointer; margin: 0; }
+
+.ui-zeile-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.ui-zeile-name .hd-ic { color: var(--text-secondary); }
+.ui-breit { flex: 1; min-width: 0; }
+
+/* Schalter — gleiche Bauform wie in der Druckvorbereitung (.prep-switch),
+   hier nur ohne deren Zeilenrahmen. */
+.ui-schalter { position: relative; flex: none; display: inline-flex; }
+.ui-schalter input { position: absolute; opacity: 0; pointer-events: none; }
+
+.ui-schalter > span {
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--border-color);
+    transition: background 0.15s;
+    display: block;
+    position: relative;
+}
+
+.ui-schalter > span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+}
+
+.ui-schalter input:checked + span { background: var(--color-green); }
+.ui-schalter input:checked + span::after { transform: translateX(18px); }
+
+/* ======================================================================
+   Linien-Icons statt Emoji
+   Lag bis 21aug26 in progress-card.css — inzwischen tragen alle Dialoge
+   diese Icons in ihren Kopfzeilen, und ohne die Basisregel rendern sie als
+   grosse schwarze Flaechen (fill statt stroke). Gehoert darum hierher.
+   ====================================================================== */
+.hd-ic {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -3px;
+    flex: 0 0 auto;
+}
+.hd-ic--xs { width: 13px; height: 13px; vertical-align: -2px; }
+/* Leerzustaende: das Symbol traegt die Flaeche, nicht der Text daneben. */
+.hd-ic--xl { width: 40px; height: 40px; stroke-width: 1.4; vertical-align: 0; opacity: 0.55; }
+
+/* Die Drucker-Meldungen (.mld*) wohnen in meldungen.css — sie werden auf
+   jeder Seite gebraucht, nicht nur dort, wo components.css liegt. */
+/* ==========================================================================
+   Platzhalter, wenn es kein Vorschaubild gibt  (21aug26)
+   --------------------------------------------------------------------------
+   Drucke, die direkt aus Bambu Studio gestartet werden, legen ihre 3MF im
+   internen Speicher des Druckers ab. Der FTPS-Dienst auf Port 990 zeigt auf
+   jedem Bambu-Modell nur den externen Speicher (Stick/SD) — an die Datei und
+   damit an das Vorschaubild kommt niemand heran, auch die Home-Assistant-
+   Integration und Bambuddy nicht.
+
+   Statt eines leeren grauen Kastens steht dort jetzt ein Symbol. Der Grund
+   steht im title-Attribut und, wo Platz ist, als Text daneben.
+   ========================================================================== */
+.kein-bild {
+    display: grid !important;
+    place-items: center;
+    grid-template: 1fr / 1fr;
+    background: var(--bg-card-variant);
+    color: var(--text-secondary);
+    position: relative;
+}
+/* Ein per visibility versteckte Bild belegt weiter eine Rasterzeile und
+   schiebt das Symbol nach unten. In dieser Ansicht haelt der Platzhalter
+   selbst den Platz, das Bild darf ganz raus. */
+.kein-bild > img { display: none !important; }
+.kein-bild::after {
+    content: "";
+    grid-area: 1 / 1;
+    /* Die Breite MUSS aus der Höhe kommen: `width: 58%` bezieht sich in
+       einem `place-items: center`-Raster auf die Spaltenbreite, und die
+       richtet sich wiederum nach dem Inhalt — das Ergebnis ist 0px. */
+    height: 58%; aspect-ratio: 1; width: auto;
+    max-height: 46px;
+    opacity: 0.42;
+    background-color: currentColor;
+    -webkit-mask: var(--kein-bild-form) center / contain no-repeat;
+    mask: var(--kein-bild-form) center / contain no-repeat;
+}
+:root {
+    /* Würfelumriss mit gestrichelter Deckfläche: „ein Modell, von dem wir
+       kein Bild haben" — nicht das übliche durchgestrichene Fotosymbol, hier
+       fehlt ja keine Datei, sondern der Blick hinein. */
+    --kein-bild-form: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' \
+stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'>\
+<path d='M3 7.5l9-5 9 5v9l-9 5-9-5z'/>\
+<path d='M3 7.5l9 5 9-5' stroke-dasharray='2.5 2'/>\
+<path d='M12 12.5v9' stroke-dasharray='2.5 2'/>\
+</svg>");
+}

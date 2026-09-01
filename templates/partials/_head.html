@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="color-scheme" content="dark light">
+    <!-- DNS-PREFETCH für schnellere .local Auflösung -->
+    <link rel="dns-prefetch" href="//3d-printer.local">
+
+    <!-- Auch für andere mögliche Hostnamen -->
+    <link rel="dns-prefetch" href="//printer.local">
+    <link rel="dns-prefetch" href="//pi.local">
+
+    <title>3D Drucker Dashboard</title>
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Shared Styles und Module -->
+    <!-- Ein CSS-Buendel statt 15 Einzeldateien: jede blockierte das
+         erste Bild und stand hinter dem TLS-Handschlag der naechsten
+         freien Verbindung (gemessen 20aug26). Reihenfolge = Kaskade,
+         gepflegt in services/asset_bundle.py (CSS_ORDER). -->
+    <link rel="stylesheet" href="/static/css/app-bundle.css">
+
+    <!-- Die Drucker-Meldung steht bewusst NEBEN dem Buendel: sie gehoert
+         auf jede Seite, und Konsole, Historie und die uebrigen haben kein
+         Buendel. Eine Datei fuer alle neun. -->
+    <link rel="stylesheet" href="/static/css/meldungen.css">
+
+    <!-- Sprachdateien laden.
+         Bewusst als normale Tags: ein document.write-Einbau (nur die
+         gebrauchte Sprache) war am 20aug26 messbar LANGSAMER — er legt den
+         Vorauslese-Scanner still, der Kopf brauchte 270 ms mehr, waehrend
+         das Parsen aller fuenf Dateien zusammen nur 3 ms kostet. -->
+    <script src="/static/lang/de.js?v={{ LANG_VERSION }}"></script>
+    <script src="/static/lang/en.js?v={{ LANG_VERSION }}"></script>
+    <script src="/static/lang/fr.js?v={{ LANG_VERSION }}"></script>
+    <script src="/static/lang/es.js?v={{ LANG_VERSION }}"></script>
+    <script src="/static/lang/it.js?v={{ LANG_VERSION }}"></script>
+    <!-- Auth Handler laden -->
+    <script src="/static/auth-handler.js"></script>
+
+    <!-- Firebase FCM wird von preload.js injiziert (electron-app/firebase-init.js) -->
+    <!-- electron-push-receiver wird von preload.js injiziert (electron-app/push-receiver-init.js) -->
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- PWA Icons -->
+    <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512x512.png">
+
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+
+    <!-- Modulare CSS-Dateien (iOS Design System) -->
+
+    <!-- Camera stream loaded dynamically based on mode (mp4/mjpeg) -->
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#0F1419" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#F3F3F7" media="(prefers-color-scheme: light)">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="3D Drucker">
+    <meta name="application-name" content="3D Drucker">
+    <script src="/static/socket.io.js"></script>
+    <script src="/static/chart.umd.js"></script>
+    <!-- GridStack.js für Drag & Drop Dashboard (local) -->
+    <link rel="stylesheet" href="/static/gridstack.min.css">
+    <script src="/static/gridstack-all.js"></script>
+</head>

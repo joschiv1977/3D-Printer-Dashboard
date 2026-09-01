@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">3D Printer Dashboard - Login</title>
+    <link rel="stylesheet" href="/static/css/design-tokens.css">
+    <style>
+        /* Der Anmeldebildschirm hing als einziger nicht am Design-System:
+           eigener Farbverlauf, eigene Farben, kein Dunkelmodus. Jetzt
+           dieselben Tokens wie ueberall — damit passt er automatisch mit,
+           wenn sich die Palette aendert. */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* Setzt der Vorab-Schnipsel im Kopf, damit beim Laden nicht kurz
+           eine helle Flaeche aufblitzt, bevor die Klasse am body sitzt. */
+        html.dark-vorab { background: #0F1419; }
+        body {
+            font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .login-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            width: 100%; max-width: 380px; padding: 32px;
+            position: relative;
+        }
+        body.dark-mode .login-container { box-shadow: 0 4px 24px rgba(0,0,0,0.4); }
+
+        .marke { display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 24px; }
+        .marke svg { width: 40px; height: 40px; color: var(--accent-blue); }
+
+        .language-selector { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+        .lang-btn {
+            background: var(--bg-card-variant, transparent);
+            border: 1px solid var(--border-color);
+            padding: 7px 9px; border-radius: 8px; cursor: pointer;
+            transition: border-color .15s, background .15s;
+            display: flex; align-items: center; justify-content: center; line-height: 0;
+            opacity: .55;
+        }
+        .lang-btn:hover { opacity: .85; }
+        /* Aktiv heisst Flaeche UND Rand — duenne Randlinien allein waren zu
+           wenig (abgenommenes Muster vom 20aug26). */
+        .lang-btn.active {
+            opacity: 1;
+            border-color: var(--accent-blue);
+            background: color-mix(in srgb, var(--accent-blue) 12%, transparent);
+        }
+
+        h1 {
+            text-align: center; color: var(--text-primary);
+            font-size: 20px; font-weight: 650; margin-bottom: 24px;
+        }
+        .form-group { margin-bottom: 16px; }
+        label {
+            display: block; margin-bottom: 6px;
+            color: var(--text-secondary); font-size: 13px; font-weight: 500;
+        }
+        input {
+            width: 100%; padding: 11px 12px;
+            border: 1px solid var(--border-color); border-radius: 10px;
+            background: var(--bg-card); color: var(--text-primary);
+            font-size: 15px; transition: border-color .15s;
+        }
+        input:focus { outline: none; border-color: var(--accent-blue); }
+        .btn {
+            width: 100%; padding: 12px; margin-top: 8px;
+            background: var(--accent-blue); border: none; border-radius: 10px;
+            color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+            transition: filter .15s;
+        }
+        .btn:hover { filter: brightness(1.07); }
+        .btn:disabled { opacity: .6; cursor: default; }
+
+        .error-message, .success-message {
+            padding: 10px 12px; border-radius: 10px; margin-bottom: 16px;
+            font-size: 14px; display: none;
+        }
+        .error-message { background: color-mix(in srgb, var(--accent-red) 12%, transparent); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .success-message { background: color-mix(in srgb, var(--accent-green) 12%, transparent); border: 1px solid var(--accent-green); color: var(--accent-green); }
+
+        .fusszeile {
+            margin-top: 22px; text-align: center;
+            color: var(--text-secondary); font-size: 12px;
+        }
+    </style>
+    <script>
+        // Dieselbe Entscheidung wie in app-init.js: gespeicherte Wahl, sonst
+        // die des Systems. Laeuft VOR dem Zeichnen, damit es nicht flackert.
+        (function () {
+            try {
+                var wahl = localStorage.getItem('theme');
+                var dunkel = wahl === 'dark' || ((!wahl || wahl === 'auto')
+                    && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (dunkel) document.documentElement.classList.add('dark-vorab');
+                document.addEventListener('DOMContentLoaded', function () {
+                    if (dunkel) document.body.classList.add('dark-mode');
+                });
+            } catch (e) { /* localStorage gesperrt — dann eben hell */ }
+        })();
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <div class="language-selector">
+            <button type="button" class="lang-btn" data-lang="de"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="640" height="160" fill="#000"/><rect y="160" width="640" height="160" fill="#D00"/><rect y="320" width="640" height="160" fill="#FFCE00"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="en"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect fill="#012169" width="640" height="480"/><path d="M75 0l244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z" fill="#fff"/><path d="M424 281l216 159v40L369 281h55zm-184 20l6 35L54 480H0l240-179zM640 0v3L391 191l2-44L590 0h50zM0 0l239 176h-60L0 42V0z" fill="#C8102E"/><path d="M241 0v480h160V0H241zM0 160v160h640V160H0z" fill="#fff"/><path d="M0 193v96h640v-96H0zM273 0v480h96V0h-96z" fill="#C8102E"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="fr"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="213" height="480" fill="#002395"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#ED2939"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="es"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="640" height="480" fill="#c60b1e"/><rect y="120" width="640" height="240" fill="#ffc400"/></svg></button>
+            <button type="button" class="lang-btn" data-lang="it"><svg style="width:24px;height:16px;border-radius:2px;display:block" viewBox="0 0 640 480"><rect width="213" height="480" fill="#009246"/><rect x="213" width="214" height="480" fill="#fff"/><rect x="427" width="213" height="480" fill="#CE2B37"/></svg></button>
+        </div>
+        <div class="marke">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 9V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v5"/>
+                <rect x="3" y="9" width="18" height="7" rx="1"/>
+                <path d="M7 16v4a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-4"/>
+            </svg>
+        </div>
+        <h1 id="login-title">3D Printer Dashboard</h1>
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username" id="username-label">Benutzername</label>
+                <input type="text" id="username" name="username" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password" id="password-label">Passwort</label>
+                <input type="password" id="password" name="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="btn" id="login-button">Anmelden</button>
+        </form>
+        <div class="fusszeile" id="versionszeile">__SERVER_VERSION__</div>
+    </div>
+
+    <script>
+        // Load translations
+        let texts = {};
+        const currentLang = localStorage.getItem('language') || 'de';
+        let translationsLoaded = false;
+
+        // Load language file
+        const langScript = document.createElement('script');
+        langScript.src = `/static/lang/${currentLang}.js`;
+        langScript.onload = function() {
+            // Access the loaded translation object directly
+            if (currentLang === 'de' && typeof translations_de !== 'undefined') {
+                texts = translations_de;
+            } else if (currentLang === 'en' && typeof translations_en !== 'undefined') {
+                texts = translations_en;
+            } else if (currentLang === 'fr' && typeof translations_fr !== 'undefined') {
+                texts = translations_fr;
+            } else if (currentLang === 'es' && typeof translations_es !== 'undefined') {
+                texts = translations_es;
+            } else if (currentLang === 'it' && typeof translations_it !== 'undefined') {
+                texts = translations_it;
+            } else {
+                texts = translations_en || translations_de || {};
+            }
+            translationsLoaded = true;
+            // Update texts after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', updateTexts);
+            } else {
+                updateTexts();
+            }
+        };
+        document.head.appendChild(langScript);
+
+        function updateTexts() {
+            if (!translationsLoaded) return;
+
+            // Helper function to safely update element
+            const updateEl = (id, text) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            };
+
+            // Update all static texts with fallbacks
+            updateEl('page-title', texts.login_page_title || '3D Printer Dashboard - Login');
+            updateEl('login-title', texts.login_title || '3D Printer Dashboard');
+            updateEl('username-label', texts.login_username || 'Username');
+            updateEl('password-label', texts.login_password || 'Password');
+            updateEl('login-button', texts.login_button || 'Login');
+
+            // Update active language button
+            updateLanguageButtons();
+        }
+
+        function updateLanguageButtons() {
+            const currentLang = localStorage.getItem('language') || 'de';
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.dataset.lang === currentLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function changeLanguage(newLang) {
+            // Save to localStorage
+            localStorage.setItem('language', newLang);
+
+            // Reload page to apply new language
+            window.location.reload();
+        }
+
+        // Language selector event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const lang = this.dataset.lang;
+                    changeLanguage(lang);
+                });
+            });
+
+            // Set initial active state
+            updateLanguageButtons();
+        });
+    </script>
+
+    <script>
+        // ============================================
+        // Auto-Login für Electron App
+        // ============================================
+        async function tryAutoLogin() {
+            // Prüfe ob Electron App läuft
+            if (!window.electronAPI) {
+                console.log('[Auto-Login] Kein Electron - Skip Auto-Login');
+                return false;
+            }
+
+            try {
+                console.log('[Auto-Login] Lade gespeicherte Credentials...');
+                const credentials = await window.electronAPI.loadCredentials();
+
+                if (!credentials || !credentials.username || !credentials.deviceToken) {
+                    console.log('[Auto-Login] Keine Credentials gespeichert');
+                    return false;
+                }
+
+                if (!credentials.autoLogin) {
+                    console.log('[Auto-Login] Auto-Login ist deaktiviert');
+                    return false;
+                }
+
+                console.log('[Auto-Login] Credentials gefunden für User:', credentials.username);
+                console.log('[Auto-Login] Versuche Auto-Login mit Device Token...');
+
+                // Zeige Status-Nachricht
+                const successMsg = document.getElementById('successMessage');
+                successMsg.textContent = 'Automatische Anmeldung läuft...';
+                successMsg.style.display = 'block';
+
+                // Verwende Device Token für Login
+                const language = localStorage.getItem('language') || 'de';
+                const response = await fetch('/api/auth/device/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username: credentials.username,
+                        device_token: credentials.deviceToken,
+                        language
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.username) {
+                    console.log('[Auto-Login] ✅ Auto-Login erfolgreich!');
+
+                    // Speichere User-Daten
+                    localStorage.setItem('username', data.username);
+                    localStorage.setItem('role', data.role);
+
+                    if (data.csrf_token) {
+                        sessionStorage.setItem('csrf_token', data.csrf_token);
+                        localStorage.setItem('csrf_token', data.csrf_token);
+                    }
+
+                    // Redirect zum Dashboard
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const nextUrl = urlParams.get('next') || '/';
+
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    window.location.href = nextUrl;
+                    return true;
+                } else {
+                    console.log('[Auto-Login] ❌ Auto-Login fehlgeschlagen:', data.error);
+                    console.log('[Auto-Login] Fallback zu manuellem Login');
+
+                    // Verstecke Status-Nachricht
+                    successMsg.style.display = 'none';
+
+                    // Fülle Username-Feld vor
+                    document.getElementById('username').value = credentials.username;
+                    return false;
+                }
+            } catch (error) {
+                console.error('[Auto-Login] ❌ Error:', error);
+                return false;
+            }
+        }
+
+        // Versuche Auto-Login sobald DOM geladen ist
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[Auto-Login] DOM geladen, starte Auto-Login...');
+            await tryAutoLogin();
+        });
+
+        // ============================================
+        // Manuelles Login-Formular
+        // ============================================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const language = localStorage.getItem('language') || 'de';
+
+            try {
+                // Gerätekennung mitschicken, dieselbe wie bei allen
+                // weiteren Anfragen (auth-handler.js). Der Server haengt sie
+                // an die Sitzung — nur so laesst sich spaeter erkennen, dass
+                // die Anmeldung im Fenster und das registrierte Geraet
+                // dasselbe sind. Die Electron-App legt hier ihre eigene
+                // Kennung ab und erscheint dadurch als EIN Eintrag statt als
+                // zwei.
+                let geraeteKennung = localStorage.getItem('web_device_id');
+                if (!geraeteKennung) {
+                    const zufall = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                        ? crypto.randomUUID()
+                        : `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+                    geraeteKennung = `web_${zufall}`;
+                    localStorage.setItem('web_device_id', geraeteKennung);
+                }
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Device-Id': geraeteKennung
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({ username, password, language })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // SECURITY: Token wird als HttpOnly Cookie vom Server gesetzt
+                    // Wir speichern NUR nicht-sensitive Daten in localStorage
+                    if (data.username) {
+                        localStorage.setItem('username', data.username);
+                        localStorage.setItem('role', data.role);
+                    }
+
+                    if (data.csrf_token) {
+                        sessionStorage.setItem('csrf_token', data.csrf_token);
+                        localStorage.setItem('csrf_token', data.csrf_token);
+                    }
+
+                    // ============================================
+                    // Electron: Device Token registrieren für Auto-Login
+                    // ============================================
+                    if (window.electronAPI) {
+                        try {
+                            console.log('[Auto-Login] Registriere Device für Auto-Login...');
+                            // Device-Info von Electron holen (wie in preload.js)
+                            let deviceInfo = {};
+                            if (window.electronAPI.fcm && window.electronAPI.fcm.getDeviceInfo) {
+                                deviceInfo = await window.electronAPI.fcm.getDeviceInfo();
+                            }
+                            const registerResponse = await fetch('/api/auth/device/register', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                credentials: 'include',
+                                body: JSON.stringify({
+                                    username: username,
+                                    password: password,
+                                    device_name: deviceInfo.device_name || 'Electron App',
+                                    device_type: 'electron',
+                                    device_model: deviceInfo.device_model || (navigator.platform || 'Desktop'),
+                                    device_id: deviceInfo.device_id || undefined,
+                                    app_version: deviceInfo.app_version || '1.0.0'
+                                })
+                            });
+
+                            if (registerResponse.ok) {
+                                const registerData = await registerResponse.json();
+                                console.log('[Auto-Login] ✅ Device Token erhalten:', registerData.device_token.substring(0, 20) + '...');
+
+                                // Speichere nur Benutzername und Geraetetoken.
+                                // NICHT das Passwort: saveCredentials nimmt genau
+                                // zwei Argumente (preload.js), das dritte fiel
+                                // frueher weg — womit das Passwort im Feld
+                                // deviceToken landete und der Auto-Login mit 401
+                                // scheiterte, weil er ein Passwort als Token schickte.
+                                await window.electronAPI.saveCredentials(
+                                    username,
+                                    registerData.device_token
+                                );
+                                console.log('[Auto-Login] ✅ Credentials gespeichert für Auto-Login');
+                            } else {
+                                console.error('[Auto-Login] ❌ Device Registrierung fehlgeschlagen');
+                            }
+                        } catch (error) {
+                            console.error('[Auto-Login] ❌ Error bei Device Registrierung:', error);
+                        }
+                    }
+
+                    // FIX: Warte bis Cookie wirklich mitgeschickt wird.
+                    // Der 100ms-setTimeout reichte bei HTTPS+self-signed-cert in
+                    // Safari nicht — der navigierte GET / kam manchmal noch ohne
+                    // neuen access_token-Cookie an → Redirect zurück zu /login.
+                    // Stattdessen: test-fetch auf /api/auth/me mit credentials,
+                    // erst bei 200 navigieren. Fallback nach 2s hart navigieren.
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const nextUrl = urlParams.get('next') || '/';
+
+                    const start = Date.now();
+                    let sessionActive = false;
+                    while (Date.now() - start < 2000) {
+                        try {
+                            const check = await fetch('/api/auth/me', {
+                                method: 'GET',
+                                credentials: 'include',
+                                cache: 'no-store'
+                            });
+                            if (check.ok) { sessionActive = true; break; }
+                        } catch (_) {}
+                        await new Promise(r => setTimeout(r, 100));
+                    }
+                    if (!sessionActive) {
+                        console.warn('[Login] Session-Check failed after 2s — navigate anyway');
+                    }
+                    window.location.href = nextUrl;
+                } else {
+                    const errorMsg = data.error || texts.login_failed || 'Login failed';
+                    document.getElementById('errorMessage').textContent = errorMsg;
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                const networkError = texts.login_network_error || 'Network error';
+                document.getElementById('errorMessage').textContent = networkError;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

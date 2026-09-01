@@ -1,0 +1,1166 @@
+/* ============================================
+ * Printer Control Modal (Drucker Steuerung)
+ * ============================================ */
+
+/* Camera Preview */
+.ctrl-camera-wrap {
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 auto 16px;
+    max-width: 380px;
+    position: relative;
+}
+
+.ctrl-camera-wrap img,
+.ctrl-camera-wrap video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.ctrl-camera-light-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.15s;
+    z-index: 2;
+}
+
+.ctrl-camera-light-btn:hover { background: rgba(0, 0, 0, 0.8); }
+
+/* An = gruener Rand, gleiche Sprache wie der Licht-Knopf in der Uebersicht. */
+.ctrl-camera-light-btn.ctrl-licht-an {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35);
+}
+
+.ctrl-camera-source-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.15s;
+    display: none;
+}
+
+.ctrl-camera-source-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Tab Navigation */
+.ctrl-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.ctrl-tab {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: -2px;
+}
+
+.ctrl-tab:hover {
+    color: var(--text-primary);
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.ctrl-tab.active {
+    color: var(--text-primary);
+    border-bottom-color: var(--accent-blue);
+}
+
+body.dark-mode .ctrl-tab:hover {
+    background: rgba(33, 150, 243, 0.08);
+}
+
+/* Control Panels (sections within tabs) */
+.ctrl-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.ctrl-panel-title {
+    text-align: center;
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Move Buttons (arrows, home) */
+.ctrl-move-btn {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+}
+
+.ctrl-move-btn:active {
+    transform: scale(0.95);
+}
+
+.ctrl-step-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.ctrl-quick-btn {
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+}
+
+.ctrl-quick-btn:active {
+    transform: scale(0.96);
+}
+
+/* Extruder Tab — Temp Display */
+.ctrl-temp-display {
+    text-align: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+}
+
+.ctrl-temp-current {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent-red, #ef5350);
+}
+
+.ctrl-temp-target {
+    color: var(--text-secondary);
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.ctrl-preset-btn {
+    border: 1px solid transparent;
+    padding: 10px 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+}
+
+.ctrl-preset-btn:active {
+    transform: scale(0.95);
+}
+
+/* Custom Temp Row */
+.ctrl-custom-temp {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.ctrl-custom-temp-input {
+    width: 80px;
+    padding: 8px 10px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.ctrl-custom-temp-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.ctrl-custom-temp-unit {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.ctrl-custom-temp-set {
+    background: rgba(33, 150, 243, 0.12);
+    border: 1px solid rgba(33, 150, 243, 0.25);
+    color: #1565c0;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+}
+
+.ctrl-custom-temp-set:hover {
+    background: rgba(33, 150, 243, 0.22);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .ctrl-custom-temp-set {
+    background: rgba(33, 150, 243, 0.18);
+    color: #90caf9;
+}
+
+body.dark-mode .ctrl-custom-temp-set:hover {
+    background: rgba(33, 150, 243, 0.28);
+}
+
+/* Extrude button - green */
+.ctrl-extrude-btn {
+    border: 1px solid transparent;
+    padding: 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.15s;
+    line-height: 1.4;
+}
+
+.ctrl-extrude-btn:active {
+    transform: scale(0.96);
+}
+
+/* Filament Tab — Action Cards */
+.ctrl-filament-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.ctrl-filament-btn {
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 16px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 80px;
+    transition: all 0.15s;
+}
+
+.ctrl-filament-btn:active {
+    transform: scale(0.96);
+}
+
+.ctrl-filament-icon {
+    font-size: 22px;
+}
+
+.ctrl-filament-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Filament Tip Box */
+.ctrl-tip-box {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ============================================
+ * Printer Control — Mobile Responsive
+ * ============================================ */
+@media (max-width: 768px) {
+    .ctrl-movement-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ctrl-tab {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .ctrl-quick-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ============================================================
+ * Klipper-Direct Steuerung (Achsen/Extruder/Maschine) —
+ * Parität zur Android-App (Mainsail-Stil). Nur im Klipper-Modus
+ * per JS in die Tabs injiziert (printer-control.js buildKlipperControl).
+ * ============================================================ */
+.kctrl-pos-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.kctrl-pos {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    background: var(--bg-secondary, rgba(0,0,0,0.04)); border-radius: 8px; padding: 8px 4px;
+}
+.kctrl-pos-label { font-size: 12px; color: var(--text-secondary); }
+.kctrl-pos span:last-child { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.kctrl-btn-row { display: flex; gap: 8px; }
+.kctrl-btn {
+    flex: 1; padding: 10px 8px; border: none; border-radius: 8px; cursor: pointer;
+    background: var(--accent-color, #2196F3); color: #fff; font-size: 13px; font-weight: 600;
+    white-space: nowrap;
+}
+.kctrl-btn--outline {
+    background: transparent; color: var(--text-primary);
+    border: 1px solid var(--border-color, rgba(0,0,0,0.2));
+}
+.kctrl-btn--danger { background: #d32f2f; color: #fff; width: 100%; margin-top: 8px; }
+.kctrl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.kctrl-jog-row { display: flex; gap: 4px; align-items: center; margin-bottom: 6px; }
+.kctrl-step {
+    flex: 1; min-width: 0; padding: 9px 2px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border-color, rgba(0,0,0,0.2)); background: var(--bg-secondary, transparent);
+    color: var(--text-primary); font-size: 12px; font-variant-numeric: tabular-nums;
+}
+.kctrl-step--sel { background: var(--accent-color, #2196F3); border-color: var(--accent-color, #2196F3); color: #fff; }
+.kctrl-step:disabled { opacity: 0.4; cursor: not-allowed; }
+.kctrl-axis {
+    flex: 0.7; padding: 9px 2px; border: none; border-radius: 6px; cursor: pointer;
+    background: var(--accent-color, #2196F3); color: #fff; font-weight: 700; font-size: 13px;
+}
+.kctrl-preset-row { display: flex; gap: 6px; margin: 4px 0 8px; }
+
+.kctrl-slider { width: 100%; }
+.kctrl-toocold { margin-top: 8px; color: #d32f2f; font-size: 13px; }
+
+.kctrl-macro-group {
+    border: 1.5px solid var(--border-color, rgba(0,0,0,0.2)); border-radius: 12px;
+    padding: 10px 12px; margin: 0 4px 10px;
+}
+.kctrl-macro-group-title { font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+.kctrl-macro-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+.kctrl-macro {
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
+    border: 1px solid var(--accent-color, #2196F3); background: transparent; color: var(--text-primary);
+    white-space: nowrap;
+}
+.kctrl-macro-empty { color: var(--text-secondary); padding: 4px; }
+
+/* ============================================================
+ * Display-Stil fuers Steuerungs-Fenster (Mockup 18aug26)
+ * ============================================================ */
+
+/* Tabs als Segmente statt Unterstrich-Reiter */
+.ctrl-tabs {
+    background: rgba(128, 128, 128, 0.08);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+    border-bottom: none !important;
+}
+
+.ctrl-tab {
+    flex: 1;
+    text-align: center;
+    border-radius: 8px !important;
+    border-bottom: none !important;
+    padding: 8px 6px !important;
+}
+
+.ctrl-tab.active {
+    background: rgba(59, 130, 246, 0.18);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* --- Geraetekalibrierung: Haekchenliste wie in Studios Dialog --- */
+.cali-schritte {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 6px 16px; margin-bottom: 12px;
+}
+.cali-schritt {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13px; color: var(--text-primary); cursor: pointer;
+    padding: 5px 2px;
+}
+.cali-schritt input { width: 16px; height: 16px; accent-color: #22c55e; cursor: pointer; }
+.cali-fuss {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
+}
+.cali-fuss .ext-sub { flex: 1 1 240px; }
+
+/* Die Einzellaeufe: untereinander, volle Breite der Karte — anders als
+   der Sammelknopf, weil hier jede Zeile ein eigener Durchgang ist. */
+.cali-laeufe {
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
+}
+.cali-laeufe .cali-lauf-btn { width: 100%; text-align: center; }
+
+/* Laufender Durchgang im Kalibrier-Reiter */
+.cali-stufe {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 10px;
+}
+.cali-balken {
+    height: 8px; border-radius: 999px; overflow: hidden;
+    background: rgba(128, 128, 128, 0.18);
+}
+.cali-balken span {
+    display: block; height: 100%; border-radius: 999px;
+    background: #3b82f6; transition: width 0.4s ease;
+}
+.cali-zahlen {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 12px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Achsen: rundes Jog-Pad --- */
+.jog-layout { display: flex; gap: 12px; }
+.jog-panel { flex: 1; display: flex; flex-direction: column; align-items: center; }
+.jog-pad { width: 230px; max-width: 100%; }
+.jog-seg path {
+    fill: rgba(128, 128, 128, 0.10);
+    stroke: rgba(128, 128, 128, 0.28);
+    cursor: pointer;
+    transition: fill 0.12s;
+}
+.jog-seg:hover path { fill: rgba(59, 130, 246, 0.25); }
+.jog-home circle {
+    fill: rgba(74, 222, 128, 0.15);
+    stroke: #4ade80;
+    cursor: pointer;
+}
+.jog-home text { fill: #4ade80; font-size: 17px; cursor: pointer; }
+.jog-lbl { fill: var(--text-secondary); font-size: 12px; pointer-events: none; }
+.jog-lbl--s { font-size: 10px; opacity: 0.7; }
+
+.jog-zcol { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 190px; }
+.jog-zbtn {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.22);
+    border-radius: 10px;
+    padding: 11px 10px;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+}
+.jog-zbtn:hover { border-color: rgba(59, 130, 246, 0.55); }
+.jog-zbtn--home { border-color: rgba(240, 160, 60, 0.6); color: #f0b46a; }
+
+.jog-actions { display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+.jog-abtn {
+    background: rgba(59, 130, 246, 0.14);
+    color: var(--accent-blue, #6ea8ff);
+    border: none;
+    border-radius: 9px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+}
+.jog-abtn:hover { background: rgba(59, 130, 246, 0.24); }
+/* Gesperrt: waehrend eines Drucks oder einer laufenden Kalibrierung weist
+   der Server denselben Befehl ohnehin ab (action_guards). */
+.jog-abtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.jog-abtn:disabled:hover { background: rgba(59, 130, 246, 0.14); }
+.jog-abtn--home { background: rgba(240, 160, 60, 0.14); color: #f0b46a; }
+
+/* --- Extruder --- */
+.ext-seg {
+    display: flex;
+    background: rgba(128, 128, 128, 0.10);
+    border-radius: 999px;
+    padding: 3px;
+    width: fit-content;
+    margin: 0 auto 14px;
+}
+.ext-seg-btn { padding: 6px 22px; border-radius: 999px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+.ext-seg-btn--on {
+    background: rgba(74, 222, 128, 0.16);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.5);
+    font-weight: 600;
+}
+
+.ext-layout { display: flex; gap: 14px; align-items: center; justify-content: center; }
+.ext-panel { flex: 1; max-width: 300px; text-align: center; }
+.ext-bigtemp { font-size: 28px; font-weight: 800; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.ext-sub { color: var(--text-secondary); font-size: 12px; margin-top: 3px; text-align: center; }
+.ext-noz-img { height: 110px; width: auto; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.45)); }
+.ext-arrows { display: flex; flex-direction: column; gap: 7px; align-items: center; }
+.ext-arrow {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.22);
+    border-radius: 12px;
+    padding: 12px 30px;
+    font-size: 17px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+}
+.ext-arrow:hover { border-color: rgba(59, 130, 246, 0.55); }
+
+/* --- Filament --- */
+.fil-actions { display: flex; gap: 9px; margin-top: 12px; }
+.fil-abtn { flex: 1; text-align: center; padding: 10px 8px; }
+/* Waehrend Druck/laufendem Filament-Ablauf gesperrt */
+.fil-abtn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+
+/* Laufender Filament-Ablauf: der Knopf traegt den aktuellen Schritt
+   („Düse erhitzen", „Filament schneiden") — dieselbe Auskunft wie der
+   Bildschirm des Druckers. Er bleibt gesperrt, darf aber NICHT ausgegraut
+   sein: ausgerechnet im aussagekraeftigsten Moment waere er am schlechtesten
+   zu lesen. Volle Deckkraft, abgesetzter Rand, ruhiges Pulsieren als Zeichen,
+   dass etwas laeuft. */
+.fil-abtn--laeuft:disabled {
+    opacity: 1;
+    color: var(--accent-blue, #2196f3);
+    border-color: var(--accent-blue, #2196f3);
+    background: color-mix(in srgb, var(--accent-blue, #2196f3) 14%, transparent);
+    font-weight: 600;
+    animation: fil-laeuft 1.8s ease-in-out infinite;
+}
+@keyframes fil-laeuft {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-blue, #2196f3) 45%, transparent); }
+    50%      { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-blue, #2196f3) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .fil-abtn--laeuft:disabled { animation: none; }
+}
+
+/* Ganzer Tab gesperrt (Achsen/Extruder waehrend des Drucks) */
+.ctrl-gesperrt { opacity: 0.35; pointer-events: none; }
+
+/* Kamera und Hinweis nebeneinander. Das Bild ist auf 380 px begrenzt,
+   daneben bleibt Platz — dort steht der Hinweis, statt sich unter den
+   Reitern zwischen die Rahmen zu quetschen. */
+.ctrl-kopfzeile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.ctrl-kopfzeile .ctrl-camera-wrap { margin-bottom: 0; }
+/* Der Abstand, den vorher die Kamera selbst mitbrachte. */
+.ctrl-kopfzeile { margin-bottom: 16px; }
+
+/* Sagt, warum gerade nichts geht. Eine graue Flaeche ohne Begruendung
+   sieht nach kaputt aus. */
+.ctrl-busy-hinweis {
+    flex: 0 1 240px;
+    padding: 12px 14px;
+    border: 1px solid var(--accent-orange, #ff9800);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent-orange, #ff9800) 12%, transparent);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+/* Schmales Fenster: der Hinweis rutscht unter das Bild und nimmt die
+   volle Breite — nebeneinander waere dort beides zu schmal. */
+@media (max-width: 720px) {
+    .ctrl-busy-hinweis { flex: 1 1 100%; }
+}
+#fil-slots .mz-sec:first-child { margin-top: 0; }
+
+/* --- Geraet-Tab: Panels im kv-Listen-Look --- */
+#device-tab .ctrl-panel {
+    background: rgba(128, 128, 128, 0.06);
+    border: 1px solid rgba(128, 128, 128, 0.12);
+    border-radius: 14px;
+}
+
+#device-tab .dev-row,
+#device-tab .dev-fan-row {
+    border-bottom: 1px solid rgba(128, 128, 128, 0.10);
+    padding: 7px 2px;
+}
+
+#device-tab .dev-row:last-child,
+#device-tab .dev-fan-row:last-child { border-bottom: none; }
+
+/* Geraet-Tab: zwei Spalten wie im Mockup */
+.dev-cols { display: flex; gap: 10px; align-items: flex-start; }
+.dev-col { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+@media (max-width: 560px) { .dev-cols { flex-direction: column; } }
+
+/* Schalter-Optik (Anzeige, xcam ist nicht setzbar) */
+.dev-sw {
+    width: 34px; height: 19px;
+    background: rgba(128, 128, 128, 0.25);
+    border-radius: 999px;
+    position: relative;
+    display: inline-block;
+    flex: 0 0 auto;
+}
+.dev-sw::after {
+    content: '';
+    position: absolute; left: 2px; top: 2px;
+    width: 15px; height: 15px;
+    background: #fff; border-radius: 50%;
+    transition: left 0.15s;
+}
+.dev-sw--on { background: rgba(74, 222, 128, 0.5); }
+.dev-sw--on::after { left: 17px; }
+.dev-sw--click { cursor: pointer; }
+.dev-sw--click:hover { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35); }
+
+/* Geraet-Tab: kompakter, Duesen untereinander statt gequetscht */
+#device-tab .ctrl-panel { padding: 10px 12px; }
+#device-tab .ctrl-panel-title { margin-bottom: 6px; font-size: 13px; }
+#device-tab .dev-nozzle-grid { grid-template-columns: 1fr; gap: 8px; }
+
+/* Dropdowns im Steuerungs-Fenster im App-Stil (wie Einstellungen) */
+#printerControlModal select {
+    background: var(--input-bg, var(--bg-secondary));
+    color: var(--text-primary);
+    border: 1px solid var(--input-border, var(--border-color));
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Geraet-Tab Feinschliff: Titel links + klein wie im Mockup,
+   Kammerheizung als kompakte Zeile statt Riesen-Anzeige */
+#device-tab .ctrl-panel-title {
+    text-align: left;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: none;
+}
+
+#device-tab .ctrl-temp-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    background: none;
+    padding: 2px 2px 8px;
+}
+
+#device-tab .ctrl-temp-current {
+    font-size: 20px !important;
+    color: var(--text-primary) !important;
+}
+
+#device-tab .ctrl-custom-temp { margin-top: 0; }
+
+#device-tab .ctrl-tip-box {
+    font-size: 11px;
+    padding: 7px 10px;
+    margin-top: 8px;
+    opacity: 0.85;
+}
+
+#device-tab .dev-nozzle {
+    background: rgba(128, 128, 128, 0.07);
+    border: 1px solid rgba(128, 128, 128, 0.13);
+    border-radius: 10px;
+    padding: 8px 11px;
+}
+
+#device-tab .dev-nozzle-temp { font-size: 16px; }
+
+/* An/Aus-Knoepfe der Zusatzlichter kompakt rechtsbuendig */
+#dev-lights-panel .dev-row span:last-child { display: inline-flex; gap: 6px; }
+#dev-lights-panel .ams-rfid-btn { padding: 3px 12px; font-size: 12px; border-radius: 999px; }
+
+.hd-ic--lg { width: 20px; height: 20px; }
+.ctrl-tab .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; opacity: 0.85; }
+
+/* Druck-Aktionen als Karten im Uebersichts-Grid — der wiederverwendbare
+ * Aktions-Baustein: .ov-card--btn + Farbvariante (--warn/--ok/--danger). */
+.ov-card--btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.ov-card--btn:active { transform: scale(0.97); }
+.ov-card--btn .hd-ic { width: 16px; height: 16px; }
+
+.ov-card--warn {
+    color: #e65100;
+    border-color: rgba(255, 152, 0, 0.35);
+    background: rgba(255, 152, 0, 0.08);
+}
+.ov-card--warn:hover { background: rgba(255, 152, 0, 0.16); border-color: rgba(255, 152, 0, 0.55); }
+body.dark-mode .ov-card--warn { color: #ffb74d; }
+
+.ov-card--ok {
+    color: #2e7d32;
+    border-color: rgba(76, 175, 80, 0.35);
+    background: rgba(76, 175, 80, 0.08);
+}
+.ov-card--ok:hover { background: rgba(76, 175, 80, 0.16); border-color: rgba(76, 175, 80, 0.55); }
+body.dark-mode .ov-card--ok { color: #a5d6a7; }
+
+.ov-card--danger {
+    color: #c62828;
+    border-color: rgba(229, 72, 77, 0.35);
+    background: rgba(229, 72, 77, 0.07);
+}
+.ov-card--danger:hover { background: rgba(229, 72, 77, 0.16); border-color: rgba(229, 72, 77, 0.55); }
+body.dark-mode .ov-card--danger { color: #f87171; }
+
+/* ============================================================
+ * Display-Stil-Fenster (Temperatur / Luefter / Tempo / Luftfuehrung)
+ * Bausteine: dsp-card (Wert-Karte), dsp-chip (Preset), dsp-step
+ * ============================================================ */
+.dsp-card {
+    background: rgba(128, 128, 128, 0.09);
+    border: 1px solid rgba(128, 128, 128, 0.14);
+    border-radius: 14px;
+    padding: 13px 16px;
+}
+.dsp-head .hd-ic { width: 15px; height: 15px; }
+.dsp-chip.dsp-on { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
+
+.dsp-active {
+    font-size: 11px;
+    font-weight: 700;
+    color: #2e7d32;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    background: rgba(76, 175, 80, 0.08);
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-left: auto;
+}
+body.dark-mode .dsp-active { color: #a5d6a7; }
+
+.dsp-hint { margin-top: 12px; font-size: 12px; color: var(--text-secondary); display: flex; gap: 6px; align-items: center; }
+.dsp-hint .hd-ic { width: 13px; height: 13px; flex: none; }
+.dt-grid2 .dsp-card:only-child { grid-column: span 2; }
+.df-slider { width: 100%; cursor: pointer; accent-color: var(--accent-blue); margin-top: 2px; }
+
+/* Tempo: vier Stufen-Karten */
+.ds-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.ds-card { text-align: center; padding: 16px 10px 14px; position: relative; cursor: pointer; }
+.ds-card .hd-ic { width: 22px; height: 22px; color: var(--text-secondary); }
+.ds-card b { display: block; font-size: 14px; margin-top: 8px; color: var(--text-primary); }
+.ds-card small { color: var(--text-secondary); font-size: 11.5px; }
+.ds-card.dsp-on { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
+.ds-card.dsp-on .hd-ic { color: var(--accent-blue); }
+.ds-check {
+    position: absolute; top: 8px; right: 10px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent-blue); color: #fff; font-size: 11px;
+    display: none; align-items: center; justify-content: center;
+}
+.ds-card.dsp-on .ds-check { display: flex; }
+.da-card .hd-ic { width: 30px; height: 30px; flex: none; color: var(--text-secondary); }
+.da-card.dsp-on { border-color: #e65100; box-shadow: 0 0 0 1px #e65100 inset; }
+.da-card.dsp-on .hd-ic { color: #e65100; }
+.da-card.dsp-on--cool .hd-ic { color: var(--accent-blue); }
+
+/* Temperatur-Fenster: gleiche Display-Stage wie das Luefter-Fenster.
+ * Zonen-Details klappen unter dem Eintrag aus — zwei buendige
+ * Segmentleisten (Stepper, Presets) im Stil des Modus-Toggles. */
+.dtx-hw { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.dtx-detail { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.dfx-col--l .dtx-detail { align-items: flex-end; }
+.dfx-fan-val small { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+
+.dtx-seg {
+    display: inline-flex;
+    max-width: 100%;
+    background: var(--bg-card);
+    border: 1.5px solid rgba(128, 128, 128, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+}
+.dtx-seg button {
+    border: none; background: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 700;
+    color: var(--text-primary);
+    padding: 8px 0; width: 54px; min-width: 0;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.dtx-seg--presets button {
+    font-size: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1px; padding: 6px 0; line-height: 1.15;
+}
+.dtx-seg--presets button small {
+    font-size: 10.5px; font-weight: 600; color: var(--text-secondary);
+}
+.dtx-seg--presets button.dtx-on small { color: inherit; }
+.dtx-seg button + button { border-left: 1px solid rgba(128, 128, 128, 0.25); }
+.dtx-seg button:hover { background: rgba(128, 128, 128, 0.12); }
+.dtx-seg button.dtx-on { background: rgba(59, 130, 246, 0.16); color: var(--accent-blue, #3b82f6); }
+
+/* Luefter-Fenster im X2D-Display-Layout: Modus-Toggle, Maschine mittig,
+ * Eintraege aussen mit gepunkteten Linien zur Maschine. */
+.dfx-modes { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
+.dfx-mode {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--bg-card);
+    border: 1.5px solid rgba(128, 128, 128, 0.3);
+    border-radius: 12px;
+    padding: 9px 22px;
+    font-size: 14px; font-weight: 700; color: var(--text-secondary);
+    cursor: pointer; font-family: inherit;
+}
+.dfx-mode-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid currentColor; }
+.dfx-mode--on { border-color: #22c55e; color: #16a34a; background: rgba(74, 222, 128, 0.14); }
+body.dark-mode .dfx-mode--on { color: #4ade80; }
+.dfx-mode--on .dfx-mode-dot { background: currentColor; box-shadow: inset 0 0 0 2.5px var(--bg-card); }
+
+.dfx-stage { display: grid; grid-template-columns: 1fr 250px 1fr; gap: 6px; align-items: center; position: relative; }
+.dfx-mitte img { width: 100%; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25)); }
+.dfx-col { display: flex; flex-direction: column; gap: 20px; }
+.dfx-col--l { align-items: flex-end; text-align: right; }
+.dfx-col--r { align-items: flex-start; }
+
+.dfx-fan { position: relative; min-width: 130px; }
+.dfx-fan-head { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.dfx-fan-head .hd-ic { width: 14px; height: 14px; color: var(--text-secondary); }
+.dfx-arrow { color: var(--text-secondary); opacity: 0.7; }
+.dfx-fan-val { font-size: 19px; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.dfx-fan-note { font-size: 11px; font-weight: 700; color: #e65100; margin-top: 2px; }
+body.dark-mode .dfx-fan-note { color: #ffb74d; }
+.dfx-slider { max-width: 150px; margin-top: 6px; }
+
+/* Gepunktete Verbindungslinien wie am X2D-Display: vom Eintrag horizontal,
+ * dann Knick senkrecht ans Bauteil, offener Kreis als Endpunkt. Das SVG
+ * liegt als Overlay ueber der ganzen Stage (dfxDrawWires in fan-modal.js). */
+.dfx-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dfx-wires polyline {
+    fill: none;
+    stroke: rgba(128, 128, 128, 0.75);
+    stroke-width: 1.6;
+    stroke-dasharray: 1.5 5;
+    stroke-linecap: round;
+}
+.dfx-wires circle { fill: var(--bg-card); stroke: rgba(128, 128, 128, 0.9); stroke-width: 1.6; }
+body.dark-mode .dfx-wires polyline { stroke: rgba(220, 220, 220, 0.55); }
+body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
+
+/* --- Filament-Editor (Tray-Edit) — Aufbau wie das Display
+   (wiki screen-operation/015.png): Formularzeilen mit zwei Dropdowns,
+   Farbquadrat, Temp-Anzeige, unten Abbrechen | Bestaetigen. --- */
+.tray-edit-overlay {
+    position: fixed; inset: 0; z-index: 10050;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex; align-items: center; justify-content: center;
+}
+.tray-edit-box {
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #222);
+    border-radius: 18px;
+    padding: 20px 24px;
+    width: min(520px, 94vw);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+    display: flex; flex-direction: column; gap: 18px;
+}
+.tray-edit-box h4 { margin: 0; font-size: 17px; display: flex; align-items: baseline; }
+/* Laufende Trocknung: Werte links, AMS-Bild rechts im freien Platz. */
+.dry-inhalt { display: flex; align-items: center; gap: 18px; }
+.dry-werte { flex: 1; min-width: 0; }
+/* Messspalten wie in der Materialkarte, hier als 2x2. Nebeneinander
+   passten neben das AMS-Bild nur drei — die vierte ("fertig um") stand
+   dann allein in einer zweiten Reihe. */
+.dry-mess { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px 22px; }
+/* Die Faecher dieser Einheit — Farbpunkt und Typ, wie in der Karte.
+   Mit Ueberschrift, sonst ist nicht zu erkennen, wofuer die Plaketten
+   stehen. */
+.dry-faecher-titel { margin-top: 14px; margin-bottom: 5px; font-size: 11px;
+            color: var(--text-secondary); opacity: 0.85; }
+.dry-faecher { display: flex; flex-wrap: wrap; gap: 6px; }
+.dry-fach { display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 10px 3px 4px; border-radius: 999px;
+            background: rgba(128,128,128,0.10);
+            border: 1px solid rgba(128,128,128,0.16);
+            font-size: 12px; color: var(--text-secondary); }
+.dry-fach .mz-slot-col { width: 13px; height: 13px; border-radius: 50%;
+            border: 1px solid rgba(128,128,128,0.35); }
+
+/* --- Feuchte-Gedaechtnis im AMS-Dialog ------------------------------------
+   Der Momentwert oben sagt nicht, ob getrocknet werden muss. Die Kurve zeigt
+   den Verlauf, die Zeile darunter das Urteil je Fach. */
+.fk-block { margin: 12px 0 4px; }
+.fk-block:empty { display: none; }
+.fk-kopf { display: flex; align-items: baseline; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+           text-transform: uppercase; color: var(--text-secondary);
+           margin-bottom: 6px; }
+.fk-schwelle-text { font-weight: 500; text-transform: none; letter-spacing: 0;
+           opacity: 0.75; }
+.fk-spanne { flex: 1; font-weight: 500; text-transform: none;
+            letter-spacing: 0; opacity: 0.75; }
+.fk-kurve { display: block; width: 100%; height: 46px;
+            border-radius: 8px; background: rgba(128,128,128,0.08); }
+/* Gefuellt wird nur ueber der Grenze. Eine Flaeche vom Wert bis zum Boden
+   sah bei jeder ruhigen Spule gleich aus — ein halb blauer Kasten. */
+.fk-nass { fill: rgba(239,68,68,0.20); stroke: none; }
+.fk-linie { fill: none; stroke: #3b82f6; stroke-width: 1.6;
+            vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.fk-schwelle { stroke: #ef4444; stroke-width: 1; stroke-dasharray: 4 3;
+            vector-effect: non-scaling-stroke; opacity: 0.55; }
+/* Schild am Zeiger: eigenes Element am body, nicht im Fenster — sonst
+   schnitte es der Rahmen ab und der z-index des Fensters haette es unter
+   der Spulenauswahl versteckt. */
+.fk-schild {
+    position: fixed; z-index: 2147483646; display: none;
+    pointer-events: none;
+    padding: 6px 9px; border-radius: 8px;
+    background: rgba(20, 24, 32, 0.94); color: #f3f5f8;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    font-size: 12px; line-height: 1.35; white-space: nowrap;
+    display: none;
+}
+.fk-schild b { font-weight: 700; margin-right: 7px; }
+.fk-schild span { color: #cdd5df; margin-right: 7px; }
+.fk-schild .fk-schild-zeit { display: block; margin: 2px 0 0; opacity: 0.75; }
+.fk-kurve[data-fk] { cursor: crosshair; }
+
+.fk-frisch { font-size: 12px; color: var(--text-secondary);
+            padding: 9px 11px; border-radius: 8px;
+            background: rgba(128,128,128,0.08); }
+.fk-fach { display: flex; align-items: center; gap: 8px; margin-top: 7px;
+           font-size: 12px; color: var(--text-secondary); }
+.fk-fach .mz-slot-col { width: 12px; height: 12px; border-radius: 50%; flex: none;
+           border: 1px solid rgba(128,128,128,0.35); }
+.fk-fach-name { font-weight: 600; color: var(--text-primary); flex: none; }
+.fk-urteil { flex: none; padding: 2px 8px; border-radius: 999px;
+             font-size: 11px; font-weight: 600; }
+.fk-urteil--trocken { background: rgba(34,197,94,0.16); color: #16a34a; }
+.fk-urteil--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.fk-urteil--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+.fk-detail { min-width: 0; overflow: hidden; text-overflow: ellipsis;
+             white-space: nowrap; }
+
+/* Gemessener Hinweis in der Druckvorbereitung: er schlaegt den geschaetzten
+   aus der Lagerzeit, also darf er nicht wie eine Nebenbemerkung aussehen. */
+.prep-hinweis--mess { color: #b45309; font-weight: 600; }
+
+/* Getrocknetes Filament als Plakette — es ist eine Eigenschaft des Laufs,
+   keine Messgroesse, deshalb nicht als vierte Spalte. */
+.dry-chip-kopf { font-size: 10.5px; font-weight: 600; opacity: 0.7;
+            margin-right: 7px; text-transform: uppercase; letter-spacing: 0.03em; }
+.dry-chip { display: inline-flex; align-items: center; margin-bottom: 12px;
+            padding: 4px 11px; border-radius: 999px; font-size: 12.5px;
+            font-weight: 650; background: rgba(128,128,128,0.12);
+            color: var(--text-primary); }
+/* Nicht an den rechten Rand geklebt — das Bild steht eingerueckt, so
+   wie die Werte links auch Abstand zum Rand haben. */
+.dry-ams { flex: none; width: 105px; height: auto; object-fit: contain;
+           margin-right: 34px; }
+.tray-edit-zeile {
+    display: flex; align-items: center; gap: 14px;
+}
+.tray-edit-label {
+    flex: 0 0 128px;
+    font-size: 13.5px; font-weight: 600;
+}
+.tray-edit-felder { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.tray-edit-select {
+    flex: 1; min-width: 0;
+    font-size: 13.5px;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    background: var(--bg-secondary, #f2f3f5);
+    color: var(--text-primary, #222);
+    padding: 9px 30px 9px 10px;
+    /* Eigener Pfeil statt des Zeichens vom Betriebssystem — eine Quelle
+       fuer alle Oberflaechen, siehe `--pfeil` in design-tokens.css. */
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: var(--pfeil);
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    background-size: 15px;
+    cursor: pointer;
+}
+/* Die Spoolman-Rolle ist dieselbe Entscheidung wie Hersteller und Sorte
+   darueber, nur aus der anderen Quelle — also sieht sie auch so aus.
+   Als nackter Knopf griff nur die Hintergrundfarbe: die Masse stehen in
+   `.tray-edit-actions button`, und dort steht er nicht. */
+.tray-edit-spoolknopf {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 9px;
+    font: inherit; font-size: 13.5px; text-align: left;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    background: var(--bg-secondary, #f2f3f5);
+    color: var(--text-primary, #222);
+    padding: 9px 10px; cursor: pointer;
+}
+.tray-edit-spoolknopf:hover { border-color: rgba(128, 128, 128, 0.5); }
+.tray-edit-spoolpunkt {
+    display: none; flex: 0 0 auto; width: 13px; height: 13px;
+    border-radius: 50%; border: 1px solid rgba(128, 128, 128, 0.35);
+}
+.tray-edit-spoolname {
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tray-edit-swatch {
+    width: 46px; height: 34px; border-radius: 9px;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    cursor: pointer; flex: 0 0 auto; position: relative; overflow: hidden;
+}
+.tray-edit-swatch input {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+}
+.tray-edit-palette { display: flex; gap: 6px; flex-wrap: wrap; }
+.tray-farbe {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.4);
+    cursor: pointer; display: inline-block;
+}
+.tray-farbe--on { border: 2.5px solid #4ade80; }
+.tray-edit-temps-zeile { gap: 8px; }
+.tray-edit-tdim { font-size: 13px; color: var(--text-secondary, #777); }
+.tray-edit-twert { font-size: 14px; font-weight: 700; margin-right: 10px; }
+.tray-edit-actions { display: flex; justify-content: flex-end; gap: 10px; }
+.tray-edit-actions button {
+    border: none; border-radius: var(--knopf-radius); padding: var(--knopf-polster);
+    font-size: var(--knopf-schrift); font-weight: 600; cursor: pointer;
+}
+.tray-edit-cancel { background: rgba(128, 128, 128, 0.15); color: var(--text-primary, #222); }
+.tray-edit-save { background: #4ade80; color: #fff; }
+/* Leert das Fach — muss sich von "Abbrechen" unterscheiden.
+   Beide trugen dieselbe Klasse und standen nebeneinander. */
+.tray-edit-danger { background: rgba(220, 38, 38, 0.10); color: #c62828;
+    box-shadow: inset 0 0 0 1.5px rgba(220, 38, 38, 0.45); }
+body.dark-mode .tray-edit-danger { color: #ff8a80; }
+
+/* Stift-Knopf in den Fach-Zeilen des Filament-Tabs */
+.mz-edit-btn {
+    margin-left: 6px; flex: 0 0 auto;
+    border: 1px solid rgba(128, 128, 128, 0.35);
+    background: transparent; color: var(--text-secondary, #777);
+    border-radius: 8px; padding: 2px 8px; font-size: 12px; cursor: pointer;
+}
+.mz-edit-btn:hover { color: var(--text-primary, #222); }
+
+/* Trocknungs-Dialog (014): Feuchte-Zeile + Grad/Stunden-Felder */
+.dry-feuchte { font-size: 14px; color: var(--text-secondary, #777); }
+.dry-feld {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--bg-secondary, #f2f3f5);
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px; padding: 6px 10px;
+}
+.dry-feld input {
+    width: 52px; border: none; background: transparent;
+    color: var(--text-primary, #222); font-size: 14px; font-weight: 700;
+    text-align: right; outline: none;
+}
+.dry-einheit { font-size: 12.5px; color: var(--text-secondary, #777); }
+
+/* Drehen waehrend des Trocknens. Steht unter den Zahlen und nicht neben
+   ihnen: es ist eine Entscheidung, kein Messwert, und in einer Zeile mit
+   °C und h wuerde es als dritter Wert gelesen. */
+.dry-drehen {
+    display: flex; align-items: center; gap: 9px;
+    margin: 10px 0 2px; font-size: 13px; cursor: pointer;
+    color: var(--text-primary, #222);
+}
+.dry-drehen input { width: 16px; height: 16px; accent-color: var(--color-blue, #2196F3); }
+
+/* „Drucker abkuehlen" — steht neben den Modus-Knoepfen, traegt aber keine
+   Auswahl-Bedeutung: es ist eine Handlung, kein Zustand. Darum blau
+   getoent statt mit Auswahlpunkt. */
+.dfx-kuehlen {
+    gap: 7px;
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.35);
+    color: var(--accent-blue);
+}
+
+.dfx-kuehlen:hover { background: rgba(33, 150, 243, 0.18); }
+
+/* Laeuft die Kuehlung, traegt der Knopf die Warnfarbe: er beendet dann
+   etwas, statt es zu starten. */
+.dfx-kuehlen--an {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.40);
+    color: #b26a00;
+}
+
+.dfx-kuehlen--an:hover { background: rgba(255, 152, 0, 0.20); }
+body.dark-mode .dfx-kuehlen--an { color: #ffb74d; }
+
+/* Der Kuehl-Knopf steht mittig unter der Maschine, nicht in der
+   Modus-Zeile: die beiden Modi sind eine Auswahl, das hier eine Handlung. */
+.dfx-kuehl-zeile { display: flex; justify-content: center; margin-top: 14px; }
+
+/* Rueckfrage des Druckers nach dem Laden — nur sichtbar, solange er wartet
+   (Filament-Schritt 8). Abgesetzt, damit sie nicht wie eine weitere
+   Aktionszeile aussieht. */
+.fil-confirm {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--border-color, rgba(128,128,128,.35));
+    border-radius: 10px;
+    text-align: center;
+}
+/* Die zwei Knoepfe mittig und nur so breit wie noetig — sie sollen nicht wie
+   die Aktionszeile darueber die volle Breite fuellen. */
+.fil-confirm .fil-actions {
+    justify-content: center;
+}
+.fil-confirm .fil-actions .jog-abtn {
+    flex: 0 0 auto;
+}

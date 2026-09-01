@@ -1,0 +1,285 @@
+/* ============================================
+ * Base Styles - Reset, Body, HTML
+ * ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+/* iOS PWA Safe Area Support */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+}
+
+body {
+    font-family: var(--font-family);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overscroll-behavior: none;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smooth transitions for theme switching */
+body,
+.card,
+.action-btn,
+.control-btn,
+.status-card,
+.sensor-item {
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Container */
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+    padding: var(--margin-h);
+    padding-top: 8px;  /* Kompakter ohne Header — Cards rücken nach oben */
+    padding-bottom: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-md);
+        padding-top: 8px;
+        padding-bottom: calc(70px + var(--safe-area-inset-bottom));
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-blue);
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(0.8); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes blink-hourglass {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes pulse-header {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes hms-alert {
+    0%, 100% {
+        border-color: #ff4444;
+        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+    }
+    50% {
+        border-color: #ff6666;
+        box-shadow: 0 0 10px 5px rgba(255, 68, 68, 0.3);
+    }
+}
+
+.hourglass-spinning {
+    display: inline-block;
+    animation: blink-hourglass 1.5s ease-in-out infinite;
+}
+
+/* Icons */
+.icon {
+    display: inline-block;
+    width: 20px;
+    text-align: center;
+}
+
+/* High-DPI Optimizations */
+@media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 3dppx) {
+    body {
+        text-rendering: optimizeLegibility;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    body.dark-mode {
+        --bg-primary: #000000;
+        --bg-card: #1a1f2e;
+    }
+
+    .card {
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .status-value,
+    .card-title,
+    .print-file {
+        font-weight: 700 !important;
+        color: #ffffff !important;
+    }
+
+    .control-btn {
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        font-weight: 600 !important;
+    }
+}
+
+/* ========== MODERN SCROLLBARS ========== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track-piece {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.25);
+    background-clip: padding-box;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+    display: none;
+}
+
+/* Firefox scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+body.dark-mode * {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* ========== SLIDE ANIMATIONS ========== */
+@keyframes slideInUp {
+    from { transform: translateX(-50%) translateY(100%); opacity: 0; }
+    to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
+
+@keyframes slideOutDown {
+    from { transform: translateX(-50%) translateY(0); opacity: 1; }
+    to { transform: translateX(-50%) translateY(100%); opacity: 0; }
+}
+
+/* HQ Button */
+#hq-button {
+    transition: all var(--transition-normal);
+}
+
+#hq-button:disabled {
+    opacity: 0.5;
+    cursor: wait;
+}
+
+#hq-button.active {
+    background: rgba(255, 107, 0, 0.2) !important;
+    border-color: #ff6b00 !important;
+}
+
+/* Custom Range Input */
+input[type="range"] {
+    -webkit-appearance: none;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 5px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-blue);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--accent-blue);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}

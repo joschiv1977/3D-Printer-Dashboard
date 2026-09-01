@@ -1,0 +1,119 @@
+/* ============================================
+ * Camera - Stream, Overlay Buttons, Zoom
+ * ============================================ */
+
+/* ========== CAMERA CONTAINER ========== */
+.camera-container {
+    background: black;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 4px;
+}
+
+.camera-stream {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* ========== CAMERA OVERLAY ========== */
+.camera-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* ========== OVERLAY BUTTONS ========== */
+.overlay-btn {
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /* No backdrop-filter for performance! */
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.overlay-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* iOS-style press */
+.overlay-btn:active {
+    transform: scale(0.92);
+    opacity: 0.8;
+}
+
+/* ========== CAMERA CONTAINER FIXED ASPECT RATIO ========== */
+.camera-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #0f1419;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+/* Image fills container without distortion */
+.camera-container > #camera-stream,
+.camera-container > #camera-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ========== LICHT IM KAMERABILD ==========
+   Oben links, getrennt von der Stream-Gruppe rechts: die steuert die
+   Ansicht, das Licht dagegen echte Hardware am Drucker.
+   Der Knopf traegt .control-btn, weil updateBothButtons('light-btn', …)
+   die Klasse beim Umschalten neu setzt — hier bekommt er dieselbe Optik
+   wie die Overlay-Knoepfe, ohne dass die Logik angefasst werden muss. */
+.camera-light {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 4;
+}
+
+/* `body` davor, damit die Regel `body.dark-mode .control-btn.warning` aus
+   components.css nicht gewinnt — die faerbt den Knopf sonst orange, sobald
+   das Licht an ist, und er passt nicht mehr zu den Nachbarn.
+   Kein backdrop-filter: die Overlay-Knoepfe verzichten bewusst darauf. */
+body .camera-light .control-btn,
+body .camera-light .control-btn.warning {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+body .camera-light .control-btn:hover,
+body .camera-light .control-btn.warning:hover {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Licht an: nur ein warmer Rand, damit der Zustand erkennbar bleibt, ohne
+   die Flaeche anders einzufaerben als die Nachbarn. */
+body .camera-light .control-btn.warning {
+    border-color: rgba(250, 204, 21, 0.85);
+}

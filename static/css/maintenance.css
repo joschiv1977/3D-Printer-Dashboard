@@ -1,0 +1,574 @@
+
+
+.maint-printer-select {
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+body.dark-mode .maint-printer-select {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.maint-printer-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+/* Header Buttons (glassmorphism) */
+.maint-btn {
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius);
+    cursor: pointer;
+    font-size: var(--knopf-schrift);
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    background: var(--bg-section);
+    color: var(--text-primary);
+}
+
+body.dark-mode .maint-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--text-primary);
+}
+
+.maint-btn:hover {
+    background: var(--bg-hover);
+    border-color: rgba(33, 150, 243, 0.3);
+}
+
+body.dark-mode .maint-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.maint-btn--primary {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: var(--accent-blue);
+}
+
+body.dark-mode .maint-btn--primary {
+    background: rgba(33, 150, 243, 0.15);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #64b5f6;
+}
+
+.maint-btn--primary:hover {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+.maint-btn--success {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.25);
+    color: #388e3c;
+}
+
+body.dark-mode .maint-btn--success {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: rgba(76, 175, 80, 0.3);
+    color: #81c784;
+}
+
+.maint-btn--success:hover {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.maint-btn--danger {
+    background: rgba(244, 67, 54, 0.12);
+    border-color: rgba(244, 67, 54, 0.25);
+    color: #c62828;
+}
+
+body.dark-mode .maint-btn--danger {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: rgba(244, 67, 54, 0.3);
+    color: #ef9a9a;
+}
+
+.maint-btn--danger:hover {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: rgba(244, 67, 54, 0.4);
+}
+
+/* Content Area */
+.maint-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+body.dark-mode .maint-content {
+    background: rgba(26, 31, 46, 0.6);
+    border-color: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+/* Alerts */
+.maint-alert {
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    display: none;
+    font-size: 14px;
+    border: 1px solid transparent;
+}
+
+.maint-alert.show {
+    display: block;
+}
+
+.maint-alert--success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #2e7d32;
+    border-color: rgba(76, 175, 80, 0.2);
+}
+
+body.dark-mode .maint-alert--success {
+    background: rgba(76, 175, 80, 0.12);
+    color: #81c784;
+    border-color: rgba(76, 175, 80, 0.2);
+}
+
+.maint-alert--error {
+    background: rgba(244, 67, 54, 0.1);
+    color: #c62828;
+    border-color: rgba(244, 67, 54, 0.2);
+}
+
+body.dark-mode .maint-alert--error {
+    background: rgba(244, 67, 54, 0.12);
+    color: #ef9a9a;
+    border-color: rgba(244, 67, 54, 0.2);
+}
+
+/* Empty State */
+.maint-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+ * Maintenance Modals — SD-Card Pattern
+ * ============================================ */
+
+/* Modal Footer (shared pattern) */
+.maint-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+body.dark-mode .maint-modal-footer {
+    border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.maint-modal-footer--split {
+    justify-content: space-between;
+}
+
+/* Form Elements (maintenance modal forms) */
+.maint-form-group {
+    margin-bottom: 16px;
+}
+
+.maint-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.maint-form-input,
+.maint-form-select,
+.maint-form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+body.dark-mode .maint-form-input,
+body.dark-mode .maint-form-select,
+body.dark-mode .maint-form-textarea {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.maint-form-input:focus,
+.maint-form-select:focus,
+.maint-form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.12);
+}
+
+.maint-form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Info Box */
+.maint-info-box {
+    background: var(--bg-section);
+    border: 1px solid var(--border-color);
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+body.dark-mode .maint-info-box {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.maint-info-box p {
+    margin: 0;
+}
+
+/* Hint Text */
+.maint-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 5px 0 0 0;
+}
+
+/* Checkbox Label */
+.maint-checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.maint-checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+/* Custom Postpone Row */
+.maint-postpone-custom {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.maint-postpone-custom input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: inherit;
+}
+
+body.dark-mode .maint-postpone-custom input {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Checklist */
+.maint-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.maint-checklist li {
+    padding: 10px 12px;
+    background: var(--bg-section);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+body.dark-mode .maint-checklist li {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.maint-checklist input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ============================================
+ * Maintenance — Mobile Responsive
+ * ============================================ */
+@media (max-width: 768px) {
+    .maint-header {
+        padding: 14px 16px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .maint-printer-select {
+        width: 100%;
+    }
+
+    .maint-header-actions .maint-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .maint-content {
+        padding: 14px;
+    }
+
+    .maint-postpone-custom {
+        flex-direction: column;
+    }
+}
+
+/* ==========================================================================
+   Wartung: Zeilen statt Kacheln  (21aug26)
+   --------------------------------------------------------------------------
+   Zwoelf Wartungen lagen als grosse Karten in zwei Spalten — vier passten auf
+   den Bildschirm, der Rest brauchte drei Bildschirme Scrollen. Jede Karte trug
+   acht Angaben, von denen sechs selten interessieren. Jetzt eine Zeile je
+   Wartung, gruppiert nach Dringlichkeit; alles Weitere im Aufklapper.
+   ========================================================================== */
+.container { --linie: rgba(0, 0, 0, 0.08); }
+[data-theme="dark"] .container { --linie: rgba(255, 255, 255, 0.10); }
+
+/* ---- Kopf: eine Zeile ---- */
+.maint-kopf {
+    display: flex; align-items: center; gap: 9px;
+    margin-bottom: 12px; flex-wrap: wrap;
+}
+.maint-kopf-titel {
+    margin: 0; font-size: 17px; font-weight: 650;
+    display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+}
+.maint-kopf-luft { flex: 1; }
+.maint-kopf .maint-printer-select { max-width: 220px; margin: 0; }
+
+/* ---- Menue hinter „Verwalten" ---- */
+.maint-menue-huelle { position: relative; display: inline-flex; }
+.maint-menue {
+    position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+    min-width: 250px; display: none; flex-direction: column;
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 11px; box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22); padding: 5px;
+}
+.maint-menue--auf { display: flex; }
+.maint-menue button,
+.maint-menue label {
+    display: flex; align-items: center; gap: 9px; width: 100%;
+    border: 0; background: none; color: var(--text-primary);
+    font: inherit; font-size: 13px; padding: 8px 10px;
+    border-radius: 8px; cursor: pointer; text-align: left;
+}
+.maint-menue button:hover,
+.maint-menue label:hover { background: var(--bg-card-variant); }
+.maint-menue .hd-ic { color: var(--text-secondary); }
+.maint-menue hr { border: 0; border-top: 1px solid var(--linie); margin: 5px 8px; width: 100%; }
+.maint-menue-weg,
+.maint-menue-weg .hd-ic { color: var(--color-red) !important; }
+.maint-menue label input { margin-left: auto; width: 34px; height: 19px; accent-color: var(--color-blue); }
+.maint-menue-kopf {
+    font-size: 11px; font-weight: 640; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--text-secondary); padding: 7px 10px 3px;
+}
+
+/* ---- Lage: ein Satz statt drei Zaehlkarten ---- */
+.maint-lage {
+    display: flex; align-items: center; gap: 11px;
+    padding: 11px 14px; margin-bottom: 14px;
+    border: 1px solid var(--border-color); border-radius: var(--radius-lg, 12px);
+    background: var(--bg-card); border-left: 3px solid var(--strich);
+}
+.maint-lage--ruhig   { --strich: var(--color-green); }
+.maint-lage--achtung { --strich: var(--color-red); }
+.maint-lage-ic {
+    width: 28px; height: 28px; border-radius: 50%; flex: none;
+    display: grid; place-items: center;
+    background: color-mix(in srgb, var(--strich) 16%, transparent);
+    color: var(--strich);
+}
+.maint-lage-t { flex: 1; min-width: 0; }
+.maint-lage-t b { display: block; font-size: 13.5px; font-weight: 640; }
+.maint-lage-t span { font-size: 12px; color: var(--text-secondary); }
+
+/* ---- Gruppen ---- */
+.maint-gruppe { margin-bottom: 18px; }
+.maint-gruppe-kopf {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
+    font-size: 12px; font-weight: 640; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--text-secondary);
+}
+.maint-zahl {
+    background: var(--bg-card-variant); border: 1px solid var(--border-color);
+    border-radius: 999px; padding: 1px 8px; font-size: 11px; letter-spacing: 0;
+}
+.maint-liste {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px); box-shadow: var(--shadow-card); overflow: hidden;
+}
+
+/* ---- Eine Wartung = eine Zeile ---- */
+.maint-zeile {
+    display: flex; align-items: center; gap: 11px;
+    padding: 10px 13px; cursor: pointer; border-left: 3px solid transparent;
+}
+.maint-zeile + .maint-detail + .maint-zeile,
+.maint-zeile + .maint-zeile { border-top: 1px solid var(--linie); }
+.maint-zeile:hover { background: var(--bg-card-variant); }
+.maint-zeile--bald  { border-left-color: var(--color-orange); }
+.maint-zeile--ueber { border-left-color: var(--color-red); }
+.maint-z-ic {
+    width: 32px; height: 32px; border-radius: 9px; flex: none;
+    display: grid; place-items: center;
+    background: var(--bg-card-variant); border: 1px solid var(--linie);
+    color: var(--text-secondary);
+}
+.maint-z-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.maint-z-name {
+    font-weight: 620; font-size: 13.5px; display: flex; align-items: center; gap: 7px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);
+}
+.maint-z-meta { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+.maint-z-rest {
+    flex: none; width: 180px; display: flex; flex-direction: column;
+    gap: 4px; align-items: flex-end;
+}
+.maint-z-rest-text { font-size: 12px; font-variant-numeric: tabular-nums; }
+.maint-z-rest-text--ueber { color: var(--color-red); font-weight: 640; }
+.maint-z-rest-text--bald  { color: var(--color-orange); font-weight: 640; }
+.maint-z-bahn {
+    width: 100%; height: 4px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.16); overflow: hidden;
+}
+.maint-z-bahn i { display: block; height: 100%; border-radius: 999px; background: var(--color-green); }
+.maint-z-bahn i.bald  { background: var(--color-orange); }
+.maint-z-bahn i.ueber { background: var(--color-red); }
+/* Ohne eine einzige Durchfuehrung gibt es keinen Fortschritt zu zeigen — der
+   alte Balken mass ab dem Anlegen der Aufgabe und sah aus wie ein Verlauf. */
+.maint-z-nie { font-size: 11px; color: var(--text-secondary); font-style: italic; }
+
+.maint-z-akt { flex: none; display: flex; gap: 5px; align-items: center; }
+.maint-z-erledigt {
+    border: 1px solid rgba(76, 175, 80, 0.35); background: rgba(76, 175, 80, 0.12);
+    color: #2e7d32; border-radius: 8px; padding: 5px 11px;
+    font: inherit; font-size: 12px; font-weight: 600; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+}
+[data-theme="dark"] .maint-z-erledigt { color: #81c784; }
+.maint-z-mehr {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-secondary); border-radius: 8px;
+    width: 28px; height: 28px; cursor: pointer; display: grid; place-items: center;
+}
+.maint-z-mehr:hover { color: var(--text-primary); }
+/* Nur „hoch" bekommt eine Marke — zwoelf bunte Chips ordnen nichts. */
+.maint-hoch {
+    font-size: 10.5px; font-weight: 640; padding: 1px 7px; border-radius: 999px;
+    background: rgba(229, 83, 75, 0.13); color: #c62828; flex: none;
+}
+[data-theme="dark"] .maint-hoch { color: #ef9a9a; }
+
+/* ---- Aufgeklappte Zeile ---- */
+.maint-detail {
+    display: none; padding: 0 13px 13px 56px;
+    border-top: 1px solid var(--linie); background: var(--bg-card-variant);
+}
+.maint-zeile.maint-auf + .maint-detail { display: block; }
+.maint-detail-text { font-size: 12.5px; color: var(--text-secondary); padding: 11px 0 9px; }
+.maint-detail-werte {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px 16px; margin-bottom: 11px;
+}
+.maint-dw { display: flex; flex-direction: column; }
+.maint-dw span { font-size: 11px; color: var(--text-secondary); }
+.maint-dw b { font-size: 13px; font-weight: 640; font-variant-numeric: tabular-nums; }
+.maint-detail-akt { display: flex; gap: 6px; flex-wrap: wrap; }
+.maint-dbtn {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-primary); border-radius: 8px; padding: 5px 11px;
+    font: inherit; font-size: 12px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px;
+}
+.maint-dbtn:hover { border-color: var(--color-blue); }
+
+@media (max-width: 780px) {
+    .maint-z-rest { width: 120px; }
+    .maint-z-erledigt span { display: none; }
+    .maint-detail { padding-left: 13px; }
+}
+
+/* Verschieben: Chips statt bildschirmbreiter Knoepfe mit Erklaertext. */
+.maint-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+.maint-chips button {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-primary); border-radius: 999px; padding: 7px 15px;
+    font: inherit; font-size: 13px; cursor: pointer;
+}
+.maint-chips button:hover { border-color: var(--color-blue); }
+.sd-modal-title { display: flex; align-items: center; gap: 9px; }
+
+/* Prüfliste als eine Karte mit Trennlinien statt vier einzelner Kästen —
+   sie gehören zusammen, es ist eine Liste und keine Sammlung von Knöpfen. */
+.maint-checklist {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    overflow: hidden;
+}
+.maint-checklist li {
+    background: none; border: 0; border-radius: 0; margin: 0;
+    padding: 9px 12px; font-size: 13.5px;
+}
+.maint-checklist li + li { border-top: 1px solid var(--linie, rgba(128,128,128,.15)); }
+body.dark-mode .maint-checklist li { background: none; border-color: transparent; }
+body.dark-mode .maint-checklist li + li { border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.maint-checklist input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--color-green); }
+.maint-checklist label { cursor: pointer; flex: 1; }
+
+/* Der Abschluss-Knopf ist die Hauptaktion des Dialogs. */
+.maint-modal-footer .maint-btn--success {
+    background: var(--color-green); border-color: var(--color-green);
+    color: #fff; font-weight: 600;
+}
+.maint-modal-footer .maint-btn--success:hover { filter: brightness(1.06); }

@@ -1,0 +1,36 @@
+    <!-- SD Card Modal -->
+    <div id="sdCardModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1002;">
+        <div class="modal-panel sd-modal-panel sd-modal-panel--full">
+            <!-- Header -->
+            <div class="sd-modal-header">
+                <h2 class="sd-modal-title"><svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M10 7v3M13 7v3M16 8v2"/></svg> <span id="sd-card-title"></span></h2>
+                <div class="sd-header-actions">
+                    <label for="sd-file-upload" class="sd-header-btn">
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg>
+                        <span id="upload-file-text"></span>
+                        <input id="sd-file-upload" type="file" accept=".gcode,.3mf" style="display:none;" onchange="handleFileUpload(this)">
+                    </label>
+                    <button id="sd-refresh-btn" class="sd-header-btn" onclick="handleSDRefresh()">
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg>
+                        <span id="sd-refresh-text"></span>
+                    </button>
+                    <button class="sd-close-btn" onclick="closeSDModal()">&times;</button>
+                </div>
+            </div>
+            <!-- Scrollable Content -->
+            <div class="sd-modal-body">
+                <div id="sd-loading" class="sd-loading-state">
+                    <div class="loading"></div>
+                    <p id="sd-loading-text"></p>
+                </div>
+                <div id="sd-files-container" style="display:none;">
+                    <div id="sd-files-list" class="sd-file-list">
+                        <!-- File cards rendered here -->
+                    </div>
+                </div>
+                <div id="sd-error" class="sd-error-state" style="display:none;">
+                    <span><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg> <span id="sd-error-text"></span></span>
+                </div>
+            </div>
+        </div>
+    </div>

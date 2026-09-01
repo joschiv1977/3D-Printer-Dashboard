@@ -1,0 +1,353 @@
+/* ==========================================================================
+   Spulenauswahl  (24aug26)
+   --------------------------------------------------------------------------
+   Ein Fenster statt der Auswahlliste in der Material-Karte. Beim
+   Spulenwechsel sucht man nach FARBE und Restmenge — beides stand in der
+   Liste nur als Text am Zeilenende.
+
+   Das Rad ist der Kern: Aussenring in Filamentfarbe, so weit gefuellt wie
+   die Spule voll ist, Prozentzahl in der Mitte.
+   ========================================================================== */
+
+.spw-panel {
+    position: absolute;
+    width: 96%;
+    max-width: 1180px;
+    max-height: 90vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-xl, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* .modal-panel liegt mit 95 % Deckkraft und Weichzeichner ueber dem
+       dunklen Schleier — das faerbt die Flaeche grau, waehrend die Karten
+       darauf deckend weiss sind. Hier deckend, wie im Entwurf. */
+    background: var(--bg-card) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.spw-kopf {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.spw-titel {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.spw-kopf .sd-close-btn { margin-left: auto; }
+
+/* ---- Werkzeugleiste ---- */
+.spw-werkzeuge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.spw-suche { position: relative; flex: 1 1 200px; min-width: 170px; }
+.spw-suche svg {
+    position: absolute; left: 11px; top: 50%;
+    transform: translateY(-50%); color: var(--text-secondary);
+}
+.spw-suche input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13.5px;
+}
+.spw-suche input:focus { outline: none; border-color: var(--accent-blue); }
+
+.spw-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.spw-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-variant);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.spw-chip b { color: var(--text-primary); font-weight: 700; }
+.spw-chip--an {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+.spw-chip--an b { color: inherit; }
+.spw-chip-punkt { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+.spw-sortierung {
+    padding: 7px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius, 10px);
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+/* ---- Empfehlungsband ---- */
+.spw-band {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 18px;
+    background: rgba(33, 150, 243, 0.07);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+.spw-band .hd-ic { color: var(--accent-blue); }
+.spw-band--leer { background: rgba(255, 152, 0, 0.08); }
+.spw-band--leer .hd-ic { color: var(--accent-orange); }
+
+/* ---- Raster ---- */
+.spw-raster {
+    display: grid;
+    /* minmax(0, 1fr) statt 1fr: eine 1fr-Spalte schrumpft NICHT unter ihren
+       Inhalt. Lange Namen wie "PolyLite™ ASA Dark Green" schoben das Raster
+       damit ueber den Rand hinaus, die dritte Spalte war abgeschnitten und
+       unten stand ein Querbalken (24aug26 gesehen). */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 16px 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+}
+@media (max-width: 1000px) { .spw-raster { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .spw-raster { grid-template-columns: minmax(0, 1fr); } }
+
+.spw-leer {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* ---- Eine Spule ---- */
+.spw-spule {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 13px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, transform .12s, box-shadow .15s;
+}
+.spw-spule:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--text-secondary);
+}
+.spw-spule--passt { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
+.spw-spule--aktiv { border-color: var(--accent-green); box-shadow: 0 0 0 1px var(--accent-green) inset; }
+.spw-spule--knapp { border-color: var(--accent-orange); }
+/* Die getroffene Wahl traegt den kraeftigsten Rand — sie sticht auch
+   neben „passt" und „aktiv" heraus. */
+.spw-spule--wahl { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue) inset; }
+.spw-spule--leer { opacity: .45; cursor: not-allowed; }
+.spw-spule--leer:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
+
+.spw-rad {
+    --fuell: 0;
+    --farbe: #8a8a8a;
+    width: 62px; height: 62px;
+    flex: none;
+    position: relative;
+    border-radius: 50%;
+    background: conic-gradient(var(--farbe) calc(var(--fuell) * 1%), rgba(128, 128, 128, 0.16) 0);
+}
+.spw-rad::after {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+.spw-rad > span {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-size: 12.5px; font-weight: 700;
+    color: var(--text-primary);
+    z-index: 1;
+}
+
+.spw-text { flex: 1; min-width: 0; display: block; }
+.spw-hersteller { display: block; font-size: 11.5px; color: var(--text-secondary); }
+.spw-name {
+    display: block;
+    font-size: 14px; font-weight: 650;
+    margin: 1px 0 5px;
+    padding-right: 4px;
+    color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.spw-zeile { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.spw-material {
+    font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.12);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+.spw-rest { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.spw-meter { font-size: 11.5px; color: var(--text-secondary); }
+
+.spw-fuss {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 7px;
+    font-size: 11px; color: var(--text-secondary);
+}
+.spw-fuss span { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Feuchte-Gedaechtnis: nur an Rollen, die wirklich im AMS lagen. Trocken
+   bleibt grau — sonst leuchtet die halbe Liste, ohne etwas zu sagen. */
+.spw-feucht {
+    padding: 2px 7px; border-radius: 999px; font-weight: 600;
+    background: rgba(128,128,128,0.12);
+}
+.spw-feucht--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.spw-feucht--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+/* Die Plakette ist anklickbar und oeffnet die Vorgeschichte. */
+.spw-feucht { cursor: pointer; gap: 4px; }
+.spw-feucht:hover { filter: brightness(0.95); }
+.spw-feucht .hd-ic:last-child { opacity: 0.55; margin-left: -1px; }
+
+/* Fenster mit der Vorgeschichte einer Rolle. Steckte vorher als Kurve
+   unter jeder Karte — auf elf Karten war das Tapete. */
+.spf-box { max-width: 540px; width: 100%; }
+.spf-kopf {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin: -2px 0 10px; font-size: 12px; color: var(--text-secondary);
+}
+.spf-urteil { padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 11.5px; }
+.spf-urteil--trocken { background: rgba(34,197,94,0.16); color: #16a34a; }
+.spf-urteil--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.spf-urteil--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+.spf-spanne { flex: 1; }
+.spf-grenze { opacity: 0.8; }
+.spf-box .fk-kurve { height: 96px; }
+.spf-werte {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px; margin: 12px 0 4px;
+}
+.spf-wert {
+    padding: 8px 11px; border-radius: 9px;
+    background: rgba(128,128,128,0.10);
+}
+.spf-wert-kopf {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em;
+    text-transform: uppercase; color: var(--text-secondary); margin-bottom: 3px;
+}
+.spf-wert-zahl {
+    font-size: 15px; font-weight: 700; color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+
+
+.spw-marke {
+    position: absolute; top: 10px; right: 10px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
+}
+.spw-marke--aktiv { background: rgba(76, 175, 80, 0.15); color: #2e7d32; }
+.spw-marke--passt { background: rgba(33, 150, 243, 0.15); color: #1565c0; }
+.spw-marke--knapp { background: rgba(255, 152, 0, 0.16); color: #b26a00; }
+body.dark-mode .spw-marke--aktiv { color: #8bd18e; }
+body.dark-mode .spw-marke--passt { color: #8fc6f5; }
+body.dark-mode .spw-marke--knapp { color: #ffb74d; }
+
+/* ---- Fusszeile des Fensters ---- */
+.spw-fussleiste {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border-color);
+}
+
+.modal-btn--gruen {
+    background: rgba(76, 175, 80, 0.12) !important;
+    border-color: rgba(76, 175, 80, 0.35) !important;
+    color: #2e7d32 !important;
+}
+body.dark-mode .modal-btn--gruen { color: #8bd18e !important; }
+.modal-btn--gruen:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---- Der Knopf in der Material-Karte, der das Fenster oeffnet ----
+   Er zeigt schon, WELCHE Spule aktiv ist: Farbpunkt plus Name. Die alte
+   Auswahlliste zeigte dasselbe, konnte aber nur eine Zeile Text. */
+.mz-spulknopf {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius, 10px);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.mz-spulknopf:hover { border-color: var(--text-secondary); background: var(--bg-card-variant); }
+.mz-spulknopf #mz-spulknopf-text,
+.mz-spulknopf > span:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mz-spulknopf .hd-ic { color: var(--text-secondary); }
+
+.mz-spulknopf__punkt {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex: none;
+    border: 1px solid var(--border-color);
+    background: rgba(128,128,128,0.25);
+}

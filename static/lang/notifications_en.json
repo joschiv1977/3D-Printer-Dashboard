@@ -1,0 +1,399 @@
+{
+  "notifications": {
+    "print_started": {
+      "title": "🚀 Print Started!",
+      "body": "'{filename}' has been started. Live Activity started."
+    },
+    "print_finished": {
+      "title": "✅ Print Completed!",
+      "body": "'{filename}' was successfully printed.\nPrint time: {duration}"
+    },
+    "print_cancelled": {
+      "title": "🛑 Print Cancelled",
+      "body": "'{filename}' was cancelled."
+    },
+    "print_failed": {
+      "title": "❌ Print Error!",
+      "body": "'{filename}' has failed."
+    },
+    "filament_change_required": {
+      "title": "📥 Filament Change Required!",
+      "body": "'{filename}' is waiting for filament: {filament_info} ({progress}%)"
+    },
+    "ams_filament_change": {
+      "title": "🔄 AMS Filament Change",
+      "body": "Filament source: {from_slot} → {to_slot}"
+    },
+    "filament_change_completed": {
+      "title": "✅ Filament Change Completed",
+      "body": "The filament change has been completed"
+    },
+    "filament_change_phase1": {
+      "title": "🎨 Swap filament",
+      "body": "Change #{change_count}: {spool_info}"
+    },
+    "filament_change_phase2": {
+      "title": "✅ Filament loaded?",
+      "body": "Confirm in the app: 'Done' if it extruded, otherwise 'Retry'."
+    },
+    "filament_change_retry": {
+      "title": "🔁 Reload filament",
+      "body": "Last attempt was not accepted — please try again: {spool_info}"
+    },
+    "milestone_25": {
+      "title": "📊 25% Reached",
+      "body": "'{filename}' is 25% complete"
+    },
+    "milestone_50": {
+      "title": "📊 Halfway There!",
+      "body": "'{filename}' is halfway done"
+    },
+    "milestone_75": {
+      "title": "📊 75% Reached",
+      "body": "'{filename}' is 75% complete"
+    },
+    "print_resumed": {
+      "title": "▶️ Print Resumed",
+      "body": "The print has been resumed"
+    },
+    "print_paused": {
+      "title": "⏸️ Print Paused",
+      "body": "The print has been paused"
+    },
+    "printer_power_on": {
+      "title": "🟢 Printer Turned On",
+      "body": "{printer_name} has been turned on"
+    },
+    "printer_power_on_scheduled": {
+      "title": "⏰ Scheduled Print - Printer Turned On",
+      "body": "{printer_name} has been turned on for scheduled print"
+    },
+    "printer_power_off": {
+      "title": "🔴 Printer Turned Off",
+      "body": "{printer_name} has been turned off"
+    },
+    "auto_shutdown": {
+      "title": "⏰ Auto-Shutdown in {minutes} min",
+      "body": "Printer will automatically shut down ({reason})"
+    },
+    "drying_started": {
+      "title": "🌡️ Filament drying started",
+      "body": "{material} is being dried at {temp}°C for {duration}h"
+    },
+    "drying_completed": {
+      "title": "✅ Filament drying completed",
+      "body": "{material} is ready"
+    },
+    "drying_cancelled": {
+      "title": "🚫 Filament drying cancelled",
+      "body": "{material} drying was stopped"
+    },
+    "drying_reminder": {
+      "title": "🔄 Flip filament spool!",
+      "body": "{material}: Please flip spool - {hours}h remaining"
+    },
+    "scheduled_print_failed_filament": {
+      "title": "❌ Scheduled Print Cancelled",
+      "body": "'{filename}' could not be started - insufficient filament available"
+    },
+    "test": {
+      "test_started": {
+        "title": "🧪 Test Print Started!",
+        "body": "'{filename}' test has been started."
+      },
+      "test_completed": {
+        "title": "🧪 Test Completed!",
+        "body": "'{filename}' test was successfully printed."
+      },
+      "test_cancelled": {
+        "title": "🧪 Test Cancelled",
+        "body": "Test was cancelled at {progress}%."
+      },
+      "milestone_25": {
+        "title": "🧪 Test 25% Reached",
+        "body": "'{filename}' is 25% complete"
+      },
+      "milestone_50": {
+        "title": "🧪 Test 50% Reached",
+        "body": "'{filename}' is halfway done"
+      },
+      "milestone_75": {
+        "title": "🧪 Test 75% Reached",
+        "body": "'{filename}' is almost done!"
+      },
+      "progress": {
+        "title": "Test Progress",
+        "body": "Test {progress}%"
+      }
+    },
+    "dry_pre_started_title": "🌡️ Pre-drying started",
+    "dry_pre_started_body": "Drying filament before “{filename}”",
+    "dry_pre_failed_title": "⚠️ Pre-drying failed",
+    "dry_pre_failed_body": "Printer did not come up. “{filename}” will print without drying.",
+    "calibration_started": {
+      "title": "🔧 Calibration started",
+      "body": "The printer is calibrating ({name}). This is not a print."
+    },
+    "calibration_finished": {
+      "title": "🔧 Calibration finished",
+      "body": "{name} is done.\nDuration: {duration}"
+    },
+    "sources": {
+      "tray": "Tray {slot}",
+      "ams_ht": "AMS HT tray {slot}",
+      "external_left": "External spool left",
+      "external_right": "External spool right"
+    },
+    "drying_run_started": {
+      "title": "🌡️ Drying started",
+      "body": "The printer is drying ({name}). This is not a print."
+    },
+    "drying_run_finished": {
+      "title": "🌡️ Drying finished",
+      "body": "{name} is done.\nDuration: {duration}"
+    },
+    "drying_run_cancelled": {
+      "title": "🌡️ Drying cancelled",
+      "body": "{name} was cancelled."
+    },
+    "calibration_cancelled": {
+      "title": "🔧 Calibration cancelled",
+      "body": "{name} was cancelled."
+    }
+  },
+  "status": {
+    "ready": "Ready",
+    "printing": "Printing:",
+    "preparing": "Preparing...",
+    "starting_print": "Starting Print...",
+    "print_completed": "Print Completed",
+    "print_failed": "Print Failed",
+    "paused": "Paused",
+    "no_print_active": "No Print Active",
+    "no_filament": "No Filament",
+    "filament_loading": "Loading Filament...",
+    "filament_unloading": "Unloading Filament...",
+    "filament_positioning": "Positioning Filament...",
+    "ams_ready": "AMS Ready",
+    "offline": "Offline",
+    "cancelled": "Cancelled"
+  },
+  "general": {
+    "print_job": "Print Job"
+  },
+  "pause_reasons": {
+    "filament_end": "Paused due to Filament End",
+    "heating": "Paused during Heating",
+    "ams_error": "Paused due to AMS Error",
+    "filament_break": "Paused due to Filament Break",
+    "user_pause": "Manually Paused",
+    "generic": "Paused"
+  },
+  "power_off": {
+    "reason_print_finished": "Print Finished",
+    "reason_idle": "Idle ({minutes} Min)",
+    "banner_title": "⏰ Auto Power-Off Active",
+    "banner_countdown": "Shutting down in {time}",
+    "banner_cancel": "Cancel"
+  },
+  "hms": {
+    "0700-0300-0002-0002": "First layer error detected - adhesion problems possible",
+    "0700-0300-0002-0007": "Possible first layer defects",
+    "0C00-0300-0003-0008": "Possible spaghetti defects detected",
+    "0300-8013": "Filament change for multi-color print required - please change manually",
+    "0300-8004": "Filament empty - please load new filament",
+    "fallback": "HMS error {code}",
+    "ohne_text": "Printer message with no stored text — {modul}, {stufe}. Code {code}",
+    "stufe": {
+      "fatal": "fatal",
+      "ernst": "serious",
+      "normal": "normal",
+      "Hinweis": "info",
+      "unbekannt": "severity unknown"
+    },
+    "filament": {
+      "kammer_zu_heiss": "The chamber is too hot — the filament may soften in the tube. Chamber temperature: {temp} °C.",
+      "ams_zu_heiss": "The AMS is too hot — the filament may soften. Temperature: {temp} °C."
+    },
+    "speicher": {
+      "speicher_knapp": "Little timelapse space left on {ort}: {frei} free, room for about {anzahl} more recordings.",
+      "speicher_ort_intern": "internal storage",
+      "speicher_ort_extern": "the USB stick"
+    },
+    "spule": {
+      "zuruecksetzen_links": "The filament is out. Reset the left spool?",
+      "zuruecksetzen_rechts": "The filament is out. Reset the right spool?"
+    }
+  },
+  "hms_notification_titles": {
+    "printer_info": "ℹ️ Printer Info",
+    "printer_error": "⚠️ Printer Error",
+    "info_prefix": "ℹ️ Info",
+    "hms_error_prefix": "HMS Error",
+    "new_hms_errors": "new HMS errors",
+    "new_infos": "new infos",
+    "new_printer_infos": "new printer infos"
+  },
+  "events": {
+    "pause": "⏸️ Print paused",
+    "resume": "▶️ Print resumed",
+    "printing_started": "🖨️ Print started",
+    "filament_change": "📥 Filament change: {filament_info}",
+    "stage_change": "{icon} {stage_desc}",
+    "start": "Print started: {filename}",
+    "heating": "🔥 Heating in progress",
+    "preparation": "⚙️ Preparation in progress",
+    "bed_leveling": "📐 Bed leveling in progress",
+    "manual_stop": "⏹️ Print manually stopped",
+    "finish_success": "Print successful",
+    "finish_failed": "Print failed",
+    "auto_power_off_scheduled": "⏰ Auto power-off in {minutes} minutes...",
+    "idle_power_off_scheduled": "⏰ Auto power-off in {minutes} minutes (idle)",
+    "auto_power_off_executed": "🔌 Printer automatically powered off",
+    "power_off_cancelled": "⏹️ Auto power-off cancelled",
+    "upload_start": "📤 File upload started",
+    "upload_complete": "✅ File upload completed",
+    "upload_failed": "❌ File upload failed",
+    "print_error": "❌ Error: {reason}",
+    "server_restart": "🔄 Server restarted",
+    "paused": "⏸️ Paused (layer {layer})",
+    "resumed": "▶️ Resumed (layer {layer})",
+    "error": "❌ Error: {message}",
+    "prepare_start": "⚙️ Preparation started (bed {bed}°C, hotend {hotend}°C)",
+    "prepare_end": "✅ Preparation done",
+    "heat_soak_start": "🌡️ Heat-soak started ({target}°C, tolerance {tolerance}mm)",
+    "heat_soak_end": "✅ Heat-soak done (stable: {stable})",
+    "qgl_start": "📐 Quad-Gantry-Level started",
+    "qgl_end": "✅ Quad-Gantry-Level done",
+    "bed_mesh_start": "🗺️ Bed-mesh started (mode={mode})",
+    "bed_mesh_end": "✅ Bed-mesh done",
+    "purge_start": "🧹 Purge started ({temp}°C, {filament})",
+    "purge_end": "✅ Purge done",
+    "printing_start": "🖨️ Printing",
+    "pause_print": "⏸️ Pause macro ({mode})",
+    "resume_print": "▶️ Resume macro ({mode})",
+    "cancel_print": "🛑 Print cancelled",
+    "end_print_start": "🏁 End sequence started",
+    "end_print_done": "✅ Finished",
+    "printing_finished": "✅ Print finished ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "printing_cancelled": "🛑 Print cancelled ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "printing_failed": "❌ Print failed ({duration_minutes} min, layer {layers_done}/{total_layers})",
+    "dry_started": "🌡️ Filament drying started ({material} {temp}°C, {hours}h)",
+    "dry_stopped": "⏹️ Filament drying stopped ({material})",
+    "dry_complete": "✅ Filament drying complete ({material})"
+  },
+  "stages": {
+    "0": "Printing",
+    "1": "Auto Bed Leveling",
+    "2": "Heatbed preheating",
+    "3": "Sweeping XY mech mode",
+    "4": "Changing filament",
+    "5": "M400 pause",
+    "6": "Paused - filament runout",
+    "7": "Heating hotend",
+    "8": "Calibrating extrusion",
+    "9": "Scanning bed surface",
+    "10": "Inspecting first layer",
+    "11": "Identifying build plate type",
+    "12": "Calibrating Micro Lidar",
+    "13": "Homing toolhead",
+    "14": "Cleaning nozzle tip",
+    "15": "Checking extruder temperature",
+    "16": "Paused by user",
+    "17": "Paused - front cover falling",
+    "18": "Calibrating Micro Lidar",
+    "19": "Calibrating extrusion flow",
+    "20": "Paused - nozzle temperature malfunction",
+    "21": "Paused - heat bed temperature malfunction",
+    "22": "Filament unloading",
+    "23": "Paused - skipped step",
+    "24": "Filament loading",
+    "25": "Calibrating motor noise",
+    "26": "Paused - AMS lost",
+    "27": "Paused - low fan speed heat break",
+    "28": "Paused - chamber temperature control error",
+    "29": "Cooling chamber",
+    "30": "Paused by user gcode",
+    "31": "Motor noise showoff",
+    "32": "Paused - nozzle filament covered detected",
+    "33": "Paused - cutter error",
+    "34": "Paused - first layer error",
+    "35": "Paused - nozzle clog",
+    "36": "Check accuracy before calibration",
+    "37": "Absolute accuracy calibration",
+    "38": "Check accuracy after calibration",
+    "39": "Calibrate nozzle offset",
+    "40": "Bed level high temperature",
+    "41": "Check quick release",
+    "42": "Check door and cover",
+    "43": "Laser calibration",
+    "44": "Check platform",
+    "45": "Check birdeye camera position",
+    "46": "Calibrate birdeye camera",
+    "47": "Bed level phase 1",
+    "48": "Bed level phase 2",
+    "49": "Heating chamber",
+    "50": "Heated bed cooling",
+    "51": "Print calibration lines",
+    "52": "Check material",
+    "53": "Calibrating live view camera",
+    "54": "Heating",
+    "55": "Check material position",
+    "56": "Calibrating cutter model offset",
+    "57": "Measuring surface",
+    "58": "Thermal preconditioning",
+    "59": "Homing blade holder",
+    "60": "Calibrating camera offset",
+    "61": "Calibrating blade holder position",
+    "62": "Hotend pick and place test",
+    "63": "Waiting for chamber temperature to equalize",
+    "64": "Preparing hotend",
+    "65": "Calibrating nozzle clumping detection",
+    "66": "Purifying chamber air",
+    "67": "Measuring rotary attachment",
+    "68": "Moving toolhead above purge chute",
+    "69": "Cooling nozzle",
+    "70": "Moving toolhead to center of heatbed",
+    "71": "Active arc fitting",
+    "72": "Hotend type detection",
+    "73": "Build plate alignment detection",
+    "74": "Checking heatbed surface for foreign objects",
+    "75": "Checking heatbed underside for foreign objects",
+    "76": "Pre-extrusion before printing",
+    "77": "Preparing AMS",
+    "completed": "Completed",
+    "unknown": "Unknown stage {stage}"
+  },
+  "filament": {
+    "check": {
+      "no_spool_assigned": "Filament [{filament_index}]: No spool assigned! Requires {required_weight}g",
+      "spool_not_found": "Filament [{filament_index}]: Spool #{spool_id} not found!",
+      "no_filament_left": "Filament [{filament_index}] ({spool_name}): Empty! Requires {required_weight}g",
+      "insufficient_filament": "Filament [{filament_index}] ({spool_name}): {available_weight}g available, {required_weight}g required (missing {shortage}g)",
+      "critical_error_scheduling": "Cannot schedule print - critical filament errors present"
+    }
+  },
+  "maintenance": {
+    "overdue": {
+      "title": "⚠️ Maintenance overdue",
+      "body": "{task_name}",
+      "body_days": "{task_name} - overdue for {days} day(s)"
+    },
+    "due_today": {
+      "title": "🔧 Maintenance due today",
+      "body": "{task_name}"
+    },
+    "due_tomorrow": {
+      "title": "🔔 Maintenance due tomorrow",
+      "body": "{task_name}"
+    },
+    "due_soon": {
+      "title": "🔔 Maintenance due soon",
+      "body": "{task_name} - in {days} day(s)"
+    },
+    "planned": {
+      "title": "📅 Maintenance planned",
+      "body": "{task_name} - in {days} day(s)"
+    }
+  }
+}

@@ -1,0 +1,343 @@
+/* ==========================================================================
+   Einstellungen  (21aug26)
+   --------------------------------------------------------------------------
+   Vorher: 27 Menuepunkte, 1613 Zeilen CSS in der HTML-Datei, 277 Emoji,
+   jeder Abschnitt eigenhaendig gebaut. Jetzt 11 Abschnitte in derselben
+   Bauform wie Wartung, Historie und die Dialoge: Karte mit Zeilen,
+   Beschriftung links, Bedienelement rechts.
+
+   Alle Klassen tragen das Praefix es-, damit sie sich nicht mit den
+   Restbestaenden aus der alten Seite beissen.
+   ========================================================================== */
+
+.es-huelle { max-width: 1200px; margin: 0 auto; padding: 14px 20px 90px; }
+
+/* --- Kopfzeile: gleiche Masse wie Historie, Wartung, Slicer, Benutzer --- */
+.es-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
+.es-kopf-titel {
+    margin: 0; font-size: 17px; font-weight: 650;
+    display: flex; align-items: center; gap: 8px; color: var(--text-primary);
+}
+.es-kopf-luft { flex: 1; }
+
+.es-ic {
+    width: 17px; height: 17px; stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto;
+}
+.es-ic--lg { width: 18px; height: 18px; }
+.es-ic--sm { width: 14px; height: 14px; }
+
+.es-knopf {
+    border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-primary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster); min-height: var(--knopf-hoehe);
+    font: inherit; font-size: var(--knopf-schrift); font-weight: 500; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px; white-space: nowrap;
+}
+.es-knopf:hover { border-color: var(--color-blue, #2196F3); }
+.es-knopf--haupt {
+    background: rgba(33, 150, 243, .12); border-color: rgba(33, 150, 243, .25);
+    color: #1565c0; font-weight: 600;
+}
+.es-knopf--haupt:hover { background: rgba(33, 150, 243, .2); border-color: rgba(33, 150, 243, .4); }
+.es-knopf--warn {
+    background: rgba(229, 83, 75, .10); border-color: rgba(229, 83, 75, .22); color: #c62828;
+}
+.es-knopf--warn:hover { background: rgba(229, 83, 75, .18); border-color: rgba(229, 83, 75, .35); }
+body.dark-mode .es-knopf--haupt { background: rgba(33, 150, 243, .2); color: #90caf9; }
+body.dark-mode .es-knopf--warn { color: #ef9a9a; }
+
+/* --- Zwei Spalten: Verzeichnis links, Inhalt rechts --- */
+.es-rahmen { display: grid; grid-template-columns: 236px 1fr; gap: 14px; align-items: start; }
+
+.es-verz {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 8px; position: sticky; top: 14px;
+}
+.es-suche { position: relative; margin: 2px 2px 8px; }
+.es-suche svg {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-secondary); pointer-events: none; z-index: 1;
+}
+/* Spezifischer als die allgemeinen Feldregeln der Seite — sonst gewinnt
+   deren Polster und das Lupensymbol liegt auf dem Text. */
+.es-suche input[type=text] {
+    width: 100%; border: 1px solid var(--border-color); background: var(--bg-card-variant);
+    color: var(--text-primary); border-radius: 9px; padding: 7px 9px 7px 32px;
+    font: inherit; font-size: 12.5px;
+}
+.es-suche input[type=text]::placeholder { color: var(--text-secondary); }
+
+.es-verz-gruppe {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-secondary); padding: 10px 10px 4px;
+}
+.es-verz-eintrag {
+    display: flex; align-items: center; gap: 9px; width: 100%;
+    padding: 7px 10px; border-radius: 9px; cursor: pointer;
+    color: var(--text-primary); font-size: 13px; border: 1px solid transparent;
+    background: none; font-family: inherit; text-align: left;
+}
+.es-verz-eintrag:hover { background: var(--bg-hover, rgba(128, 128, 128, .08)); }
+.es-verz-eintrag svg { color: var(--text-secondary); }
+/* Aktiv: Fuellung + Rand + Haken — wie am 20aug26 abgenommen */
+.es-verz-eintrag.an {
+    background: rgba(33, 150, 243, .12); border-color: rgba(33, 150, 243, .25);
+    color: #1565c0; font-weight: 600;
+}
+.es-verz-eintrag.an svg { color: #1565c0; }
+body.dark-mode .es-verz-eintrag.an {
+    background: rgba(33, 150, 243, .2); border-color: rgba(33, 150, 243, .35); color: #90caf9;
+}
+body.dark-mode .es-verz-eintrag.an svg { color: #90caf9; }
+.es-verz-eintrag .es-haken { margin-left: auto; opacity: 0; }
+.es-verz-eintrag.an .es-haken { opacity: 1; }
+
+/* --- Inhalt --- */
+.es-inhalt { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.es-abschnitt { display: none; flex-direction: column; gap: 12px; }
+.es-abschnitt.an { display: flex; }
+
+.es-karte { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; }
+.es-karte-kopf {
+    display: flex; align-items: center; gap: 8px; padding: 11px 14px 9px;
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-secondary); border-bottom: 1px solid var(--linie, var(--border-color));
+}
+.es-karte-kopf svg { color: var(--text-secondary); }
+.es-karte-kopf .es-rechts {
+    margin-left: auto; text-transform: none; letter-spacing: 0;
+    font-weight: 500; font-size: 12px; display: flex; align-items: center; gap: 8px;
+}
+
+.es-zeile {
+    display: flex; align-items: center; gap: 12px; padding: 9px 14px;
+    border-bottom: 1px solid var(--linie, var(--border-color)); min-height: 44px;
+}
+.es-karte > .es-zeile:last-child { border-bottom: 0; }
+.es-zeile-name { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.es-zeile-name > label,
+.es-zeile-name > b { font-weight: 600; font-size: 13.5px; color: var(--text-primary); margin: 0; }
+.es-zeile-name > span,
+.es-zeile-name small { font-size: 12px; color: var(--text-secondary); }
+.es-zeile-wert { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
+/* Device row: image on the left, like the firmware page of Bambu Studio.
+   Fixed edge length so devices of different shape (the buffer is wide, the
+   air pump is tall) do not pull the row height apart. */
+.es-geraet-bild {
+    width: 46px; height: 46px; flex: none; object-fit: contain;
+    border-radius: 8px; background: var(--flaeche-2, rgba(127,127,127,.08));
+}
+.es-wert { font-size: 13.5px; font-weight: 600; }
+.es-wert--matt { color: var(--text-secondary); font-weight: 500; font-size: 12.5px; }
+
+/* Felder in den Zeilen. !important, weil die alten Regeln der Seite
+   input/select global mit voller Breite und 10px Polster setzen. */
+.es-karte input[type=text],
+.es-karte input[type=number],
+.es-karte input[type=password],
+.es-karte input[type=email],
+.es-karte select {
+    border: 1px solid var(--input-border, var(--border-color)) !important;
+    background: var(--input-bg, var(--bg-card-variant)) !important;
+    color: var(--text-primary) !important;
+    border-radius: 9px !important; padding: 6px 9px !important;
+    font: inherit !important; font-size: 13px !important;
+    width: auto !important; min-width: 0; margin: 0 !important;
+}
+.es-karte input.es-breit { width: 260px !important; }
+.es-karte input.es-schmal { width: 88px !important; }
+.es-karte select.es-auswahl { width: 200px !important; }
+@media (max-width: 700px) {
+    .es-karte input.es-breit, .es-karte select.es-auswahl { width: 150px !important; }
+}
+
+/* Schalter — gleiche Bauform wie die uebrigen Seiten */
+.es-schalter { position: relative; width: 40px; height: 23px; flex: none; display: inline-block; }
+.es-schalter input {
+    position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2;
+}
+.es-schalter span {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: rgba(128, 128, 128, .3); transition: background .15s;
+}
+.es-schalter span::after {
+    content: ""; position: absolute; top: 2px; left: 2px; width: 19px; height: 19px;
+    border-radius: 50%; background: #fff; transition: transform .15s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+}
+.es-schalter input:checked + span { background: var(--color-green, #4CAF50); }
+.es-schalter input:checked + span::after { transform: translateX(17px); }
+
+/* Locked, because only the remembered state is on screen and the printer is
+   off. Being unable to move a switch is not enough — it has to look that
+   way, otherwise the row reads as live. Same treatment for choice and
+   button. */
+.es-schalter input:disabled { cursor: default; }
+.es-schalter input:disabled + span { opacity: .4; }
+.es-auswahl:disabled,
+.es-knopf:disabled {
+    opacity: .4; cursor: default; pointer-events: none;
+}
+
+.es-marke {
+    font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px;
+    border: 1px solid var(--border-color); color: var(--text-secondary);
+    background: var(--bg-card-variant); white-space: nowrap;
+}
+.es-marke--gut { background: rgba(76, 175, 80, .14); border-color: rgba(76, 175, 80, .25); color: #2e7d32; }
+.es-marke--warn { background: rgba(255, 152, 0, .14); border-color: rgba(255, 152, 0, .25); color: #b26a00; }
+.es-marke--weg { background: rgba(229, 83, 75, .12); border-color: rgba(229, 83, 75, .22); color: #c62828; }
+body.dark-mode .es-marke--gut { color: #a5d6a7; }
+body.dark-mode .es-marke--warn { color: #ffcc80; }
+body.dark-mode .es-marke--weg { color: #ef9a9a; }
+
+.es-hinweis {
+    display: flex; gap: 9px; padding: 10px 14px; font-size: 12.5px;
+    color: var(--text-secondary); border-top: 1px solid var(--linie, var(--border-color));
+    align-items: flex-start;
+}
+.es-hinweis svg { margin-top: 1px; flex: 0 0 auto; }
+.es-karte > .es-hinweis:first-child { border-top: 0; }
+
+/* Zwei Spalten, solange jede mindestens 360px bekommt — darunter
+   quetschen sich Feld und Knopf sonst in drei Zeilen. */
+.es-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 12px; }
+
+.es-stat-raster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--linie, var(--border-color)); }
+.es-stat { background: var(--bg-card); padding: 11px 14px; }
+.es-stat b { display: block; font-size: 17px; font-weight: 700; }
+.es-stat span { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; }
+
+/* Freier Block in einer Karte — fuer Listen, die JavaScript fuellt
+   (Token-Karten, Materialien, Lizenztexte, Kameras). */
+.es-block { padding: 12px 14px; }
+.es-block:not(:last-child) { border-bottom: 1px solid var(--linie, var(--border-color)); }
+
+/* Speicherleiste: erscheint erst, wenn etwas geaendert wurde. Ersetzt den
+   runden Knopf unten rechts, der nicht sagte, was offen ist. */
+.es-fuss {
+    position: sticky; bottom: 14px; display: none; align-items: center; gap: 9px;
+    padding: 9px 14px; background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; margin-top: 2px; box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    z-index: 30;
+}
+.es-fuss.an { display: flex; }
+.es-fuss span { font-size: 12.5px; color: var(--text-secondary); }
+.es-fuss-luft { flex: 1; }
+
+@media (max-width: 900px) {
+    .es-rahmen { grid-template-columns: 1fr; }
+    .es-verz { position: static; }
+    .es-raster, .es-stat-raster { grid-template-columns: 1fr; }
+    .es-stat-raster { gap: 1px; }
+}
+@media (max-width: 560px) {
+    .es-huelle { padding: 12px 12px 90px; }
+    .es-zeile { flex-wrap: wrap; }
+    .es-zeile-wert { margin-left: 0; width: 100%; justify-content: flex-end; }
+}
+
+
+/* ===== "At the printer": settings that live in the device ================
+   Areas as a tab bar on the desktop and as a plain list on the phone — the
+   list is the quieter form on a narrow screen, the bar saves a tap where
+   there is room for it. */
+.ed-bereiche { display: flex; gap: 4px; background: var(--bg-card-variant);
+               border-radius: 24px; padding: 4px; overflow-x: auto; }
+.ed-bereich { border: 0; background: none; color: var(--text-secondary);
+              font: inherit; font-size: 12.5px; padding: 7px 13px;
+              border-radius: 20px; white-space: nowrap; cursor: pointer; }
+.ed-bereich.an { background: var(--bg-card); color: var(--text-primary);
+                 font-weight: 700; box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.ed-bereich:disabled { opacity: .5; cursor: default; }
+@media (max-width: 767px) {
+    .ed-bereiche { flex-direction: column; gap: 0; padding: 0; overflow: visible;
+                   background: var(--bg-card); border: 1px solid var(--border-color);
+                   border-radius: 14px; }
+    .ed-bereich { text-align: left; border-radius: 0; padding: 12px 14px;
+                  border-bottom: 1px solid var(--border-color); font-size: 14px; }
+    .ed-bereich:last-child { border-bottom: 0; }
+    .ed-bereich.an { box-shadow: none; background: var(--bg-card-variant); }
+}
+
+.ed-quelle { display: inline-flex; align-items: center; gap: 6px;
+             font-size: 12px; color: var(--success-color, #4caf50); }
+.ed-quelle::before { content: ''; width: 7px; height: 7px; border-radius: 50%;
+                     background: currentColor; }
+.ed-quelle--alt { color: var(--text-secondary); }
+
+/* ---- Aufklapper in einer Zeile ----
+   Fuer alles, was selten gebraucht wird und ausgeklappt die halbe Karte
+   fuellt. Der Signaturschluessel stand mit vier Feldern dauerhaft offen
+   und schob die MakerWorld-Zeile aus dem Blick (31aug26).
+
+   Gleiches Muster wie `.sl-aufklapp` im Slicer: Chevron links, Titel,
+   Zustandsmarke rechts. Kein eigener Rahmen — die Zeile traegt ihn schon. */
+.es-aufklapp { width: 100%; }
+.es-aufklapp > summary {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    list-style: none; padding: 2px 0;
+}
+.es-aufklapp > summary::-webkit-details-marker { display: none; }
+.es-aufklapp > summary > svg {
+    width: 14px; height: 14px; flex: none; fill: none;
+    stroke: var(--text-secondary); stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round;
+    transition: transform .18s ease;
+}
+.es-aufklapp[open] > summary > svg { transform: rotate(180deg); }
+.es-aufklapp > summary > .es-aufklapp-titel {
+    font-weight: 600; font-size: 13.5px; color: var(--text-primary);
+}
+.es-aufklapp > summary > .ed-quelle { margin-left: auto; }
+.es-aufklapp-inhalt { padding: 10px 0 2px 22px; }
+.es-aufklapp-inhalt > p {
+    margin: 0 0 10px; font-size: 12px; color: var(--text-secondary);
+    max-width: 62ch;
+}
+
+/* Ein Feld mit seiner Beschriftung darueber. */
+.es-feld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.es-feld > label { font-size: 11px; color: var(--text-secondary); }
+.es-feld > textarea, .es-feld > input {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-primary); border-radius: 8px; padding: 7px 9px;
+    font: inherit; font-size: 12px; width: 100%; box-sizing: border-box;
+}
+.es-feld--code > textarea, .es-feld--code > input {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px;
+}
+.es-feld > textarea { resize: vertical; }
+
+/* ---- Dropdowns ----
+   Bis 31aug26 blieb hier der System-Pfeil des Betriebssystems stehen: ein
+   Kasten in Hausfarben mit einem fremden Zeichen darin, und je nach
+   Plattform eine andere Hoehe als die Knoepfe daneben. Deshalb wird der
+   Pfeil selbst gezeichnet, und die Groesse kommt aus denselben Marken wie
+   die Knoepfe — sonst steht das Feld hoeher als alles daneben.
+
+   (Das alte `.custom-dropdown` in components.css war die Vorlage. Es hatte
+   keinen Nutzer mehr — die Auswahlfelder des Planers heissen seit laengerem
+   `sd-spool-select` — und ist am 31aug26 entfallen.)
+
+   `!important` und diese Reihenfolge muessen sein: die Regel darueber setzt
+   `background` als Kurzform mit `!important`, und eine Kurzform loescht das
+   Hintergrundbild mit. Erst danach gesetzt, gewinnt der Pfeil. */
+.es-karte select {
+    appearance: none !important; -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    padding: var(--knopf-polster) !important;
+    padding-right: 30px !important;
+    min-height: var(--knopf-hoehe);
+    background-image: var(--pfeil) !important;
+    background-repeat: no-repeat !important;
+    background-position: right 9px center !important;
+    background-size: 15px !important;
+    cursor: pointer;
+}
+.es-karte select:hover { border-color: var(--color-blue, #2196F3) !important; }
+.es-karte select:focus {
+    outline: none; border-color: var(--color-blue, #2196F3) !important;
+}

@@ -1,0 +1,513 @@
+/* ============================================
+ * Schedule Manager — Empty State & SD Section
+ * ============================================ */
+
+.sched-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.sched-empty-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+}
+
+.sched-empty-text {
+    color: var(--text-secondary);
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.sched-empty-tip {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    margin: 0 auto;
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sched-tip-title {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 8px;
+}
+
+.sched-tip-desc {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+
+/* SD Files section inside Schedule Manager */
+.sched-sd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.sched-sd-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sched-sd-title {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.sched-sd-subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Separator between scheduled prints and SD files */
+.sched-separator {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 24px 0;
+}
+
+.sched-form-input {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    transition: border-color 0.2s;
+}
+
+.sched-form-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.sched-form-error {
+    margin: 0 16px 12px;
+    padding: 14px 16px;
+    background: rgba(244, 67, 54, 0.12);
+    border: 2px solid rgba(244, 67, 54, 0.28);
+    border-radius: 10px;
+    color: #c62828;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+body.dark-mode .sched-form-error {
+    background: rgba(244, 67, 54, 0.15);
+    border-color: rgba(244, 67, 54, 0.3);
+    color: #ef9a9a;
+}
+
+/* ======================================================================
+   Vortrocknung im Planungs-Dialog
+   ====================================================================== */
+
+.sched-dry-feld {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 2px 8px;
+}
+
+.sched-dry-feld input {
+    width: 46px;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: right;
+    padding: 4px 0;
+}
+
+.sched-dry-feld input::-webkit-outer-spin-button,
+.sched-dry-feld input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.sched-dry-einheit { color: var(--text-secondary); font-size: 12px; }
+
+/* Errechnete Einschaltzeit — bei zu knapper Vorlaufzeit als Warnung. */
+.sched-dry-hinweis {
+    margin: 0 0 4px 24px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sched-dry-hinweis.warnung { color: var(--color-orange); font-weight: 600; }
+
+/* Vortrocknung: Typ, Grad, Stunden */
+.sp-dry-zeile {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 10px 0 8px 26px;
+}
+
+.sp-dry-zeile select { flex: 1; min-width: 0; }
+
+/* Zeitstrahl: Drucker an -> Trocknung -> Druck. Ersetzt den Fliesstext,
+   weil die Abfolge der Kern der Sache ist. */
+.sp-strahl {
+    margin: 0 0 6px 26px;
+    padding: 11px 13px;
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+}
+
+.sp-strahl:empty { display: none; }
+
+.sp-strahl-punkt {
+    flex: 1;
+    position: relative;
+    padding-top: 16px;
+    font-size: 12px;
+    min-width: 0;
+}
+
+.sp-strahl-punkt::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--color-blue);
+}
+
+.sp-strahl-punkt::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 9px;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.sp-strahl-punkt:last-child::after { display: none; }
+.sp-strahl-punkt--trocknen::before { background: var(--color-orange); }
+.sp-strahl-punkt--druck::before { background: var(--color-green); }
+
+.sp-strahl-zeit { font-weight: 660; font-variant-numeric: tabular-nums; }
+.sp-strahl-was {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Fusszeile: Knoepfe kompakt rechts, abgesetzt vom Inhalt. */
+.ui-fuss {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 14px 20px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Datei-Karte: Vorschau links, Name und Eckdaten rechts. */
+.prep-datei {
+    display: flex;
+    gap: 13px;
+    align-items: center;
+}
+
+.prep-datei__bild {
+    width: 74px;
+    height: 74px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: 0 0 auto;
+}
+
+.prep-datei__text { min-width: 0; flex: 1; }
+
+.prep-datei__name {
+    font-weight: 640;
+    font-size: 14px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Eckdaten ohne Kasten — als Chips standen sie in Konkurrenz zu den
+   Bedienelementen darunter. */
+.prep-datei .prep-fact {
+    background: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.prep-datei .prep-facts { gap: 6px 14px; }
+
+/* Optionen-Karte: Zeilen wie oben, damit Schalter und Stufenwahl fluchten. */
+.ui-karte .prep-row { padding: 9px 0; }
+.ui-karte .prep-rows > .prep-row { border-top: 1px solid var(--border-color); }
+.ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
+
+@media (max-width: 640px) {
+    .ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
+}
+
+/* ======================================================================
+   Uebersicht der geplanten Drucke — Aufbau vom 21aug26
+   EIN Kasten fuer die Liste, Eintraege durch eine Linie getrennt. Vorher
+   war jeder Eintrag eine eigene Karte mit vollem Datei-Datenblatt
+   (Groesse, Slicer, Schichthoehe) — bei zehn Drucken eine Wand.
+   ====================================================================== */
+/* Jeder Termin eine eigene Karte mit Abstand. Vorher lagen sie in EINEM
+   Kasten, nur durch eine Linie getrennt — zwei Termine sahen aus wie ein
+   Block, und die Zeilen liefen ineinander. */
+.sched-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sched-eintrag {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 13px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+.sched-eintrag--vorbei { opacity: 0.5; }
+
+.sched-eintrag-bild {
+    width: 56px;
+    height: 56px;
+    border-radius: 9px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.sched-eintrag-bild img { width: 100%; height: 100%; object-fit: contain; }
+.sched-eintrag-text { flex: 1; min-width: 0; }
+
+.sched-eintrag-kopf {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 3px;
+}
+
+.sched-eintrag-name {
+    font-weight: 640;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    color: var(--text-primary);
+}
+
+/* Der Termin ist der Grund fuer den Eintrag — darum vorne und nicht
+   irgendwo in der Angabenreihe. */
+.sched-eintrag-zeit {
+    font-size: 13px;
+    font-weight: 640;
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    color: var(--text-primary);
+}
+
+.sched-eintrag-rest { font-size: 12px; color: var(--text-secondary); flex: none; }
+
+.sched-eintrag-fakten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 13px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+}
+
+.sched-eintrag-fakten span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.sched-eintrag-fakten:empty { display: none; }
+
+.sched-marken { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.sched-marke {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sched-marke--gruen {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.30);
+    color: #2e7d32;
+}
+
+.sched-marke--orange {
+    background: rgba(255, 152, 0, 0.13);
+    border-color: rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+}
+
+body.dark-mode .sched-marke--gruen { color: #8bd18e; }
+body.dark-mode .sched-marke--orange { color: #ffb74d; }
+
+/* Symbolknoepfe: zwei farbige Textknoepfe je Eintrag zogen mehr Blick auf
+   sich als der Druck selbst. */
+.sched-eintrag-akt { display: flex; flex-direction: column; gap: 6px; flex: none; }
+
+.sched-iknopf {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.sched-iknopf:hover { background: var(--bg-card-variant); color: var(--text-primary); }
+.sched-iknopf--rot:hover { border-color: #e5534b; color: #e5534b; }
+
+@media (max-width: 560px) {
+    .sched-eintrag-kopf { flex-wrap: wrap; }
+    .sched-eintrag-name { flex-basis: 100%; }
+}
+
+/* ======================================================================
+   Multimaterial-Zuordnung
+   Eine Zeile je Filament: links Farbe, Name und Typ, rechts die Spule.
+   Vorher war jedes Filament ein eigener grauer Kasten mit einer
+   Ueberschrift darin — bei acht Filamenten acht Kaesten untereinander.
+   ====================================================================== */
+.mf-punkt {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    flex: none;
+}
+
+.mf-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mf-typ { color: var(--text-secondary); font-size: 12px; flex: none; }
+
+/* Die Spulenwahl ist hier die eigentliche Aufgabe — sie darf breit sein,
+   aber nicht die ganze Zeile schlucken. */
+.mf-wahl { flex: 0 1 300px; min-width: 0; }
+
+/* Falsche Sorte gewaehlt: Rand und Hinweis darunter. Ohne das rutscht eine
+   PETG-Spule fuer einen ASA-Druck beim Ueberfliegen durch. */
+.mf-wahl--falsch {
+    border-color: var(--accent-orange, #f59e0b) !important;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35);
+}
+
+/* Die Zeile ist sonst einzeilig — mit Hinweis darf sie umbrechen. */
+.ui-zeile:has(.mf-warnung:not([style*="none"])) { flex-wrap: wrap; }
+
+.mf-warnung {
+    flex-basis: 100%;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--accent-orange, #b26a00);
+}
+
+@media (max-width: 560px) {
+    .ui-zeile:has(.mf-wahl) { flex-wrap: wrap; }
+    .mf-wahl { flex-basis: 100%; }
+}
+
+/* Hinweis im Spulen-Dialog, wenn nichts passt. Trug frueher fest
+   verdrahtete Dunkel-Farben (#442222 auf #ffb0b0) und war im hellen
+   Modus unlesbar. */
+.fm-hinweis {
+    background: rgba(255, 152, 0, 0.13);
+    border: 1px solid rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+    border-radius: 9px;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    margin-bottom: 10px;
+}
+
+body.dark-mode .fm-hinweis { color: #ffb74d; }
+
+/* Auswahlzeile: der Radioknopf sitzt vorn, Farbe und Name daneben. */
+.fm-option { gap: 10px; }
+.fm-radio { flex: none; margin: 0; accent-color: var(--color-green, #4CAF50); }
+
+/* Spulen-Empfehlung unter der Auswahl: sagt, WARUM diese Spule dasteht.
+   Vorher stand dort kommentarlos die aktive Spule — auch bei falschem
+   Material. */
+.sched-spulhinweis {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sched-spulhinweis--warnung { color: #b26a00; font-weight: 600; }
+body.dark-mode .sched-spulhinweis--warnung { color: #ffb74d; }
+
+/* Farbpunkt vor dem Filamentnamen in der Dateikarte — dieselbe Groesse wie
+   in der Dateiliste (.sd-filament-dot). */
+.prep-fil-punkt {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    margin-right: 2px;
+    vertical-align: -1px;
+}

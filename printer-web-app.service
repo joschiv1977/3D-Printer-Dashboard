@@ -1,0 +1,52 @@
+# HINWEIS: Diese Datei ist ein Template.
+# Für die Installation:
+# 1. Ersetze YOUR_USER und YOUR_GROUP mit deinem User (z.B. pi)
+# 2. Kopiere nach /etc/systemd/system/printer-web-app.service
+# 3. sudo systemctl daemon-reload
+# 4. sudo systemctl enable printer-web-app
+# 5. sudo systemctl start printer-web-app
+
+[Unit]
+Description=3D Printer Web App (Flask + SocketIO)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=YOUR_USER
+Group=YOUR_GROUP
+WorkingDirectory=/opt/printer-web-app
+Environment="PATH=/opt/printer-web-app/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Environment="FLASK_ENV=production"
+
+# Flask Server via start.py
+ExecStart=/opt/printer-web-app/venv/bin/python start.py
+
+# Restart Policy
+Restart=always
+RestartSec=10
+# Exit code 42 is the server asking to be restarted -- the button in the web
+# UI uses it. Without this line systemd counts each of those as a failure, and
+# StartLimitBurst then refuses to start the service at all after five in a row.
+SuccessExitStatus=42
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=printer-web-app
+
+# Security Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/printer-web-app
+
+# Performance & Limits
+LimitNOFILE=65536
+LimitNPROC=512
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

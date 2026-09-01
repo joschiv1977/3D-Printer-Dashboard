@@ -1,0 +1,1301 @@
+/* ============================================
+ * SD Card Modal - File Cards
+ * iOS-Style Compact List Layout
+ * ============================================ */
+
+/* Modal specific overrides */
+.sd-modal-panel {
+    position: absolute;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* SD Card modal needs full height (many files) */
+.sd-modal-panel--full {
+    height: 90vh;
+}
+
+.sd-modal-header {
+    padding: 20px 25px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.sd-modal-title {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.sd-modal-body {
+    padding: 20px 25px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Header Action Buttons (Upload, Refresh) */
+.sd-header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Kopfknoepfe neutral. Vorher trug "Datei laden" Gruen und "Aktualisieren"
+   Blau — zwei Farben fuer zwei gleichrangige Werkzeuge, waehrend die Farbe
+   in der Liste darunter der eigentlichen Handlung (Drucken) gehoert.
+   Der Hebe-Effekt beim Ueberfahren ist raus: Kopfzeilen springen nicht. */
+.sd-header-btn {
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    border-radius: var(--knopf-radius);
+    font-size: var(--knopf-schrift);
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.sd-header-btn:hover {
+    background: var(--bg-card);
+    border-color: var(--text-secondary);
+}
+
+.sd-close-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+body.dark-mode .sd-close-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Aktion in der Kopfzeile eines Fensters, links vom Kreuz. Gleiche Hoehe,
+   gleicher Rahmen, gleiche Rundung wie das Kreuz — nur breit genug fuer
+   ein Wort. */
+.sd-kopf-knopf {
+    height: 36px;
+    padding: 0 13px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.sd-kopf-knopf:hover { border-color: var(--color-blue, #2196F3); }
+body.dark-mode .sd-kopf-knopf,
+[data-theme="dark"] .sd-kopf-knopf {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sd-close-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+body.dark-mode .sd-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Loading State */
+.sd-loading-state {
+    text-align: center;
+    padding: 40px;
+}
+
+.sd-loading-state p {
+    color: var(--text-secondary);
+    margin-top: 15px;
+}
+
+/* Error State */
+.sd-error-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--accent-red);
+}
+
+/* ============================================
+ * Sort/Filter Toolbar
+ * ============================================ */
+
+.sd-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.sd-toolbar-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sd-sort-select {
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    transition: all 0.2s;
+}
+
+.sd-sort-select:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sd-sort-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.sd-sort-select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+body.dark-mode .sd-sort-select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* Search Input */
+.sd-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 120px;
+    max-width: 280px;
+}
+
+.sd-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.sd-search-input {
+    width: 100%;
+    padding: 8px 12px 8px 32px;
+    font-size: 13px;
+    font-weight: 400;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.sd-search-input::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.sd-search-input:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.sd-search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.sd-search-clear {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 2px 6px;
+    border-radius: 50%;
+    display: none;
+    line-height: 1;
+}
+
+.sd-search-clear:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .sd-search-clear:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sd-search-wrap.has-value .sd-search-clear {
+    display: block;
+}
+
+/* File count badge */
+.sd-file-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.sd-filter-check {
+    margin-left: auto;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.sd-filter-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent-blue);
+}
+
+/* ============================================
+ * File List Container
+ * ============================================ */
+
+.sd-file-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* ============================================
+ * File Card - Compact Horizontal Layout
+ * ============================================ */
+
+.sd-file-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+    transition: all 0.2s;
+    overflow: visible;
+}
+
+.sd-file-card:hover {
+    box-shadow: 0 4px 12px var(--shadow);
+    border-color: rgba(33, 150, 243, 0.15);
+}
+
+.sd-file-thumb--has-img {
+    cursor: zoom-in;
+}
+
+/* ============================================
+ * Inline File Rename
+ * ============================================ */
+
+.sd-file-name--editing {
+    overflow: visible !important;
+    white-space: normal !important;
+}
+
+.sd-rename-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-width: 0;
+    width: 100%;
+}
+
+.sd-rename-input {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--accent-blue, #667eea);
+    border-radius: 6px 0 0 6px;
+    padding: 3px 8px;
+    outline: none;
+    min-width: 60px;
+    flex: 1;
+    font-family: inherit;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+body:not(.dark-mode) .sd-rename-input {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.sd-rename-input:focus {
+    border-color: var(--accent-blue, #667eea);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.sd-rename-input--error {
+    border-color: #f44336 !important;
+    box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.3) !important;
+    animation: sd-rename-shake 0.3s ease;
+}
+
+@keyframes sd-rename-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.sd-rename-ext {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    padding: 3px 8px;
+    white-space: nowrap;
+    user-select: none;
+    line-height: 1.5;
+}
+
+body:not(.dark-mode) .sd-rename-ext {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.sd-file-name--renaming {
+    opacity: 0.7;
+}
+
+.sd-rename-loading {
+    animation: sd-rename-pulse 1s ease-in-out infinite;
+}
+
+@keyframes sd-rename-pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Filament Color Dot */
+.sd-filament-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode .sd-filament-dot {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Multi-Filament Badge */
+.sd-multi-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2px 8px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 500;
+    font-size: 11px;
+}
+
+.sd-spool-select {
+    width: auto;
+    max-width: 100%;
+    padding: 4px 28px 4px 8px;
+    font-size: 12px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 14px;
+}
+
+.sd-action-btn {
+    min-width: 90px;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    background: none;
+    white-space: nowrap;
+}
+
+.sd-action-btn .sd-btn-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+}
+
+.sd-action-btn .sd-btn-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: inherit;
+}
+
+.sd-action-btn:active {
+    transform: scale(0.95);
+    opacity: 0.7;
+}
+
+/* Schedule button - blue */
+.sd-action-btn--schedule {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.2);
+    color: #1565c0;
+}
+
+.sd-action-btn--schedule:hover {
+    background: rgba(33, 150, 243, 0.25);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .sd-action-btn--schedule {
+    background: rgba(33, 150, 243, 0.2);
+    color: #90caf9;
+}
+
+body.dark-mode .sd-action-btn--schedule:hover {
+    background: rgba(33, 150, 243, 0.3);
+    border-color: rgba(33, 150, 243, 0.5);
+}
+
+/* Settings button - neutral */
+.sd-action-btn--settings {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+    color: var(--text-secondary);
+}
+
+.sd-action-btn--settings:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.dark-mode .sd-action-btn--settings {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.06);
+    color: var(--text-secondary);
+}
+
+body.dark-mode .sd-action-btn--settings:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+ * Print Options Popover (replaces <details>)
+ * Default: opens DOWNWARD
+ * Add .sd-popover--up class via JS for upward
+ * ============================================ */
+
+.sd-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 12px;
+    min-width: 220px;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: none;
+    animation: sdPopoverDown 0.15s ease-out;
+}
+
+/* Upward variant (when near bottom) */
+.sd-popover.sd-popover--up {
+    top: auto;
+    bottom: calc(100% + 8px);
+    animation: sdPopoverUp 0.15s ease-out;
+}
+
+body.dark-mode .sd-popover {
+    background: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.sd-popover.active {
+    display: block;
+}
+
+@keyframes sdPopoverDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes sdPopoverUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+ * SD Card — Mobile Responsive
+ * ============================================ */
+
+@media (max-width: 768px) {
+    .sd-modal-panel {
+        width: 95% !important;
+        max-height: 90vh !important;
+        max-width: 100% !important;
+    }
+
+    .sd-modal-panel--full {
+        height: 90vh !important;
+    }
+
+    .sd-modal-header {
+        padding: 15px;
+    }
+
+    .sd-modal-body {
+        padding: 15px;
+    }
+
+    .sd-modal-title {
+        font-size: 18px;
+    }
+
+    .sd-header-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .sd-file-card {
+        padding: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .sd-action-btn {
+        min-width: auto;
+        padding: 6px 8px;
+    }
+
+    /* Hide button labels on mobile, show only icons */
+    .sd-action-btn .sd-btn-label {
+        display: none;
+    }
+
+    .sd-spool-select {
+        max-width: 100%;
+        width: 100%;
+    }
+}
+
+.sd-popover-tri {
+    display: inline-flex;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sd-popover-tri__opt {
+    cursor: pointer;
+    margin: 0;
+}
+
+.sd-popover-tri__opt input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sd-popover-tri__opt span {
+    display: block;
+    padding: 3px 9px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border-color);
+}
+
+.sd-popover-tri__opt:last-child span { border-right: none; }
+
+.sd-popover-tri__opt input:checked + span {
+    background: var(--accent-blue);
+    color: #fff;
+}
+
+/* ============================================
+ * Druckvorbereitung — Blatt vor dem Start
+ * Nutzt dieselben Bausteine wie die uebrigen Dialoge (modal-overlay /
+ * modal-panel) und die Segment-Knoepfe der Optionsliste (.sd-popover-tri).
+ * ============================================ */
+.prep-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.prep-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.prep-fact {
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: rgba(127, 127, 127, 0.12);
+    border-radius: 6px;
+    padding: 3px 8px;
+    white-space: nowrap;
+}
+
+.prep-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.prep-row__label { min-width: 0; }
+
+.prep-filament {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.prep-filament__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.prep-filament__name { opacity: 0.75; }
+
+/* Schalter in der Vorbereitung — gleiche Anmutung wie die Segment-Knoepfe
+   daneben, damit die Zeilen zusammen ruhig wirken. */
+.prep-switch input { position: absolute; opacity: 0; pointer-events: none; }
+
+.prep-switch span {
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+    border-radius: 11px;
+    background: var(--border-color);
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.prep-switch span::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.15s ease;
+}
+
+.prep-switch input:checked + span { background: var(--accent-blue); }
+.prep-switch input:checked + span::after { transform: translateX(18px); }
+
+.prep-plate {
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.prep-plate img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: rgba(127, 127, 127, 0.10);
+    border-radius: 6px;
+}
+
+.prep-plate--on {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+}
+
+/* Druckvorbereitung ueber die volle Breite (Planen-Dialog): Vorschau links,
+   Angaben rechts daneben, Optionen darunter in zwei Spalten — sonst steht
+   alles in einer schmalen Saeule und daneben bleibt es leer. */
+.prep-wide .prep-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: row dense;
+    gap: 0 24px;
+}
+
+/* Die drei Auto/Ein/Aus-Reihen (Bett/Fluss/Duesenversatz) stapeln in der
+   rechten Spalte untereinander, die einfachen Schalter links — sonst
+   stehen die Dreifach-Schalter kreuz und quer im Raster. */
+.prep-wide .prep-row--sw { grid-column: 1; }
+.prep-wide .prep-row--tri { grid-column: 2; }
+
+@media (max-width: 640px) {
+    .prep-wide .prep-rows { grid-template-columns: 1fr; }
+}
+
+/* ======================================================================
+   Dateiliste — Aufbau vom 21aug26
+   Vorher trug jede Datei ein Datenblatt aus elf Angaben in zwei Spalten,
+   eine Spulen-Auswahl ueber die volle Breite und drei gleich grosse
+   farbige Knoepfe. Bei neun Dateien war das eine Wand.
+   ====================================================================== */
+.sd-liste {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.sd-zeile {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 12px 14px;
+}
+
+.sd-zeile + .sd-zeile { border-top: 1px solid var(--border-color); }
+.sd-zeile:hover { background: var(--bg-card-variant); }
+
+.sd-zeile--korrupt {
+    background: rgba(192, 57, 43, 0.06);
+    box-shadow: inset 3px 0 0 var(--accent-red, #c0392b);
+}
+
+.sd-zeile-bild {
+    width: 58px;
+    height: 58px;
+    border-radius: 9px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.sd-zeile-bild img { width: 100%; height: 100%; object-fit: contain; }
+.sd-zeile-platzhalter { font-size: 22px; opacity: 0.55; }
+
+.sd-zeile-text { flex: 1; min-width: 0; }
+
+.sd-zeile-name {
+    font-weight: 640;
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+}
+
+/* Die vier Angaben, nach denen man eine Datei sucht. */
+.sd-zeile-fakten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.sd-zeile-fakten > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.sd-zeile-fakten:empty { display: none; }
+
+.sd-zeile-marken {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.sd-marke {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sd-marke--neu {
+    background: rgba(76, 175, 80, 0.13);
+    border-color: rgba(76, 175, 80, 0.32);
+    color: #2e7d32;
+}
+
+.sd-marke--gedruckt {
+    background: rgba(255, 152, 0, 0.13);
+    border-color: rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+}
+
+.sd-marke--korrupt {
+    background: rgba(192, 57, 43, 0.13);
+    border-color: rgba(192, 57, 43, 0.35);
+    color: #c0392b;
+}
+
+/* Woher die Datei kommt — Stick oder interner Speicher des Druckers.
+   Bewusst zurueckhaltend: eine Herkunft ist kein Zustand wie "neu" oder
+   "korrupt", sie soll die farbigen Marken daneben nicht ueberstimmen. */
+.sd-marke--speicher {
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.28);
+    color: #1565c0;
+}
+
+body.dark-mode .sd-marke--speicher { color: #7fb8f0; }
+body.dark-mode .sd-marke--neu { color: #8bd18e; }
+body.dark-mode .sd-marke--gedruckt { color: #ffb74d; }
+body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
+
+/* Details bleiben da, nur zusammengeklappt. */
+.sd-mehr {
+    border: 0;
+    background: none;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 11.5px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sd-mehr:hover { background: rgba(128, 128, 128, 0.12); color: var(--text-primary); }
+.sd-mehr .hd-ic { transition: transform 0.15s; }
+.sd-zeile.offen .sd-mehr .hd-ic { transform: rotate(90deg); }
+
+.sd-zeile-details {
+    display: none;
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px dashed var(--border-color);
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 5px 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-zeile.offen .sd-zeile-details { display: grid; }
+.sd-zeile-details b { font-weight: 600; color: var(--text-primary); }
+
+.sd-zeile-spule {
+    display: none;
+    margin-top: 9px;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-zeile.offen .sd-zeile-spule { display: flex; }
+.sd-zeile-spule .sd-spool-select { flex: 1; min-width: 0; }
+
+/* Drucken traegt Farbe, Planen und Loeschen sind Symbole — drei gleich
+   grosse farbige Knoepfe zogen mehr Blick auf sich als die Dateien. */
+.sd-zeile-akt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+}
+
+.sd-btn-haupt {
+    border: 1px solid var(--color-green, #4CAF50);
+    background: var(--color-green, #4CAF50);
+    color: #fff;
+    border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    font: inherit;
+    font-size: var(--knopf-schrift);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.sd-btn-haupt:hover { filter: brightness(1.07); }
+
+.sd-btn-haupt:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.35);
+}
+
+.sd-btn-haupt:disabled:hover { filter: grayscale(0.35); }
+
+.sd-iknopf {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.sd-iknopf:hover { background: var(--bg-card-variant); color: var(--text-primary); }
+.sd-iknopf--rot:hover { border-color: #e5534b; color: #e5534b; }
+
+/* Werkzeugleiste: Suche vorn und breit, Rest kompakt.
+   min-width NICHT auf 0 setzen — dann schrumpft das Feld in der engen
+   Zeile auf die Breite der Lupe zusammen und die Sortierung schiebt sich
+   darueber (21aug26 in Chrome gesehen). */
+.sd-toolbar .sd-search-wrap {
+    flex: 1 1 200px;
+    min-width: 170px;
+    max-width: none;
+}
+
+/* Der Spulen-Chip haelt das rechte Ende. Ohne das sammelte sich der freie
+   Platz beim Suchfeld und die Zeile stand bei voller Modalbreite exakt auf
+   Kante — ein Zeichen mehr im Spulennamen und sie brach um. */
+.sd-toolbar .sd-aktive-spule { margin-left: auto; }
+
+@media (max-width: 560px) {
+    .sd-zeile { flex-wrap: wrap; }
+    .sd-zeile-akt { width: 100%; justify-content: flex-end; }
+}
+
+/* Aktive Spule in der Werkzeugleiste. Stand frueher als Auswahlfeld in
+   JEDER Dateikarte, ueberall mit demselben Wert. */
+.sd-aktive-spule {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--text-primary);
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sd-aktive-spule:hover { border-color: var(--color-blue, #2196F3); }
+.sd-aktive-spule--leer { color: var(--text-secondary); font-style: italic; }
+
+/* Hinweis unter einer Option — z.B. warum die Trocknung vorgeschlagen wird. */
+.prep-hinweis {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: var(--color-orange, #FF9800);
+    padding: 2px 0 8px;
+}
+
+/* Spulen-Empfehlung in der Dateizeile: welche Spule passt zu dieser Datei?
+   Ruhig gehalten — sie steht neben Dauer, Gewicht und Material und darf
+   die Zeile nicht uebernehmen. */
+.sd-spulwahl {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--accent-blue, #3b82f6);
+    white-space: nowrap;
+}
+
+.sd-spulwahl:empty { display: none; }
+.sd-spulwahl--keine { color: #b26a00; font-weight: 600; }
+body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
+
+/* ==========================================================================
+   Abgleich mit dem Drucker  (24aug26)
+   --------------------------------------------------------------------------
+   Er zeigte sich frueher als Block MITTEN in der Liste: erschien, schob
+   alles nach unten, verschwand, alles rutschte zurueck. Bei zwei Sekunden
+   Dauer war das nur Gezappel.
+
+   Jetzt laeuft ein duenner Faden unter der Kopfzeile, und der
+   Aktualisieren-Knopf fuellt sich — die Rueckmeldung sitzt da, wo man
+   gedrueckt hat, und verdeckt nichts.
+   ========================================================================== */
+.sd-modal-header { position: relative; }
+
+.sd-sync-faden {
+    position: absolute;
+    left: 0; right: 0; bottom: -1px;
+    height: 2px;
+    background: rgba(128, 128, 128, 0.18);
+    overflow: hidden;
+}
+
+.sd-sync-faden > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    background: var(--accent-blue);
+    transition: width .25s ease-out;
+}
+
+.sd-refresh--laeuft {
+    position: relative;
+    overflow: hidden;
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.35);
+    color: var(--accent-blue);
+    opacity: 1;             /* NICHT abblenden — er ist die Anzeige */
+    cursor: default;
+}
+
+.sd-refresh-fuell {
+    position: absolute;
+    inset: 0;
+    width: 0;
+    background: rgba(33, 150, 243, 0.16);
+    transition: width .25s ease-out;
+}
+
+.sd-refresh--laeuft > *:not(.sd-refresh-fuell) { position: relative; }
+
+/* Erstes Oeffnen, noch keine Liste: dort darf der Abgleich die Flaeche
+   haben — er schiebt nichts weg, weil nichts da ist. */
+.sd-sync-gross { padding: 40px 18px; text-align: center; }
+.sd-sync-titel { margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.sd-sync-rest { margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+
+.sd-sync-balken {
+    margin: 14px auto 0;
+    max-width: 280px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.20);
+    overflow: hidden;
+}
+
+.sd-sync-balken > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--accent-blue);
+    transition: width .25s ease-out;
+}
+
+.sd-sync-kreisel {
+    display: inline-block;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 3px solid rgba(128, 128, 128, 0.25);
+    border-top-color: var(--accent-blue);
+    animation: sd-dreh .8s linear infinite;
+}
+
+@keyframes sd-dreh { to { transform: rotate(360deg); } }
+
+/* ============================================
+ * Blaetterleiste unter der Dateiliste
+ *
+ * Der Server schneidet die Liste in Seiten (routes/sdcard.py
+ * _seitenweise) — hier steht, auf welcher man ist und wie man
+ * weiterkommt. Suche, Filter und Sortierung laufen serverseitig ueber
+ * den GANZEN Bestand, nicht nur ueber die sichtbare Seite.
+ *
+ * Die Leiste versteckt sich selbst, wenn es nur eine Seite gibt
+ * (.sd-blaettern--eine) — bei einer Handvoll Dateien soll da nichts
+ * stehen.
+ * ============================================ */
+
+.sd-blaettern {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding: 11px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-blaettern--eine { display: none; }
+
+.sd-blaettern-stand { white-space: nowrap; }
+.sd-blaettern-stand b { color: var(--text-primary); font-weight: 600; }
+.sd-blaettern-luecke { flex: 1; }
+
+.sd-seiten {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.sd-seiten button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.sd-seiten button:hover:not(:disabled) {
+    background: rgba(127, 127, 127, 0.10);
+}
+
+/* Aktiv = Flaeche + Rand, nicht nur eine duenne Linie. */
+.sd-seiten button.an {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: var(--accent-blue);
+    font-weight: 640;
+    cursor: default;
+}
+
+.sd-seiten button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.sd-seiten .sd-seiten-punkte {
+    padding: 0 2px;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+body.dark-mode .sd-seiten button.an {
+    color: #90caf9;
+}
+
+@media (max-width: 560px) {
+    .sd-blaettern { gap: 8px; }
+    .sd-blaettern-luecke { flex-basis: 100%; height: 0; }
+}

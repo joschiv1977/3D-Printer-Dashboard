@@ -1,0 +1,14 @@
+{
+    "type": "filament",
+    "filament_flow_ratio": [
+        "1.045"
+    ],
+    "filament_settings_id": [
+        "OVERTURE TPU Basic Flow Rate Calibrated"
+    ],
+    "from": "User",
+    "inherits": "OVERTURE TPU Basic @Bambu Lab P1S 0.4 nozzle",
+    "is_custom_defined": "0",
+    "name": "OVERTURE TPU Basic Flow Rate Calibrated",
+    "version": "1.9.0.14"
+}

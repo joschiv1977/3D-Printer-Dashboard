@@ -1,0 +1,318 @@
+/* ============================================
+ * Dashboard Layout - GridStack + iOS 2-Column
+ * ============================================ */
+
+/* ========== GRIDSTACK CONTAINER ========== */
+.grid-stack {
+    background: transparent;
+    min-height: 0 !important;
+}
+
+.grid-stack-item {
+    position: absolute;
+}
+
+.grid-stack-item-content {
+    background: transparent;
+    overflow: visible !important;
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cards inside GridStack take full height */
+.grid-stack-item-content > .card,
+.grid-stack-item-content > .status-grid {
+    margin-bottom: 0 !important;
+    flex: 1;
+    min-height: 100%;
+    box-sizing: border-box;
+}
+
+.grid-stack-item-content > .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-stack-item-content > .card > .card-header {
+    flex-shrink: 0;
+}
+
+/* ========== RESIZE HANDLES ========== */
+.ui-resizable-handle {
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.ui-resizable-handle:hover {
+    opacity: 1 !important;
+}
+
+.ui-resizable-se::before,
+.ui-resizable-sw::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+}
+
+.ui-resizable-se::before {
+    right: 0;
+    bottom: 0;
+}
+
+.ui-resizable-sw::before {
+    left: 0;
+    bottom: 0;
+}
+
+.ui-resizable-se {
+    width: 20px !important;
+    height: 20px !important;
+    right: 4px !important;
+    bottom: 4px !important;
+    background: none !important;
+    border-radius: 0 0 12px 0;
+    cursor: se-resize !important;
+}
+
+.ui-resizable-sw {
+    width: 20px !important;
+    height: 20px !important;
+    left: 4px !important;
+    bottom: 4px !important;
+    background: none !important;
+    border-radius: 0 0 0 12px;
+    cursor: sw-resize !important;
+}
+
+/* ========== MOBILE: DISABLE GRIDSTACK ========== */
+@media (max-width: 768px) {
+    .grid-stack {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px;
+        height: auto !important;
+    }
+
+    .grid-stack-item {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        transform: none !important;
+    }
+
+    .grid-stack-item-content {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .grid-stack-item-content > .card {
+        margin-bottom: 0 !important;
+    }
+}
+
+/* ========== CONTROL CARD RESPONSIVE ========== */
+@media (min-width: 769px) {
+    .control-card-mobile {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .control-card-desktop {
+        display: none !important;
+    }
+}
+
+/* ============================================================
+ * Filament-Trocknung — Karte im Stil der uebrigen Oberflaeche
+ * (Mockup 26aug26). Vorher trug sie durchgehend Inline-Stile:
+ * graue Info-Box, Ankreuzfeld, Knoepfe ueber die volle Breite.
+ * ============================================================ */
+.tr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
+
+/* Die zwoelf Punkte oben gelten nur zwischen den KINDERN von .tr-koerper —
+   und davon gibt es genau zwei: den Block zum Starten und den fuer den
+   laufenden Lauf. Deren Zeilen lagen deshalb ohne jeden Abstand
+   aufeinander: Auswahl, Kaestchen und Schalter klebten aneinander
+   (27aug26 im Bild gesehen). Also dieselbe Regel eine Ebene tiefer. */
+#material-selection,
+#drying-active { display: flex; flex-direction: column; gap: 12px; }
+
+/* Zeile: Beschriftung links, Bedienelement rechts — dieselbe Bauform
+   wie `.tray-edit-zeile` im Trocknungs-Dialog. */
+.tr-zeile { display: flex; align-items: center; gap: 14px; }
+.tr-lab { flex: 0 0 96px; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+.tr-wahl {
+    flex: 1; min-width: 0;
+    font-size: 13.5px; font-family: inherit;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    background: var(--bg-secondary, #f2f3f5);
+    color: var(--text-primary);
+    padding: 9px 10px;
+    cursor: pointer;
+}
+
+/* Zahlen wie `.dry-feld`: getoente Flaeche, feiner Rand. Der Wert bringt
+   seine Einheit selbst mit (JS schreibt „90-100°C"). */
+.tr-felder { display: flex; gap: 10px; }
+.tr-feld {
+    /* Nie umbrechen: ein Wert, eine Zeile. Bricht er doch, waechst das
+       Kaestchen und die ganze Reihe verrutscht (27aug26 gesehen). */
+    white-space: nowrap;
+    display: inline-flex; align-items: baseline;
+    background: var(--bg-secondary, #f2f3f5);
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    padding: 7px 11px;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-primary);
+}
+.tr-feld--warm { color: var(--accent-orange, #e65100); }
+
+/* Zahlenfeld im Kaestchen — die Farbe kommt vom Kaestchen, das Feld selbst
+   bringt keinen eigenen Rahmen und keinen eigenen Grund mit. */
+.tr-feld input[type="number"] {
+    width: 3.2em; border: 0; background: none; padding: 0;
+    font: inherit; color: inherit; text-align: right;
+    -moz-appearance: textfield;
+}
+.tr-feld input[type="number"]::-webkit-outer-spin-button,
+.tr-feld input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
+.tr-feld input[type="number"]:focus { outline: none; }
+.tr-einheit { margin-left: 3px; font-size: 12.5px; font-weight: 600; opacity: 0.75; }
+
+/* Schalter statt Ankreuzfeld — das Feld bleibt, es traegt den Zustand
+   fuer das JavaScript, ist aber nicht mehr zu sehen. */
+.tr-schalter-zeile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.tr-schalter-txt { flex: 1; font-size: 13px; color: var(--text-primary); }
+.tr-schalter-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+.tr-cb { position: absolute; opacity: 0; width: 0; height: 0; }
+.tr-schalter {
+    flex: none; width: 42px; height: 24px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.35); position: relative; transition: background .15s;
+}
+.tr-schalter::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+    transition: left .15s;
+}
+.tr-cb:checked + .tr-schalter { background: var(--accent-green, #16a34a); }
+.tr-cb:checked + .tr-schalter::after { left: 21px; }
+
+/* Fuss: kompakte Knoepfe rechts statt einer Leiste ueber die ganze Breite. */
+.tr-fuss {
+    display: flex; justify-content: flex-end; gap: 10px;
+    border-top: 1px solid var(--border-color); padding-top: 10px;
+}
+.tr-knopf {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none; border-radius: 999px; padding: 8px 16px;
+    font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+    transition: filter .15s;
+}
+.tr-knopf:hover:not(:disabled) { filter: brightness(0.96); }
+.tr-knopf:disabled { opacity: 0.45; cursor: default; }
+.tr-knopf--gruen { background: rgba(22, 163, 74, 0.12); color: var(--accent-green, #16a34a); }
+.tr-knopf--rot { background: rgba(220, 38, 38, 0.10); color: var(--accent-red, #dc2626); }
+
+/* Laufende Trocknung: Zeile, Balken, Prozent rechts — wie die Druckkarte. */
+.tr-lauf { display: flex; align-items: center; gap: 12px; }
+.tr-mat-punkt {
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    background: var(--text-secondary); border: 1px solid var(--border-color);
+}
+.tr-lauf-txt { flex: 1; min-width: 0; }
+.tr-lauf-txt b { font-size: 15px; }
+.tr-lauf-txt small { display: block; font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+.tr-proz { font-size: 20px; font-weight: 800; color: var(--accent-green, #16a34a); }
+.tr-balken { height: 7px; border-radius: 999px; background: var(--bg-secondary, #e5e7eb); overflow: hidden; }
+.tr-balken i { display: block; height: 100%; background: var(--accent-green, #16a34a); transition: width .3s; }
+
+/* Der Punkt im Kopf sagt, ob getrocknet wird. */
+#drying-status-indicator {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+    margin-left: 10px; background: var(--text-secondary); color: transparent;
+    overflow: hidden;
+}
+
+/* ===================================================================
+   Hotend-Magazin (H2C) — Karte
+   Aufbau wie die Material-Zone: oben wohin gedruckt wird, darunter das
+   Lager. Entwurf: static/_mockup_magazin.html.
+   =================================================================== */
+.hr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
+.hr-zaehler { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+/* Die zwei Druckstellen */
+.hr-duesen { display: flex; gap: 10px; }
+.hr-duese {
+    flex: 1; min-width: 0; background: var(--bg-secondary, #f0f1f4);
+    border: 1px solid var(--border-color, rgba(120, 120, 130, 0.22));
+    border-radius: 12px; padding: 9px 11px;
+}
+.hr-wo {
+    display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--text-secondary); text-transform: uppercase;
+}
+.hr-was { display: block; font-size: 13.5px; font-weight: 700; margin-top: 2px; color: var(--text-primary); }
+.hr-zu { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+.hr-duese--wechsel {
+    border-color: rgba(59, 130, 246, 0.45);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* Laufender Wechsel */
+.hr-wechsel {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(59, 130, 246, 0.09);
+    border: 1px solid rgba(59, 130, 246, 0.30);
+    border-radius: 12px; padding: 9px 11px;
+}
+.hr-wechsel > svg { flex: none; color: var(--accent-blue, #3b82f6); }
+.hr-wechsel-txt { flex: 1; min-width: 0; font-size: 13px; }
+.hr-wechsel-txt b { font-weight: 600; color: var(--text-primary); }
+.hr-wechsel-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+
+/* Die Plaetze. Drei Spalten, am Telefon zwei. */
+.hr-plaetze { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.hr-pl {
+    position: relative; min-height: 78px;
+    background: var(--bg-secondary, #f0f1f4);
+    border: 1px solid var(--border-color, rgba(120, 120, 130, 0.22));
+    border-radius: 12px; padding: 9px 10px;
+}
+.hr-nr {
+    display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--text-secondary); text-transform: uppercase;
+}
+.hr-dm { display: block; font-size: 15px; font-weight: 800; margin-top: 3px; color: var(--text-primary); }
+.hr-dm span { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-left: 2px; }
+.hr-code { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+/* Verschleiss als nackte Zahl, ohne Balken: der Drucker meldet einen Wert,
+   aber kein Maximum — ein Balken waere geraten. */
+.hr-vs { display: block; font-size: 10.5px; color: var(--text-secondary); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.hr-leer { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); opacity: 0.55; margin-top: 6px; }
+
+/* Aktiv-Zustand: Fuellung + Rand + Haken — dasselbe Muster wie ueberall,
+   keine duenne Randlinie allein. */
+.hr-pl--auf { background: rgba(22, 163, 74, 0.10); border-color: rgba(22, 163, 74, 0.55); }
+.hr-pl--ziel { background: rgba(59, 130, 246, 0.10); border-color: rgba(59, 130, 246, 0.55); }
+.hr-marke {
+    position: absolute; top: 7px; right: 8px; width: 17px; height: 17px;
+    border-radius: 50%; display: grid; place-items: center;
+}
+.hr-pl--auf .hr-marke { background: var(--accent-green, #16a34a); }
+.hr-pl--ziel .hr-marke { background: var(--accent-blue, #3b82f6); }
+.hr-marke svg { width: 11px; height: 11px; fill: none; stroke: #fff; stroke-width: 3; }
+
+@media (max-width: 768px) {
+    .hr-plaetze { grid-template-columns: repeat(2, 1fr); }
+}

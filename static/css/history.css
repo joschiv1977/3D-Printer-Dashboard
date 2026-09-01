@@ -1,0 +1,1212 @@
+/* ============================================
+ * History Page Styles (hist-*)
+ * Modern glassmorphism design
+ * ============================================ */
+
+/* Page Container */
+.hist-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 90px;
+}
+
+/* Seitenkopf: eine Zeile ohne Kasten. Vorher eine eigene Karte mit
+   20px Innenabstand und 20px Rand — rund 100px allein fuer Titel und
+   zwei Knoepfe, die der Liste darunter fehlten. */
+.hist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: nowrap;
+}
+
+.hist-header-title {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 650;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--text-primary);
+}
+.hist-header-title .hd-ic--lg { width: 18px; height: 18px; }
+
+.hist-header-actions {
+    display: flex;
+    flex: none;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.hist-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    border-radius: var(--knopf-radius);
+    cursor: pointer;
+    font-size: var(--knopf-schrift);
+    font-weight: 500;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body:not(.dark-mode) .hist-btn {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.hist-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+body:not(.dark-mode) .hist-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.hist-btn--primary {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: var(--accent-blue);
+}
+
+/* Im hellen Modus gewinnt sonst `body:not(.dark-mode) .hist-btn` mit
+   seinem grauen Grund — die Schrift war blau, der Knopf grau. */
+body:not(.dark-mode) .hist-btn--primary {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+}
+
+body:not(.dark-mode) .hist-btn--primary:hover {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: rgba(33, 150, 243, 0.4);
+}
+
+body.dark-mode .hist-btn--primary {
+    background: rgba(33, 150, 243, 0.15);
+    border-color: rgba(33, 150, 243, 0.3);
+    color: #64b5f6;
+}
+
+.hist-btn--primary:hover {
+    background: rgba(33, 150, 243, 0.2);
+}
+
+.hist-btn--danger {
+    background: rgba(244, 67, 54, 0.08);
+    border-color: rgba(244, 67, 54, 0.15);
+    color: #ef5350;
+}
+
+.hist-btn--danger:hover {
+    background: rgba(244, 67, 54, 0.15);
+}
+
+.hist-btn--icon {
+    padding: 6px 10px;
+    font-size: 16px;
+    min-width: 36px;
+    justify-content: center;
+}
+
+/* Tab Navigation — echte Pill-Buttons */
+.hist-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.hist-tab-btn {
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 9px 18px;
+    cursor: pointer;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+}
+
+.hist-tab-btn.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.hist-tab-btn:hover:not(.active) {
+    color: var(--text-primary);
+    border-color: var(--accent-blue);
+}
+
+/* Controls / Filter */
+.hist-controls {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    gap: 12px;
+}
+
+.hist-dropdown {
+    padding: 10px 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+body:not(.dark-mode) .hist-dropdown {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* Filterleiste: Suche */
+.hist-search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.hist-search-box i {
+    position: absolute;
+    left: 14px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.hist-search-box input {
+    width: 100%;
+    padding: 11px 14px 11px 38px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.hist-search-box input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+/* Filterleiste: Reihe mit Selects + Toggle */
+.hist-filter-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.hist-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius);
+    background: var(--bg-card-variant);
+    color: var(--text-secondary);
+    font-size: var(--knopf-schrift);
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+}
+
+.hist-toggle-btn:hover { color: var(--text-primary); border-color: var(--accent-blue); }
+
+.hist-toggle-btn.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+/* Filterleiste: Farb-Punkte */
+.hist-color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hist-color-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.hist-colors {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.hist-color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    box-shadow: 0 0 0 1px var(--border-color) inset;
+    transition: transform .12s, border-color .12s;
+}
+
+.hist-color-dot:hover { transform: scale(1.12); }
+.hist-color-dot.active { border-color: var(--accent-blue); transform: scale(1.12); }
+
+#history-list-statistics.active {
+    display: flex !important;
+    flex-direction: column;
+    gap: 14px;
+}
+
+@media (min-width: 900px) {
+    #history-list-current.active,
+    #history-list-archive.active {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Card Thumbnail */
+.hist-thumb {
+    width: 76px;
+    height: 76px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    align-self: center;
+}
+
+.hist-printer-tag {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+/* Empty State */
+.hist-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+    grid-column: 1 / -1;
+}
+
+.hist-empty-icon {
+    display: block;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.hist-empty-icon .hd-ic { width: 56px; height: 56px; stroke-width: 1.3; }
+
+/* Section Cards */
+.hist-section {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+body:not(.dark-mode) .hist-section {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.hist-section-title {
+    color: var(--text-primary);
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* ---- Detail Modal Styles ---- */
+
+/* Detail Modal — uses .modal-panel for background, flexbox centered by overlay */
+.hist-detail-modal {
+    width: 90%;
+    max-width: 1100px;
+    max-height: calc(100vh - 40px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+/* Header */
+.hist-detail-modal .sd-modal-header {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    position: relative;
+    z-index: 2;
+    border-bottom: none;  /* Trennlinie unter dem Header raus (geteilte Klasse nur hier) */
+}
+
+.hist-detail-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+}
+
+.hist-detail-tab {
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 7px 14px;
+    cursor: pointer;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
+}
+
+.hist-detail-tab.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.hist-detail-tab:hover:not(.active) {
+    color: var(--text-primary);
+    border-color: var(--accent-blue);
+}
+
+/* Chart Container */
+.hist-chart-wrap {
+    background: rgba(255, 255, 255, 0.04);
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+body:not(.dark-mode) .hist-chart-wrap {
+    background: rgba(0, 0, 0, 0.02);
+    border: none;
+}
+
+/* Events Container */
+.hist-events-wrap {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+body:not(.dark-mode) .hist-events-wrap {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Day Statistics Modal */
+.hist-day-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.hist-day-stat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+body:not(.dark-mode) .hist-day-stat {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.hist-day-stat-icon .hd-ic {
+    width: 26px;
+    height: 26px;
+    stroke-width: 1.6;
+    opacity: 0.75;
+}
+
+.hist-day-stat-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.hist-day-stat-label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Day Print List */
+.hist-day-print-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.hist-day-print-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+body:not(.dark-mode) .hist-day-print-item {
+    background: rgba(0, 0, 0, 0.015);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.hist-day-print-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+body:not(.dark-mode) .hist-day-print-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.hist-day-print-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hist-day-print-icon {
+    font-size: 20px;
+}
+
+.hist-day-print-name {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.hist-day-print-meta {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.hist-day-print-right {
+    text-align: right;
+}
+
+.hist-day-print-grams {
+    color: var(--accent-blue);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.hist-day-print-layers {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* ---- Mobile Responsive ---- */
+@media (max-width: 768px) {
+    .hist-container {
+        padding: 12px;
+        padding-bottom: 90px;
+    }
+
+    .hist-tab-btn {
+        padding: 10px 16px;
+        font-size: 13px;
+    }
+
+    .hist-detail-footer .hist-btn {
+        flex: 1;
+    }
+}
+
+/* ==========================================================================
+   Meister-Detail statt Modal  (21aug26)
+   --------------------------------------------------------------------------
+   Vorher lag jeder Druck in einem Overlay-Modal: zum naechsten Druck kam man
+   nur ueber Schliessen -> Liste -> anderer Eintrag. Zum Durchblaettern von
+   ein paar Drucken war das drei Klicks pro Druck. Jetzt steht die Liste
+   links und wechselt nur der rechte Teil; ueber Pfeiltasten geht es ganz
+   ohne Maus weiter.
+   Unter 900px gibt es keinen Platz fuer zwei Spalten — dort schiebt sich das
+   Detail wie bisher ueber die Liste, mit Zurueck-Knopf statt Kreuz.
+   ========================================================================== */
+.hist-container { --linie: rgba(0, 0, 0, 0.08); }
+[data-theme="dark"] .hist-container { --linie: rgba(255, 255, 255, 0.10); }
+
+.hv-rahmen {
+    display: grid;
+    grid-template-columns: 352px 1fr;
+    gap: 14px;
+    align-items: start;
+}
+
+/* Statistik braucht die ganze Breite — Liste und Detail treten beiseite. */
+.hv-rahmen.hv-statistik { grid-template-columns: 1fr; }
+.hv-rahmen.hv-statistik > .hv-spalte,
+.hv-rahmen.hv-statistik > .hv-detail { display: none; }
+/* Nur verstecken, nie den sichtbaren Zustand setzen: das Dashboard bringt
+   sein eigenes display:grid mit (zwei Spalten). Ein display:block hier
+   gewann durch hoehere Spezifitaet und legte alle Karten untereinander. */
+.hv-rahmen:not(.hv-statistik) > .hv-stat { display: none; }
+
+.hv-spalte,
+.hv-detail {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+/* ---- Liste ---- */
+.hv-listenkopf {
+    padding: 11px 12px;
+    border-bottom: 1px solid var(--linie);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+.hv-liste { max-height: calc(100vh - 300px); min-height: 240px; overflow-y: auto; }
+
+.hv-eintrag {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 9px 12px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    position: relative;
+}
+.hv-eintrag + .hv-eintrag { border-top: 1px solid var(--linie); }
+.hv-eintrag:hover { background: var(--bg-card-variant); }
+.hv-eintrag.an { background: var(--bg-card-variant); border-left-color: var(--color-blue); }
+
+.hv-e-bild {
+    width: 42px; height: 42px;
+    border-radius: 8px;
+    background: rgba(127, 127, 127, 0.10);
+    border: 1px solid var(--linie);
+    flex: none;
+    display: grid; place-items: center;
+    overflow: hidden;
+    font-size: 17px;
+}
+.hv-e-bild img { width: 100%; height: 100%; object-fit: contain; }
+.hv-e-text { flex: 1; min-width: 0; }
+.hv-e-name {
+    font-weight: 620; font-size: 13px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Die einzelnen Angaben duerfen NICHT schrumpfen. Sonst wird ihre Box
+   schmaler als ihr Text (gemessen 48 px Box fuer 67 px Inhalt), der Text
+   laeuft heraus und schiebt sich ueber den Nachbarn. Sichtbar wurde das,
+   sobald rechts eine Marke Platz braucht — also genau bei laufenden und
+   fehlgeschlagenen Drucken. Jetzt behalten sie ihre Breite und die Zeile
+   schneidet sauber ab. */
+.hv-e-meta > * { flex: none; }
+
+.hv-e-meta {
+    font-size: 11.5px; color: var(--text-secondary);
+    display: flex; gap: 9px; align-items: center;
+    white-space: nowrap; overflow: hidden;
+    margin-top: 2px;
+}
+.hv-e-meta > span { display: inline-flex; align-items: center; gap: 4px; min-width: 0; }
+.hv-punkt { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+.hv-e-loeschen {
+    flex: none; width: 26px; height: 26px;
+    border: 0; background: none; border-radius: 7px;
+    color: var(--text-secondary); cursor: pointer;
+    opacity: 0; transition: opacity 0.12s;
+}
+.hv-eintrag:hover .hv-e-loeschen,
+.hv-eintrag.an .hv-e-loeschen { opacity: 1; }
+.hv-e-loeschen:hover { background: rgba(244, 67, 54, 0.13); color: var(--color-red); }
+
+/* ---- Detail ---- */
+.hv-d-kopf {
+    display: flex; align-items: center; gap: 11px;
+    padding: 12px 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+.hv-d-bild {
+    width: 38px; height: 38px; border-radius: 8px; flex: none;
+    background: rgba(127, 127, 127, 0.10);
+    display: grid; place-items: center; overflow: hidden;
+}
+.hv-d-bild img { width: 100%; height: 100%; object-fit: contain; }
+.hv-d-titel { flex: 1; min-width: 0; }
+.hv-d-name {
+    font-weight: 650; font-size: 15px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hv-d-unter { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+.hv-blaettern {
+    display: flex; gap: 4px; align-items: center; flex: none;
+    color: var(--text-secondary); font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+.hv-blaettern button {
+    width: 28px; height: 28px; border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card); color: var(--text-secondary);
+    cursor: pointer; display: grid; place-items: center;
+}
+.hv-blaettern button:hover:not(:disabled) { background: var(--bg-card-variant); color: var(--text-primary); }
+.hv-blaettern button:disabled { opacity: 0.35; cursor: default; }
+.hv-zurueck { display: none; }
+
+.hv-d-reiter {
+    display: flex;
+    padding: 0 15px;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+.hv-d-reiter button {
+    border: 0; background: none; color: var(--text-secondary);
+    font: inherit; font-size: 13px;
+    padding: 10px 12px; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+}
+.hv-d-reiter button.active {
+    color: var(--text-primary); font-weight: 640;
+    border-bottom-color: var(--color-blue);
+}
+.hv-d-koerper { padding: 15px; max-height: calc(100vh - 260px); overflow-y: auto; }
+
+/* Nichts gewaehlt: Platzhalter statt leerer weisser Flaeche. */
+.hv-nichts {
+    padding: 70px 20px; text-align: center; color: var(--text-secondary);
+}
+.hv-nichts .hd-ic { width: 34px; height: 34px; opacity: 0.35; margin-bottom: 10px; }
+
+@media (max-width: 900px) {
+    .hv-rahmen { grid-template-columns: 1fr; }
+    /* Detail liegt ueber der Liste, sobald ein Druck gewaehlt ist. */
+    .hv-detail { display: none; }
+    .hv-rahmen.hv-offen > .hv-spalte { display: none; }
+    .hv-rahmen.hv-offen > .hv-detail { display: block; }
+    .hv-zurueck { display: grid; }
+    .hv-d-koerper, .hv-liste { max-height: none; }
+}
+
+/* --- Filterleiste in der schmalen Listenspalte ---------------------------
+   Suche, Reiter und Filter sassen vorher in einer 1100px breiten Karte. In
+   352px brauchen sie kleinere Masse, sonst bricht jeder Filter in eine
+   eigene Zeile und der Kopf wird hoeher als die Liste darunter. */
+.hv-listenkopf .hist-controls { margin-bottom: 0; gap: 8px; }
+.hv-listenkopf .hist-search-box input { padding: 8px 12px 8px 33px; font-size: 13px; }
+.hist-search-box .hd-ic {
+    position: absolute; left: 10px;
+    color: var(--text-secondary); pointer-events: none;
+}
+.hv-listenkopf .hist-filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.hv-listenkopf .hist-dropdown {
+    padding: 6px 8px; font-size: 12.5px; border-radius: 8px;
+    min-width: 0; width: 100%;
+}
+.hv-listenkopf .hist-toggle-btn {
+    grid-column: 1 / -1;
+    justify-content: center; padding: 6px 10px; font-size: 12.5px;
+}
+.hv-listenkopf .hist-color-row { margin: 0; }
+
+/* --- Feste Bildschirmhoehe statt mitwachsender Seite ---------------------
+   Liste und Detail sollen nebeneinander stehenbleiben und JEWEILS fuer sich
+   scrollen. Ohne feste Rahmenhoehe wuchs die Seite mit dem laengeren der
+   beiden und lief unter die schwebende Navigationsleiste. */
+.hv-rahmen { height: calc(100vh - 176px); min-height: 420px; }
+/* Reiterleiste ueber beiden Spalten — bleibt in jedem Modus erreichbar. */
+.hv-reiter { grid-column: 1 / -1; margin-bottom: 0; gap: 6px; flex-wrap: wrap; }
+.hv-reiter .hist-tab-btn { padding: 7px 16px; font-size: 13px; border-radius: 999px; }
+.hv-spalte,
+.hv-detail { height: 100%; display: flex; flex-direction: column; min-height: 0; }
+.hv-listenkopf { flex: none; }
+.hv-liste { flex: 1; min-height: 0; max-height: none; }
+
+#hv-inhalt { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.hv-d-kopf, .hv-d-reiter, .hv-d-fuss { flex: none; }
+.hv-d-koerper { flex: 1; min-height: 0; max-height: none; overflow-y: auto; }
+.hv-nichts { flex: 1; display: grid; place-content: center; }
+
+.hv-rahmen.hv-statistik { height: auto; }
+.hv-stat { overflow: visible; }
+
+/* Die Reiter im Detail sind Unterstriche, keine blauen Kacheln — sonst
+   konkurrieren sie optisch mit den Listenreitern links daneben. */
+.hv-d-reiter .hist-detail-tab {
+    background: none; border: 0; border-radius: 0;
+    color: var(--text-secondary); font-weight: 500;
+    padding: 10px 12px;
+    border-bottom: 2px solid transparent;
+    box-shadow: none;
+}
+.hv-d-reiter .hist-detail-tab.active {
+    background: none; color: var(--text-primary); font-weight: 640;
+    border-bottom-color: var(--color-blue);
+    box-shadow: none;
+}
+.hv-d-reiter .hist-detail-tab:hover:not(.active) { color: var(--text-primary); background: none; }
+
+@media (max-width: 900px) {
+    .hv-rahmen { height: auto; min-height: 0; }
+    .hv-spalte, .hv-detail { height: auto; }
+    .hv-liste { max-height: none; }
+    .hv-d-koerper { max-height: none; }
+}
+
+/* --- Ereignisse als Zeitstrahl ------------------------------------------
+   Vorher: 46 Zeilen mit immer demselben Stecknadel-Emoji davor. Jetzt eine
+   durchgehende Linie mit farbigem Punkt je Art (Start, Ende, Fehler,
+   Neustart) — man sieht auf einen Blick, wo etwas schiefging. */
+/* ============================================================
+   Phasen dieses Drucks — der Balken ueber der Ereignisliste.
+
+   Der Drucker meldet jeden Stufenwechsel; bis 27aug26 standen die nur als
+   Zeilen untereinander. Als Balken sieht man auf einen Blick, WO die Zeit
+   hinging: bei Druck 1319 waren zehn von zwoelf Minuten Vorkonditionierung.
+   ============================================================ */
+.hv-phasen { margin-bottom: 18px; }
+.hv-phasen-kopf {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; margin-bottom: 8px;
+}
+.hv-phasen-titel { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+.hv-phasen-summe {
+    font-size: 12px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+.hv-balken {
+    display: flex; height: 26px; border-radius: 8px; overflow: hidden;
+    background: var(--bg-secondary, #eef0f3);
+}
+.hv-balken i {
+    display: block; min-width: 3px; height: 100%;
+    /* Keine Luecken: die Abschnitte stossen aneinander, sonst sieht der
+       Balken loecherig aus, obwohl die Zeit lueckenlos verlaeuft. */
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
+}
+.hv-balken i:last-child { box-shadow: none; }
+/* Aufteilung Drucken vs. Vorbereitung — die eine Zahl, die der Balken
+   selbst nicht hergibt. */
+.hv-split {
+    display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 10px;
+}
+.hv-split-teil {
+    flex: 1 1 140px; padding: 7px 11px; border-radius: 8px;
+    background: var(--bg-secondary, #f1f3f6);
+    font-size: 12px; color: var(--text-secondary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hv-split-teil b {
+    color: var(--text-primary); font-weight: 700;
+    font-variant-numeric: tabular-nums; margin-right: 4px;
+}
+
+/* Rangliste statt Legende: nach Dauer sortiert, der Anteil steckt als
+   Fuellung hinter der Zeile. Die alte 3-Spalten-Legende war chronologisch
+   sortiert und bis zu 33 Zeilen lang — man sah nicht, wo die Zeit blieb. */
+.hv-rangliste { margin-top: 12px; }
+.hv-rang, .hv-mehr {
+    position: relative; display: flex; align-items: center; gap: 10px;
+    width: 100%; padding: 6px 10px; border-radius: 7px;
+    font-size: 12.5px; color: var(--text-primary);
+    background: none; border: 0; text-align: left;
+}
+.hv-rang::before, .hv-mehr::before {
+    content: ''; position: absolute; inset: 0 auto 0 0;
+    width: var(--anteil, 0%); min-width: 3px;
+    border-radius: 7px; background: var(--farbe, #94a3b8); opacity: .18;
+}
+.hv-rang > *, .hv-mehr > * { position: relative; }
+.hv-rang-name {
+    flex: 1; min-width: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+}
+.hv-rang-zeit {
+    flex: none; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.hv-rang-pct {
+    flex: none; width: 42px; text-align: right;
+    color: var(--text-secondary); font-variant-numeric: tabular-nums;
+}
+.hv-mehr {
+    --farbe: #94a3b8;
+    cursor: pointer; color: var(--text-secondary);
+    font-family: inherit; font-size: 12.5px;
+}
+.hv-mehr:hover::before { opacity: .3; }
+.hv-mehr-pfeil {
+    flex: none; width: 0; height: 0; margin-left: 1px;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+    transition: transform .15s ease;
+}
+.hv-phasen--offen .hv-mehr-pfeil { transform: rotate(90deg); }
+.hv-phasen:not(.hv-phasen--offen) .hv-rang--extra { display: none; }
+.hv-rang--extra { padding-left: 24px; }
+
+.hv-strahl { position: relative; padding-left: 22px; }
+.hv-strahl::before {
+    content: ""; position: absolute; left: 5px; top: 10px; bottom: 10px;
+    width: 1px; background: var(--border-color);
+}
+.hv-ereignis {
+    position: relative; display: flex; gap: 12px; align-items: baseline; padding: 6px 0;
+}
+.hv-ereignis::before {
+    content: ""; position: absolute; left: -21px; top: 11px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--punkt, var(--color-blue));
+    border: 2px solid var(--bg-card);
+}
+.hv-ev-zeit {
+    font-size: 12px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums; flex: none; width: 44px;
+}
+.hv-ev-text { flex: 1; min-width: 0; font-size: 13px; word-break: break-word; }
+
+/* --- Detailkarten nach dem Entwurf --------------------------------------
+   Eine Kartenform fuer alle Abschnitte statt vier verschiedener Kachelarten
+   mit je eigener Schriftgroesse und Farbe. Zahlen stehen in Textfarbe;
+   Orange, Blau und Gruen quer durch die Werte ordneten nichts, sie lenkten
+   nur ab. Farbe bleibt dem Status vorbehalten. */
+.hv-karte {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 13px 14px;
+}
+.hv-karte + .hv-karte { margin-top: 12px; }
+.hv-karte-kopf {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 11px;
+    font-size: 12px; font-weight: 640; letter-spacing: .04em;
+    text-transform: uppercase; color: var(--text-secondary);
+}
+.hv-karte-kopf .hd-ic { opacity: .75; }
+
+.hv-werte { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 9px 16px; }
+.hv-werte--2 { grid-template-columns: 1fr 1fr; }
+.hv-wert { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.hv-wert-name { font-size: 11.5px; color: var(--text-secondary); }
+.hv-wert-zahl { font-size: 15px; font-weight: 660; font-variant-numeric: tabular-nums; }
+.hv-wert-zahl small { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); }
+.hv-wert-zahl--leer { color: var(--text-secondary); font-weight: 500; }
+
+/* Zwei Spalten: was geplant war, was wirklich passiert ist. */
+.hv-paar { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
+.hv-paar-kopf {
+    font-size: 11px; font-weight: 640; letter-spacing: .04em; text-transform: uppercase;
+    color: var(--text-secondary);
+    padding-bottom: 5px; border-bottom: 1px solid var(--linie); margin-bottom: 6px;
+}
+@media (max-width: 620px) { .hv-paar { grid-template-columns: 1fr; } }
+
+.hv-fil-liste { display: flex; flex-direction: column; gap: 7px; }
+.hv-fil { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.hv-fil-punkt {
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    border: 1px solid var(--linie);
+}
+.hv-fil-name { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hv-fil-typ, .hv-fil-g, .hv-fil-nr { font-size: 11.5px; color: var(--text-secondary); flex: none; }
+.hv-fil-nr { margin-left: auto; }
+
+/* Status als Chip im Kopf, nicht als Wort in der Unterzeile. */
+.hv-marke {
+    display: inline-flex; align-items: center; gap: 5px; flex: none;
+    font-size: 11.5px; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
+}
+
+/* --- Zeitraffer ---------------------------------------------------------
+   Feste 16:9-Buehne mit schwarzem Grund. Das Video wird eingepasst, statt
+   die Flaeche zu bestimmen: hochkant aufgenommene Zeitraffer machten die
+   Karte sonst ueber 900px hoch und die Bedienleiste lag unter dem Falz. */
+.hv-video {
+    width: 100%; max-width: 640px; margin: 0 auto;
+    aspect-ratio: 16 / 9;
+    max-height: 58vh;
+    background: #000; border-radius: 10px; overflow: hidden;
+    display: grid; place-items: center;
+}
+.hv-video video { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+/* Status-Marken: nur bei Abweichung vom Normalfall. */
+.hv-marke--success   { background: rgba(76, 175, 80, .13);  border: 1px solid rgba(76, 175, 80, .3);  color: #2e7d32; }
+.hv-marke--running   { background: rgba(33, 150, 243, .13); border: 1px solid rgba(33, 150, 243, .3); color: #1565c0; }
+.hv-marke--failed    { background: rgba(244, 67, 54, .13);  border: 1px solid rgba(244, 67, 54, .3);  color: #c62828; }
+.hv-marke--cancelled { background: rgba(255, 152, 0, .13);  border: 1px solid rgba(255, 152, 0, .3);  color: #e65100; }
+[data-theme="dark"] .hv-marke--success   { color: #81c784; }
+[data-theme="dark"] .hv-marke--running   { color: #64b5f6; }
+[data-theme="dark"] .hv-marke--failed    { color: #ef9a9a; }
+[data-theme="dark"] .hv-marke--cancelled { color: #ffb74d; }
+
+.hv-e-marke {
+    flex: none; font-size: 11px; padding: 2px 8px; border-radius: 999px;
+    white-space: nowrap; font-weight: 600;
+}
+.hv-e-marke--running   { background: rgba(33, 150, 243, .14); color: #1565c0; }
+.hv-e-marke--failed    { background: rgba(244, 67, 54, .14);  color: #c62828; }
+.hv-e-marke--cancelled { background: rgba(255, 152, 0, .14);  color: #e65100; }
+[data-theme="dark"] .hv-e-marke--running   { color: #64b5f6; }
+[data-theme="dark"] .hv-e-marke--failed    { color: #ef9a9a; }
+[data-theme="dark"] .hv-e-marke--cancelled { color: #ffb74d; }
+
+/* Systemlauf (Kalibrierung). Violett, weil die vier Statusfarben schon
+   belegt sind — und weil das hier KEIN Status ist: eine Kalibrierung kann
+   genauso gelingen oder scheitern wie ein Druck. Die Marke steht deshalb
+   vor dem Namen, nicht bei der Statusmarke rechts. */
+.hv-e-marke--system {
+    background: rgba(168, 85, 247, .14);
+    color: #7e22ce;
+    margin-right: 7px;
+    vertical-align: 1px;
+}
+[data-theme="dark"] .hv-e-marke--system { color: #d8b4fe; }
+
+/* Der Streifen links traegt den Status mit — auch ohne Auswahl. */
+.hv-eintrag--failed    { border-left-color: var(--color-red); }
+.hv-eintrag--cancelled { border-left-color: var(--color-orange); }
+.hv-eintrag--running   { border-left-color: var(--color-blue); }
+.hv-eintrag--system    { border-left-color: #a855f7; }
+
+/* --- Verlauf: Chips statt Chart-Legende ---------------------------------
+   Die eingebaute Legende von Chart.js war eine Zeile grauer Kaestchen ohne
+   Werte. Die Chips tragen den zuletzt gemessenen Wert mit und schalten die
+   jeweilige Kurve an und aus. */
+.hv-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.hv-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(128, 128, 128, .10);
+    border: 1px solid rgba(128, 128, 128, .18);
+    border-radius: 999px; padding: 5px 11px;
+    font: inherit; font-size: 12.5px; color: var(--text-primary); cursor: pointer;
+}
+.hv-chip-punkt { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.hv-chip-wert { font-weight: 660; font-variant-numeric: tabular-nums; }
+.hv-chip--aus { opacity: .38; }
+.hv-leinwand { position: relative; height: clamp(180px, 28vh, 360px); width: 100%; }
+.hv-leinwand canvas { position: absolute; inset: 0; }
+
+.hist-container { padding-top: 14px; }
+
+/* Auf schmalen Schirmen verschwinden die Beschriftungen, das Icon genuegt. */
+@media (max-width: 560px) {
+    .hist-header .hist-btn span { display: none; }
+    .hist-header .hist-btn { padding: 7px 9px; }
+}
+
+/* --- Übersichtsleiste zum Zoomen ---------------------------------------
+   Ein fünfstündiger Druck bringt rund 660 Messpunkte; auf 1000 Pixel trägt
+   damit jeder Pixel zwei Messungen und die Düsenkurve wird zum Zickzack-Band.
+   Die Leiste zeigt immer den ganzen Druck, das Fenster darin den Ausschnitt —
+   so weiß man beim Hineinzoomen jederzeit, wo im Druck man gerade ist. */
+.hv-spur {
+    position: relative; height: 54px; margin-top: 10px;
+    border: 1px solid var(--border-color); border-radius: 9px;
+    overflow: hidden; background: var(--bg-card-variant);
+    cursor: grab; user-select: none; touch-action: none;
+}
+.hv-spur:active { cursor: grabbing; }
+.hv-spur canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hv-schatten {
+    position: absolute; top: 0; bottom: 0; left: 0;
+    background: rgba(20, 25, 35, .40); pointer-events: none;
+}
+[data-theme="dark"] .hv-schatten { background: rgba(0, 0, 0, .5); }
+.hv-fenster {
+    position: absolute; top: 0; bottom: 0;
+    border-left: 2px solid var(--color-blue); border-right: 2px solid var(--color-blue);
+    background: rgba(33, 150, 243, .10);
+}
+.hv-griff { position: absolute; top: 0; bottom: 0; width: 12px; cursor: ew-resize; }
+.hv-griff::after {
+    content: ""; position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px; height: 18px; border-radius: 2px; background: var(--color-blue);
+}
+.hv-griff--l { left: -7px; }
+.hv-griff--r { right: -7px; }
+.hv-spur-fuss {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; color: var(--text-secondary); margin-top: 5px;
+    font-variant-numeric: tabular-nums;
+}
+.hv-spur-fuss > span:nth-child(2) { color: var(--text-primary); font-weight: 600; }
+
+.hv-chip-luft { flex: 1; }
+.hv-bereich {
+    display: inline-flex; gap: 2px; background: var(--bg-card-variant);
+    border: 1px solid var(--border-color); border-radius: 9px; padding: 3px;
+}
+.hv-bereich button {
+    border: 0; background: none; color: var(--text-secondary);
+    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;
+}
+.hv-bereich button:hover { color: var(--text-primary); background: var(--bg-card); }
+
+/* Ziehen im Diagramm darf keine Textauswahl auslösen. */
+.hv-leinwand { user-select: none; touch-action: none; }
+
+/* --- Aktionen in der Reiterzeile ----------------------------------------
+   Die eigene Fußzeile kostete 78px Höhe für drei Knöpfe. Rechts neben den
+   Reitern steht ohnehin leerer Platz — der Verlauf bekommt die Höhe. */
+.hv-reiter-luft { flex: 1; }
+.hv-d-aktionen { display: flex; align-items: center; gap: 6px; padding: 0 0 0 8px; flex: none; }
+/* Spezifischer als `.hv-d-reiter button`, sonst gewinnt dessen
+   background:none und der Hauptknopf bleibt farblos. */
+.hv-d-reiter .hv-akt-btn {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-secondary); border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster); min-height: var(--knopf-hoehe);
+    font: inherit; font-size: var(--knopf-schrift); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 6px; white-space: nowrap;
+    border-bottom-color: var(--border-color);
+}
+.hv-d-reiter .hv-akt-btn:hover {
+    color: var(--text-primary); border-color: var(--color-blue); background: var(--bg-card);
+}
+/* Hauptknopf wie in den Dialogen der ganzen App (.modal-btn-primary):
+   getoenter Grund, blaue Schrift. Vollflaechig blau war hier der
+   Ausreisser — daneben stand in der Wartung ein getoentes "Erstellen". */
+.hv-d-reiter .hv-akt-btn--haupt {
+    background: rgba(33, 150, 243, 0.15); border-color: rgba(33, 150, 243, 0.3);
+    color: #1565c0; font-weight: 600;
+}
+.hv-d-reiter .hv-akt-btn--haupt:hover {
+    background: rgba(33, 150, 243, 0.25); border-color: rgba(33, 150, 243, 0.4);
+    color: #1565c0;
+}
+body.dark-mode .hv-d-reiter .hv-akt-btn--haupt {
+    background: rgba(33, 150, 243, 0.3); border-color: rgba(33, 150, 243, 0.4);
+    color: #90caf9;
+}
+body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
+    background: rgba(33, 150, 243, 0.45); border-color: rgba(33, 150, 243, 0.5);
+    color: #90caf9;
+}
+.hv-d-reiter { align-items: center; padding-right: 12px; }
+
+/* Kurzer Hinweis, wie man zoomt — ohne ihn ist die Leiste nur ein Bild. */
+.hv-zoom-hilfe {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    font-size: 11.5px; color: var(--text-secondary); margin-top: 8px;
+}
+.hv-zoom-hilfe kbd {
+    background: var(--bg-card-variant); border: 1px solid var(--border-color);
+    border-radius: 5px; padding: 0 5px; font: inherit; font-size: 11px;
+}
+
+@media (max-width: 900px) {
+    /* Auf schmalen Schirmen wandern die Aktionen unter die Reiter. */
+    .hv-d-aktionen { padding: 0 0 8px 15px; }
+    .hv-d-reiter { flex-wrap: wrap; }
+    .hv-reiter-luft { flex-basis: 100%; }
+}
+
+/* Hinweiszeile, wenn kein Vorschaubild da ist. */
+.hv-kein-bild-zeile { display: flex; align-items: flex-start; gap: 11px; }
+.hv-kein-bild-ic {
+    width: 40px; height: 40px; border-radius: 9px; flex: none;
+    border: 1px solid var(--linie);
+}
+.hv-kein-bild-zeile > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+.hv-kein-bild-zeile b { font-size: 13.5px; font-weight: 620; }
+.hv-kein-bild-zeile span span { font-size: 12px; color: var(--text-secondary); }
+.hv-e-bild.kein-bild, .hv-d-bild.kein-bild { border: 1px solid var(--linie); }
+
+/* --- Zeitraffer: eigene Bedienleiste ------------------------------------
+   Die eingebauten Steuerelemente des Browsers sehen überall anders aus und
+   können kein Tempo vorgeben. Unter dem Video ist ohnehin Platz. */
+.hv-tl-leiste {
+    display: flex; align-items: center; gap: 9px; margin-top: 11px; flex-wrap: wrap;
+}
+.hv-tl-btn {
+    border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-secondary); border-radius: 9px;
+    width: 34px; height: 34px; flex: none;
+    display: grid; place-items: center; cursor: pointer; text-decoration: none;
+}
+.hv-tl-btn:hover { color: var(--text-primary); border-color: var(--color-blue); }
+.hv-tl-btn--haupt {
+    background: var(--color-blue); border-color: var(--color-blue); color: #fff;
+}
+.hv-tl-btn--haupt:hover { color: #fff; filter: brightness(1.06); }
+.hv-tl-zeit {
+    font-size: 12px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums; flex: none; min-width: 82px;
+}
+.hv-tl-bahn {
+    flex: 1; min-width: 90px; height: 6px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.18); overflow: hidden; cursor: pointer;
+}
+.hv-tl-bahn > i { display: block; height: 100%; width: 0; background: var(--color-blue); }
+.hv-tl-tempo {
+    display: inline-flex; gap: 2px; flex: none;
+    background: var(--bg-card-variant); border: 1px solid var(--border-color);
+    border-radius: 9px; padding: 3px;
+}
+.hv-tl-tempo button {
+    border: 0; background: none; color: var(--text-secondary);
+    font: inherit; font-size: 12px; font-variant-numeric: tabular-nums;
+    padding: 3px 9px; border-radius: 6px; cursor: pointer;
+}
+.hv-tl-tempo button.an { background: var(--color-blue); color: #fff; font-weight: 600; }
+.hv-tl-tempo button:hover:not(.an) { color: var(--text-primary); }
+
+/* --- Einstellungen als Menü am Knopf ------------------------------------
+   Vorher eine aufklappbare Karte über der Liste, die beim Öffnen den ganzen
+   Inhalt nach unten schob. Am Knopf bleibt die Seite stehen. */
+.hv-menue-huelle { position: relative; display: inline-flex; }
+.hv-menue {
+    position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
+    min-width: 268px; display: none; flex-direction: column;
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 11px; box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22); padding: 5px;
+    text-align: left;
+}
+.hv-menue--auf { display: flex; }
+.hv-menue-kopf {
+    font-size: 11px; font-weight: 640; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--text-secondary); padding: 7px 10px 3px;
+}
+.hv-menue hr { border: 0; border-top: 1px solid var(--linie); margin: 6px 8px; width: 100%; }
+.hv-menue-feld {
+    display: flex; flex-direction: column; gap: 4px; padding: 5px 10px;
+}
+.hv-menue-feld > span { font-size: 11.5px; color: var(--text-secondary); }
+.hv-menue-feld input,
+.hv-menue-feld select {
+    width: 100%; border: 1px solid var(--border-color); background: var(--bg-card);
+    color: var(--text-primary); border-radius: 8px; padding: 7px 9px;
+    font: inherit; font-size: 13px;
+}
+.hv-menue-fuss {
+    display: flex; justify-content: flex-end;
+    padding: 9px 10px 5px; margin-top: 3px; border-top: 1px solid var(--linie);
+}

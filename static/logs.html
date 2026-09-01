@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">System Logs - 3D Printer Dashboard</title>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=2">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
+    <link rel="stylesheet" href="/static/css/base.css?v=2">
+    <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
+    <link rel="stylesheet" href="/static/css/meldungen.css">
+
+    <!-- Sprachdateien laden -->
+    <script src="/static/lang/de.js"></script>
+    <script src="/static/lang/en.js"></script>
+    <script src="/static/lang/fr.js"></script>
+    <script src="/static/lang/es.js"></script>
+    <script src="/static/lang/it.js"></script>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 0;
+            padding-bottom: 90px; /* Space for tab bar */
+            margin: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            height: calc(100vh - 90px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ========== HEADER ==========
+           Wie auf Historie, Wartung, Slicer und Benutzer: kein Kasten,
+           Titel 17px. Die Karte drumherum kostete 68px Hoehe fuer eine
+           Zeile Text. */
+        .header {
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-bottom: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Kein !important mehr noetig: die globale Regel, die alle
+           .header-actions versteckte, gehoerte zum entfernten App-Header. */
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn {
+            background: var(--bg-section);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--knopf-polster);
+            min-height: var(--knopf-hoehe);
+            justify-content: center;
+            border-radius: var(--knopf-radius);
+            cursor: pointer;
+            font-size: var(--knopf-schrift);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        body.dark-mode .btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn:hover {
+            background: var(--bg-hover, rgba(255, 255, 255, 0.1));
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: rgba(220, 53, 69, 0.12);
+            color: #ff6b7a;
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(220, 53, 69, 0.25);
+            border-color: rgba(220, 53, 69, 0.4);
+        }
+
+        /* ========== CONTENT ========== */
+        .content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        body.dark-mode .content {
+            background: rgba(26, 31, 46, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* ========== STATS BAR ========== */
+        /* Stufen sind Filter, keine Deko: antippen blendet eine Stufe aus.
+           Vorher waren es vier Zahlenkaesten, von denen immer nur EINER
+           gleichzeitig aktiv sein konnte — "alles ausser Debug" ging nicht. */
+        .stats-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card, var(--bg-section));
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+        }
+
+        .stat-card::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex: none;
+        }
+
+        .stat-card.error::before   { background: #E5534B; }
+        .stat-card.warning::before { background: #FF9800; }
+        .stat-card.info::before    { background: #2196F3; }
+        .stat-card.debug::before   { background: var(--text-secondary); }
+
+        .stat-value {
+            font-weight: 680;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        .stat-label { font-size: 12.5px; }
+
+        /* aus = ausgeblendet */
+        .stat-card.aus { opacity: 0.4; }
+        .stat-card.aus .stat-value { text-decoration: line-through; }
+
+        .stat-card.active.error   { border-color: #E5534B; background: rgba(229,83,75,.08); }
+        .stat-card.active.warning { border-color: #FF9800; background: rgba(255,152,0,.10); }
+        .stat-card.active.info    { border-color: #2196F3; background: rgba(33,150,243,.09); }
+        .stat-card.active.debug   { border-color: var(--text-secondary); }
+
+        /* ========== CONTROLS ========== */
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--bg-section);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        body.dark-mode .controls {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .control-group input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent-blue);
+        }
+
+        .control-group select,
+        .search-input {
+            padding: 7px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        body.dark-mode .control-group select,
+        body.dark-mode .search-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .control-group select:focus,
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .search-input {
+            min-width: 220px;
+            cursor: text;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .control-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border-color);
+        }
+
+        body.dark-mode .control-divider {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* ========== LOG CONTAINER ========== */
+        .log-container {
+            background: var(--bg-section);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 4px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            font-family: 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 12.5px;
+            line-height: 1.7;
+        }
+
+        body.dark-mode .log-container {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        /* Klipper-Konsole (Direct): Terminal-Zeilen */
+        .console-line { white-space: pre-wrap; word-break: break-word; padding: 0 6px; }
+        .console-cmd { color: var(--accent-blue, #2196f3); font-weight: 600; }
+        .console-resp { color: var(--text-primary); }
+        .console-err { color: var(--accent-red, #f44336); }
+
+        /* Scrollbar */
+        .log-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .log-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .log-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .log-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ========== LOG LINES ==========
+           Feste Spalten: Zeit, Stufe, Meldung. Vorher rutschte die Meldung
+           je nach Laenge des Zeitstempels. Und die Farbe traegt die STUFE,
+           nicht der Text — gruener Fliesstext auf hellem Grund war schlecht
+           lesbar und liess alles nach "in Ordnung" aussehen. */
+        .log-line {
+            margin: 0;
+            padding: 5px 14px;
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            transition: background 0.15s ease;
+        }
+
+        .log-line + .log-line { border-top: 1px solid var(--border-color); }
+        .log-line:hover { background: var(--bg-section); }
+
+        .log-line.error {
+            background: rgba(229, 83, 75, 0.05);
+            box-shadow: inset 3px 0 0 #E5534B;
+        }
+
+        .log-line.warning {
+            background: rgba(255, 152, 0, 0.05);
+            box-shadow: inset 3px 0 0 #FF9800;
+        }
+
+        .log-timestamp {
+            color: var(--text-secondary);
+            opacity: 0.75;
+            font-size: 12px;
+            flex-shrink: 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .log-level {
+            display: inline-block;
+            padding: 1px 0;
+            border-radius: 5px;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            width: 54px;
+            text-align: center;
+        }
+
+        .log-level.error   { background: rgba(229,83,75,.15);  color: #E5534B; }
+        .log-level.warning { background: rgba(255,152,0,.16);  color: #b26a00; }
+        .log-level.info    { background: rgba(33,150,243,.13); color: #1668a8; }
+        .log-level.debug   { background: rgba(128,128,128,.13); color: var(--text-secondary); }
+
+        body.dark-mode .log-level.warning { color: #ffb74d; }
+        body.dark-mode .log-level.info    { color: #64b5f6; }
+
+        .log-message {
+            flex: 1;
+            min-width: 0;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+
+        .log-line.debug .log-message { color: var(--text-secondary); }
+
+        /* Wiederholungen zaehlen statt stapeln — die Haelfte des Protokolls
+           war dieselbe Zeile hintereinander. */
+        .log-wdh {
+            flex: none;
+            font-size: 10.5px;
+            color: var(--text-secondary);
+            background: rgba(128, 128, 128, 0.13);
+            border-radius: 999px;
+            padding: 1px 8px;
+        }
+
+        .log-fuss {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .log-fuss .sp { flex: 1; }
+
+        /* Strich-Icons wie im uebrigen Programm statt Emoji. */
+        .log-ic {
+            width: 15px;
+            height: 15px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex: 0 0 auto;
+        }
+
+        /* Suche fuellt die Zeile, Rest kompakt. */
+        .log-suche {
+            position: relative;
+            flex: 1;
+            min-width: 170px;
+            display: flex;
+            align-items: center;
+        }
+
+        .log-suche .log-ic {
+            position: absolute;
+            left: 11px;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .log-suche input {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            background: var(--bg-card, var(--bg-section));
+            color: var(--text-primary);
+            border-radius: 9px;
+            padding: 8px 12px 8px 34px;
+            font: inherit;
+            font-size: 13.5px;
+        }
+
+        /* "Mitlaufen" als Schalter statt Kaestchen mit dem Text
+           "Auto-Refresh (5 Sek)" — die Sekunden interessieren nicht. */
+        .log-schalt {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .log-schalter {
+            width: 38px;
+            height: 22px;
+            border-radius: 999px;
+            background: var(--border-color);
+            position: relative;
+            flex: none;
+            transition: background 0.15s;
+        }
+
+        .log-schalter::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: left 0.15s;
+        }
+
+        .log-schalt input:checked + .log-schalter { background: #4CAF50; }
+        .log-schalt input:checked + .log-schalter::after { left: 19px; }
+
+        .log-ic--lg { width: 18px; height: 18px; vertical-align: -3px; }
+
+        /* Zeilenzahl im selben Stil wie Suche und Kopfknoepfe — als nacktes
+           Systemfeld sass sie sonst zwischen zwei gestalteten Elementen. */
+        #lines-select {
+            border: 1px solid var(--border-color);
+            background: var(--bg-card, var(--bg-section));
+            color: var(--text-primary);
+            border-radius: 9px;
+            padding: 8px 10px;
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            flex: none;
+        }
+
+        .log-message {
+            word-break: break-word;
+            flex: 1;
+        }
+
+        /* ========== EMPTY STATE ========== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 768px) {
+            .container { padding: 8px; }
+            .header-actions { width: 100%; }
+            .header-actions .btn { flex: 1; justify-content: center; }
+            .content { padding: 12px; border-radius: 10px; }
+            .stats-bar { flex-wrap: wrap; }
+            .stat-card { flex: 1 1 calc(50% - 4px); min-width: 0; }
+            .controls { flex-direction: column; align-items: stretch; padding: 10px 12px; }
+            .control-group { justify-content: space-between; }
+            .control-divider { display: none; }
+            .search-input { min-width: unset; width: 100%; }
+            .log-container { font-size: 11.5px; max-height: calc(100vh - 420px); }
+        }
+
+        /* ========== BG HOVER FALLBACK ========== */
+        :root { --bg-hover: rgba(0, 0, 0, 0.05); }
+        body.dark-mode { --bg-hover: rgba(255, 255, 255, 0.06); }
+    </style>
+</head>
+<body>
+    <!-- Apply dark mode immediately to prevent white flash -->
+    <script>
+        (function() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+            } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.body.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <!-- Shared Module Scripts -->
+    <script src="/static/js/modules/icons.js"></script>
+    <script src="/static/js/modules/confirm-dialog.js"></script>
+    <script src="/static/js/modules/theme-manager.js"></script>
+    <script src="/static/js/modules/i18n-manager.js"></script>
+    <script src="/static/js/modules/tab-bar-manager.js"></script>
+    <script src="/static/socket.io.js"></script>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1><svg class="log-ic log-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg> <span data-i18n="system_logs">System Logs</span></h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn" onclick="refreshLogs()">
+                    <svg class="log-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg>
+                    <span data-i18n="refresh">Aktualisieren</span>
+                </button>
+                <button class="btn" onclick="downloadLogs()">
+                    <svg class="log-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>
+                    <span data-i18n="download">Download</span>
+                </button>
+                <button class="btn btn-danger" onclick="clearLogs()">
+                    <svg class="log-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>
+                    <span data-i18n="delete">Löschen</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card error" onclick="filterByLevel('error')" id="stat-error">
+                    <div class="stat-label" data-i18n="errors">Fehler</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card warning" onclick="filterByLevel('warning')" id="stat-warning">
+                    <div class="stat-label" data-i18n="warnings">Warnungen</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card info" onclick="filterByLevel('info')" id="stat-info">
+                    <div class="stat-label" data-i18n="info">Info</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <!-- Debug startet gedimmt: es macht zwei Drittel des
+                     Protokolls aus und verdeckt sonst alles andere. -->
+                <div class="stat-card debug aus" onclick="filterByLevel('debug')" id="stat-debug">
+                    <div class="stat-label" data-i18n="debug">Debug</div>
+                    <div class="stat-value">0</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <!-- Suche zuerst: bei tausend Zeilen sucht man, statt zu
+                     blaettern. Vorher stand sie hinter zwei Trennstrichen. -->
+                <div class="log-suche">
+                    <svg class="log-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                    <input type="text" id="search-input" placeholder="Im Protokoll suchen"
+                           data-i18n-placeholder="search_logs" oninput="filterLogs()">
+                </div>
+
+                <select id="lines-select" onchange="refreshLogs()">
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000" selected>1000</option>
+                </select>
+
+                <label class="log-schalt">
+                    <input type="checkbox" id="auto-refresh" onchange="toggleAutoRefresh()" hidden>
+                    <span class="log-schalter" id="auto-refresh-knopf"></span>
+                    <span data-i18n="logs_follow">Mitlaufen</span>
+                </label>
+            </div>
+
+            <!-- Log Container -->
+            <div class="log-container" id="log-container">
+                <div class="empty-state">
+                    <div class="empty-state-icon"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></div>
+                    <p data-i18n="loading_logs">Logs werden geladen...</p>
+                </div>
+            </div>
+
+            <div class="log-fuss">
+                <span id="log-status"></span>
+                <span class="sp"></span>
+                <span id="log-letzte"></span>
+            </div>
+
+            <!-- Klipper-Konsole: Eingabezeile (nur Direct-Modus) -->
+            <div class="controls" id="console-input-bar" style="display:none; gap:8px; margin-top:10px;">
+                <input type="text" id="console-input" class="search-input"
+                       data-i18n-placeholder="console_input_hint" placeholder="G-Code / Befehl eingeben…"
+                       style="flex:1; font-family:monospace;" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <button class="btn" id="console-send" data-i18n="send">Senden</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/auth-handler.js"></script>
+    <script>
+        let allLogs = [];
+        // Zwei Zustaende:
+        //   nurStufe = null  -> Grundansicht: alles ausser Debug. Debug macht
+        //                       zwei Drittel des Protokolls aus und verdeckt
+        //                       sonst alles andere.
+        //   nurStufe = 'x'   -> NUR diese Stufe. Ein Klick auf "Fehler" zeigt
+        //                       die Fehler, er blendet sie nicht aus.
+        // Nochmal auf dieselbe Stufe klicken fuehrt zurueck zur Grundansicht.
+        let nurStufe = null;
+        const GRUNDANSICHT = { error: true, warning: true, info: true, debug: false };
+
+        function stufeSichtbar(level) {
+            return nurStufe ? level === nurStufe : GRUNDANSICHT[level] !== false;
+        }
+        let autoRefreshInterval = null;
+
+        // Get translations
+        function getText(key, fallback = key) {
+            return window.i18nManager ? window.i18nManager.getText(key, fallback) : fallback;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            if (window.tabBarManager) window.tabBarManager.render();
+            if (window.i18nManager) window.i18nManager.applyTranslations();
+
+            // Direct-Modus → Klipper-Konsole (gcode live + Backlog) statt Backend-Logs.
+            let direct = false;
+            try {
+                const c = await (window.__directCfgPromise ||
+                    fetch('/api/config', { credentials: 'same-origin' }).then(r => r.json()));
+                direct = !!(c && c.direct_mode === true);
+            } catch (_) {}
+            if (direct) { initKlipperConsole(); return; }
+
+            // Bambu-Backend: Logs wie bisher (Polling).
+            loadLogs();
+            const autoRefreshCheckbox = document.getElementById('auto-refresh');
+            autoRefreshCheckbox.checked = true;
+            toggleAutoRefresh();
+        });
+
+        // ===================== Klipper-Konsole (Direct-Modus) =====================
+        // Wie Android: Backlog aus server.gcode_store (GET /api/console) + live über
+        // Socket.IO 'gcode_response' (Adapter relayt notify_gcode_response). Senden
+        // via /api/printer/gcode (lokales Echo). Kein Backend-Log-Polling.
+        async function initKlipperConsole() {
+            const h1 = document.querySelector('.header h1');
+            if (h1) h1.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> <span>' + getText('console_title', 'Konsole') + '</span>';
+            // Backend-Log-spezifische UI weg (Level-Stats, Auto-Refresh/Zeilen, Datei-Ops).
+            const statsBar = document.querySelector('.stats-bar');
+            if (statsBar) statsBar.style.display = 'none';
+            const ctrls = document.querySelector('.content .controls');
+            if (ctrls && ctrls.id !== 'console-input-bar') ctrls.style.display = 'none';
+            document.querySelectorAll('.header-actions .btn').forEach((b) => { b.style.display = 'none'; });
+            const bar = document.getElementById('console-input-bar');
+            if (bar) bar.style.display = 'flex';
+
+            const container = document.getElementById('log-container');
+            if (container) container.innerHTML = '';
+
+            // Backlog laden.
+            try {
+                const r = await apiCall('/api/console?count=300');
+                const d = await r.json();
+                (d.lines || []).forEach((l) => appendConsole(l.type, l.message, false));
+            } catch (_) {}
+            scrollConsole();
+
+            // Live: Socket.IO 'gcode_response' (Antworten). Befehle echoen wir lokal.
+            try {
+                if (typeof io !== 'undefined') {
+                    const s = io({ transports: ['polling', 'websocket'] });
+                    window.__consoleSocket = s;
+                    s.on('gcode_response', (line) => appendConsole('response', String(line), true));
+                }
+            } catch (_) {}
+
+            // Eingabe.
+            const inp = document.getElementById('console-input');
+            const sendBtn = document.getElementById('console-send');
+            if (inp) inp.placeholder = getText('console_input_hint', 'G-Code / Befehl eingeben…');
+            if (sendBtn) sendBtn.textContent = getText('send', 'Senden');
+            const send = () => {
+                const cmd = (inp && inp.value || '').trim();
+                if (!cmd) return;
+                appendConsole('command', cmd, true);   // lokales Echo
+                if (inp) inp.value = '';
+                apiCall('/api/printer/gcode', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ script: cmd }),
+                }).catch(() => {});
+            };
+            if (sendBtn) sendBtn.onclick = send;
+            if (inp) inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+        }
+
+        function appendConsole(type, message, autoscroll) {
+            const c = document.getElementById('log-container');
+            if (!c || message == null) return;
+            const div = document.createElement('div');
+            const isCmd = type === 'command';
+            // Moonraker-Fehlerantworten beginnen mit "!!".
+            const isErr = !isCmd && String(message).trimStart().startsWith('!!');
+            div.className = 'console-line ' + (isCmd ? 'console-cmd' : (isErr ? 'console-err' : 'console-resp'));
+            div.textContent = (isCmd ? '> ' : '') + message;
+            c.appendChild(div);
+            while (c.childElementCount > 600) c.removeChild(c.firstChild);   // Cap
+            if (autoscroll) scrollConsole();
+        }
+
+        function scrollConsole() {
+            const c = document.getElementById('log-container');
+            if (c) c.scrollTop = c.scrollHeight;
+        }
+
+        async function loadLogs() {
+            try {
+                const lines = document.getElementById('lines-select').value;
+                const response = await apiCall(`/api/logs?lines=${lines}`);
+                const data = await response.json();
+
+                if (data.logs) {
+                    // Parse logs into structured format
+                    allLogs = parseLogs(data.logs);
+                    renderLogs();
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                document.getElementById('log-container').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg></div>
+                        <p>${getText('error_loading_logs', 'Fehler beim Laden der Logs')}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function parseLogs(logText) {
+            const lines = logText.split('\n').filter(line => line.trim());
+            return lines.map(line => {
+                // Parse format: YYYY-MM-DD HH:MM:SS,mmm - LEVEL - Message
+                const pattern = /^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}(?:,\d+)?)\s*-\s*(\w+)\s*-\s*(.+)$/;
+                const match = line.match(pattern);
+
+                if (match) {
+                    const timestamp = match[1];
+                    const levelString = match[2];
+                    const message = match[3];
+
+                    // Convert timestamp to German format: DD.MM.YYYY HH:mm:ss
+                    const formattedTimestamp = formatToGermanDate(timestamp);
+
+                    // Detect log level
+                    let level = 'info';
+                    if (levelString.match(/ERROR|FEHLER/i)) level = 'error';
+                    else if (levelString.match(/WARNING|WARNUNG/i)) level = 'warning';
+                    else if (levelString.match(/DEBUG/i)) level = 'debug';
+                    else if (levelString.match(/INFO/i)) level = 'info';
+
+                    return {
+                        raw: line,
+                        timestamp: formattedTimestamp,
+                        level,
+                        message
+                    };
+                } else {
+                    // Fallback for unstructured logs
+                    const timestampMatch = line.match(/^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/);
+                    const timestamp = timestampMatch ? formatToGermanDate(timestampMatch[1]) : null;
+
+                    // Detect log level
+                    let level = 'info';
+                    if (line.match(/ERROR|FEHLER|❌/i)) level = 'error';
+                    else if (line.match(/WARNING|WARNUNG|⚠️/i)) level = 'warning';
+                    else if (line.match(/DEBUG|🔵|🔴/i)) level = 'debug';
+                    else if (line.match(/INFO|✅/i)) level = 'info';
+
+                    return {
+                        raw: line,
+                        timestamp,
+                        level,
+                        message: line
+                    };
+                }
+            });
+        }
+
+        function formatToGermanDate(timestamp) {
+            // Convert YYYY-MM-DD HH:mm:ss,mmm to DD.MM.YYYY HH:mm:ss
+            try {
+                const parts = timestamp.split(/[\s,]/);
+                const datePart = parts[0]; // YYYY-MM-DD
+                const timePart = parts[1]; // HH:mm:ss
+
+                const [year, month, day] = datePart.split('-');
+                const time = timePart.substring(0, 8); // Remove milliseconds if present
+
+                return `${day}.${month}.${year} ${time}`;
+            } catch (e) {
+                return timestamp;
+            }
+        }
+
+        /**
+         * Aufeinanderfolgende gleiche Meldungen zusammenfassen. Im Protokoll
+         * stand "pushall nach 11 uebersprungenen Runden" fuenfmal hintereinander;
+         * gezaehlt liest es sich als eine Zeile mit "5x".
+         */
+        function fasseZusammen(zeilen) {
+            const raus = [];
+            for (const z of zeilen) {
+                const letzte = raus[raus.length - 1];
+                if (letzte && letzte.level === z.level && letzte.message === z.message) {
+                    letzte.anzahl = (letzte.anzahl || 1) + 1;
+                    letzte.timestamp = z.timestamp;   // juengster Zeitpunkt gewinnt
+                } else {
+                    raus.push({ ...z, anzahl: 1 });
+                }
+            }
+            return raus;
+        }
+
+        function renderLogs() {
+            const container = document.getElementById('log-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            let filtered = allLogs.filter(log => stufeSichtbar(log.level));
+            if (searchTerm) {
+                filtered = filtered.filter(log => log.raw.toLowerCase().includes(searchTerm));
+            }
+            const gruppiert = fasseZusammen(filtered);
+
+            if (gruppiert.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon"><svg viewBox="0 0 24 24" aria-hidden="true" style="width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5.5 5.5 4 13v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5l-1.5-7.5A2 2 0 0 0 16.6 4H7.4a2 2 0 0 0-1.9 1.5z"/></svg></div>
+                        <p>${getText('no_logs', 'Keine Logs vorhanden')}</p>
+                    </div>
+                `;
+                zeigeFuss(0, 0);
+                return;
+            }
+
+            container.innerHTML = gruppiert.map(log => {
+                const zeit = log.timestamp
+                    ? `<span class="log-timestamp">${log.timestamp}</span>` : '';
+                const wdh = log.anzahl > 1
+                    ? `<span class="log-wdh">${log.anzahl}×</span>` : '';
+                return `<div class="log-line ${log.level}">${zeit}`
+                    + `<span class="log-level ${log.level}">${log.level}</span>`
+                    + `<span class="log-message">${escapeHtml(log.message)}</span>${wdh}</div>`;
+            }).join('');
+
+            zeigeFuss(gruppiert.length, filtered.length);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        /** Fusszeile: wie viel ist zu sehen, was ist ausgeblendet, wie alt. */
+        function zeigeFuss(gezeigt, vorGruppierung) {
+            const status = document.getElementById('log-status');
+            const letzte = document.getElementById('log-letzte');
+            if (status) {
+                const teile = [`${gezeigt} ${getText('logs_of_lines', 'von')} ${allLogs.length}`];
+                if (vorGruppierung > gezeigt) {
+                    teile.push(`${vorGruppierung - gezeigt} ${getText('logs_merged', 'zusammengefasst')}`);
+                }
+                if (nurStufe) {
+                    teile.push(`${getText('logs_only', 'nur')} ${getText(nurStufe, nurStufe)}`);
+                } else {
+                    teile.push(`${getText('debug', 'Debug')} ${getText('logs_hidden', 'ausgeblendet')}`);
+                }
+                status.textContent = teile.join(' · ');
+            }
+            if (letzte) {
+                const l = allLogs[allLogs.length - 1];
+                letzte.textContent = l && l.timestamp ? `${getText('logs_last', 'zuletzt')} ${l.timestamp}` : '';
+            }
+        }
+
+        function updateStats() {
+            const stats = {
+                error: 0,
+                warning: 0,
+                info: 0,
+                debug: 0
+            };
+
+            allLogs.forEach(log => {
+                stats[log.level]++;
+            });
+
+            document.querySelector('#stat-error .stat-value').textContent = stats.error;
+            document.querySelector('#stat-warning .stat-value').textContent = stats.warning;
+            document.querySelector('#stat-info .stat-value').textContent = stats.info;
+            document.querySelector('#stat-debug .stat-value').textContent = stats.debug;
+        }
+
+        function filterByLevel(level) {
+            // Auf eine Stufe stellen; nochmal darauf zurueck zur Grundansicht.
+            nurStufe = (nurStufe === level) ? null : level;
+            ['error', 'warning', 'info', 'debug'].forEach(l => {
+                const karte = document.getElementById(`stat-${l}`);
+                if (!karte) return;
+                karte.classList.toggle('active', nurStufe === l);
+                // Gedimmt heisst "kommt in dieser Ansicht nicht vor".
+                karte.classList.toggle('aus', !stufeSichtbar(l));
+            });
+            renderLogs();
+        }
+
+        function filterLogs() {
+            renderLogs();
+        }
+
+        async function refreshLogs() {
+            await loadLogs();
+        }
+
+        function toggleAutoRefresh() {
+            const checkbox = document.getElementById('auto-refresh');
+
+            if (checkbox.checked) {
+                autoRefreshInterval = setInterval(loadLogs, 5000);
+            } else {
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+            }
+        }
+
+        // Bestaetigung und Meldung kommen aus confirm-dialog.js — dieselben
+        // wie auf allen anderen Seiten. Hier standen bis 21aug26 eigene
+        // Fassungen mit eigenem Kasten und Emoji-Symbolen.
+        function showConfirmDialog(message, title) {
+            return window.skConfirm(message, { title: title });
+        }
+
+        function showWebToast(message, type) {
+            window.skToast(message, type || 'success');
+        }
+
+        async function clearLogs() {
+            const confirmed = await showConfirmDialog(
+                getText('confirm_clear_logs', 'Möchten Sie wirklich alle Logs löschen?'),
+                getText('confirm_title', 'Bestätigung')
+            );
+            if (!confirmed) return;
+
+            try {
+                const response = await apiCall('/api/logs', {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    allLogs = [];
+                    renderLogs();
+                    updateStats();
+                    showWebToast(getText('logs_cleared', 'Logs gelöscht'), 'success');
+                } else {
+                    showWebToast(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'), 'error');
+                }
+            } catch (error) {
+                console.error('Error clearing logs:', error);
+                showWebToast(getText('error_clearing_logs', 'Fehler beim Löschen der Logs'), 'error');
+            }
+        }
+
+        function downloadLogs() {
+            const logText = allLogs.map(log => log.raw).join('\n');
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', function() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+        });
+    </script>
+    <script src="/static/js/modules/hms-severity.js"></script>
+    <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/hms-overlay.js"></script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<svg width="200" height="150" viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #1a1a1a; }
+      .spinner { animation: spin 1s linear infinite; }
+      .dot { animation: pulse 1.5s ease-in-out infinite; }
+      .camera-icon { fill: #666; }
+      .text { fill: #888; font-family: Arial, sans-serif; font-size: 12px; text-anchor: middle; }
+
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+    </style>
+  </defs>
+
+  <!-- Hintergrund -->
+  <rect class="bg" width="200" height="150" rx="8"/>
+
+  <!-- Kamera Icon -->
+  <g class="camera-icon" transform="translate(100, 50) scale(0.6)">
+    <rect x="-15" y="-8" width="30" height="16" rx="3"/>
+    <circle cx="0" cy="0" r="6"/>
+    <circle cx="0" cy="0" r="3"/>
+    <rect x="12" y="-4" width="6" height="8" rx="1"/>
+  </g>
+
+  <!-- Spinner -->
+  <g class="spinner" transform="translate(100, 80)">
+    <circle cx="0" cy="-12" r="2" class="dot" style="animation-delay: 0s"/>
+    <circle cx="8.5" cy="-8.5" r="2" class="dot" style="animation-delay: 0.125s"/>
+    <circle cx="12" cy="0" r="2" class="dot" style="animation-delay: 0.25s"/>
+    <circle cx="8.5" cy="8.5" r="2" class="dot" style="animation-delay: 0.375s"/>
+    <circle cx="0" cy="12" r="2" class="dot" style="animation-delay: 0.5s"/>
+    <circle cx="-8.5" cy="8.5" r="2" class="dot" style="animation-delay: 0.625s"/>
+    <circle cx="-12" cy="0" r="2" class="dot" style="animation-delay: 0.75s"/>
+    <circle cx="-8.5" cy="-8.5" r="2" class="dot" style="animation-delay: 0.875s"/>
+  </g>
+
+  <!-- Text -->
+  <text class="text" x="100" y="110">Kamera wird umgeschaltet...</text>
+  <text class="text" x="100" y="125" style="font-size: 10px;">Bitte warten</text>
+</svg>

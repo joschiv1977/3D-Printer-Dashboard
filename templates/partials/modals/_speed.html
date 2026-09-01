@@ -1,0 +1,65 @@
+    <div id="speedModal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1002;">
+        <div class="modal-panel" style="position:absolute; width:90%; max-width:{{ '620px' if active_printer_type == 'bambu' else '400px' }}; top:50%; left:50%; transform:translate(-50%, -50%); border-radius:12px; padding:20px;">
+          <button class="modal-close-btn" onclick="closeSpeedModal()">×</button>
+            <h2 style="margin-bottom:20px; color:var(--text-primary);"><svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 13 16 8"/><circle cx="12" cy="14" r="1.4"/></svg> <span id="speed-modal-title">Geschwindigkeit</span></h2>
+{% if active_printer_type == 'bambu' %}
+            <!-- Display-Stil: vier Stufen-Karten, Klick setzt sofort -->
+            <div class="ds-grid" id="ds-grid">
+                <button class="dsp-card ds-card" id="ds-card-1" onclick="dsPick(1)">
+                    <span class="ds-check">✓</span>
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 14 9 10"/></svg>
+                    <b id="ds-name-1">Leise</b><small id="ds-desc-1">50 %</small>
+                </button>
+                <button class="dsp-card ds-card" id="ds-card-2" onclick="dsPick(2)">
+                    <span class="ds-check">✓</span>
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 13.6V8.4"/></svg>
+                    <b id="ds-name-2">Standard</b><small id="ds-desc-2">100 %</small>
+                </button>
+                <button class="dsp-card ds-card" id="ds-card-3" onclick="dsPick(3)">
+                    <span class="ds-check">✓</span>
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 14l3.4-4"/></svg>
+                    <b id="ds-name-3">Sport</b><small id="ds-desc-3">124 %</small>
+                </button>
+                <button class="dsp-card ds-card" id="ds-card-4" onclick="dsPick(4)">
+                    <span class="ds-check">✓</span>
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 14.4 16.6 11"/></svg>
+                    <b id="ds-name-4">Ludicrous</b><small id="ds-desc-4">166 %</small>
+                </button>
+            </div>
+            <div class="dsp-hint"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg> <span id="ds-hint"></span></div>
+{% else %}
+            <div style="background:var(--bg-secondary); border-radius:10px; padding:15px; margin-bottom:15px;">
+                <p id="speed-modal-hint" style="color:var(--text-secondary); margin-bottom:15px; font-size:14px;">
+                    Diese Funktion ist nur während des Druckens wirksam
+                </p>
+                <!-- Slider Container -->
+                <div style="position:relative; margin:20px 0;">
+                    <input type="range" id="speed-slider" min="1" max="4" value="2" step="1"
+                           style="width:100%; cursor:pointer;"
+                           oninput="updateSpeedDisplay(this.value)">
+                    <!-- Labels unter dem Slider (Bambu-Stufen; Klipper blendet sie aus) -->
+                    <div id="speed-level-labels" style="display:flex; justify-content:space-between; margin-top:10px;">
+                        <span id="speed-label-silent" style="font-size:12px; color:var(--text-secondary);">Leise</span>
+                        <span id="speed-label-standard" style="font-size:12px; color:var(--text-secondary);">Standard</span>
+                        <span id="speed-label-sport" style="font-size:12px; color:var(--text-secondary);">Sport</span>
+                        <span id="speed-label-ludicrous" style="font-size:12px; color:var(--text-secondary);">Verrückt</span>
+                    </div>
+                </div>
+                <!-- Aktuelle Auswahl -->
+                <div style="text-align:center; margin-top:20px;">
+                    <div id="speed-display" style="font-size:24px; font-weight:bold; color:var(--accent-blue);">Standard</div>
+                    <div id="speed-description" style="font-size:14px; color:var(--text-secondary); margin-top:5px;">Ausgewogene Geschwindigkeit</div>
+                </div>
+            </div>
+            <!-- Buttons (Klipper: Anwenden-Modell) -->
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+              <button class="modal-btn modal-btn-cancel" onclick="closeSpeedModal()">
+                  <span id="speed-cancel-btn">Abbrechen</span>
+              </button>
+              <button class="modal-btn modal-btn-primary" onclick="applySpeed()">
+                  <span id="speed-apply-btn">Anwenden</span>
+              </button>
+            </div>
+{% endif %}
+        </div>
+    </div>

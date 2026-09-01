@@ -1,0 +1,100 @@
+          <!-- Filament Drying Card (initial versteckt, wird bei Drucker online + Feature aktiv angezeigt) -->
+          <div class="grid-stack-item" gs-w="5" gs-h="9" gs-x="7" gs-y="16" gs-min-w="3" gs-min-h="6" gs-max-w="8" gs-max-h="24" id="filament-drying-card-grid" style="display: none;">
+              <div class="grid-stack-item-content">
+                  <div class="card" id="filament-drying-card">
+                      <div class="card-header">
+                          <h3 class="card-title">
+                              <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4a2 2 0 0 0-4 0v10.5a4 4 0 1 0 4 0V4z"/></svg>
+                              <span id="drying-title"></span>
+                          </h3>
+                          <span class="drying-status" id="drying-status-indicator">●</span>
+                      </div>
+                      <div id="filament-drying-content" class="tr-koerper" style="display:none;">
+                          <div id="material-selection">
+                              <!-- Zeile: Beschriftung links, Wahl rechts — wie im
+                                   Trocknungs-Dialog des AMS (.tray-edit-zeile). -->
+                              <div class="tr-zeile">
+                                  <span class="tr-lab" id="material-select-label"></span>
+                                  <select id="material-selector" class="tr-wahl">
+                                      <option value="" id="material-select-option"></option>
+                                  </select>
+                              </div>
+
+                              <!-- Grad und Stunden als Kaestchen statt grauer Info-Box.
+                                   Die Werte tragen ihre Einheit selbst (JS). -->
+                              <!-- Grad und Dauer sind AENDERBAR. Bis 27aug26 standen
+                                   hier nur die Werte der Voreinstellung, waehrend der
+                                   AMS-Dialog daneben beides einstellen liess. Die
+                                   Voreinstellung fuellt die Felder, wer will, schreibt
+                                   darueber. -->
+                              <div class="tr-zeile" id="material-info" style="display:none;">
+                                  <span class="tr-lab"></span>
+                                  <span class="tr-felder">
+                                      <span class="tr-feld tr-feld--warm">
+                                          <input type="number" id="material-temp" min="40" max="110" step="1">
+                                          <span class="tr-einheit">°C</span>
+                                      </span>
+                                      <span class="tr-feld">
+                                          <input type="number" id="material-duration" min="1" max="48" step="1">
+                                          <span class="tr-einheit">h</span>
+                                      </span>
+                                  </span>
+                              </div>
+
+                              <!-- If the printer dries by itself, this shows what it
+                                   zuletzt benutzt hat. Seine Voreinstellungen
+                                   abfragen kann man nicht; mitgehoert werden sie,
+                                   wenn jemand am Display startet. -->
+                              <div class="tr-zeile" id="drying-native-hint" hidden>
+                                  <small id="drying-native-text"></small>
+                                  <button type="button" id="drying-native-uebernehmen"
+                                          class="tr-knopf tr-knopf--klein" hidden></button>
+                              </div>
+
+                              <label class="tr-schalter-zeile">
+                                  <span class="tr-schalter-txt">
+                                      <span id="skip-homing-label"></span>
+                                      <small id="skip-homing-hint"></small>
+                                  </span>
+                                  <input type="checkbox" id="skip-homing-checkbox" class="tr-cb">
+                                  <span class="tr-schalter"></span>
+                              </label>
+
+                              <div class="tr-fuss">
+                                  <button id="start-drying-btn" class="tr-knopf tr-knopf--gruen"
+                                          onclick="startFilamentDrying()" disabled>
+                                      <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                                      <span id="start-drying-text"></span>
+                                  </button>
+                              </div>
+                          </div>
+
+                          <div id="drying-active" style="display:none;">
+                              <div class="tr-lauf">
+                                  <span class="tr-mat-punkt" id="drying-material-punkt"></span>
+                                  <span class="tr-lauf-txt">
+                                      <b id="drying-material-name">PLA</b>
+                                      <small>
+                                          <span id="drying-temp">70°C</span> ·
+                                          <span id="drying-elapsed">0:00</span> /
+                                          <span id="drying-total">12:00</span>
+                                      </small>
+                                  </span>
+                                  <span class="tr-proz" id="drying-progress-percent">0%</span>
+                              </div>
+
+                              <!-- Balken bleibt gruen: der fruehere Verlauf nach Orange
+                                   sagte nichts aus, und Orange ist hier die Warnfarbe. -->
+                              <div class="tr-balken"><i id="drying-progress-bar" style="width:0%;"></i></div>
+
+                              <div class="tr-fuss">
+                                  <button class="tr-knopf tr-knopf--rot" onclick="stopFilamentDrying()">
+                                      <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                                      <span id="stop-drying-text"></span>
+                                  </button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>

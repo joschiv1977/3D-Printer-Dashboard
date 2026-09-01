@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Ersteinrichtung</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <!-- Dasselbe Aussehen wie der Rest. Bis 31aug26 standen hier 529 Zeilen
+         eigenes CSS und kein einziger Hausbaustein — der allererste
+         Bildschirm sah aus wie eine andere Anwendung. -->
+    <link rel="stylesheet" href="/static/css/design-tokens.css?v=3">
+    <link rel="stylesheet" href="/static/css/base.css?v=3">
+    <link rel="stylesheet" href="/static/css/shared-styles.css?v=3">
+    <link rel="stylesheet" href="/static/css/components.css?v=3">
+    <link rel="stylesheet" href="/static/css/einstellungen.css?v=3">
+    <link rel="stylesheet" href="/static/font-awesome.min.css">
+    <style>
+        /* Nur was ein Assistent braucht und die Einstellungen nicht kennen:
+           die Huelle, die Schrittanzeige und das Ein-/Ausblenden der Karten. */
+        body { background: var(--bg-primary); color: var(--text-primary);
+               min-height: 100vh; padding: max(16px, env(safe-area-inset-top)) 16px 32px; }
+
+        .se-huelle { max-width: 640px; margin: 0 auto; }
+
+        .se-kopf { display: flex; align-items: center; gap: 10px; margin: 8px 0 4px; }
+        .se-kopf h1 { font-size: 20px; font-weight: 700; margin: 0; }
+        .se-kopf .se-rechts { margin-left: auto; display: flex; gap: 8px; }
+        .se-unterzeile { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+
+        /* Schrittanzeige. Der Balken dahinter liegt hinter den Punkten,
+           damit er beim Umbruch nicht durch die Beschriftung laeuft. */
+        .se-schritte { display: flex; position: relative; margin-bottom: 18px; }
+        .se-schritte::before {
+            content: ''; position: absolute; top: 15px; left: 12%; right: 12%;
+            height: 2px; background: var(--border-color); z-index: 0;
+        }
+        .se-schritt { flex: 1; text-align: center; position: relative; z-index: 1; }
+        .se-nummer {
+            width: 30px; height: 30px; margin: 0 auto 6px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            background: var(--bg-secondary); color: var(--text-secondary);
+            border: 2px solid var(--border-color); transition: all .2s;
+        }
+        .se-schritt.aktiv .se-nummer {
+            background: var(--accent-blue); border-color: var(--accent-blue); color: #fff;
+        }
+        .se-schritt.fertig .se-nummer {
+            background: var(--accent-green); border-color: var(--accent-green); color: #fff;
+        }
+        .se-marke { font-size: 11px; color: var(--text-secondary); }
+        .se-schritt.aktiv .se-marke { color: var(--text-primary); font-weight: 600; }
+
+        .se-karte { display: none; }
+        .se-karte.aktiv { display: block; }
+
+        .se-text { padding: 12px 14px; color: var(--text-secondary);
+                   font-size: 13px; line-height: 1.5; }
+        .se-text code { background: var(--bg-secondary); padding: 1px 5px;
+                        border-radius: 4px; font-size: 12px; }
+
+        .se-fuss { display: flex; gap: 8px; justify-content: flex-end;
+                   padding: 12px 14px; border-top: 1px solid var(--border-color); }
+
+        .se-hinweis { display: none; margin-bottom: 14px; padding: 11px 13px;
+                      border-radius: 10px; font-size: 13px; line-height: 1.45; }
+        .se-hinweis.zeig { display: block; }
+        .se-hinweis.gut  { background: rgba(76,175,80,.12);  color: #4caf50; }
+        .se-hinweis.warn { background: rgba(255,152,0,.12);  color: #ff9800; }
+        .se-hinweis.fehl { background: rgba(244,67,54,.12);  color: #f44336; }
+
+        /* Der Abdruck der Maschine — lang, darf umbrechen. */
+        .se-abdruck { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                      font-size: 12px; word-break: break-all; cursor: pointer;
+                      background: var(--bg-secondary); padding: 9px 11px;
+                      border-radius: 8px; border: 1px solid var(--border-color); }
+
+        .se-staerke { height: 4px; border-radius: 2px; background: var(--border-color);
+                      margin-top: 7px; overflow: hidden; }
+        .se-staerke i { display: block; height: 100%; width: 0; transition: all .25s; }
+
+        .se-wahl { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 14px; }
+        .se-wahl label {
+            flex: 1; min-width: 150px; cursor: pointer; display: flex; gap: 9px;
+            align-items: flex-start; padding: 11px 12px; border-radius: 10px;
+            border: 1px solid var(--border-color); background: var(--bg-secondary);
+        }
+        .se-wahl label.gewaehlt { border-color: var(--accent-blue);
+                                  background: color-mix(in srgb, var(--accent-blue) 12%, transparent); }
+        .se-wahl input { margin-top: 2px; width: auto !important; }
+        .se-wahl b { display: block; font-size: 13px; }
+        .se-wahl span { display: block; font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+        .se-dreher { display: inline-block; width: 13px; height: 13px;
+                     border: 2px solid currentColor; border-top-color: transparent;
+                     border-radius: 50%; animation: se-dreh .7s linear infinite;
+                     vertical-align: -2px; }
+        @keyframes se-dreh { to { transform: rotate(360deg); } }
+
+        /* Step 5: one row per task. The state is carried by the glyph and by
+           colour, never by colour alone -- the glyph stays readable for
+           anyone who cannot tell the two apart. */
+        .abschluss-zeile .es-zeile-name { font-variant-numeric: tabular-nums; }
+        .abschluss--offen   .es-zeile-name { color: var(--text-secondary); }
+        .abschluss--laeuft  .es-zeile-name { color: var(--accent-blue); }
+        .abschluss--fertig  .es-zeile-name { color: var(--accent-green); }
+        .abschluss--warnung .es-zeile-name { color: var(--accent-orange); }
+        .abschluss-zeile .es-zeile-wert { color: var(--text-secondary); font-size: 12px; }
+    </style>
+</head>
+<body>
+<div class="se-huelle">
+
+    <div class="se-kopf">
+        <h1 data-i18n="setup_title">Ersteinrichtung</h1>
+        <div class="se-rechts">
+            <button type="button" class="es-knopf" title="Hell / Dunkel / Automatisch"
+                    onclick="window.themeManager && window.themeManager.toggleTheme()">
+                <span id="theme-icon"></span>
+            </button>
+        </div>
+    </div>
+    <div class="se-unterzeile" data-i18n="setup_subtitle">
+        Willkommen. Ein paar Angaben, dann läuft es.
+    </div>
+
+    <div class="se-schritte">
+        <div class="se-schritt" id="schritt-marke-1">
+            <div class="se-nummer">1</div>
+            <div class="se-marke" data-i18n="setup_step_license">Lizenz</div>
+        </div>
+        <div class="se-schritt" id="schritt-marke-2">
+            <div class="se-nummer">2</div>
+            <div class="se-marke" data-i18n="setup_step_admin">Zugang</div>
+        </div>
+        <div class="se-schritt" id="schritt-marke-3">
+            <div class="se-nummer">3</div>
+            <div class="se-marke" data-i18n="setup_step_printer">Drucker</div>
+        </div>
+        <div class="se-schritt" id="schritt-marke-4">
+            <div class="se-nummer">4</div>
+            <div class="se-marke" data-i18n="setup_step_power">Steckdose</div>
+        </div>
+        <div class="se-schritt" id="schritt-marke-5">
+            <div class="se-nummer">5</div>
+            <div class="se-marke" data-i18n="setup_step_finish">Abschluss</div>
+        </div>
+    </div>
+
+    <div id="hinweis" class="se-hinweis"></div>
+
+    <!-- ── 1: Lizenz ───────────────────────────────────────────────── -->
+    <div class="se-karte aktiv" id="schritt-1">
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-key"></i><span data-i18n="setup_license_head">Lizenz</span>
+            </div>
+            <div class="se-text" data-i18n="setup_license_text">
+                Ohne gültige Lizenz geht es nicht weiter.
+            </div>
+            <form id="lizenz-form" onsubmit="lizenzAktivieren(event)">
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="lizenz-schluessel" data-i18n="setup_license_key">Lizenzschlüssel</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="lizenz-schluessel" class="es-breit"
+                               placeholder="XXXXX-XXXXX-XXXXX-XXXXX" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label data-i18n="setup_hardware_id">Kennung dieses Rechners</label>
+                        <span data-i18n="setup_hardware_id_hint">Zum Anfordern der Lizenz — antippen kopiert sie</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <div class="se-abdruck" id="abdruck" onclick="abdruckKopieren()">
+                            <span class="se-dreher"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="se-fuss">
+                    <button type="submit" class="es-knopf es-knopf--haupt" id="lizenz-knopf"
+                            data-i18n="setup_license_activate">Aktivieren und weiter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── 2: Zugang ───────────────────────────────────────────────── -->
+    <div class="se-karte" id="schritt-2">
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-lock"></i><span data-i18n="setup_admin_head">Zugang</span>
+            </div>
+            <div class="se-text">
+                <span data-i18n="setup_admin_text">Setze dein eigenes Passwort. Mindestens 12 Zeichen, Groß- und Kleinbuchstaben, Zahlen und ein Sonderzeichen.</span>
+                <br><br>
+                <span data-i18n="setup_admin_initial">Das Startpasswort steht in</span>
+                <code>data/initial_password.txt</code><span data-i18n="setup_admin_initial2">. Die Datei verschwindet nach diesem Schritt.</span>
+            </div>
+            <form id="passwort-form" onsubmit="passwortSetzen(event)">
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="pw-alt" data-i18n="setup_pw_old">Startpasswort</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="password" id="pw-alt" class="es-breit" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="pw-neu" data-i18n="setup_pw_new">Neues Passwort</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="password" id="pw-neu" class="es-breit" required
+                               autocomplete="new-password" oninput="staerkePruefen()">
+                        <div class="se-staerke"><i id="staerke-balken"></i></div>
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="pw-wdh" data-i18n="setup_pw_repeat">Noch einmal</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="password" id="pw-wdh" class="es-breit" required autocomplete="new-password">
+                    </div>
+                </div>
+                <div class="se-fuss">
+                    <button type="submit" class="es-knopf es-knopf--haupt" id="passwort-knopf"
+                            data-i18n="setup_pw_save">Passwort setzen und weiter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── 3: Drucker ──────────────────────────────────────────────── -->
+    <div class="se-karte" id="schritt-3">
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-print"></i><span data-i18n="setup_printer_head">Drucker</span>
+            </div>
+            <div class="se-text" data-i18n="setup_printer_text">
+                Welche Art Drucker soll angebunden werden?
+            </div>
+
+            <div class="se-wahl" id="typ-wahl">
+                <label id="typ-label-bambu" class="gewaehlt">
+                    <input type="radio" name="druckertyp" value="bambu" checked onchange="typWechseln()">
+                    <span>
+                        <b>Bambu Lab</b>
+                        <span data-i18n="setup_type_bambu_hint">P1, X1, H2, A1, X2D — über MQTT im eigenen Netz</span>
+                    </span>
+                </label>
+                <label id="typ-label-klipper">
+                    <input type="radio" name="druckertyp" value="klipper" onchange="typWechseln()">
+                    <span>
+                        <b>Klipper</b>
+                        <span data-i18n="setup_type_klipper_hint">Über Moonraker, z.&nbsp;B. Voron oder Sovol</span>
+                    </span>
+                </label>
+            </div>
+
+            <!-- Bambu -->
+            <form id="bambu-form" onsubmit="bambuSpeichern(event)">
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-name" data-i18n="setup_printer_name">Name</label>
+                        <span data-i18n="setup_printer_name_hint">Frei wählbar, steht später überall dran</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="bambu-name" class="es-breit" placeholder="Speed-Knuffel" required>
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-modell" data-i18n="setup_printer_model">Modell</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <select id="bambu-modell" class="es-auswahl" required>
+                            <option value="" data-i18n="setup_loading">Lade …</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-ip" data-i18n="setup_printer_ip">IP-Adresse</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="bambu-ip" class="es-breit" placeholder="192.168.1.100"
+                               required pattern="^(\d{1,3}\.){3}\d{1,3}$" inputmode="decimal">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-serie" data-i18n="setup_printer_serial">Seriennummer</label>
+                        <span data-i18n="setup_printer_serial_hint">Steht am Drucker und in der Bambu-App</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="bambu-serie" class="es-breit" placeholder="01P09C4C1700729" required>
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-code" data-i18n="setup_printer_access_code">Zugangscode</label>
+                        <span data-i18n="setup_printer_access_code_hint">Am Drucker unter Netzwerk, acht Ziffern</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="bambu-code" class="es-breit" placeholder="********"
+                               required pattern="^[A-Za-z0-9]{8}$" maxlength="8" autocapitalize="off" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-entwickler" data-i18n="setup_printer_devmode">Entwicklermodus</label>
+                        <span data-i18n="setup_printer_devmode_hint">Volle Steuerung; ohne das geht nur Zusehen</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <label class="es-schalter"><input type="checkbox" id="bambu-entwickler" checked><span></span></label>
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="bambu-lan" data-i18n="setup_printer_lan">Nur im eigenen Netz</label>
+                        <span data-i18n="setup_printer_lan_hint">Keine Verbindung zur Bambu-Cloud</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <label class="es-schalter"><input type="checkbox" id="bambu-lan" checked><span></span></label>
+                    </div>
+                </div>
+                <div class="se-fuss">
+                    <button type="submit" class="es-knopf es-knopf--haupt" id="bambu-knopf"
+                            data-i18n="setup_save_continue">Speichern und weiter</button>
+                </div>
+            </form>
+
+            <!-- Klipper -->
+            <form id="klipper-form" onsubmit="klipperSpeichern(event)" style="display:none;">
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="klipper-name" data-i18n="setup_printer_name">Name</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="klipper-name" class="es-breit" placeholder="Voron 2.4">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="klipper-kennung" data-i18n="setup_klipper_id">Kennung</label>
+                        <span data-i18n="setup_klipper_id_hint">Kurz und klein, nur a–z, 0–9, _ und –</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="klipper-kennung" class="es-breit" placeholder="voron"
+                               pattern="[a-z0-9][a-z0-9_-]*">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="klipper-adresse" data-i18n="setup_klipper_url">Moonraker-Adresse</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="text" id="klipper-adresse" class="es-breit"
+                               placeholder="http://192.168.1.152" inputmode="url">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="klipper-schluessel" data-i18n="setup_klipper_key">API-Schlüssel</label>
+                        <span data-i18n="setup_klipper_key_hint">Leer lassen, wenn das Netz vertraut ist</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <input type="password" id="klipper-schluessel" class="es-breit" autocomplete="off">
+                    </div>
+                </div>
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="klipper-wo" data-i18n="setup_klipper_hostmode">Wo läuft Moonraker?</label>
+                        <span data-i18n="setup_klipper_hostmode_hint">Auf dem Drucker heißt „nicht erreichbar" gleich „aus". Auf einem durchlaufenden Rechner heißt es nur „getrennt" — ob der Drucker an ist, sagt dann die Steckdose.</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <select id="klipper-wo" class="es-auswahl">
+                            <option value="printer" data-i18n="setup_klipper_host_printer">Auf dem Drucker</option>
+                            <option value="external" data-i18n="setup_klipper_host_external">Auf einem anderen Rechner</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="se-fuss">
+                    <button type="submit" class="es-knopf es-knopf--haupt" id="klipper-knopf"
+                            data-i18n="setup_save_continue">Speichern und weiter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ── 4: Steckdose ────────────────────────────────────────────── -->
+    <div class="se-karte" id="schritt-4">
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-plug"></i><span data-i18n="setup_power_head">Steckdose</span>
+            </div>
+            <div class="se-text" data-i18n="setup_power_text">
+                Hängt der Drucker an einer schaltbaren Steckdose, kann er automatisch aus. Das ist freiwillig.
+            </div>
+            <form id="strom-form" onsubmit="stromSpeichern(event)">
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <label for="strom-art" data-i18n="setup_power_kind">Art</label>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <select id="strom-art" class="es-auswahl" onchange="stromFelder()">
+                            <option value="none" data-i18n="setup_power_none">Keine</option>
+                            <option value="homeassistant">Home Assistant</option>
+                            <option value="meross">Meross</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="ha-felder" style="display:none;">
+                    <div class="es-zeile">
+                        <div class="es-zeile-name"><label for="ha-url" data-i18n="setup_ha_url">Adresse</label></div>
+                        <div class="es-zeile-wert"><input type="text" id="ha-url" class="es-breit" placeholder="http://192.168.1.2:8123"></div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name">
+                            <label for="ha-token" data-i18n="setup_ha_token">Token</label>
+                            <span data-i18n="setup_ha_token_hint">In Home Assistant unter Profil → Sicherheit</span>
+                        </div>
+                        <div class="es-zeile-wert"><input type="password" id="ha-token" class="es-breit" autocomplete="off"></div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name"><label for="ha-entity" data-i18n="setup_ha_entity">Entity-ID</label></div>
+                        <div class="es-zeile-wert"><input type="text" id="ha-entity" class="es-breit" placeholder="switch.drucker"></div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name"><label for="ha-anzeige" data-i18n="setup_ha_label">Anzeigename</label></div>
+                        <div class="es-zeile-wert"><input type="text" id="ha-anzeige" class="es-breit" value="Steckdose"></div>
+                    </div>
+                </div>
+
+                <div id="meross-felder" style="display:none;">
+                    <div class="es-zeile">
+                        <div class="es-zeile-name"><label for="meross-mail" data-i18n="setup_meross_mail">E-Mail</label></div>
+                        <div class="es-zeile-wert"><input type="email" id="meross-mail" class="es-breit" autocomplete="off"></div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name"><label for="meross-pw" data-i18n="setup_meross_pw">Passwort</label></div>
+                        <div class="es-zeile-wert"><input type="password" id="meross-pw" class="es-breit" autocomplete="off"></div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name">
+                            <label for="meross-region" data-i18n="setup_meross_region">Region</label>
+                            <span data-i18n="setup_meross_region_hint">Muss zum Konto passen</span>
+                        </div>
+                        <div class="es-zeile-wert">
+                            <select id="meross-region" class="es-auswahl">
+                                <option value="eu">Europa</option>
+                                <option value="us">USA</option>
+                                <option value="ap">Asien-Pazifik</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="es-zeile">
+                        <div class="es-zeile-name">
+                            <label for="meross-geraet" data-i18n="setup_meross_device">Gerätename</label>
+                            <span data-i18n="setup_meross_device_hint">Leer lassen nimmt das erste gefundene</span>
+                        </div>
+                        <div class="es-zeile-wert"><input type="text" id="meross-geraet" class="es-breit"></div>
+                    </div>
+                </div>
+
+                <div class="se-fuss">
+                    <button type="button" class="es-knopf" onclick="stromUeberspringen()"
+                            data-i18n="setup_skip_next">Überspringen</button>
+                    <button type="submit" class="es-knopf es-knopf--haupt" id="strom-knopf"
+                            data-i18n="setup_save_next">Speichern und weiter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="se-karte" id="schritt-5">
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-flag-checkered"></i><span data-i18n="setup_finish_head">Abschluss</span>
+            </div>
+            <div class="se-text" data-i18n="setup_finish_text">
+                Der Server richtet jetzt den Rest ein. Das dauert einen Moment.
+            </div>
+
+            <div id="abschluss-liste" class="es-karte-inhalt"></div>
+
+            <div class="se-fuss">
+                <button type="button" class="es-knopf es-knopf--haupt" id="abschluss-knopf"
+                        onclick="abschlussStarten()"
+                        data-i18n="setup_finish_start">Einrichtung abschließen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dieselbe Themenverwaltung wie ueberall: sie kennt drei Zustaende
+     (automatisch/dunkel/hell) und zeichnet ihr Symbol selbst in
+     #theme-icon. Eine eigene Kopie hier waere der vierte Ort mit eigener
+     Vorstellung davon gewesen.
+
+     Am ENDE, nicht im <head>: ihr Konstruktor ruft updateIcons() und
+     greift dabei auf #theme-icon zu. Steht das Element noch nicht, wirft
+     er — und `window.themeManager` wird nie gesetzt (31aug26 genau so
+     gemessen: skIcon da, themeManager undefined). -->
+<script src="/static/js/modules/icons.js"></script>
+<script src="/static/js/modules/theme-manager.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// Sprache. Derselbe Weg wie login.html: die Datei wird nachgeladen,
+// weil diese Seite VOR der Anmeldung laeuft und kein Buendel bekommt.
+// ─────────────────────────────────────────────────────────────────────
+let texte = {};
+const sprache = localStorage.getItem('language') || 'de';
+
+function t(schluessel, ersatz) {
+    return texte[schluessel] || ersatz || schluessel;
+}
+
+function texteSetzen() {
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+        const wert = texte[el.getAttribute('data-i18n')];
+        if (wert) el.textContent = wert;
+    });
+}
+
+(function ladeSprache() {
+    const s = document.createElement('script');
+    s.src = '/static/lang/' + sprache + '.js';
+    s.onload = function () {
+        texte = window['translations_' + sprache]
+             || window.translations_en || window.translations_de || {};
+        texteSetzen();
+    };
+    // Faellt die Datei aus, bleiben die deutschen Vorgaben im HTML stehen —
+    // besser als eine leere Seite.
+    s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
+    document.head.appendChild(s);
+})();
+
+// ─────────────────────────────────────────────────────────────────────
+// Schritte
+// ─────────────────────────────────────────────────────────────────────
+let schritt = 1;
+
+function schritteZeichnen() {
+    for (let i = 1; i <= 5; i++) {
+        const marke = document.getElementById('schritt-marke-' + i);
+        const karte = document.getElementById('schritt-' + i);
+        marke.classList.toggle('aktiv', i === schritt);
+        marke.classList.toggle('fertig', i < schritt);
+        karte.classList.toggle('aktiv', i === schritt);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function weiter(zu) {
+    schritt = zu;
+    schritteZeichnen();
+}
+
+function melde(text, art) {
+    const el = document.getElementById('hinweis');
+    el.textContent = text;
+    el.className = 'se-hinweis zeig ' + (art || 'gut');
+    if (art === 'gut') setTimeout(function () { el.className = 'se-hinweis'; }, 4000);
+}
+
+function arbeitet(knopf, ja, ruhetext) {
+    knopf.disabled = ja;
+    knopf.innerHTML = ja ? '<span class="se-dreher"></span>' : ruhetext;
+}
+
+/** Der Kopf, den die Setup-Routen verlangen: Cookie plus CSRF-Marke. */
+function kopfMitCsrf() {
+    const marke = localStorage.getItem('csrf_token');
+    if (!marke) throw new Error(t('setup_err_csrf', 'Nicht angemeldet — bitte neu laden.'));
+    return { 'Content-Type': 'application/json', 'X-CSRF-Token': marke };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 1: Lizenz
+// ─────────────────────────────────────────────────────────────────────
+let abdruckWert = '';
+
+(async function abdruckLaden() {
+    try {
+        const a = await fetch('/license/api/hardware-id');
+        const d = await a.json();
+        abdruckWert = d.hardware_id || d.hwid || '';
+        document.getElementById('abdruck').textContent =
+            abdruckWert || t('setup_hardware_id_fail', 'Nicht ermittelbar');
+    } catch (e) {
+        document.getElementById('abdruck').textContent =
+            t('setup_hardware_id_fail', 'Nicht ermittelbar');
+    }
+})();
+
+function abdruckKopieren() {
+    if (!abdruckWert) return;
+    navigator.clipboard.writeText(abdruckWert).then(function () {
+        melde(t('setup_copied', 'Kennung kopiert'), 'gut');
+    }).catch(function () {});
+}
+
+async function lizenzAktivieren(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('lizenz-knopf');
+    const ruhe = knopf.textContent;
+    arbeitet(knopf, true, ruhe);
+    try {
+        const a = await fetch('/license/api/activate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ license_key: document.getElementById('lizenz-schluessel').value.trim() })
+        });
+        const d = await a.json();
+        if (!a.ok || d.success === false) throw new Error(d.error || d.message || 'Aktivierung abgelehnt');
+        melde(t('setup_license_ok', 'Lizenz aktiv.'), 'gut');
+        setTimeout(function () { weiter(2); }, 700);
+    } catch (err) {
+        melde(err.message, 'fehl');
+    } finally {
+        arbeitet(knopf, false, ruhe);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 2: Zugang
+// ─────────────────────────────────────────────────────────────────────
+function staerkePruefen() {
+    const pw = document.getElementById('pw-neu').value;
+    let punkte = 0;
+    if (pw.length >= 12) punkte++;
+    if (/[A-Z]/.test(pw)) punkte++;
+    if (/[a-z]/.test(pw)) punkte++;
+    if (/[0-9]/.test(pw)) punkte++;
+    if (/[^A-Za-z0-9]/.test(pw)) punkte++;
+    const balken = document.getElementById('staerke-balken');
+    balken.style.width = (punkte * 20) + '%';
+    balken.style.background = punkte >= 5 ? '#4caf50' : punkte >= 3 ? '#ff9800' : '#f44336';
+}
+
+async function passwortSetzen(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('passwort-knopf');
+    const ruhe = knopf.textContent;
+    const alt = document.getElementById('pw-alt').value;
+    const neu = document.getElementById('pw-neu').value;
+    const wdh = document.getElementById('pw-wdh').value;
+
+    if (neu !== wdh) { melde(t('setup_err_pw_match', 'Die Passwörter sind nicht gleich.'), 'fehl'); return; }
+    if (neu.length < 12) { melde(t('setup_err_pw_short', 'Mindestens 12 Zeichen.'), 'fehl'); return; }
+    if (!/[A-Z]/.test(neu) || !/[a-z]/.test(neu) || !/[0-9]/.test(neu) || !/[^A-Za-z0-9]/.test(neu)) {
+        melde(t('setup_err_pw_weak', 'Groß- und Kleinbuchstaben, Ziffer und Sonderzeichen nötig.'), 'fehl');
+        return;
+    }
+
+    arbeitet(knopf, true, ruhe);
+    try {
+        // ONE call. It checks the current password, changes it, removes
+        // initial_password.txt and signs the user in.
+        //
+        // Rebuilt by hand (login -> change-password -> login) the file was
+        // left behind. The wizard then considered the password unchanged
+        // and threw the user back to this step on every reload -- with an
+        // initial password that no longer applied.
+        const w = await fetch('/api/setup/first-login', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ old_password: alt, password: neu })
+        });
+        const wd = await w.json().catch(function () { return {}; });
+        if (!w.ok) throw new Error(wd.error || t('setup_err_pw_wrong', 'Aktuelles Passwort stimmt nicht.'));
+        localStorage.setItem('csrf_token', wd.csrf_token || '');
+
+        melde(t('setup_pw_ok', 'Passwort gesetzt.'), 'gut');
+        await modelleLaden();
+        setTimeout(function () { weiter(3); }, 700);
+    } catch (err) {
+        melde(err.message, 'fehl');
+    } finally {
+        arbeitet(knopf, false, ruhe);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 3: Drucker
+// ─────────────────────────────────────────────────────────────────────
+function typWechseln() {
+    const typ = document.querySelector('input[name="druckertyp"]:checked').value;
+    document.getElementById('bambu-form').style.display = typ === 'bambu' ? '' : 'none';
+    document.getElementById('klipper-form').style.display = typ === 'klipper' ? '' : 'none';
+    document.getElementById('typ-label-bambu').classList.toggle('gewaehlt', typ === 'bambu');
+    document.getElementById('typ-label-klipper').classList.toggle('gewaehlt', typ === 'klipper');
+}
+
+/** Die Modelle kommen vom Server — dort werden neue gepflegt. */
+async function modelleLaden() {
+    const wahl = document.getElementById('bambu-modell');
+    try {
+        const a = await fetch('/api/setup/printer_models', {
+            headers: kopfMitCsrf(), credentials: 'include'
+        });
+        const d = await a.json();
+        if (!a.ok || !d.models) throw new Error(d.error || 'Liste nicht ladbar');
+        wahl.innerHTML = '<option value="">' + t('setup_choose', '— bitte wählen —') + '</option>';
+        d.models.forEach(function (m) {
+            const o = document.createElement('option');
+            o.value = m.id; o.textContent = m.name;
+            wahl.appendChild(o);
+        });
+    } catch (err) {
+        wahl.innerHTML = '<option value="">' + t('setup_models_fail', 'Liste nicht ladbar') + '</option>';
+        console.error('Modelle laden:', err);
+    }
+}
+
+async function bambuSpeichern(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('bambu-knopf');
+    const ruhe = knopf.textContent;
+    arbeitet(knopf, true, ruhe);
+    try {
+        const a = await fetch('/api/setup/printer', {
+            method: 'POST', headers: kopfMitCsrf(), credentials: 'include',
+            body: JSON.stringify({
+                printer_name: document.getElementById('bambu-name').value.trim(),
+                printer_model: document.getElementById('bambu-modell').value,
+                printer_ip: document.getElementById('bambu-ip').value.trim(),
+                printer_serial: document.getElementById('bambu-serie').value.trim(),
+                printer_access_code: document.getElementById('bambu-code').value.trim(),
+                developer_mode: document.getElementById('bambu-entwickler').checked,
+                lan_only: document.getElementById('bambu-lan').checked
+            })
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok) throw new Error(d.error || 'Speichern fehlgeschlagen');
+        melde(t('setup_printer_ok', 'Drucker eingetragen.'), 'gut');
+        setTimeout(function () { weiter(4); }, 700);
+    } catch (err) {
+        melde(err.message, 'fehl');
+    } finally {
+        arbeitet(knopf, false, ruhe);
+    }
+}
+
+async function klipperSpeichern(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('klipper-knopf');
+    const ruhe = knopf.textContent;
+    const name = document.getElementById('klipper-name').value.trim();
+    const kennung = document.getElementById('klipper-kennung').value.trim().toLowerCase();
+    const adresse = document.getElementById('klipper-adresse').value.trim();
+
+    if (!name || !kennung || !adresse) {
+        melde(t('setup_err_klipper_fields', 'Name, Kennung und Adresse werden gebraucht.'), 'fehl');
+        return;
+    }
+    arbeitet(knopf, true, ruhe);
+    try {
+        const a = await fetch('/api/setup/klipper', {
+            method: 'POST', headers: kopfMitCsrf(), credentials: 'include',
+            body: JSON.stringify({
+                printer_name: name,
+                printer_id: kennung,
+                base_url: adresse,
+                api_key: document.getElementById('klipper-schluessel').value.trim(),
+                host_mode: document.getElementById('klipper-wo').value
+            })
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok) throw new Error(d.error || 'Speichern fehlgeschlagen');
+        melde(t('setup_printer_ok', 'Drucker eingetragen.'), 'gut');
+        setTimeout(function () { weiter(4); }, 700);
+    } catch (err) {
+        melde(err.message, 'fehl');
+    } finally {
+        arbeitet(knopf, false, ruhe);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// 4: Steckdose
+// ─────────────────────────────────────────────────────────────────────
+function stromFelder() {
+    const art = document.getElementById('strom-art').value;
+    document.getElementById('ha-felder').style.display = art === 'homeassistant' ? '' : 'none';
+    document.getElementById('meross-felder').style.display = art === 'meross' ? '' : 'none';
+}
+
+/** Beide Dienste in EINEM Aufruf setzen — der jeweils andere wird
+ *  ausgeschaltet. Vorher stand dieselbe Folge dreimal im Quelltext. */
+async function stromSetzen(art) {
+    const kopf = kopfMitCsrf();
+    const ha = art === 'homeassistant'
+        ? { enabled: true,
+            url: document.getElementById('ha-url').value.trim(),
+            token: document.getElementById('ha-token').value.trim(),
+            entity_id: document.getElementById('ha-entity').value.trim(),
+            display_name: document.getElementById('ha-anzeige').value.trim() || 'Steckdose' }
+        : { enabled: false };
+    const meross = art === 'meross'
+        ? { enabled: true,
+            email: document.getElementById('meross-mail').value.trim(),
+            password: document.getElementById('meross-pw').value,
+            region: document.getElementById('meross-region').value,
+            device_name: document.getElementById('meross-geraet').value.trim() }
+        : { enabled: false };
+
+    for (const [pfad, rumpf] of [['homeassistant', ha], ['meross', meross]]) {
+        const a = await fetch('/api/setup/' + pfad, {
+            method: 'POST', headers: kopf, credentials: 'include',
+            body: JSON.stringify(rumpf)
+        });
+        if (!a.ok && rumpf.enabled) {
+            const d = await a.json().catch(function () { return {}; });
+            throw new Error(d.error || (pfad + ' abgelehnt'));
+        }
+    }
+}
+
+async function abschliessen(knopf, ruhe) {
+    try {
+        const a = await fetch('/api/setup/complete', {
+            method: 'POST', headers: kopfMitCsrf(), credentials: 'include'
+        });
+        const d = await a.json().catch(function () { return {}; });
+        if (!a.ok) throw new Error(d.error || 'Abschluss abgelehnt');
+    } catch (err) {
+        melde(err.message, 'fehl');
+        if (knopf) arbeitet(knopf, false, ruhe);
+        return;
+    }
+
+    // Der Server beendet sich mit Code 42, der Launcher startet ihn neu.
+    let rest = 12;
+    const zeigen = function () {
+        melde(t('setup_done', 'Fertig. Der Server startet neu …') + ' (' + rest + 's)', 'gut');
+    };
+    zeigen();
+    const uhr = setInterval(function () {
+        rest--;
+        if (rest > 0) { zeigen(); } else { clearInterval(uhr); window.location.href = '/login'; }
+    }, 1000);
+}
+
+async function stromSpeichern(e) {
+    e.preventDefault();
+    const knopf = document.getElementById('strom-knopf');
+    const ruhe = knopf.textContent;
+    arbeitet(knopf, true, ruhe);
+    try {
+        await stromSetzen(document.getElementById('strom-art').value);
+    } catch (err) {
+        melde(err.message, 'fehl');
+        arbeitet(knopf, false, ruhe);
+        return;
+    }
+    arbeitet(knopf, false, ruhe);
+    entwurfLoeschen();
+    weiter(5);
+}
+
+async function stromUeberspringen() {
+    try { await stromSetzen('none'); } catch (err) { /* nichts zu retten */ }
+    entwurfLoeschen();
+    weiter(5);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Zwischenspeichern
+// ─────────────────────────────────────────────────────────────────────
+//
+// A page reload must not throw away what has been typed. Every step writes
+// its result to the server, so only two things can get lost: which step you
+// were on (the server answers that, see /api/setup/status) and the input of
+// the step you are IN.
+//
+// sessionStorage, not localStorage: this survives a reload, which is the
+// point, but not closing the tab -- setup data has no business outliving the
+// session on a shared machine.
+//
+// Secrets are NOT in this list, on purpose: passwords, the printer's access
+// code, the Home Assistant token, the Meross password. They stay in the form
+// and get retyped after a reload. Everything else is addresses and names.
+const ENTWURF_FELDER = [
+    'bambu-name', 'bambu-ip', 'bambu-serie', 'bambu-modell',
+    'klipper-name', 'klipper-url', 'klipper-id',
+    'strom-art', 'ha-url', 'ha-entity', 'ha-anzeige',
+    'meross-mail', 'meross-region', 'meross-geraet',
+];
+
+function entwurfSpeichern() {
+    try {
+        const d = {};
+        ENTWURF_FELDER.forEach(function (id) {
+            const el = document.getElementById(id);
+            if (el && el.value) d[id] = el.value;
+        });
+        const typ = document.querySelector('input[name="druckertyp"]:checked');
+        if (typ) d._typ = typ.value;
+        sessionStorage.setItem('setup_entwurf', JSON.stringify(d));
+    } catch (e) { /* privates Fenster, voller Speicher - kein Beinbruch */ }
+}
+
+function entwurfLaden() {
+    try {
+        const d = JSON.parse(sessionStorage.getItem('setup_entwurf') || '{}');
+        Object.keys(d).forEach(function (id) {
+            if (id === '_typ') {
+                const r = document.querySelector('input[name="druckertyp"][value="' + d._typ + '"]');
+                if (r) { r.checked = true; }
+                return;
+            }
+            const el = document.getElementById(id);
+            if (el) el.value = d[id];
+        });
+    } catch (e) { /* nichts wiederherzustellen */ }
+}
+
+function entwurfLoeschen() {
+    try { sessionStorage.removeItem('setup_entwurf'); } catch (e) {}
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Schritt 5: der Abschluss
+// ─────────────────────────────────────────────────────────────────────
+const ABSCHLUSS_TEXTE = {
+    profile: ['setup_fin_profile', 'Slicer-Profile'],
+    wartung: ['setup_fin_wartung', 'Wartungsplan'],
+    drucker: ['setup_fin_drucker', 'Drucker erreichbar'],
+    kamera:  ['setup_fin_kamera',  'Kamera vorbereiten'],
+};
+const ABSCHLUSS_ZEICHEN = { offen: '·', laeuft: '…', fertig: '✓', warnung: '!' };
+
+function abschlussZeichnen(aufgaben) {
+    const ziel = document.getElementById('abschluss-liste');
+    if (!ziel) return;
+    ziel.innerHTML = (aufgaben || []).map(function (a) {
+        const paar = ABSCHLUSS_TEXTE[a.name] || [null, a.name];
+        const name = paar[0] ? t(paar[0], paar[1]) : paar[1];
+        const zeichen = ABSCHLUSS_ZEICHEN[a.zustand] || '·';
+        return '<div class="es-zeile abschluss-zeile abschluss--' + a.zustand + '">'
+             + '<div class="es-zeile-name">' + zeichen + ' ' + name + '</div>'
+             + '<div class="es-zeile-wert">' + (a.detail || '') + '</div>'
+             + '</div>';
+    }).join('');
+}
+
+async function abschlussStarten() {
+    const knopf = document.getElementById('abschluss-knopf');
+    const ruhe = knopf ? knopf.textContent : '';
+    if (knopf) arbeitet(knopf, true, ruhe);
+    try {
+        await fetch('/api/setup/finalize', {
+            method: 'POST', headers: kopfMitCsrf(), credentials: 'include'
+        });
+    } catch (err) {
+        // Even a failed start must not be a dead end -- the poll below finds
+        // out what is really going on.
+    }
+    abschlussVerfolgen(knopf, ruhe);
+}
+
+function abschlussVerfolgen(knopf, ruhe) {
+    const uhr = setInterval(async function () {
+        let d = {};
+        try {
+            const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
+            d = await a.json();
+        } catch (e) { return; }   // Netz zuckt - beim naechsten Mal wieder
+        abschlussZeichnen(d.aufgaben);
+        if (d.fertig) {
+            clearInterval(uhr);
+            entwurfLoeschen();
+            await abschliessen(knopf, ruhe);
+        }
+    }, 1000);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// Start: dort weitermachen, wo es hing
+// ─────────────────────────────────────────────────────────────────────
+(async function starten() {
+    // Erst den Entwurf, dann die Felder danach ausrichten: der gespeicherte
+    // Druckertyp entscheidet, welche Bloecke sichtbar sind.
+    entwurfLaden();
+    typWechseln();
+    stromFelder();
+    // Ab jetzt jede Eingabe mitschreiben. Ein Neuladen darf nicht alles
+    // wegwerfen -- bis 01sep26 stand man danach wieder vor leeren Feldern.
+    document.addEventListener('input', entwurfSpeichern);
+    document.addEventListener('change', entwurfSpeichern);
+    try {
+        const a = await fetch('/api/setup/status');
+        const d = await a.json();
+        // Der Statusbericht meldet seit 31aug26 echte Werte — vorher waren
+        // Lizenz und Passwort fest auf `true` verdrahtet.
+        // Der Strom-Schritt ist beantwortet, sobald power_control.mode steht --
+        // "Keine" ist eine Antwort. Ohne dieses Feld war sie von "noch nicht
+        // gefragt" nicht zu unterscheiden.
+        if (d.finalize_done || d.power_configured) { schritt = 5; }
+        else if (d.printer_configured) { schritt = 4; }
+        else if (d.password_changed) { schritt = 3; await modelleLaden(); }
+        else if (d.license_configured) { schritt = 2; }
+        if (d.printer_type === 'klipper') {
+            document.querySelector('input[name="druckertyp"][value="klipper"]').checked = true;
+            typWechseln();
+        }
+    } catch (e) {
+        // Kein Status? Dann von vorn — das ist der Normalfall beim
+        // allerersten Start.
+    }
+    schritteZeichnen();
+
+    // Auf Schritt 5 nachsehen, ob der Abschluss schon laeuft oder durch ist.
+    // Nach einem Neuladen mitten in der Arbeit haengt sich die Seite so
+    // wieder an den laufenden Vorgang, statt ihn ein zweites Mal zu starten.
+    if (schritt === 5) {
+        try {
+            const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
+            const d = await a.json();
+            if (d.aufgaben && d.aufgaben.length) abschlussZeichnen(d.aufgaben);
+            if (d.laeuft) {
+                const k = document.getElementById('abschluss-knopf');
+                if (k) arbeitet(k, true, k.textContent);
+                abschlussVerfolgen(k, k ? k.textContent : '');
+            }
+        } catch (e) { /* dann eben per Knopf */ }
+    }
+})();
+</script>
+</body>
+</html>

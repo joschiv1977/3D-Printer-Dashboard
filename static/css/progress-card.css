@@ -1,0 +1,1278 @@
+/* ============================================
+ * Print Progress Card — Modern Glassmorphism
+ * Dark/Light Mode support via CSS variables
+ * ============================================ */
+
+/* ========== PROGRESS CARD ========== */
+.progress-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+    padding: 14px !important;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 16px;
+}
+
+body:not(.dark-mode) .progress-card {
+    background: rgba(0, 0, 0, 0.025);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+.print-status {
+    font-size: var(--font-size-small);  /* 12px — wie andere Card-Subtitles */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.print-status .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    flex-shrink: 0;
+}
+
+.print-status .status-dot.status-running { background: var(--accent-green); }
+.print-status .status-dot.status-paused { background: var(--accent-orange); }
+.print-status .status-dot.status-failed { background: var(--accent-red); }
+.print-status .status-dot.status-idle { background: var(--text-secondary); }
+.print-status .status-dot.status-preparing { background: var(--accent-blue); }
+
+.print-status-text {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.progress-status-container .status-grid {
+    flex: 0 0 auto;
+    width: 280px;
+    grid-auto-rows: min-content;
+    margin-bottom: 0;
+}
+
+.progress-status-container .status-card {
+    padding: 4px 10px;
+    gap: 10px;
+    height: 82px;
+}
+
+.progress-status-container .status-icon {
+    font-size: 22px;
+}
+
+.progress-status-container .status-label {
+    font-size: 14px;
+    margin-bottom: 1px;
+    opacity: 0.7;
+}
+
+.progress-status-container .status-value {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.progress-status-container .progress-card {
+    flex: 1;
+    max-width: none;
+    min-width: 350px;
+}
+
+.progress-status-container .status-grid.align-right {
+    margin-left: auto;
+}
+
+@media (max-width: 968px) {
+
+    .progress-status-container .status-grid {
+        width: 100%;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .progress-status-container .progress-card {
+        min-width: unset;
+    }
+
+    .progress-card {
+        max-width: 100%;
+    }
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+    .progress-ring {
+        width: 90px;
+        height: 90px;
+    }
+}
+
+@media (min-width: 1024px) {
+
+    /* Schriftgrößen kommen jetzt aus den CSS-Variablen (base) — keine
+       Desktop-Überschreibung nötig, die Variablen skalieren selbst. */
+}
+
+/* ============================================
+ * HelixScreen-inspired Layout (Sovol 356C)
+ * Linke Spalte: Thumbnail + Metadata-Overlay
+ * Rechte Spalte: Temp/Speed/Fans/Buttons
+ * ============================================ */
+
+.progress-card--helix {
+    padding: 12px !important;
+}
+
+.progress-card__cols {
+    display: grid;
+    grid-template-columns: 5fr 4fr;
+    gap: 14px;
+    height: 100%;
+    min-height: 0;
+}
+
+/* ----- LEFT: Thumbnail + Metadata-Overlay ----- */
+.progress-card__left {
+    position: relative;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+}
+
+body:not(.dark-mode) .progress-card__left {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.progress-card__thumb-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+}
+
+.progress-card__thumb {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.progress-card__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px 12px;
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 0.78) 0%,
+        rgba(0, 0, 0, 0.55) 70%,
+        rgba(0, 0, 0, 0) 100%);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 0 0 12px 12px;
+}
+
+body:not(.dark-mode) .progress-card__overlay {
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 0.72) 0%,
+        rgba(0, 0, 0, 0.40) 70%,
+        rgba(0, 0, 0, 0) 100%);
+}
+
+.progress-card__bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.progress-card__bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+}
+
+.progress-card__row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
+    flex-wrap: wrap;
+}
+
+.progress-card__row--time {
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.progress-card__sep::before {
+    content: " · ";
+    color: rgba(255, 255, 255, 0.45);
+    margin-right: 2px;
+}
+
+.progress-card__cell {
+    white-space: nowrap;
+}
+
+.progress-card__muted {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* Bambu-Karte: Metazeile liegt auf hellem Kartengrund, nicht auf dem
+ * dunklen Thumbnail-Overlay — weisser Text war im hellen Modus unsichtbar. */
+.progress-card--bambu .progress-card__muted {
+    color: var(--text-secondary);
+    opacity: 0.75;
+}
+
+.progress-card__filename {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 2px 0;
+}
+
+.progress-card__pct {
+    font-size: 15px;
+    font-weight: 700;
+    color: #4ade80;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.progress-card__display-msg {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.65);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-top: 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 2px;
+}
+
+.progress-card__status-pill {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    backdrop-filter: blur(4px);
+}
+
+/* ----- RIGHT: Controls ----- */
+.progress-card__right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+}
+
+.helix-temp-card {
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+body.dark-mode .helix-temp-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.helix-temp-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.helix-temp-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.helix-temp-value {
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.helix-temp-sep {
+    color: var(--text-placeholder);
+    margin: 0 2px;
+}
+
+.helix-status-pill {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.15);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.helix-status-pill.is-ready    { background: rgba(34, 197, 94, 0.18); color: #16a34a; }
+.helix-status-pill.is-heating  { background: rgba(249, 115, 22, 0.18); color: #ea580c; }
+.helix-status-pill.is-cooling  { background: rgba(56, 189, 248, 0.18); color: #0284c7; }
+.helix-status-pill.is-off      { background: rgba(128, 128, 128, 0.12); color: var(--text-placeholder); }
+
+body.dark-mode .helix-status-pill.is-ready    { color: #22c55e; }
+body.dark-mode .helix-status-pill.is-heating  { color: #f97316; }
+body.dark-mode .helix-status-pill.is-cooling  { color: #38bdf8; }
+
+.helix-inline-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 4px 12px;
+    flex-wrap: wrap;
+    color: var(--text-secondary);
+}
+
+.helix-inline-icon {
+    font-size: 14px;
+    opacity: 0.85;
+}
+
+.helix-inline-value {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.helix-inline-sep {
+    color: var(--text-placeholder);
+    margin: 0 2px;
+}
+
+.helix-fan-row {
+    background: rgba(56, 189, 248, 0.06);
+    border-radius: 8px;
+    padding: 6px 12px;
+}
+
+.helix-fan-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary);
+}
+
+.helix-fan-icon {
+    color: #0284c7;
+    font-size: 14px;
+}
+
+body.dark-mode .helix-fan-icon { color: #38bdf8; }
+
+.helix-extras-row {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Responsive: schmale Viewports → Spalten stacken */
+@media (max-width: 720px) {
+    .progress-card__cols {
+        grid-template-columns: 1fr;
+    }
+    .progress-card__left {
+        min-height: 200px;
+    }
+}
+
+/* ============================================
+ * Bed-Mesh-Heatmap (Klipper-only)
+ * Kompakte 2D-Top-Down-Heatmap unter Z-Extras
+ * ============================================ */
+.helix-bed-mesh {
+    margin: 4px 12px 0;
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+body.dark-mode .helix-bed-mesh {
+    background: rgba(255, 255, 255, 0.04);
+}
+.helix-bed-mesh__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.helix-bed-mesh__title {
+    font-weight: 500;
+}
+.helix-bed-mesh__range {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.helix-bed-mesh__grid {
+    width: 100%;
+    aspect-ratio: 200 / 140;  /* matches viewBox des SVGs */
+    max-height: 200px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.20);
+    display: block;
+}
+body.dark-mode .helix-bed-mesh__grid {
+    background: rgba(0, 0, 0, 0.40);
+}
+
+.pv-machine {
+    position: relative;
+    flex: 1.6;
+    min-width: 0;
+}
+
+.pv-toolhead {
+    position: relative;
+    flex: 1;
+    min-width: 74px;
+    max-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.pv-divider {
+    width: 1px;
+    background: rgba(128, 128, 128, 0.22);
+    margin: 6px 0;
+}
+.pv-noztip.pv-hot { fill: #f0703a; }
+
+.pv-bed {
+    fill: rgba(180, 150, 120, 0.35);
+    stroke: rgba(180, 160, 140, 0.6);
+    stroke-width: 1;
+    transition: fill 0.4s;
+}
+.pv-bedglow.pv-hot { fill: rgba(240, 112, 58, 0.30); }
+.pv-bed.pv-hot { fill: rgba(240, 130, 70, 0.55); }
+
+.pv-badge {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(18, 22, 30, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 2px 9px;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Prozente auf dem BESCHNITTENEN Render (20aug26): der x2d.png hatte rundum
+   durchsichtigen Rand — der zaehlte optisch als Abstand zum AMS und schob
+   die Standlinie nach oben. Nach dem Beschneiden liegen Drucker und AMS
+   buendig, dafuer wandern die Plaketten mit. */
+.pv-badge--chamber { left: 10.7%; top: 41%; }
+.pv-badge--bed     { left: 25.8%; top: 79.2%; }
+
+/* Duesen-Plaketten im Werkzeugkopf-Feld: unter der Grafik gestapelt */
+.pv-toolhead .pv-badge { position: static; }
+.pv-badge.pv-active { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
+
+/* Bambu zeigt die Grafik, die alten Textzeilen entfallen dort */
+body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
+
+/* ============================================================
+ * Steuerungs-Uebersicht (X2D-Display-Stil) im Control-Modal
+ * ============================================================ */
+.ov-layout {
+    display: flex;
+    gap: 14px;
+    align-items: stretch;
+}
+
+.ov-cards {
+    flex: 1.2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-content: start;
+}
+
+.ov-card {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.16);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+}
+
+.ov-card:hover {
+    border-color: rgba(59, 130, 246, 0.55);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.ov-card-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.ov-arrow { margin-left: auto; opacity: 0.55; font-size: 15px; }
+
+.ov-card-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ov-card-value--split { display: flex; gap: 12px; font-size: 14px; }
+
+.ov-machine {
+    flex: 1;
+    min-width: 180px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.ov-light-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(18, 22, 30, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.ov-light-btn.ov-on { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
+
+@media (max-width: 640px) {
+    .ov-layout { flex-direction: column; }
+    .ov-machine { min-width: 0; }
+}
+
+/* Plaketten in der Grafik sind einzeln klickbar (Zonen-Dialog) */
+.pv-badge--click { pointer-events: auto; cursor: pointer; }
+.pv-badge--click:hover { border-color: rgba(59, 130, 246, 0.7); }
+
+/* Echte Renderings statt gezeichneter Grafik */
+.pv-img { width: 100%; height: auto; display: block; }
+
+.pv-nozzle-img {
+    /* Anteil der Zeilenhoehe statt fester 64px — sonst waechst die Duese
+       optisch mit, wenn die Karte kleiner gezogen wird. */
+    height: 58%;
+    width: auto;
+    display: block;
+    margin: 2px auto 4px;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+
+.pv-ic, .ov-ic {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    vertical-align: -2px;
+    color: currentColor;
+}
+
+.pv-badge .pv-ic { filter: invert(1) brightness(1.6); width: 13px; height: 13px; }
+
+/* Plaketten-Positionen fuer das echte X2D-Render (354x354, 3/4-Ansicht):
+   Kammer mittig im Glas, Bett auf Hoehe der Druckplatte. */
+.pv-badge--chamber { left: 26%; top: 46%; }
+.pv-badge--bed     { left: 32%; top: 66%; }
+
+/* ============================================================
+ * Hauptseiten-Zonen (Variante B): Drucker links, Material rechts
+ * ============================================================ */
+.ov-cards--zone { padding: 4px 2px; }
+
+.mz-sys {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+    background: rgba(128, 128, 128, 0.06);
+    border: 1px solid rgba(128, 128, 128, 0.12);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-top: 10px;
+}
+
+.mz-chip {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12.5px;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.mz-chip:hover { border-color: rgba(59, 130, 246, 0.55); }
+.mz-chip--static { cursor: default; }
+.mz-chip.mz-on { border-color: rgba(74, 222, 128, 0.55); }
+.mz-chip.mz-ok { color: #4ade80; }
+#mz-sys-power.mz-pwr-off .hd-ic { color: #4ade80; }
+#mz-sys-power.mz-pwr-on .hd-ic { color: #f87171; }
+#mz-sys-light.mz-on { border-color: rgba(250, 204, 21, 0.55); }
+#mz-sys-light.mz-on .hd-ic { color: #facc15; }
+
+.mz-badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    background: var(--accent-red, #e5484d);
+    color: #fff;
+    border-radius: 999px;
+    min-width: 19px;
+    height: 19px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.mz-sec {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 10px 0 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mz-unit {
+    background: rgba(128, 128, 128, 0.06);
+    border: 1px solid rgba(128, 128, 128, 0.12);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+}
+
+/* Textspalte links, Knopf rechts — ueber beide Zeilen mittig. */
+.mz-unit-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.mz-unit-links {
+    flex: 1;
+    min-width: 0;
+}
+
+.mz-unit-head {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+/* Trocknungszeile unter dem Kopf. Eigene Zeile, weil sonst zwei
+   Gradzahlen nebeneinander stehen — die Feuchte des Faches und die
+   Solltemperatur des Programms — und beim Umbruch nicht mehr zu
+   unterscheiden sind (27aug26). */
+.mz-unit-dry {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+
+/* Messspalten wie am AMS-Display: Zeichen und Kuerzel oben, Wert
+   darunter. Zwei davon nebeneinander, RH und Temp. */
+.mz-mess {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-right: 18px;
+}
+
+.mz-mess-kopf {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+.mz-mess-wert {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Restzeit als eigene Zeile unter Programm und Ziel. Dadurch bleibt
+   rechts neben der Trocknungszeile Platz fuer den Stopp-Knopf. */
+.mz-unit-rest {
+    margin-top: -2px;
+}
+
+.mz-dry-btn {
+    /* Hoeher als die alte Pille (war 3px Polster): der Knopf soll neben
+       zwei Textzeilen bestehen, nicht darin untergehen. */
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: none;
+    background: rgba(59, 130, 246, 0.14);
+    color: var(--accent-blue, #3b82f6);
+    border: none;
+    border-radius: 10px;
+    padding: 9px 15px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.mz-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.16);
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 12.5px;
+    color: var(--text-primary);
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+    margin-top: 4px;
+}
+
+/* Speist gerade eine Duese: Fuellung + kraeftiger Rand — die duenne
+   Randlinie allein war kaum sichtbar. */
+.mz-slot.mz-active-slot {
+    border: 2px solid #4ade80;
+    background: rgba(74, 222, 128, 0.14);
+    padding: 6px 9px;
+}
+
+/* Zielwahl im Filament-Tab: deutlich gefuellt + Haekchen-Badge — die
+   duenne Randlinie allein war kaum sichtbar. */
+.mz-slot.mz-ziel-slot {
+    background: rgba(74, 222, 128, 0.16);
+    border: 2px solid #4ade80;
+    padding: 6px 9px;
+}
+.mz-ziel-check {
+    margin-left: auto;
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #4ade80;
+    color: #fff;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.mz-slot-col {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    flex: 0 0 auto;
+}
+
+.mz-slot-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mz-slot-pct { margin-left: auto; color: var(--text-secondary); font-size: 11.5px; flex: 0 0 auto; }
+/* K-Wert (Pressure Advance) am aktiven Fach — der Drucker meldet ihn je
+   Filament, nicht je Geraet. Dezent, er ist Beiwerk zum Namen. */
+.mz-slot-k {
+    flex: 0 0 auto; margin-left: 8px; font-size: 10.5px; font-weight: 600;
+    color: var(--text-secondary); border: 1px solid var(--border-color);
+    border-radius: 999px; padding: 1px 6px; white-space: nowrap;
+}
+
+.mz-spool-row { display: flex; gap: 8px; }
+
+.mz-active {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 9px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(128, 128, 128, 0.14);
+}
+
+/* Bambu: alte Knopf-Karten weichen den Zonen. Klipper unveraendert. */
+body[data-active-printer="bambu"] #control-card-mobile,
+body[data-active-printer="bambu"] #control-card-desktop,
+body[data-active-printer="bambu"] #dev-control-card-mobile,
+body[data-active-printer="bambu"] #dev-control-card-desktop {
+    display: none !important;
+}
+body[data-active-printer="klipper"] #printer-zone-card-grid,
+body[data-active-printer="klipper"] #material-zone-card-grid {
+    display: none !important;
+}
+
+/* Druckkarte: Tempo-/Fluss- und Luefter-Zeilen im Chip-Stil */
+body[data-active-printer="bambu"] .helix-inline-row,
+body[data-active-printer="bambu"] .helix-fan-row {
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid rgba(128, 128, 128, 0.13);
+    border-radius: 999px;
+    padding: 4px 12px;
+    width: fit-content;
+    max-width: 100%;
+}
+
+/* ============================================================
+ * Bambu-Druckkarte: Proportionen wie im Mockup — Geraet im
+ * Zentrum, Thumbnail schmaler, Chips in einer Reihe
+ * ============================================================ */
+body[data-active-printer="bambu"] .progress-card__cols {
+    grid-template-columns: 2fr 3fr;
+}
+
+/* ============================================================
+ * Bambu-Druckkarte im Display-Stil (progress-card--bambu)
+ * ============================================================ */
+.progress-card--bambu {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 12px 14px;
+    overflow: hidden;
+}
+
+/* Status-Pille sitzt oben LINKS ueber dem Thumbnail */
+.progress-card--bambu .progress-card__status-pill { left: 10px; right: auto; }
+
+/* Druck-Aktionen oben rechts (Pause/Fortsetzen/Abbrechen) */
+.pcb-actions {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+    z-index: 3;
+}
+
+.pcb-act {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(18, 22, 30, 0.85);
+    color: #fff;
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.pcb-act:hover { border-color: rgba(59, 130, 246, 0.6); }
+.pcb-act--stop:hover { border-color: rgba(229, 72, 77, 0.8); color: #f87171; }
+
+.pcb-top {
+    display: flex;
+    gap: 10px;
+    /* MUSS stretch bleiben: nur dann haben die Spalten eine definierte
+       Hoehe, und nur dann loesen die Prozent-Hoehen der Geraetebilder darin
+       auf. Auf flex-end gestellt verloren Duese und AMS ihre Groesse und
+       standen fix in Pixeln da, waehrend der Drucker weiter mitskalierte.
+       Die gemeinsame Standlinie wird INNERHALB der Spalten gesetzt. */
+    align-items: stretch;
+    /* EIN Regler fuer die Groesse aller drei Geraete. Die Anteile
+       untereinander (Drucker 100, AMS 60, Duese 30) sind die echten
+       Groessenverhaeltnisse und bleiben; hier wird nur gemeinsam gezoomt.
+       Sonst muesste ich drei Zahlen einzeln verstellen — und genau dabei
+       laufen sie auseinander. */
+    --geraet: 0.78;
+    flex: 1;
+    min-height: 0;
+}
+
+.pcb-thumb {
+    /* Wie die Geraete an der Zeilenhoehe haengen, damit die Vorschau beim
+       Ziehen der Karte mitskaliert statt den freien Platz zu fluten.
+       Quadratisch, weil die Modellbilder in jedem Seitenverhaeltnis kommen. */
+    flex: 0 0 auto;
+    align-self: flex-end;
+    height: calc(88% * var(--geraet, 1));
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    /* Kein eigener Hintergrund und keine Ecken: die hoben sich vom
+       Kartenhintergrund ab, dadurch wirkte die Vorschau wie ein
+       aufgeklebtes Bild. Das Modell steht jetzt direkt auf der Karte. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.pcb-thumb-img {
+    max-width: 100%;
+    max-height: 100%;
+    height: auto;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
+
+.pcb-mach {
+    /* NICHT schrumpfen. Der Drucker ist der Massstab: das AMS daneben wird
+       als Anteil der Zeilenhoehe bemessen, und das stimmt nur, solange der
+       Drucker die Zeilenhoehe wirklich ausfuellt. Liess man ihn von der
+       Breite einschnueren, war er kleiner als die Zeile — und das AMS
+       dadurch relativ zu ihm viel zu gross. Platz macht stattdessen die
+       Vorschau (siehe .pcb-thumb). */
+    flex: 0 0 auto;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+/* Render ist quadratisch (354x354): Wrapper an die Spaltenhoehe binden,
+   damit die Maschine nie ueber Chips/Balken hinauswaechst. Die Plaketten
+   sitzen in % vom Wrapper — bei 1:1-Ratio deckungsgleich mit dem Bild. */
+.pcb-mach .pv-machine {
+    flex: none;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    /* Seitenverhaeltnis des BESCHNITTENEN Renders (234x241). Stand hier
+       1/1, obwohl das Bild nicht quadratisch ist — `object-fit: contain`
+       baute den durchsichtigen Rand dadurch wieder ein, den das
+       Beschneiden gerade entfernt hatte. Die Plaketten sitzen in Prozent
+       dieses Kastens, er muss also exakt aufs Bild passen. */
+    aspect-ratio: 234 / 241;
+    width: auto;
+}
+
+.pcb-mach .pv-img { width: 100%; height: 100%; object-fit: contain; }
+
+/* Drucker: Massstab fuer die anderen beiden. */
+.pcb-mach .pv-machine { height: calc(100% * var(--geraet, 1)); }
+
+.pcb-tool {
+    flex: 0 0 auto;
+    /* Volle Zeilenhoehe, damit die Prozent-Hoehe des Bildes darin aufloest.
+       Der Inhalt sitzt unten — gemeinsame Standlinie mit Drucker und AMS. */
+    align-self: stretch;
+    justify-content: flex-end;
+    /* Schmal halten: jeder Pixel hier fehlt rechts beim AMS. */
+    min-width: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Rahmen sitzt auf .pv-tool-box, nicht hier — sonst wuerde er ueber die
+       ganze Zeilenhoehe gezogen. */
+    cursor: pointer;
+}
+
+.pcb-tool:hover .pv-tool-box { border-color: rgba(59, 130, 246, 0.45); }
+
+/* Eine Duese: Bild oben, ihre Temperatur darunter. */
+.pv-tool-one {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+/* Der sichtbare Rahmen. Eigene, definierte Hoehe — damit loest die
+   Prozent-Hoehe des Duesenbildes darin auf, ohne dass der Rahmen die ganze
+   Zeile einnimmt. */
+.pv-tool-box {
+    height: calc(96% * var(--geraet, 1));
+    /* Zwei Duesen nebeneinander — der X2D hat wirklich zwei. */
+    flex-direction: row !important;
+    gap: 8px;
+    background: rgba(128, 128, 128, 0.06);
+    border: 1px solid rgba(128, 128, 128, 0.10);
+    border-radius: 10px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.pcb-chips {
+    display: flex;
+    gap: 7px;
+    margin: 10px 0 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.pcb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(128, 128, 128, 0.08);
+    border: 1px solid rgba(128, 128, 128, 0.15);
+    border-radius: 999px;
+    padding: 3px 11px;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.pcb-chip-ic { width: 13px; height: 13px; opacity: 0.75; }
+body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
+.pcb-chip-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.pcb-chip-sep { opacity: 0.45; }
+.pcb-chip .helix-fan-cell { display: inline-flex; gap: 4px; align-items: center; }
+
+.pcb-bar {
+    height: 7px;
+    border-radius: 99px;
+    background: rgba(128, 128, 128, 0.18);
+    overflow: hidden;
+    flex: 0 0 auto;
+}
+
+.pcb-bar-fill {
+    height: 100%;
+    background: #4ade80;
+    border-radius: 99px;
+    transition: width 0.5s ease;
+}
+
+.pcb-meta {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+}
+
+.pcb-pct {
+    margin-left: auto;
+    color: #4ade80;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.pcb-file {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+
+/* Material-Zone: Spoolman kompakt — eine Infozeile statt Klotz */
+#spoolman-content #active-spool-info { padding: 6px 10px !important; margin-top: 7px !important; }
+#spoolman-content #spool-selector { padding: 7px 10px !important; font-size: 12.5px !important; }
+
+.mz-chip .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; }
+.card-title .hd-ic { opacity: 0.85; }
+
+/* Drucker-Zone: Titelzeile weg — nur ein schmaler Greifstreifen bleibt
+   (die Kopfzeile ist der Drag-Griff des Rasters). */
+#printer-zone-card-grid .card-header {
+    padding: 0 0 6px;
+    min-height: 12px;
+    cursor: grab;
+}
+#printer-zone-card-grid .card-title { display: none; }
+
+/* Systemleiste: drei Gruppen — Geraet | Steuerung | Ansichten.
+   Gruppen brechen als Einheit um, kein einsamer Chip in Zeile 2. */
+.mz-sys { justify-content: flex-start; }
+.mz-sys-grp { display: flex; gap: 6px; flex-wrap: nowrap; }
+.mz-sys-div {
+    width: 1px;
+    align-self: stretch;
+    background: rgba(128, 128, 128, 0.25);
+    margin: 3px 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Angebautes AMS neben dem Drucker
+   ---------------------------------------------------------------------
+   Nur sichtbar, wenn der Drucker eine Einheit meldet (das `hidden`-Attribut
+   setzt socket-manager).
+
+   Alles haengt an der ZEILENHOEHE, nichts an der Breite. Der Nutzer kann die
+   Karte in der Hoehe ziehen; frueher standen hier Prozent-Raender, und
+   Prozent rechnet CSS bei `margin` gegen die BREITE — Bildgroesse und
+   Abstand liefen dadurch bei jeder anderen Kartenhoehe auseinander.
+
+   Die Renders sind auf ihren Inhalt beschnitten (kein durchsichtiger Rand
+   mehr), deshalb braucht es auch keine negativen Raender, um die Luecke zu
+   schliessen. */
+.pcb-ams {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-end;      /* Standlinie mit dem Drucker */
+    justify-content: center;
+    /* Nach unten druecken, egal ob die Duesen-Box daneben steht. Die wird
+       ausgeblendet, sobald der Drucker nur EINE Duesentemperatur meldet
+       (socket-manager: dual). Dann war das AMS das einzige Kind der Spalte,
+       und space-between setzt ein einzelnes Kind an den ANFANG — das AMS
+       rutschte waehrend eines Drucks sichtbar nach oben, weg von der
+       Standlinie des Druckers. */
+    margin-top: auto;
+}
+
+.pcb-ams[hidden] { display: none; }
+
+/* Gemeinsamer Rahmen fuer Bild und Anzeige. Die Hoehe bestimmt die Groesse,
+   die Breite folgt dem Seitenverhaeltnis des Bildes. */
+.pv-ams-wrap {
+    position: relative;
+    /* Der Drucker fuellt die Zeile jetzt ganz aus (kein Quadrat-Rand mehr),
+       also ist der Anteil hier direkt das Groessenverhaeltnis der Geraete:
+       das AMS HT ist real rund 60 % so hoch wie der X2D. */
+    height: calc(92% * var(--geraet, 1));
+    max-width: 100%;
+    display: flex;
+}
+
+.pv-ams-img {
+    height: 100%;
+    width: auto;
+    display: block;
+    /* Gleiche Anmutung wie die Duese daneben. */
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* Feuchte und Temperatur auf der Frontblende — dort, wo das Geraet sie in
+   echt auch anzeigt. Prozent beziehen sich auf den Rahmen und damit exakt
+   auf das Bild. Das Bild ist gespiegelt (damit es zum Drucker schaut), die
+   Blende liegt also links unten. */
+.pcb-ams .pv-badge {
+    position: absolute;
+    left: 22%;
+    top: 57%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 1px 6px;
+}
+
+/* Reihenfolge in der Druckerkarte: Duese, Drucker, AMS.
+   Ueber `order` statt Markup-Umbau — das Markup bedient auch Klipper und
+   Geraete ohne AMS, da will ich keine zweite Variante pflegen.
+   Die Vorschau bleibt ganz links; ohne laufenden Druck ist sie ausgeblendet,
+   dann steht die Duese aussen. */
+.pcb-top > .pcb-thumb { order: 0; }
+.pcb-top > .pcb-mach  { order: 1; }
+.pcb-top > .pcb-side  { order: 2; }
+
+/* Spalte rechts vom Drucker: Duese oben, AMS unten.
+   Wird auf Zeilenhoehe gedehnt — nur so loesen die Prozent-Hoehen der
+   beiden Kaesten darin auf. */
+.pcb-side {
+    flex: 0 0 auto;
+    min-width: 0;
+    /* Platz fuer die Pause/Stop-Knoepfe, die absolut oben rechts in der
+       Karte sitzen (34px hoch, 8px vom Rand). Ohne den Abstand lagen sie
+       waehrend eines Drucks auf den Duesen. */
+    padding-top: 46px;
+    /* Nach rechts, aber nicht bis an die Kante: alle Spalten haben feste
+       Breite, der freie Platz sammelte sich sonst komplett rechts vom AMS.
+       margin-left: auto schiebt hin, margin-right laesst Luft. */
+    margin-left: auto;
+    margin-right: 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Feste Anteile der Spaltenhoehe, damit die Kinder darin wieder eine
+   definierte Bezugsgroesse haben. */
+.pcb-side > .pcb-tool { height: 46%; justify-content: flex-start; }
+.pcb-side > .pcb-ams  { height: 54%; align-items: flex-end; }
+
+/* Mit AMS daneben stellt sich der Drucker auf die Standlinie statt mittig in
+   seiner Spalte zu schweben — sonst steht das AMS sichtbar tiefer. Ohne AMS
+   bleibt er zentriert, dort gibt es keinen Bezugspunkt. */
+.pcb-top:has(#pv-ams:not([hidden])) > .pcb-mach {
+    align-items: flex-end;
+}
+

@@ -1,0 +1,14 @@
+{
+    "type": "filament",
+    "filament_settings_id": [
+        "Bambu PLA Matte, skew"
+    ],
+    "filament_shrink": [
+        "99.8%"
+    ],
+    "from": "User",
+    "inherits": "Bambu PLA Matte @BBL X1C",
+    "is_custom_defined": "0",
+    "name": "Bambu PLA Matte, skew",
+    "version": "2.1.0.19"
+}
