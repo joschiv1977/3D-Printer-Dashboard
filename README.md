@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🖨️ Bambu Lab Printer Web App
+# 🖨️ 3D Printer Dashboard
 
 **Control and monitoring for Bambu Lab and Klipper 3D printers**
 **— Web, Desktop, iOS and Android, one server behind all of them**
