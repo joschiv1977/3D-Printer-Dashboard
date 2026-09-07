@@ -1,0 +1,19 @@
+{
+  "manifest": {
+    "product": "server",
+    "channel": "stable",
+    "platform": "macos",
+    "version": "2.2.12",
+    "files": [
+      {
+        "name": "3D-Printer-Server-2.2.12.zip",
+        "sha256": "9f03eef941071ea466753b0b5cbbe3609f0d8ccb68ef2dc59661b3c326bbd22e",
+        "size": 227513503,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.2.12/3D-Printer-Server-2.2.12.zip"
+      }
+    ],
+    "notes": null,
+    "issued": 1788781326
+  },
+  "signature": "B0X9lXtFz52Ug1Z1syFvk0TG8fOuPEbCG2ceeXRJ4hrrfu3wYqS9bPrw0QEn0NdJDYMtC2CTLkKvlkP7vv7MCQ=="
+}

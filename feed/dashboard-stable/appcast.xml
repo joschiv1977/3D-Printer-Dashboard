@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>dashboard (stable)</title>
+    <item>
+      <title>2.2.12</title>
+      <sparkle:version>2.2.12</sparkle:version>
+      <sparkle:shortVersionString>2.2.12</sparkle:shortVersionString>
+      <pubDate>Mon, 07 Sep 2026 11:46:56 +0000</pubDate>
+      <enclosure url="https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/Dashboard-2.2.12-arm64-mac.zip"
+                 length="137735634"
+                 type="application/octet-stream"
+                 sparkle:edSignature="BqbvMybdoP+MuAz5uu3PYv1h98ix4eW4SolBx53SbzkRI30m/e6o7shiza/7B/SLym0g0sgnH6iq7r4LBLFABA==" />
+    </item>
+  </channel>
+</rss>

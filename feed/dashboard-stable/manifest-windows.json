@@ -1,0 +1,25 @@
+{
+  "manifest": {
+    "product": "dashboard",
+    "channel": "stable",
+    "platform": "windows",
+    "version": "2.2.12",
+    "files": [
+      {
+        "name": "Dashboard Setup 2.2.12.exe",
+        "sha256": "e3f6e6f68e65071cd5627d88a9c074a5d94e09df78536d9f1965d3a96c16b8f5",
+        "size": 117999685,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/Dashboard Setup 2.2.12.exe"
+      },
+      {
+        "name": "latest.yml",
+        "sha256": "d2d0ba360f8610fc6deeb9f3ae5fb6fd6ea5985350645f0791b6a6b32a4eaaf3",
+        "size": 350,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/latest.yml"
+      }
+    ],
+    "notes": null,
+    "issued": 1788781658
+  },
+  "signature": "GuADnOxHqiAHkxutem8YagTh5B+FZ++9U6Gkc9/0+aNY9uuwoC/QBM9rc3BLHbuQaCM4ItE79z+QxKPNc8SwBw=="
+}
