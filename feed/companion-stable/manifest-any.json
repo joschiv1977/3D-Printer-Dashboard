@@ -1,0 +1,19 @@
+{
+  "manifest": {
+    "product": "companion",
+    "channel": "stable",
+    "platform": "any",
+    "version": "2.2.10",
+    "files": [
+      {
+        "name": "companion-2.2.10.tar.gz",
+        "sha256": "b05238246d0bdb5ab47f10a3ef0702c814e49458708270e647a0e3e2da8d7d58",
+        "size": 505819,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/companion-stable-2.2.10/companion-2.2.10.tar.gz"
+      }
+    ],
+    "notes": null,
+    "issued": 1788774927
+  },
+  "signature": "QF3Jk29q6zD8cDpGGbWQ10RsTs3zbvn1hDBC8L1j67XOWinD7Su0jr2HLggBe+LmecZlGUnIRJ/yC9oaMkaTBA=="
+}
