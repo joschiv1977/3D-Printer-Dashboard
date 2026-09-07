@@ -7,19 +7,13 @@
     "files": [
       {
         "name": "Dashboard Setup 2.2.12.exe",
-        "sha256": "e3f6e6f68e65071cd5627d88a9c074a5d94e09df78536d9f1965d3a96c16b8f5",
-        "size": 117999685,
+        "sha256": "32402ce7af397d9cf4f932f35418a5cd289fb450ab3e5de6f00c4956932d6ca9",
+        "size": 117999730,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/Dashboard Setup 2.2.12.exe"
-      },
-      {
-        "name": "latest.yml",
-        "sha256": "d2d0ba360f8610fc6deeb9f3ae5fb6fd6ea5985350645f0791b6a6b32a4eaaf3",
-        "size": 350,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/latest.yml"
       }
     ],
     "notes": null,
-    "issued": 1788781658
+    "issued": 1788809609
   },
-  "signature": "GuADnOxHqiAHkxutem8YagTh5B+FZ++9U6Gkc9/0+aNY9uuwoC/QBM9rc3BLHbuQaCM4ItE79z+QxKPNc8SwBw=="
+  "signature": "zwBtxQes0qXHco7HprIWHRl3vmwDe9Pz2Rc3MkG7GBRTK7upp0KDEh1snYiS5Y5Xhm5HvC4A7yhRhR0Ww63CAg=="
 }

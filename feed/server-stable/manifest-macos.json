@@ -7,13 +7,13 @@
     "files": [
       {
         "name": "3D-Printer-Server-2.2.12.zip",
-        "sha256": "9f03eef941071ea466753b0b5cbbe3609f0d8ccb68ef2dc59661b3c326bbd22e",
-        "size": 227513503,
+        "sha256": "52ec99eaadb39b5711b73a751982e9583605fbfdac37390f2749f9458385b859",
+        "size": 227514344,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.2.12/3D-Printer-Server-2.2.12.zip"
       }
     ],
     "notes": null,
-    "issued": 1788781326
+    "issued": 1788809284
   },
-  "signature": "B0X9lXtFz52Ug1Z1syFvk0TG8fOuPEbCG2ceeXRJ4hrrfu3wYqS9bPrw0QEn0NdJDYMtC2CTLkKvlkP7vv7MCQ=="
+  "signature": "VT4nOYMmswMj5KZU/3pDOM1zkmgruqvbGcTDmX782GIN6Tuo8beQfsaN8GY21Mt4vEY/xr1sJVCl+VWAt0Q8AQ=="
 }
