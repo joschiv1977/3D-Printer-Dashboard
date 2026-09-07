@@ -3,17 +3,17 @@
     "product": "dashboard",
     "channel": "stable",
     "platform": "macos",
-    "version": "2.2.12",
+    "version": "2.2.13",
     "files": [
       {
-        "name": "Dashboard-2.2.12-arm64-mac.zip",
-        "sha256": "947825c3bf958bf868673cc36a4132927cbdb521c0b1e36faab0bac8e85dfb24",
-        "size": 137735739,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.12/Dashboard-2.2.12-arm64-mac.zip"
+        "name": "Dashboard-2.2.13-arm64-mac.zip",
+        "sha256": "b9c0df15d2fba157140dab064fff33e121c103d87dd494aea888063d842d6aa5",
+        "size": 137735747,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.13/Dashboard-2.2.13-arm64-mac.zip"
       }
     ],
     "notes": null,
-    "issued": 1788809568
+    "issued": 1788810854
   },
-  "signature": "aldAs5gMN7kUbn5xwf3f3d/rZ/6H7bjaqIVtWE1PNpEoIGyqghHRoczWKrFhQxWB+7aTXS3d2He022NLRzuuDw=="
+  "signature": "c+CIYeivOyOX6M4Nbudyq+IoDozOXbUWQsLBYg+NvPxrUzzY7FzjlEL0iTLqUs8FZy/L4YbkV+JWWUF7H5i7Bw=="
 }

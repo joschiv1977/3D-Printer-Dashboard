@@ -3,14 +3,14 @@
   <channel>
     <title>server (stable)</title>
     <item>
-      <title>2.2.12</title>
-      <sparkle:version>2.2.12</sparkle:version>
-      <sparkle:shortVersionString>2.2.12</sparkle:shortVersionString>
-      <pubDate>Mon, 07 Sep 2026 19:27:38 +0000</pubDate>
-      <enclosure url="https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.2.12/3D-Printer-Server-2.2.12.zip"
-                 length="227514344"
+      <title>2.2.13</title>
+      <sparkle:version>2.2.13</sparkle:version>
+      <sparkle:shortVersionString>2.2.13</sparkle:shortVersionString>
+      <pubDate>Mon, 07 Sep 2026 19:49:10 +0000</pubDate>
+      <enclosure url="https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.2.13/3D-Printer-Server-2.2.13.zip"
+                 length="227514641"
                  type="application/octet-stream"
-                 sparkle:edSignature="OLYBMdFCaFQNrmFFe15CFbQOpVUC1s97/Gyh2EK6l/WlP+vQxbnLvAwRaUoqjELSxB+AUiOV9o/SC6P2VhKxAw==" />
+                 sparkle:edSignature="vZ5ylrxms7o/iDSoZ/z/6FgBjm/jAnilQKYEpAqV/EMKK33XU5Vo4q71rmjf1xM1zQDIC4dfKiyOZkKKHs/wCw==" />
     </item>
   </channel>
 </rss>

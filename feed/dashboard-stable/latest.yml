@@ -1,8 +1,8 @@
-version: 2.2.12
+version: 2.2.13
 files:
-  - url: Dashboard Setup 2.2.12.exe
-    sha512: 0sWeKF1AjeUKKDziVuAKk2G7PGLmAR0FxzeIii3+ZC3JVQBhUIJPHiv/pLgHVu7tqkIqBEeBXtj5ysqW82skaw==
-    size: 117999730
-path: Dashboard Setup 2.2.12.exe
-sha512: 0sWeKF1AjeUKKDziVuAKk2G7PGLmAR0FxzeIii3+ZC3JVQBhUIJPHiv/pLgHVu7tqkIqBEeBXtj5ysqW82skaw==
-releaseDate: '2026-09-07T19:33:28.921Z'
+  - url: Dashboard Setup 2.2.13.exe
+    sha512: BEPIIyvfIanimT59eUlaFnLUag7EmsNCId325z31ExBlR4oxKNGnARfoaEM32KxF6DMxdvqZ9WmyLaNz6ZATjw==
+    size: 117999835
+path: Dashboard Setup 2.2.13.exe
+sha512: BEPIIyvfIanimT59eUlaFnLUag7EmsNCId325z31ExBlR4oxKNGnARfoaEM32KxF6DMxdvqZ9WmyLaNz6ZATjw==
+releaseDate: '2026-09-07T19:54:56.529Z'
