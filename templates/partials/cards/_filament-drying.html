@@ -1,4 +1,5 @@
-          <!-- Filament Drying Card (initial versteckt, wird bei Drucker online + Feature aktiv angezeigt) -->
+          <!--Filament Drying Card (hidden initially, shown once the printer is
+               online and the feature is active)-->
           <div class="grid-stack-item" gs-w="5" gs-h="9" gs-x="7" gs-y="16" gs-min-w="3" gs-min-h="6" gs-max-w="8" gs-max-h="24" id="filament-drying-card-grid" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card" id="filament-drying-card">
@@ -11,8 +12,8 @@
                       </div>
                       <div id="filament-drying-content" class="tr-koerper" style="display:none;">
                           <div id="material-selection">
-                              <!-- Zeile: Beschriftung links, Wahl rechts — wie im
-                                   Trocknungs-Dialog des AMS (.tray-edit-zeile). -->
+                              <!--Row: label on the left, choice on the right -- same as in the
+                                   AMS drying dialog (.tray-edit-zeile).-->
                               <div class="tr-zeile">
                                   <span class="tr-lab" id="material-select-label"></span>
                                   <select id="material-selector" class="tr-wahl">
@@ -20,13 +21,11 @@
                                   </select>
                               </div>
 
-                              <!-- Grad und Stunden als Kaestchen statt grauer Info-Box.
-                                   Die Werte tragen ihre Einheit selbst (JS). -->
-                              <!-- Grad und Dauer sind AENDERBAR. Bis 27aug26 standen
-                                   hier nur die Werte der Voreinstellung, waehrend der
-                                   AMS-Dialog daneben beides einstellen liess. Die
-                                   Voreinstellung fuellt die Felder, wer will, schreibt
-                                   darueber. -->
+                              <!--Degrees and hours as small boxes instead of a grey info box.
+                                   The values carry their own unit (JS).-->
+                              <!--Degrees and duration are EDITABLE. The preset
+                                   fills the fields; anyone who wants to can write
+                                   over them.-->
                               <div class="tr-zeile" id="material-info" style="display:none;">
                                   <span class="tr-lab"></span>
                                   <span class="tr-felder">
@@ -41,10 +40,10 @@
                                   </span>
                               </div>
 
-                              <!-- If the printer dries by itself, this shows what it
-                                   zuletzt benutzt hat. Seine Voreinstellungen
-                                   abfragen kann man nicht; mitgehoert werden sie,
-                                   wenn jemand am Display startet. -->
+                              <!--If the printer dries by itself, this shows what it
+                                   last used. Its presets cannot be queried directly;
+                                   they are picked up by listening in when someone
+                                   starts a dry from the display.-->
                               <div class="tr-zeile" id="drying-native-hint" hidden>
                                   <small id="drying-native-text"></small>
                                   <button type="button" id="drying-native-uebernehmen"
@@ -83,8 +82,9 @@
                                   <span class="tr-proz" id="drying-progress-percent">0%</span>
                               </div>
 
-                              <!-- Balken bleibt gruen: der fruehere Verlauf nach Orange
-                                   sagte nichts aus, und Orange ist hier die Warnfarbe. -->
+                              <!--Bar stays green: transitioning to orange would not mean
+                                   anything here, and orange is the warning color in
+                                   this context.-->
                               <div class="tr-balken"><i id="drying-progress-bar" style="width:0%;"></i></div>
 
                               <div class="tr-fuss">

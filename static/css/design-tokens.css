@@ -4,12 +4,11 @@
  * ============================================ */
 
 :root {
-    /* === Der Pfeil der Auswahlfelder ===
-       Eine Quelle fuer alle Oberflaechen. Ein `select` mit Hausrahmen und
-       dem Zeichen des Betriebssystems darin ist unfertig, und die Datei-URI
-       an jeder Stelle zu wiederholen waere ein Flickenteppich — beim
-       dritten Vorkommen am 31aug26 hierher gezogen.
-       Benutzung: `appearance: none` und `background-image: var(--pfeil)`. */
+    /* === The select field arrow ===
+       One source for all UIs. A `select` with the house border and the
+       operating system's own glyph inside it is unfinished, and repeating
+       the data URI at every call site would be a patchwork.
+       Usage: `appearance: none` and `background-image: var(--pfeil)`. */
     --pfeil: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 
     /* === Safe Area === */
@@ -36,7 +35,7 @@
     --input-border: #ddd;
     --shadow: rgba(0, 0, 0, 0.1);
 
-    /* === Semantische Farben (gleich in Light+Dark) === */
+    /* === Semantic colors (same in light+dark) === */
     --color-blue: #2196F3;
     --color-green: #4CAF50;
     --color-orange: #FF9800;
@@ -78,6 +77,16 @@
     --margin-h: 20px;
     --margin-v: 20px;
 
+    /* Room the floating dock needs at the bottom of every page.
+       .floating-tab-bar is position:fixed, 66px tall, sitting 16px off the
+       bottom edge -- content that runs into those 82px disappears under it.
+       Measured 01sep26: on a 13" MacBook the dashboard's bottom row of cards
+       ended 100px inside the dock, because .container reserved only 30px.
+       Two other pages carried their own 90px, so the number stood in three
+       places and drifted. It stands here now.
+       82px plus a gap, so the cards do not touch the dock. */
+    --dock-freiraum: 94px;
+
     /* === Corner Radius (iPhone) === */
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -95,10 +104,7 @@
     --btn-height-medium: 44px;
     --btn-radius: var(--radius-lg);
 
-    /* === Knopfmasse — eine Quelle fuer alle Knoepfe ===
-       Vorher trug jede Seite ihre eigenen Zahlen: 10/20 in den Dialogen,
-       8/16 in der Wartung, 7/14 auf Benutzer, 8/15 im Slicer. Nebeneinander
-       sah man den Unterschied sofort. */
+    /* === Button dimensions — one source for all buttons === */
     --knopf-hoehe: 31px;
     --knopf-polster: 6px 12px;
     --knopf-schrift: 12.5px;
@@ -147,6 +153,6 @@ body.dark-mode {
     }
 }
 
-/* Der zweite Dunkel-Schalter des Hauses — die Seiten setzen mal
-   `body.dark-mode`, mal `data-theme`. */
+/* The house's second dark-mode switch — pages set either
+   `body.dark-mode` or `data-theme`. */
 [data-theme="dark"] { --pfeil: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }

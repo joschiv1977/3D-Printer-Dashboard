@@ -1,30 +1,30 @@
 /**
  * Printer Adapter — Multi-Printer (Refactor Phase)
  *
- * EINE Action-Funktion, EIN State-Event, KEINE Type-Checks im Frontend.
+ * ONE action function, ONE state event, NO type checks in the frontend.
  *
- * Backend dispatcht via `printer_app.controller.<action>()`. Bambu und
- * Klipper landen am selben Endpoint, nur die Implementation unterscheidet.
+ * The backend dispatches via `printer_app.controller.<action>()`. Bambu and
+ * Klipper land on the same endpoint, only the implementation differs.
  *
- * Frontend nutzt:
+ * Frontend uses:
  *   - window.printerAdapter.action(name, params)  — generic
  *   - window.printerAdapter.<convenience>()       — typed wrapper
  *
- * Status-Stream:
- *   - SocketIO 'printer_state' (unified Schema)
- *   - State landet in window.activePrinter.state und window.lastPrintData
+ * Status stream:
+ *   - SocketIO 'printer_state' (unified schema)
+ *   - State lands in window.activePrinter.state and window.lastPrintData
  *
- * Capability-Visibility:
- *   - data-capability="X"      — sichtbar wenn Backend Cap X hat
- *   - data-not-capability="X"  — versteckt wenn Backend Cap X hat
- *   - data-printer-type="bambu|klipper" — sichtbar nur bei diesem Type
+ * Capability visibility:
+ *   - data-capability="X"      — visible when the backend has capability X
+ *   - data-not-capability="X"  — hidden when the backend has capability X
+ *   - data-printer-type="bambu|klipper" — visible only for this type
  */
 
 (function () {
     'use strict';
 
     // -------------------------------------------------------------
-    // Default-State (Server-Side Hint im body[data-active-printer])
+    // Default state (server-side hint in body[data-active-printer])
     // -------------------------------------------------------------
     window.activePrinter = window.activePrinter || {
         type: 'bambu',
@@ -42,7 +42,7 @@
             capabilities: (info && info.capabilities) || [],
             displayName: (info && info.display_name) || null,
             connected: !!(info && info.connected),
-            // Klipper-spezifisch fuer Camera-Adapter / Spoolman / Files
+            // Klipper-specific, for camera adapter / Spoolman / files
             klipperId: window.activePrinter.klipperId,
             klipperBaseUrl: window.activePrinter.klipperBaseUrl,
         };
@@ -58,8 +58,8 @@
         } catch (e) {
             console.warn('printer-adapter: /api/printer/info failed', e);
         }
-        // Klipper-spezifische extras (klipperId fuer Camera-Proxy etc.)
-        // — der alte /api/printer-info-Endpoint liefert die separat.
+        // Klipper-specific extras (klipperId for the camera proxy etc.)
+        // — the old /api/printer-info endpoint delivers those separately.
         try {
             const r2 = await fetch('/api/printer-info', { credentials: 'same-origin' });
             if (r2.ok) {
@@ -72,10 +72,10 @@
     }
 
     // -------------------------------------------------------------
-    // Capability-Visibility (Phase E)
+    // Capability visibility (Phase E)
     // -------------------------------------------------------------
-    // DOM-Elemente werden anhand ihres data-Attributs sichtbar/versteckt.
-    // Funktioniert idempotent — wird bei printer_state-Events wiederholt.
+    // DOM elements are shown/hidden based on their data attribute.
+    // Idempotent — repeated on printer_state events.
     function applyCapabilityVisibility() {
         const caps = new Set(window.activePrinter.capabilities || []);
         const type = window.activePrinter.type || 'bambu';
@@ -96,13 +96,13 @@
     window.applyCapabilityVisibility = applyCapabilityVisibility;
 
     // -------------------------------------------------------------
-    // ACTION — der einzige Action-Weg im System
+    // ACTION — the only action path in the system
     // -------------------------------------------------------------
     async function action(name, params) {
-        // window.apiCall statt rohem fetch: haengt CSRF/Device-Token an und
-        // macht bei 401/403 EINEN Token-Refresh + Retry. Ein roher fetch
-        // scheiterte nach jedem Server-Neustart dauerhaft mit 403, weil der
-        // gespeicherte CSRF-Token serverseitig weg war.
+        // Use window.apiCall instead of a raw fetch: it attaches the CSRF/device
+        // token and does ONE token refresh + retry on 401/403. A raw fetch
+        // would fail permanently with 403 after every server restart, because the
+        // stored CSRF token was gone server-side.
         const r = await window.apiCall('/api/printer/' + encodeURIComponent(name), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -113,45 +113,60 @@
                  error: data.error };
     }
 
-    // Convenience-Wrapper — alle delegieren an action(). Frontend kann
-    // weiter z.B. `printerAdapter.pause()` schreiben, das ist lesbarer.
+    // Convenience wrappers — all delegate to action(). The frontend can
+    // still write e.g. `printerAdapter.pause()`, which is more readable.
     const pause          = ()                  => action('pause');
     const resume         = ()                  => action('resume');
     const stop           = ()                  => action('stop');
-    const home           = (axis)              => action('home', { axis: axis || null });
-    const move           = (axis, distance)    => action('move', { axis: axis, distance: distance });
-    const park           = ()                  => action('park');
-    const center         = ()                  => action('center');
-    // nozzleId optional (0 rechts, 1 links) — trifft bei Doppelduese die
-    // gewuenschte Seite statt der aktiven.
+    // Every move that is NOT an absolute target invalidates the map's mark:
+    // the head ends up somewhere nobody named, so a mark left standing would
+    // claim a position that was never sent. Clearing it here covers all four
+    // at once instead of at every call site.
+    const forgetMark = (r) => {
+        if (window.clearMovementMark) window.clearMovementMark();
+        return r;
+    };
+    const home           = (axis)              => action('home', { axis: axis || null }).then(forgetMark);
+    const move           = (axis, distance)    => action('move', { axis: axis, distance: distance }).then(forgetMark);
+    const park           = ()                  => action('park').then(forgetMark);
+    const center         = ()                  => action('center').then(forgetMark);
+    // Absolute target in machine coordinates — the map view sends a point on
+    // the bed instead of a step. Axes left out stay where they are.
+    const moveTo         = (target)            => action('move_to', {
+        x: target.x != null ? target.x : null,
+        y: target.y != null ? target.y : null,
+        z: target.z != null ? target.z : null,
+    });
+    // nozzleId optional (0 right, 1 left) — for a dual nozzle, targets the
+    // desired side instead of the active one.
     const setTemp        = (target, value, nozzleId) => action('set_temp',
         nozzleId != null ? { target: target, value: value, nozzle_id: nozzleId }
                          : { target: target, value: value });
     const selectExtruder = (extruderIndex)     => action('select_extruder', { extruder_index: extruderIndex });
     const setSpeed       = (percent)           => action('set_speed', { percent: percent });
-    // node nur mitschicken, wenn es nicht das Hauptlicht ist — Klipper kennt
-    // den Parameter nicht.
+    // Only send node when it's not the main light — Klipper doesn't
+    // know this parameter.
     const setLight       = (on, node)          => action('set_light',
         node ? { on: !!on, node: node } : { on: !!on });
     const setLightBrightness = (frac)          => action('set_light_brightness', { value: frac });
     const setToolheadLed     = (r, g, b)       => action('set_toolhead_led', { r: r, g: g, b: b });
     const extrude        = (length)            => action('extrude', { length: length });
-    // ams_id waehlt bei Bambu-Doppelduese die externe Spule (255 links,
-    // 254 rechts). NUR mitschicken, wenn es wirklich etwas zu waehlen gibt —
-    // Backends mit einer Quelle (Klipper) kennen den Parameter nicht.
+    // ams_id selects the external spool on a Bambu dual nozzle (255 left,
+    // 254 right). Only send it when there is actually something to select —
+    // backends with a single source (Klipper) don't know this parameter.
     const filamentLoad   = (amsId, slotId)     => action('filament_load',
         amsId != null ? { ams_id: amsId, slot_id: slotId || 0 } : {});
     const filamentUnload = (amsId)             => action('filament_unload', amsId != null ? { ams_id: amsId } : {});
-    // Bambu-Style Filament-Change-Episode (Klipper-only).
-    // start: nach M600-Pause aufrufen — heizt + entlaedt + wartet.
-    // inserted: nach Einlegen aufrufen — laedt + purgt + RESUME.
-    // abort: bricht die Episode + den Druck ab.
+    // Bambu-style filament-change episode (Klipper-only).
+    // start: call after the M600 pause — heats + unloads + waits.
+    // inserted: call after inserting — loads + purges + RESUME.
+    // abort: cancels the episode + the print.
     const filamentChangeStart    = () => action('filament_change_start');
     const filamentChangeInserted = () => action('filament_change_inserted');
     const filamentChangeAbort    = () => action('filament_change_abort');
-    // Nur Bambu (H2/X2/P2-Reihe). Backends ohne diese Faehigkeit antworten 501.
+    // Bambu only (H2/X2/P2 series). Backends without this capability respond 501.
     const setFan         = (fan, percent)      => action('set_fan', { fan: fan, percent: percent });
-    // XCam-Ueberwachung (Spaghetti & Co.) — sensitivity optional
+    // XCam monitoring (spaghetti detection & co.) — sensitivity optional
     // (never_halt | low | medium | high).
     const setXcam        = (module, on, sensitivity) => action('set_xcam',
         sensitivity ? { module: module, on: !!on, sensitivity: sensitivity }
@@ -162,14 +177,14 @@
         { auto_recovery: !!autoRecovery });
     const setAirduct     = (mode)              => action('set_airduct', { mode: mode });
     const buzzer         = (mode)              => action('buzzer', { mode: mode });
-    // AMS: Trocknen koennen nur AMS 2 Pro und AMS HT (status.ams.units[].can_dry).
+    // AMS: only AMS 2 Pro and AMS HT can dry (status.ams.units[].can_dry).
     const amsDryStart    = (amsId, temp, duration, filament, rotate) =>
         action('ams_dry_start', { ams_id: amsId, temp: temp, duration: duration,
                                   filament: filament || '', rotate: !!rotate });
     const amsDryStop     = (amsId)             => action('ams_dry_stop', { ams_id: amsId });
     const amsReadRfid    = (amsId, slotId)     => action('ams_read_rfid', { ams_id: amsId, slot_id: slotId });
-    // tray_info_idx ist Bambus Profil-Kennung (z.B. GFL99) — ohne sie
-    // uebernimmt der Drucker die Einstellung nicht.
+    // tray_info_idx is Bambu's profile identifier (e.g. GFL99) — without it
+    // the printer won't accept the setting.
     const amsSetFilament = (amsId, trayId, idx, type, color, tempMin, tempMax) =>
         action('ams_set_filament', { ams_id: amsId, tray_id: trayId,
                                      tray_info_idx: idx, tray_type: type, tray_color: color,
@@ -201,13 +216,13 @@
                         window.socketManager.handlePrintUpdate(
                             window.lastPrintData, 'printer_state');
                     }
-                    // Power/Online (switch/mqtt) aus dem Socket in dieselbe Logik
-                    // wie der /api/status-Pfad → Power-Button + Online-Cards leben
-                    // jetzt vom Socket, der 8s-/api/status-Poll entfällt.
+                    // Power/online (switch/mqtt) from the socket into the same logic
+                    // as the /api/status path → the power button + online cards now
+                    // live off the socket, the 8s /api/status poll is gone.
                     if (window.statusManager &&
                         typeof window.statusManager.updateStatusDisplay === 'function') {
-                        // Fehler NICHT stumm schlucken — sonst bleiben Buttons
-                        // (z.B. SD-Karte) unsichtbar ohne jede Spur in der Konsole.
+                        // Do NOT swallow errors silently — otherwise buttons
+                        // (e.g. SD card) stay invisible without any trace in the console.
                         try { window.statusManager.updateStatusDisplay(msg); }
                         catch (e) { console.error('updateStatusDisplay failed:', e); }
                     }
@@ -215,9 +230,9 @@
                 }
             });
 
-            // Legacy: 'klipper_state'-Event hat dasselbe Mapping waehrend
-            // der Migrationsphase. Backend wird beides pushen, Frontend
-            // toleriert beide.
+            // Legacy: the 'klipper_state' event has the same mapping during
+            // the migration phase. The backend pushes both, the frontend
+            // tolerates both.
             s.on('klipper_state', (msg) => {
                 if (!msg || window.activePrinter.type !== 'klipper') return;
                 window.activePrinter.state = msg;
@@ -247,16 +262,16 @@
         const remainingMin = Math.round((s.remaining_seconds || 0) / 60);
         const elapsedMin = Math.round((s.elapsed_seconds || 0) / 60);
 
-        // HelixScreen-Pattern: Klipper meldet state=printing schon waehrend
-        // START_PRINT-Macro (Heat-Soak/QGL/Mesh/Purge). Wir override gcode_state
-        // auf PREPARE solange das Macro `preparation_done=false` meldet.
-        // Wenn die Variable fehlt (Slicer-Drucke ohne START_PRINT), nutzen wir
-        // print_duration als Fallback (first-extrusion-Signal).
+        // HelixScreen pattern: Klipper reports state=printing already during
+        // the START_PRINT macro (heat-soak/QGL/mesh/purge). We override gcode_state
+        // to PREPARE as long as the macro reports `preparation_done=false`.
+        // When the variable is missing (slicer prints without START_PRINT), we
+        // use print_duration as a fallback (first-extrusion signal).
         let resolvedState = s.state || 'unknown';
         if (resolvedState === 'printing') {
             const prepDone = s.print_preparation_done;
             if (prepDone === true) {
-                // echter Druck
+                // real print
             } else if (prepDone === false) {
                 resolvedState = 'preparing';
             } else {
@@ -271,32 +286,32 @@
             total_layers: s.layer_total || 0,
             remaining_time: remainingMin,
             print_time: elapsedMin,
-            // Roh-Sekunden fuer HelixScreen-PrintCard "1h 52m vergangen".
-            // WICHTIG: total_duration_seconds (ab Print-Start inkl. Heat-Soak/
-            // QGL/Mesh) — NICHT print_duration_seconds (nur Extrusion).
-            // HelixScreen zeigt total_duration, das matched fuer User-Erwartung.
+            // Raw seconds for the HelixScreen print card "1h 52m elapsed".
+            // IMPORTANT: total_duration_seconds (from print start, including heat-soak/
+            // QGL/mesh) — NOT print_duration_seconds (extrusion only).
+            // HelixScreen shows total_duration, which matches user expectation.
             elapsed_seconds: s.total_duration_seconds
                 || s.elapsed_seconds
                 || s.print_duration_seconds
                 || 0,
             filename: s.current_filename || '',
-            // Bambu sendet `thumbnail_base64` direkt im print_progress.
-            // Klipper hat keinen Push-Mechanismus — wir verweisen auf
-            // unseren Proxy `/api/sd_thumbnail/<filename>` der das aus
-            // Moonraker-Metadata holt. socket-manager nimmt thumbnail_url
-            // direkt als <img src>.
+            // Bambu sends `thumbnail_base64` directly in print_progress.
+            // Klipper has no push mechanism — we point to
+            // our proxy `/api/sd_thumbnail/<filename>` which fetches it from
+            // Moonraker metadata. socket-manager uses thumbnail_url
+            // directly as <img src>.
             thumbnail_url: s.current_filename
                 ? '/api/sd_thumbnail/' + encodeURIComponent(s.current_filename)
                 : '',
             gcode_state: stateMap[resolvedState] || 'IDLE',
-            // status_text MUSS mit "status."-Prefix sein damit
-            // translateStatusKey() die Lokalisierung aufloesen kann.
-            // Sonst zeigt das Frontend den raw Enum-String ("printing")
-            // statt der uebersetzten Variante ("Druckt:").
+            // status_text MUST have the "status." prefix so
+            // translateStatusKey() can resolve the localization.
+            // Otherwise the frontend shows the raw enum string ("printing")
+            // instead of the translated variant ("Printing:").
             status_text: s.status_text || `status.${resolvedState}`,
-            // Stage kommt fertig klassifiziert vom Producer (STATUS_CONTRACT §4b):
-            // stage_code = 'stage.*' (Client übersetzt), stage_custom = roher M117
-            // (Decision A). Hier NUR durchreichen, nicht erneut ableiten.
+            // Stage arrives already classified from the producer (STATUS_CONTRACT §4b):
+            // stage_code = 'stage.*' (client translates), stage_custom = raw M117
+            // (Decision A). Just pass it through here, don't re-derive it.
             stage_code: s.stage_code || '',
             stage_custom: s.stage_custom || '',
             nozzle_temp: s.nozzle_temp,
@@ -304,7 +319,7 @@
             bed_temp: s.bed_temp,
             bed_target: s.bed_target,
             chamber_temp: s.chamber_temp,
-            // Erweiterte Live-Werte (KlipperScreen-Parity)
+            // Extended live values (KlipperScreen parity)
             z_position: s.z_position,
             speed_factor_percent: s.speed_factor_percent,
             flow_factor_percent: s.flow_factor_percent,
@@ -313,10 +328,9 @@
             total_duration_seconds: s.total_duration_seconds,
             z_offset_mm: s.z_offset_mm,
             display_message: s.display_message,
-            // HelixScreen-Parity: Fan-Werte + Objects + Heating-Status-Pills.
-            // Klipper-Backend pusht die im SocketIO klipper_state-Event,
-            // wir mappen sie 1:1 durch. Vorher flackerten sie nach dem ersten
-            // /api/status-Load weg, weil mapStateToPrintData sie nicht weitergab.
+            // HelixScreen parity: fan values + objects + heating status pills.
+            // The Klipper backend pushes them in the SocketIO klipper_state event,
+            // we map them through 1:1.
             part_fan_percent: s.part_fan_percent != null
                 ? Math.round(s.part_fan_percent) : null,
             hotend_fan_percent: s.hotend_fan_percent != null
@@ -325,24 +339,24 @@
                 ? Math.round(s.aux_fan_percent) : null,
             objects_current: s.objects_current,
             objects_total: s.objects_total,
-            // Heating-Status (ready/heating/cooling/off) — vom Server in
-            // _klipper_publish_state aus |actual-target| abgeleitet.
-            // Im klipper_state-Event nicht enthalten → wir leiten clientside ab.
+            // Heating status (ready/heating/cooling/off) — derived server-side in
+            // _klipper_publish_state from |actual-target|.
+            // Not included in the klipper_state event → we derive it client-side.
             nozzle_status: deriveHeaterStatus(s.nozzle_temp, s.nozzle_target),
             bed_status: deriveHeaterStatus(s.bed_temp, s.bed_target),
-            // Kammer-Pill nur wenn ein ECHTER Kammer-Heizer existiert (wie Android).
-            // Sensor-only Kammer (z.B. AHT20) → has_chamber_heater=false → kein Pill
-            // (sonst „Heizt", obwohl nur ein temperature_fan-Target gesetzt ist).
+            // Chamber pill only when a REAL chamber heater exists (like Android).
+            // A sensor-only chamber (e.g. AHT20) → has_chamber_heater=false → no pill
+            // (otherwise "Heating" even though only a temperature_fan target is set).
             chamber_status: (s.chamber_temp != null && s.has_chamber_heater !== false)
                 ? deriveHeaterStatus(s.chamber_temp, s.chamber_target) : null,
-            // Temp-Targets (fuer die Aktuelle/Soll-Anzeige)
+            // Temp targets (for the actual/target display)
             nozzle_temp: s.nozzle_temp,
             nozzle_target: s.nozzle_target,
             bed_temp: s.bed_temp,
             bed_target: s.bed_target,
             chamber_temp: s.chamber_temp,
             chamber_target: s.chamber_target,
-            // Doppelduese, Luftfuehrung, Tuer, Werkzeug (X2D/H2D & Co.)
+            // Dual nozzle, air duct, door, tool (X2D/H2D & co.)
             nozzle_temps: s.nozzle_temps,
             nozzle_targets: s.nozzle_targets,
             active_nozzle: s.active_nozzle,
@@ -352,39 +366,39 @@
             door_open: s.door_open,
             tool_module: s.tool_module,
             ams_units: (s.ams && s.ams.units) || s.ams_units || [],
-            // Was der Drucker kann — Profil und Live-Zustand serverseitig
-            // zusammengefuehrt (services/printer_capabilities.py).
+            // What the printer can do — profile and live state merged
+            // server-side (services/printer_capabilities.py).
             capabilities: s.capabilities || null,
             chamber_humidity: s.chamber_humidity,
             has_chamber_heater: s.has_chamber_heater,
             speed_percent: s.speed_factor_percent,
-            // ETA-Uhrzeit + Speed-Level kommen jetzt aus dem Socket (vorher nur
-            // /api/status) → ~Fertig-Zeit und „Standard/Sport…" auch live.
+            // ETA time + speed level now also come from the socket → the ~finish
+            // time and "Standard/Sport…" are live too.
             eta_time: s.eta_time || '',
             speed_level: s.speed_level,
             speed_level_text: s.speed_level_text,
-            // filament_display kommt jetzt AUCH über SocketIO printer_state
-            // (Adapter publishState resolvet Spoolman/Metadaten). Den Socket-Wert
-            // bevorzugen; fehlt er mal in einem Update, den letzten bekannten Wert
-            // behalten, damit das Filament nicht auf "--" flackert.
+            // filament_display now ALSO comes via SocketIO printer_state
+            // (the adapter's publishState resolves Spoolman/metadata). Prefer the
+            // socket value; if it's missing in an update, keep the last known value
+            // so the filament doesn't flicker to "--".
             filament_display: s.filament_display
                 || (window.lastPrintData && window.lastPrintData.filament_display)
                 || '',
             filament_name: (window.lastPrintData &&
                 (window.lastPrintData.filament_display ||
                  window.lastPrintData.filament_name)) || '',
-            // bed_mesh kommt jetzt AUCH über SocketIO printer_state (localhost →
-            // die Matrix-Größe ist unkritisch). Socket-Wert bevorzugen, sonst den
-            // letzten bekannten behalten, damit die Heatmap nicht flackert.
+            // bed_mesh now ALSO comes via SocketIO printer_state (localhost →
+            // the matrix size is uncritical). Prefer the socket value, otherwise keep
+            // the last known one so the heatmap doesn't flicker.
             bed_mesh: s.bed_mesh
                 || (window.lastPrintData && window.lastPrintData.bed_mesh)
                 || null,
         };
     }
 
-    // Heating-Status-Ableitung (spiegelt _heater_state in web_app.py).
-    // Ready: target>0 und |actual-target|<1.5; Heating: target>actual+1.5;
-    // Cooling: target==0 und actual>30; Off: target==0 und actual<=30.
+    // Heating status derivation (mirrors _heater_state in web_app.py).
+    // Ready: target>0 and |actual-target|<1.5; Heating: target>actual+1.5;
+    // Cooling: target==0 and actual>30; Off: target==0 and actual<=30.
     function deriveHeaterStatus(actual, target) {
         const a = Number(actual) || 0;
         const t = Number(target) || 0;
@@ -394,9 +408,9 @@
         return a > 30 ? 'cooling' : 'off';
     }
 
-    // KlipperScreen-Parity Detail-Chips: Z-Hoehe, Speed-Faktor, Flow-Faktor,
-    // Filament-Verbrauch, ETA als Uhrzeit, Z-Offset, Display-Message.
-    // Zeige Chip nur wenn Wert != null/undefined (sonst eh nicht aussagekraeftig).
+    // KlipperScreen parity detail chips: Z height, speed factor, flow factor,
+    // filament usage, ETA as a time, Z offset, display message.
+    // Only show a chip when the value != null/undefined (otherwise not meaningful anyway).
     function updateExtraDetailChips(s) {
         const setChip = (chipId, valueId, value, format) => {
             const chip = document.getElementById(chipId);
@@ -416,9 +430,9 @@
                 v => v + '%');
         setChip('filament-used-info', 'filament-used-value', s.filament_used_mm,
                 v => v >= 1000 ? (v / 1000).toFixed(2) + ' m' : Math.round(v) + ' mm');
-        // Z-Offset (Babystepping) nur zeigen wenn live aktiv. 0 = kein
-        // Babystepping → Chip ausblenden, sonst stehen da konstant
-        // "+0.000 mm" und es wirkt wie ein toter Wert.
+        // Only show Z offset (babystepping) when live active. 0 = no
+        // babystepping → hide the chip, otherwise it constantly shows
+        // "+0.000 mm" and looks like a dead value.
         setChip('z-offset-info', 'z-offset-value',
                 (s.z_offset_mm != null && Math.abs(s.z_offset_mm) > 0.0001)
                     ? s.z_offset_mm : null,
@@ -426,7 +440,7 @@
         setChip('display-message-info', 'display-message-value',
                 (s.display_message && s.display_message !== 'Printing') ? s.display_message : null);
 
-        // ETA als Uhrzeit (jetzt + remaining_seconds), nur wenn aktiv druckend
+        // ETA as a time (now + remaining_seconds), only while actively printing
         const remSec = s.remaining_seconds;
         if (remSec && remSec > 0 && s.state === 'printing') {
             const eta = new Date(Date.now() + remSec * 1000);
@@ -439,25 +453,25 @@
             setChip('eta-info', 'eta-value', null);
         }
 
-        // Speed-Faktor: existing #speed-value chip — wir aktualisieren mit
-        // dem live-Wert (statt Bambu-Level-Text wenn der nicht gesetzt ist).
+        // Speed factor: existing #speed-value chip — we update it with
+        // the live value (instead of the Bambu level text when that isn't set).
         if (s.speed_factor_percent != null) {
             const sv = document.getElementById('speed-value');
             if (sv && (!sv.textContent || sv.textContent.includes('--'))) {
                 sv.textContent = s.speed_factor_percent + '%';
             } else if (sv && window.activePrinter.type === 'klipper') {
-                // Im Klipper-Mode immer den Live-Wert
+                // In Klipper mode, always the live value
                 sv.textContent = s.speed_factor_percent + '%';
             }
         }
     }
     window._updateExtraDetailChips = updateExtraDetailChips;
 
-    // Light-Button-Renderer (semantisch — die einzige UI-Stelle die
-    // den Light-Status anhand des Backend-Werts setzt).
+    // Light button renderer (semantic — the only UI spot that
+    // sets the light status based on the backend value).
     function updateLightButtonsFromState(isOn) {
         const texts = window.texts || {};
-        // Beschriftung ist die Handlung: leuchtet es, steht "Licht aus" drauf.
+        // The label describes the action: when the light is on, it reads "Licht aus" (light off).
         const label = isOn ? (texts.light_off || 'Licht aus')
                            : (texts.light_on  || 'Licht an');
 
@@ -469,14 +483,14 @@
             btn.innerHTML = window.skIcon('licht') + '<span>' + label + '</span>';
         });
 
-        // Knopf in der Uebersicht des Steuerungs-Fensters …
+        // Button in the overview of the control window …
         const uebersicht = document.getElementById('ov-light-btn');
         if (uebersicht) {
             uebersicht.classList.toggle('ov-on', isOn);
             const lbl = document.getElementById('ov-light-label');
             if (lbl) lbl.textContent = label;
         }
-        // … und der am Kamerabild, der in jedem Reiter erreichbar ist.
+        // … and the one on the camera image, reachable from every tab.
         const amBild = document.getElementById('ctrl-camera-light');
         if (amBild) {
             amBild.classList.toggle('ctrl-licht-an', isOn);
@@ -486,8 +500,8 @@
     }
 
     // -------------------------------------------------------------
-    // LICHT-HELLIGKEIT — Rechtsklick (Desktop) + Long-Press (Touch) auf den
-    // Licht-Button öffnet einen Helligkeits-Slider (wie Android Long-Press).
+    // LIGHT BRIGHTNESS — right-click (desktop) + long-press (touch) on the
+    // light button opens a brightness slider (like the Android long-press).
     // -------------------------------------------------------------
     function openLightBrightnessDialog() {
         const texts = window.texts || {};
@@ -530,9 +544,9 @@
     }
 
     // -------------------------------------------------------------
-    // TOOLHEAD-LED — RGB-Sektion im Helligkeits-Dialog (nur wenn der
-    // Drucker ein `neopixel toolhead_rgb` meldet; sonst unsichtbar).
-    // Basisfarbe (Presets + freies Farbfeld) × Helligkeits-Slider → SET_LED.
+    // TOOLHEAD LED — RGB section in the brightness dialog (only when the
+    // printer reports a `neopixel toolhead_rgb`; hidden otherwise).
+    // Base color (presets + free color field) × brightness slider → SET_LED.
     // -------------------------------------------------------------
     const TOOLHEAD_PRESETS = ['#ffffff', '#ffb46b', '#ff2020', '#20c020', '#2060ff', '#b040ff'];
 
@@ -541,7 +555,7 @@
         if (!led) return '';
         const max = Math.max(led.r, led.g, led.b);
         const pct = Math.round(max * 100);
-        // Basisfarbe = auf volle Helligkeit normierte aktuelle Farbe (aus = weiß)
+        // Base color = current color normalized to full brightness (off = white)
         const norm = (c) => Math.round((max > 0 ? c / max : 1) * 255);
         const hex = '#' + [led.r, led.g, led.b].map((c) =>
             norm(c).toString(16).padStart(2, '0')).join('');
@@ -565,7 +579,7 @@
 
     function wireToolheadLedSection(modal) {
         const bright = modal.querySelector('#th-led-bright');
-        if (!bright) return; // Sektion nicht gerendert (kein toolhead_rgb)
+        if (!bright) return; // section not rendered (no toolhead_rgb)
         const colorInp = modal.querySelector('#th-led-color');
         const valLbl = modal.querySelector('#th-led-val');
         let t = null;
@@ -594,13 +608,13 @@
         if (window.__lightBrightSetup) return;
         window.__lightBrightSetup = true;
         const onLightBtn = (el) => el && el.closest && el.closest('#light-btn, #light-btn-mobile');
-        // Nur bei dimmbarem Licht (light_level gemeldet) — Bambu/nicht-dimmbar: kein Dialog.
+        // Only for dimmable light (light_level reported) — Bambu/non-dimmable: no dialog.
         const canDim = () => typeof window.__lightLevel === 'number';
-        // Rechtsklick (Desktop) → Helligkeits-Dialog statt Browser-Kontextmenü.
+        // Right-click (desktop) → brightness dialog instead of the browser context menu.
         document.addEventListener('contextmenu', (e) => {
             if (onLightBtn(e.target)) { e.preventDefault(); if (canDim()) openLightBrightnessDialog(); }
         });
-        // Long-Press (Touch) → Dialog; den folgenden Toggle-Click unterdrücken.
+        // Long-press (touch) → dialog; suppress the following toggle click.
         let lpTimer = null, lpFired = false;
         document.addEventListener('touchstart', (e) => {
             if (!onLightBtn(e.target) || !canDim()) return;
@@ -617,12 +631,12 @@
     else document.addEventListener('DOMContentLoaded', setupLightBrightnessTriggers);
 
     // -------------------------------------------------------------
-    // FILE OPERATIONS — unified ueber /api/printer/files/*
+    // FILE OPERATIONS — unified via /api/printer/files/*
     // -------------------------------------------------------------
     // opts: { fresh, page, per_page, sort, dir, search, only_new }
-    // Suche, Sortierung und Seiten macht der Adapter serverseitig ueber den
-    // ganzen Bestand — die Antwort traegt total/page/pages/per_page, die
-    // die Blaetterleiste braucht.
+    // Search, sorting and paging are done by the adapter server-side across the
+    // full set — the response carries total/page/pages/per_page, which the
+    // pagination bar needs.
     async function listFiles(opts) {
         const o = opts || {};
         const p = new URLSearchParams();
@@ -667,14 +681,14 @@
     }
 
     // -------------------------------------------------------------
-    // Open the printer's native web UI (Mainsail/Fluidd fuer Klipper).
-    // Bambu hat keine local-Web-UI — no-op.
+    // Open the printer's native web UI (Mainsail/Fluidd for Klipper).
+    // Bambu has no local web UI — no-op.
     // -------------------------------------------------------------
     function openPrinterWeb() {
         if (window.activePrinter.type !== 'klipper') return;
-        // Nur bei eingeschaltetem Drucker — Mainsail ist sonst nicht erreichbar.
-        // Ohne eingerichtete Steckdose entscheidet die Verbindung -- die
-        // Antwort steht in status-manager.js, hier wird sie nur gelesen.
+        // Only when the printer is on — otherwise Mainsail is unreachable.
+        // Without a configured smart plug, the connection decides — the
+        // answer lives in status-manager.js, here it's only read.
         const printerOnline = (typeof window.druckerDa === 'boolean') ? window.druckerDa
             : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
         if (!printerOnline) {
@@ -684,14 +698,14 @@
         }
         const url = window.activePrinter.klipperBaseUrl;
         if (!url) return;
-        // klipperBaseUrl zeigt auf Moonraker (Port 7125). Die native Web-UI
-        // (Mainsail/Fluidd) läuft aber auf Port 80 → den Moonraker-Port strippen
-        // und nur Host öffnen, sonst landet man auf der nackten Moonraker-Seite.
+        // klipperBaseUrl points to Moonraker (port 7125). But the native web UI
+        // (Mainsail/Fluidd) runs on port 80 → strip the Moonraker port
+        // and open just the host, otherwise you land on the bare Moonraker page.
         let target = url;
         try {
             const u = new URL(url);
             target = u.protocol + '//' + u.hostname + '/';
-        } catch (_) { /* Fallback: Original-URL */ }
+        } catch (_) { /* fallback: original URL */ }
         window.open(target, '_blank', 'noopener');
     }
     window.openPrinterWeb = openPrinterWeb;
@@ -709,6 +723,7 @@
         home: home,
         move: move,
         park: park,
+        moveTo: moveTo,
         center: center,
         setTemp: setTemp,
         selectExtruder: selectExtruder,

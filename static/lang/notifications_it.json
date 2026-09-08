@@ -159,11 +159,23 @@
     "calibration_cancelled": {
       "title": "🔧 Calibrazione annullata",
       "body": "{name} è stata annullata."
+    },
+    "scheduled_print_started": {
+      "title": "⏰ Stampa programmata avviata",
+      "body": "'{filename}' è in stampa."
+    },
+    "scheduled_print_failed": {
+      "title": "❌ Stampa programmata fallita",
+      "body": "'{filename}' — {reason}"
+    },
+    "update_available": {
+      "title": "⬆️ Nuova versione {version}",
+      "body": "{version} è pronta per {produkt}. Installala nelle impostazioni."
     }
   },
   "status": {
     "ready": "Pronto",
-    "printing": "Stampa:",
+    "printing": "Stampa",
     "preparing": "Preparazione...",
     "starting_print": "Avvio stampa...",
     "print_completed": "Stampa completata",
@@ -280,7 +292,16 @@
     "printing_failed": "❌ Stampa fallita ({duration_minutes} min, layer {layers_done}/{total_layers})",
     "dry_started": "🌡️ Asciugatura filamento avviata ({material} {temp}°C, {hours}h)",
     "dry_stopped": "⏹️ Asciugatura filamento fermata ({material})",
-    "dry_complete": "✅ Asciugatura filamento completata ({material})"
+    "dry_complete": "✅ Asciugatura filamento completata ({material})",
+    "hms_error": "⚠️ HMS {code}: {text}",
+    "hms_info": "ℹ️ {text}",
+    "hms_more_errors": "📌 {errors} nuovi errori",
+    "hms_more_infos": "ℹ️ {infos} nuovi avvisi",
+    "hms_more_mixed": "📌 {errors} nuovi errori, {infos} nuovi avvisi",
+    "speed_change": "⚡ Velocità: {level}",
+    "ams_tray_change": "🔄 {from} → {to} al layer {layer}",
+    "spool_changed": "🧵 Bobina cambiata — {grams} g addebitati alla vecchia",
+    "spoolman_tracked": "🧵 {grams} g di filamento addebitati (arresto manuale)"
   },
   "stages": {
     "0": "Stampa",
@@ -371,6 +392,10 @@
       "no_filament_left": "Filamento [{filament_index}] ({spool_name}): Vuoto! Richiede {required_weight}g",
       "insufficient_filament": "Filamento [{filament_index}] ({spool_name}): {available_weight}g disponibile, {required_weight}g richiesto (mancano {shortage}g)",
       "critical_error_scheduling": "Impossibile programmare la stampa - errori critici di filamento presenti"
+    },
+    "mismatch": {
+      "title": "Il filamento non corrisponde",
+      "body": "{file} richiede {wanted}: nel vassoio c'è {loaded}."
     }
   },
   "maintenance": {
@@ -395,5 +420,15 @@
       "title": "📅 Manutenzione pianificata",
       "body": "{task_name} - tra {days} giorno/i"
     }
+  },
+  "speed_levels": {
+    "1": "Silenzioso",
+    "2": "Standard",
+    "3": "Sport",
+    "4": "Folle"
+  },
+  "scheduled": {
+    "reason_klipper_boot": "Controller Klipper non raggiungibile dopo l’avvio",
+    "reason_mqtt": "Nessuna connessione MQTT dopo {cycles} cicli di alimentazione"
   }
 }

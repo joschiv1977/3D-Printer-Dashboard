@@ -158,9 +158,9 @@
 
 </div>
 
-<!-- Dieselbe Themenverwaltung wie ueberall, und am ENDE geladen: ihr
-     Konstruktor greift auf #theme-icon zu und wirft, wenn das Element noch
-     nicht steht (31aug26 auf setup.html genau so gemessen). -->
+<!--Same theme manager as everywhere else, and loaded at the END: its
+    constructor accesses #theme-icon and throws if the element does not
+    yet exist. -->
 <script src="/static/js/modules/icons.js"></script>
 <script src="/static/js/modules/theme-manager.js"></script>
 <script>
@@ -189,7 +189,7 @@ function texteSetzen() {
              || window.translations_en || window.translations_de || {};
         texteSetzen();
     };
-    // Faellt die Datei aus, bleiben die deutschen Vorgaben im HTML stehen.
+    // When the file fails, the defaults in the HTML stand.
     s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
     document.head.appendChild(s);
 })();
@@ -217,8 +217,8 @@ let kennungWert = '';
     try {
         const a = await fetch('/license/api/hardware-id');
         const d = await a.json();
-        // Der Server nennt sie je nach Plattform verschieden -- auf macOS
-        // fuehrt sie der Swift-Launcher und Python meldet 'managed_by_app'.
+        // The server names it differently per platform -- on macOS the Swift
+        // launcher carries it and Python reports 'managed_by_app'.
         kennungWert = d.hardware_id || d.hardwareId || '';
         feld.textContent = kennungWert || t('lizenz_kennung_fehlt', 'nicht ermittelbar');
     } catch (e) {
@@ -232,8 +232,8 @@ async function kennungKopieren() {
         await navigator.clipboard.writeText(kennungWert);
         melde(t('lizenz_kopiert', 'Kennung kopiert.'), 'gut');
     } catch (e) {
-        // Ohne Zwischenablage -- etwa ueber http statt https -- markieren wir
-        // sie wenigstens, dann reicht Strg+C.
+        // Without a clipboard -- over http instead of https, say -- at least
+        // select it, and Ctrl+C is enough.
         const bereich = document.createRange();
         bereich.selectNodeContents(document.getElementById('lizenz-kennung'));
         const wahl = window.getSelection();
@@ -292,7 +292,7 @@ async function lizenzDatei(e) {
     } catch (err) {
         melde(err.message, 'fehl');
     } finally {
-        // Zuruecksetzen, sonst loest dieselbe Datei kein change mehr aus.
+        // Reset it, or the same file raises no further change event.
         e.target.value = '';
     }
 }

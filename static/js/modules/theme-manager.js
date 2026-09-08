@@ -1,6 +1,6 @@
 /**
- * Theme Manager - Verwaltet Dark/Light Mode für die gesamte App
- * Wird von allen Seiten gemeinsam genutzt
+ * The theme manager - handles dark and light mode for the whole app.
+ * Shared by every page.
  */
 class ThemeManager {
     constructor() {
@@ -12,7 +12,7 @@ class ThemeManager {
         this.applyTheme();
         this.updateIcons();
 
-        // Event Listener für System-Theme-Änderungen
+        // The event listener for changes of the system theme
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 if (this.theme === 'auto') {
@@ -23,7 +23,7 @@ class ThemeManager {
     }
 
     /**
-     * Wechselt zwischen Dark/Light/Auto Mode
+     * Cycles between the dark, light and auto modes
      */
     toggleTheme() {
         const themes = ['auto', 'dark', 'light'];
@@ -39,13 +39,13 @@ class ThemeManager {
     }
 
     /**
-     * Wendet das aktuelle Theme an
+     * Applies the current theme
      */
     applyTheme() {
         const body = document.body;
 
         if (this.theme === 'auto') {
-            // System-Präferenz verwenden
+            // Use the system preference
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             body.classList.toggle('dark-mode', prefersDark);
         } else if (this.theme === 'dark') {
@@ -81,14 +81,14 @@ class ThemeManager {
     }
 
     /**
-     * Gibt den aktuellen Theme-Status zurück
+     * Returns the current theme state
      */
     getCurrentTheme() {
         return this.theme;
     }
 
     /**
-     * Gibt zurück ob Dark Mode aktiv ist
+     * Returns whether dark mode is active
      */
     isDarkMode() {
         if (this.theme === 'auto') {
@@ -101,6 +101,6 @@ class ThemeManager {
 // Globale Instanz erstellen
 window.themeManager = new ThemeManager();
 
-// Backwards Compatibility: Alte Funktionen behalten
+// Backwards compatibility: the old functions are kept
 window.toggleDarkMode = () => window.themeManager.toggleTheme();
 window.applyStoredTheme = () => window.themeManager.applyTheme();

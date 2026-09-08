@@ -1,18 +1,13 @@
 /* ==========================================================================
-   Benutzer  (21aug26)
+   Users
    --------------------------------------------------------------------------
-   Vorher drei gleichrangige Formularkarten nebeneinander (Benutzername,
-   Passwort, Sprache), darunter die Geräte als Kachelraster mit ungleichen
-   Höhen, dann die Benutzerverwaltung und ganz unten „Abmelden" als eigener
-   Abschnitt mit Überschrift — so groß wie die Geräteliste darüber.
-
-   Jetzt: „Mein Konto" mit drei Aufklappern links, Geräte als Zeilenliste
-   rechts, Abmelden im Kopf.
+   "My account" with three expanders on the left, devices as a row list
+   on the right, sign out in the header.
    ========================================================================== */
-.container { --linie: rgba(0, 0, 0, 0.08); max-width: 1080px; padding-top: 14px; padding-bottom: 90px; }
+.container { --linie: rgba(0, 0, 0, 0.08); max-width: 1080px; padding-top: 14px; padding-bottom: var(--dock-freiraum, 94px); }
 [data-theme="dark"] .container, body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 
-/* ---- Kopf ---- */
+/* ---- Header ---- */
 .bn-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
 .bn-kopf-titel {
     margin: 0; font-size: 17px; font-weight: 650;
@@ -41,8 +36,8 @@
     cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
 }
 .bn-btn:hover { border-color: var(--color-blue); }
-/* Getoenter Grund, blaue Schrift — dieselbe Bauform wie der Hauptknopf
-   in allen Dialogen (.modal-btn-primary) und in der Wartung. */
+/* Tinted background, blue text — the same construction as the primary
+   button in all dialogs (.modal-btn-primary) and in maintenance. */
 .bn-btn--haupt {
     background: rgba(33, 150, 243, 0.15); border-color: rgba(33, 150, 243, 0.3);
     color: #1565c0; font-weight: 600;
@@ -63,7 +58,7 @@ body.dark-mode .bn-btn--haupt:hover {
 .bn-btn--weg:hover { border-color: var(--color-red); }
 .bn-btn--klein { padding: var(--knopf-polster-klein); font-size: var(--knopf-schrift-klein); }
 
-/* ---- Zwei Spalten ---- */
+/* ---- Two columns ---- */
 .bn-rahmen {
     display: grid; grid-template-columns: minmax(300px, 1fr) 1.3fr;
     gap: 12px; align-items: start;
@@ -81,7 +76,7 @@ body.dark-mode .bn-btn--haupt:hover {
 }
 .bn-karte-luft { flex: 1; }
 
-/* ---- Aufklapper ---- */
+/* ---- Expander ---- */
 .bn-zeile { display: flex; align-items: center; gap: 11px; padding: 10px 2px; cursor: pointer; }
 .bn-zeile + .bn-zeile, .bn-auf + .bn-zeile { border-top: 1px solid var(--linie); }
 .bn-zeile:hover .bn-z-t b { color: var(--color-blue); }
@@ -106,15 +101,15 @@ body.dark-mode .bn-btn--haupt:hover {
 }
 .bn-hinweis { font-size: 11.5px; color: var(--text-secondary); margin: 0 0 9px; }
 
-/* ---- Sitzungen und Benutzer als Zeilen ---- */
+/* ---- Sessions and users as rows ---- */
 .bn-liste { display: flex; flex-direction: column; }
 .bn-sitz {
     display: flex; align-items: center; gap: 11px;
     padding: 10px 2px; border-left: 3px solid transparent;
 }
 .bn-sitz + .bn-sitz { border-top: 1px solid var(--linie); }
-/* Die eigene Sitzung traegt einen Streifen statt eines CURRENT-Chips neben
-   einem ausgegrauten Knopf. */
+/* Your own session carries a stripe instead of a CURRENT chip next to
+   a grayed-out button. */
 .bn-sitz--ich { border-left-color: var(--color-green); padding-left: 8px; }
 .bn-s-ic {
     width: 32px; height: 32px; border-radius: 9px; flex: none;
@@ -142,8 +137,8 @@ body.dark-mode .bn-btn--haupt:hover {
 [data-theme="dark"] .bn-jetzt, body.dark-mode .bn-jetzt { color: #81c784; }
 [data-theme="dark"] .bn-rolle--admin, body.dark-mode .bn-rolle--admin { color: #64b5f6; }
 
-/* Rot war fuenfmal auf einem Bildschirm. Es bleibt dem einen Knopf im Kopf
-   vorbehalten; die Zeilen-Knoepfe faerben sich erst beim Ueberfahren. */
+/* Red appeared five times on one screen. It stays reserved for the one
+   button in the header; the row buttons only take color on hover. */
 .bn-s-weg {
     border: 1px solid var(--border-color); background: var(--bg-card);
     color: var(--text-secondary); border-radius: 8px;

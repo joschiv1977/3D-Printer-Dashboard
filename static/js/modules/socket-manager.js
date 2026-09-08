@@ -9,7 +9,7 @@ class SocketManager {
         this.lastValidGcodeState = 'IDLE';
         this.lastAndroidUpdateTime = 0;
         this.androidUpdateTimeout = null;
-        this.ANDROID_UPDATE_THROTTLE = 2000; // 2 Sekunden
+        this.ANDROID_UPDATE_THROTTLE = 2000; // 2 seconds
         this.lastVisibilityChange = 0;
     }
 
@@ -30,7 +30,7 @@ class SocketManager {
                           window.navigator.standalone === true;
             const isSafariPWA = window.isSafari && window.isPWA;
 
-            // PWA Session Recovery VOR Socket-Initialisierung
+            // PWA session recovery BEFORE socket initialization
             if (window.isSafariPWA && window.authHandler) {
                 console.log(texts.console_safari_pwa_session_recovery);
                 const sessionValid = await window.authHandler.restorePWASession();
@@ -61,7 +61,7 @@ class SocketManager {
         console.log(texts.console_initialize_websocket);
         console.log(`📱 Safari: ${window.isSafari}, PWA: ${window.isPWA}`);
 
-        // WICHTIG: Alte Socket-Verbindung sauber schließen falls vorhanden
+        // IMPORTANT: cleanly close old socket connection if one exists
         if (window.socket) {
             console.log('🧹 Cleaning up old socket connection');
             try {
@@ -72,13 +72,13 @@ class SocketManager {
                 console.log('⚠️ Error cleaning up old socket:', e);
             }
             window.socket = null;
-            // Kurz warten damit Verbindung sauber geschlossen wird
+            // Wait briefly so the connection closes cleanly
             await new Promise(resolve => setTimeout(resolve, 100));
         }
 
         const socket = io({
-            // WebSocket bevorzugt (eine persistente Verbindung statt XHR-Dauerpolling),
-            // Polling nur als Fallback. Spart in Electron massig Requests.
+            // WebSocket preferred (one persistent connection instead of constant XHR polling),
+            // polling only as fallback. Saves a ton of requests in Electron.
             transports: ['websocket', 'polling'],
             upgrade: true,
             reconnection: true,
@@ -86,15 +86,15 @@ class SocketManager {
             reconnectionDelay: 1000,
             reconnectionDelayMax: 5000,
             timeout: 10000,
-            forceNew: true,  // Immer neue Verbindung
-            // Authentifizierung mit Token
+            forceNew: true,  // Always a new connection
+            // Authentication with token
             auth: (cb) => {
                 const token = localStorage.getItem('access_token');
                 cb({ token: token });
             }
         });
 
-        // Safari PWA spezifischer Heartbeat
+        // Safari PWA specific heartbeat
         if (window.isSafariPWA) {
             let heartbeatInterval;
 
@@ -103,12 +103,12 @@ class SocketManager {
                 heartbeatInterval = setInterval(() => {
                     if (socket.connected) {
                         socket.emit('ping');
-                        // Prüfe auch Token-Gültigkeit
+                        // Also check token validity
                         if (window.authHandler) {
                             window.authHandler.checkAndRefreshToken();
                         }
                     }
-                }, 20000); // Alle 20 Sekunden
+                }, 20000); // Every 20 seconds
             };
 
             const stopHeartbeat = () => {
@@ -121,7 +121,7 @@ class SocketManager {
             socket.on('connect', startHeartbeat);
             socket.on('disconnect', stopHeartbeat);
 
-            // Bei Socket-Fehler: Session Recovery
+            // On socket error: session recovery
             socket.on('connect_error', async (error) => {
                 console.log(texts.console_socket_connection_error, error.message);
                 if (error.message.includes('unauthorized') || error.message.includes('401')) {
@@ -137,29 +137,32 @@ class SocketManager {
         // Window-global
         window.socket = socket;
 
-        // Jetzt alle Handler registrieren
+        // Now register all handlers
         socket.on('connect', function() {
             console.log(texts.console_websocket_connected);
 
-            // Frischen CSRF-Token holen. Ein neuer Socket heisst in aller
-            // Regel: der Server wurde neu gestartet, und unser Token von
-            // vorher kann verfallen sein. Die erste
-            // schreibende Aktion (Licht, Steckdose) lief bisher ins 403.
-            // Sie wurde zwar automatisch wiederholt, kostete aber je einen
-            // verworfenen Umlauf plus eine WARNING im Server-Log.
+            // Fetch a fresh CSRF token. A new socket usually means the
+            // server was just restarted, and our previous token may
+            // have expired. The first
+            // write action (light, outlet) used to run into a 403.
+            // It got retried automatically, but each time cost one
+            // discarded round-trip plus a WARNING in the server log.
             if (window.authHandler
                 && typeof window.authHandler.erneuereCsrfToken === 'function') {
                 deferNonCritical(() => window.authHandler.erneuereCsrfToken());
             }
 
-            // Non-Critical: Diese drei Calls sind für Banner/Badges die erst
-            // nach dem eigentlichen UI-Render relevant sind. Auf Idle verschoben
-            // damit sie nicht mit dem kritischen Initial-Paint konkurrieren.
+            // Non-critical: these three calls are for banners/badges that only
+            // matter after the actual UI render. Deferred to idle so they
+            // don't compete with the critical initial paint.
             deferNonCritical(() => loadHMSStatus());
             deferNonCritical(() => loadPowerOffTimerStatus());
             deferNonCritical(() => updateScheduledPrintsBadge());
+            // And catch up on whatever was handled elsewhere while
+            // disconnected — see gleicheMeldungenAb.
+            deferNonCritical(() => gleicheMeldungenAb());
 
-            // Browser Notifications prüfen
+            // Check browser notifications
             if ('Notification' in window) {
                 if (Notification.permission === 'default') {
                     console.log(texts.console_browser_notifications_not_allowed);
@@ -168,13 +171,13 @@ class SocketManager {
                 }
             }
 
-            // Permission automatisch anfragen wenn noch nicht gesetzt
-            // ELECTRON: Keine Browser-Notifications - Electron nutzt FCM Push
+            // Automatically request permission if not yet set
+            // ELECTRON: no browser notifications - Electron uses FCM push
             if (!window.electronAPI && 'Notification' in window && Notification.permission === 'default') {
                 Notification.requestPermission().then(function(permission) {
                     console.log('📱 Notification Permission:', permission);
                     if (permission === 'granted') {
-                        // Test-Notification
+                        // Test notification
                         new Notification(texts.notifications_enabled || 'Benachrichtigungen aktiviert', {
                             body: 'Du erhältst jetzt Updates vom 3D Drucker',
                             icon: '/static/icon-192x192.png'
@@ -186,11 +189,11 @@ class SocketManager {
 
         socket.on('disconnect', function() {
             console.log(texts.console_websocket_disconnected);
-            // Fallback-Polling übernimmt das gegatete 8s-Interval in app-init
-            // (läuft, sobald Socket/Drucker nicht voll-online sind).
+            // Fallback polling takes over the gated 8s interval in app-init
+            // (runs whenever socket/printer aren't fully online).
         });
 
-        // Power-Off Timer WebSocket Handler - NUR EINER!
+        // Power-off timer WebSocket handler - ONLY ONE!
         socket.on('power_off_timer', function(data) {
             console.log(texts.console_poweroff_timer_event, data);
 
@@ -201,13 +204,13 @@ class SocketManager {
             if (data.active) {
                 window.powerOffTimerActive = true;
 
-                // Banner anzeigen
+                // Show banner
                 if (banner) {
                     banner.classList.add('active');
                     if (bannerReason) bannerReason.textContent = data.reason;
                 }
 
-                // Countdown updaten
+                // Update countdown
                 const updateCountdown = () => {
                     const remaining = Math.max(0, data.end_time - (Date.now() / 1000));
                     const minutes = Math.floor(remaining / 60);
@@ -221,7 +224,7 @@ class SocketManager {
                     if (remaining > 0 && window.powerOffTimerActive) {
                         requestAnimationFrame(updateCountdown);
                     } else if (remaining <= 0) {
-                        // Timer abgelaufen - Banner ausblenden
+                        // Timer expired - hide banner
                         if (banner) banner.classList.remove('active');
                     }
                 };
@@ -229,7 +232,7 @@ class SocketManager {
                 updateCountdown();
 
             } else {
-                // Timer deaktiviert - Banner ausblenden
+                // Timer deactivated - hide banner
                 window.powerOffTimerActive = false;
                 if (banner) {
                     banner.classList.remove('active');
@@ -237,15 +240,15 @@ class SocketManager {
             }
         });
 
-        // Filament-Trocknung Status Handler
+        // Filament drying status handler
         socket.on('filament_drying_status', function(data) {
             console.log(texts.console_drying_status, data);
 
-            // Karte und Steuerungs-Sichtbarkeit mitziehen. Die haengen an
-            // FilamentDryingManager.updateStatus() — das holte den Stand
-            // frueher alle 10 Sekunden selbst, obwohl er hier schon
-            // ankommt. Jetzt reichen wir die Daten weiter, statt sie ein
-            // zweites Mal zu erfragen.
+            // Update the card and control visibility together. They hang off
+            // FilamentDryingManager.updateStatus() — which used to fetch the
+            // state itself every 10 seconds before, even though it already
+            // arrives here. Now we just pass the data along instead of
+            // asking for it a second time.
             if (window.filamentDryingManager
                 && typeof window.filamentDryingManager.updateStatus === 'function') {
                 window.filamentDryingManager.updateStatus(data);
@@ -253,19 +256,19 @@ class SocketManager {
 
             const details = document.getElementById('filament-drying-details');
 
-            // Global Status aktualisieren
+            // Update global status
             window.isFilamentDrying = data.active;
 
             if (data.active) {
-                // Details aktualisieren - unterscheide zwischen Auto-Erkennung und manueller Trocknung
+                // Update details - distinguish between auto-detection and manual drying
                 if (data.end_time_formatted) {
-                    // Manuelle Trocknung mit Endzeit
+                    // Manual drying with end time
                     const temp = Math.round(data.temperature);
                     details.textContent = texts.filament_drying_banner_with_endtime
                         .replace('{temp}', temp)
                         .replace('{time}', data.end_time_formatted);
                 } else if (data.bed_temp !== undefined) {
-                    // Auto-Erkennung
+                    // Auto-detection
                     const temp = Math.round(data.bed_temp);
                     const minutes = Math.round(data.elapsed_minutes);
                     details.textContent = texts.filament_drying_banner_auto
@@ -273,33 +276,33 @@ class SocketManager {
                         .replace('{minutes}', minutes);
                 }
 
-                // Ob die Meldung stehen bleibt, entscheidet applyDryingBanner:
-                // waehrend eines Drucks trocknet das AMS nebenbei, dann genuegt
-                // ein einmaliger Hinweis.
+                // Whether the message stays up is decided by applyDryingBanner:
+                // during a print the AMS dries on the side, so a one-time
+                // notice is enough.
                 if (window.applyDryingBanner) window.applyDryingBanner(data);
 
-                // Steuerung + Print-Status zentral ausblenden (geteilter Helfer in
-                // filament-drying.js — identisch zum sofortigen Poll, kein Lag/Dopplung).
+                // Hide controls + print status centrally (shared helper in
+                // filament-drying.js — identical to the immediate poll, no lag/duplication).
                 if (window.applyDryingControlsVisibility) window.applyDryingControlsVisibility(true);
             } else {
                 if (window.applyDryingBanner) window.applyDryingBanner(data);
 
-                // Steuerung + Print-Status zentral wieder anzeigen (geteilter Helfer).
+                // Show controls + print status centrally again (shared helper).
                 if (window.applyDryingControlsVisibility) window.applyDryingControlsVisibility(false);
             }
 
-            // Neue Filament-Trocknen Card aktualisieren
+            // Update the new filament-drying card
             if (typeof updateDryingStatus === 'function') {
                 updateDryingStatus();
             }
         });
 
-        // SD-Sync Status Updates
+        // SD sync status updates
         socket.on('sd_sync_start', function(data) {
             console.log(texts.console_auto_sync_started);
             if (window.sdCardManager) window.sdCardManager.sdSyncInProgress = true;
 
-            // Deaktiviere Refresh-Button
+            // Disable refresh button
             const refreshBtn = document.getElementById('sd-refresh-btn');
             if (refreshBtn) {
                 refreshBtn.disabled = true;
@@ -312,7 +315,7 @@ class SocketManager {
             console.log(texts.console_auto_sync_completed);
             if (window.sdCardManager) window.sdCardManager.sdSyncInProgress = false;
 
-            // Aktiviere Refresh-Button wieder
+            // Re-enable refresh button
             const refreshBtn = document.getElementById('sd-refresh-btn');
             if (refreshBtn) {
                 refreshBtn.disabled = false;
@@ -321,7 +324,7 @@ class SocketManager {
                 refreshBtn.innerHTML = window.skIcon('aktualisieren') + '<span>' + texts.refresh + '</span>';
             }
 
-            // Update Banner wenn Modal offen
+            // Update banner when the modal is open
             if (document.getElementById('sdCardModal').style.display === 'block') {
                 const banner = document.getElementById('sync-banner');
                 if (banner) {
@@ -331,7 +334,7 @@ class SocketManager {
                         <span>${texts.sync_completed.replace('{count}', count)}</span>
                     `;
 
-                    // Nach 3 Sekunden ausblenden
+                    // Hide after 3 seconds
                     setTimeout(() => {
                         banner.style.transition = 'opacity 0.5s';
                         banner.style.opacity = '0';
@@ -339,17 +342,24 @@ class SocketManager {
                     }, 3000);
                 }
 
-                // Wenn neue Dateien da sind, Liste aktualisieren
+                // If new files came in, refresh the list
                 if (data.changes && data.changes.downloaded.length > 0) {
                     skToast(texts.toast_new_files_available.replace('{count}', data.changes.downloaded.length), 'info');
-                    // Optional: Automatisch neu laden
+                    // Optional: reload automatically
                     // showSDFiles();
                 }
             }
         });
 
         socket.on('sd_sync_progress', function(data) {
-            // NEU: Bei manuellem Sync auch Loading-Bereich updaten
+            // Pass the real state through to the refresh button. It used
+            // to fill in from a client-side estimate before; now it
+            // shows "File N of M" the way the server reports it.
+            if (data.manual_sync && window.sdCardManager
+                    && typeof window.sdCardManager._syncStand === 'function') {
+                window.sdCardManager._syncStand(data.percent || 0, window.texts || {});
+            }
+            // NEW: also update the loading area on manual sync
             if (data.manual_sync) {
                 const loadingDiv = document.getElementById('sd-loading');
                 if (loadingDiv && loadingDiv.style.display !== 'none') {
@@ -384,7 +394,7 @@ class SocketManager {
                     statusText.textContent = data.message;
                     progressBar.style.width = data.percent + '%';
 
-                    // Details anzeigen
+                    // Show details
                     if (data.message.includes('/')) {
                         detailsText.textContent = data.message;
                     }
@@ -396,7 +406,7 @@ class SocketManager {
                     progressBar.style.width = '100%';
                     progressBar.style.background = 'var(--accent-green)';
 
-                    // Nach 2 Sekunden Dateien anzeigen
+                    // Show files after 2 seconds
                     setTimeout(() => {
                         showSDFiles();
                     }, 2000);
@@ -409,17 +419,17 @@ class SocketManager {
 
         // FTPS Status Updates (Upload/Download/Sync)
         socket.on('ftps_status', function(data) {
-            // Globalen Status speichern
+            // Save global status
             window.ftpsStatus = data;
 
-            // Aktualisieren-Button Status - nur deaktivieren, keine Prozentanzeige im Button
+            // Refresh-button status - only disable it, no percentage shown in the button
             const refreshBtn = document.getElementById('sd-refresh-btn');
             if (refreshBtn) {
                 if (data.active) {
                     refreshBtn.disabled = true;
                     refreshBtn.style.opacity = '0.5';
                     refreshBtn.style.cursor = 'not-allowed';
-                    // Nur generischen Hinweis zeigen, Prozent gehört in den Fortschrittsbalken
+                    // Show only a generic hint, the percentage belongs in the progress bar
                     const operation = data.operation || '';
                     let btnText = 'FTPS aktiv...';
                     if (operation === 'upload') btnText = texts.uploading || 'Upload läuft...';
@@ -434,34 +444,34 @@ class SocketManager {
                 }
             }
 
-            // Optional: Toast bei Start/Ende von FTPS-Operationen
+            // Optional: toast at start/end of FTPS operations
             if (data.operation !== 'idle' && data.progress === 0) {
-                // Operation gestartet
+                // Operation started
                 console.log(`📡 FTPS ${data.operation}: ${data.message}`);
             }
         });
 
-        // Bidirektionaler Sync abgeschlossen
+        // Bidirectional sync completed
         socket.on('bidirectional_sync_complete', function(data) {
             const t = window.texts || {};
             skToast((t.toast_sync_done || 'Sync fertig — {down} geladen, {up} gesendet')
                 .replace('{down}', data.downloaded).replace('{up}', data.uploaded), 'success');
-            // SD-Dateien neu laden
+            // Reload SD files
             if (document.getElementById('sd-modal')?.style.display === 'block') {
                 showSDFiles();
             }
         });
 
-        // Bidirektionaler Sync Fehler
+        // Bidirectional sync error
         socket.on('bidirectional_sync_error', function(data) {
             const t = window.texts || {};
             skToast((t.toast_sync_error || 'Sync-Fehler: {error}').replace('{error}', data.error), 'error');
         });
 
-        // Geplante Drucke geaendert (created/updated/deleted/started/failed) ->
-        // Badge sofort neu laden statt auf 30s-Polling zu warten.
-        // Backend liefert {count, reason} - wir nutzen count direkt wenn die
-        // Manager-Instanz da ist, sonst loesen wir das volle Refresh aus.
+        // Scheduled prints changed (created/updated/deleted/started/failed) ->
+        // reload the badge right away instead of waiting for the 30s poll.
+        // Backend delivers {count, reason} - we use count directly if the
+        // manager instance exists, otherwise trigger a full refresh.
         socket.on('scheduled_prints_changed', function(data) {
             try {
                 const count = data && typeof data.count === 'number' ? data.count : null;
@@ -470,7 +480,7 @@ class SocketManager {
                 const badgeZone = document.getElementById('mz-sched-badge');
 
                 if (count !== null) {
-                    // Direkt aus Event setzen - keine extra REST-Runde
+                    // Set directly from the event - no extra REST round trip
                     if (count > 0) {
                         if (badgeMobile) { badgeMobile.textContent = count; badgeMobile.style.display = 'flex'; }
                         if (badgeDesktop) { badgeDesktop.textContent = count; badgeDesktop.style.display = 'flex'; }
@@ -481,7 +491,7 @@ class SocketManager {
                         if (badgeZone) badgeZone.style.display = 'none';
                     }
                 }
-                // Wenn die Verwaltungs-Liste offen ist, Inhalt mit-refreshen
+                // If the management list is open, refresh its content too
                 if (window.printScheduler && typeof window.printScheduler.loadScheduledPrints === 'function') {
                     const mgr = document.getElementById('scheduleManagerModal');
                     if (mgr && mgr.style.display === 'block') {
@@ -495,18 +505,18 @@ class SocketManager {
 
         // Print Progress Updates
         socket.on('print_progress', (data) => {
-            // Zwei Bloecke versorgen die Oberflaeche, und sie sind fast
-            // disjunkt: handlePrintUpdate deckt Druckkarte, Fortschritt und
-            // Chips ab (42 DOM-Elemente), applyStatus die Knoepfe, den
-            // Geraete-Tab, Filament- und Hardware-Angaben (30). Gemeinsam
-            // haben sie nur das HMS-Banner.
+            // Two blocks feed the UI, and they are almost
+            // disjoint: handlePrintUpdate covers the print card, progress and
+            // chips (42 DOM elements), applyStatus the buttons, the
+            // device tab, filament and hardware info (30). Together
+            // they only share the HMS banner.
             //
-            // applyStatus haing frueher allein am 8-Sekunden-Poll. Als der
-            // wegfiel, hoerten 26 Elemente auf, sich nachzufuehren — am
-            // sichtbarsten der Licht-Knopf: der Server hatte den neuen Stand
-            // binnen 1,3 s, aber niemand trug ihn ein. Der Push traegt
-            // dieselben 95 Schluessel wie /api/status, also speist er jetzt
-            // beide Wege.
+            // applyStatus used to hang solely off the 8-second poll. When that
+            // was dropped, 26 elements stopped keeping up — most
+            // visibly the light button: the server had the new state within
+            // 1.3s, but nothing wrote it in. The push carries
+            // the same 95 keys as /api/status, so it now feeds
+            // both paths.
             this.handlePrintUpdate(data, 'print_progress');
             if (window.statusManager && typeof window.statusManager.applyStatus === 'function') {
                 try { window.statusManager.applyStatus(data); }
@@ -514,14 +524,14 @@ class SocketManager {
             }
         });
 
-        // 'status_update' hatte hier einen Zuhoerer, den kein Server-Codepfad
-        // je bedient hat — wie 'full_status_update'. Entfernt.
+        // 'status_update' had a listener here that no server code path
+        // ever served — like 'full_status_update'. Removed.
 
-        // Handler für vollständige Status-Anfragen
-        // 'full_status_update' gab es hier als Zuhoerer, aber kein
-        // Server-Codepfad hat es je gesendet — ein halb gebauter Umbau,
-        // der genau das wollte, was 'print_progress' seit 20aug26 tut:
-        // den vollen Stand schicken. Entfernt statt angeschlossen.
+        // Handler for full status requests
+        // 'full_status_update' existed here as a listener, but no
+        // server code path ever sent it — a half-built rework
+        // that wanted exactly what 'print_progress' has done since 20aug26:
+        // send the full state. Removed instead of wired up.
 
         // Spoolman active spool update (from backend after print start)
         socket.on('spoolman_active_spool', function(data) {
@@ -533,23 +543,23 @@ class SocketManager {
         });
 
         socket.on('mqtt_status', function(data) {
-            // Stoppe Timer wenn Status über WebSocket kommt
+            // Stop timer when status arrives via WebSocket
             if (window.statusManager && window.statusManager.mqttCountdownInterval) {
                 clearInterval(window.statusManager.mqttCountdownInterval);
                 window.statusManager.mqttCountdownInterval = null;
             }
 
-            // Speichere MQTT Status
+            // Save MQTT status
             window.lastMqttStatus = data.connected;
 
-            // Klipper-Direct: Kamera an die Drucker-Verbindung koppeln. Drucker aus
-            // → Snapshot-Polling stoppen (sonst 404-Dauerfeuer gegen die tote Cam),
-            // Drucker an → Kamera neu initialisieren.
+            // Klipper-Direct: couple the camera to the printer connection. Printer off
+            // → stop snapshot polling (otherwise 404s hammer the dead cam),
+            // printer on → reinitialize the camera.
             if (window.cameraManager && typeof window.cameraManager.onPrinterConnectionChange === 'function') {
                 window.cameraManager.onPrinterConnectionChange(data.connected);
             }
 
-            // Cards aktualisieren die vom Drucker-Status abhängen
+            // Update cards that depend on printer status
             if (typeof updatePrinterDependentCards === 'function') {
                 updatePrinterDependentCards();
             }
@@ -559,14 +569,14 @@ class SocketManager {
                 console.log(texts.console_mqtt_auto_connect_success);
             } else {
                 updateBothButtons('mqtt-btn', 'control-btn', window.skIcon('funk') + '<span>MQTT</span>');
-                // Timer stoppen falls noch laufend
+                // Stop timer if still running
                 if (window.statusManager && window.statusManager.mqttCountdownInterval) {
                     clearInterval(window.statusManager.mqttCountdownInterval);
                     window.statusManager.mqttCountdownInterval = null;
                 }
             }
 
-            // Update Filament Card Sichtbarkeit
+            // Update filament card visibility
             if (typeof updateFilamentCardVisibility === 'function') {
                 updateFilamentCardVisibility();
             }
@@ -578,48 +588,76 @@ class SocketManager {
             if (displayElement) {
                 displayElement.textContent = data.text;
 
-                // Farbe je nach Status
+                // Color depending on status
                 if (data.state === 'IDLE') {
-                    displayElement.style.color = '#00ff00';  // Grün
+                    displayElement.style.color = '#00ff00';  // Green
                 } else if (data.state === 'RUNNING') {
-                    displayElement.style.color = '#00aaff';  // Blau
+                    displayElement.style.color = '#00aaff';  // Blue
                 } else if (data.state === 'PAUSE') {
                     displayElement.style.color = '#ffaa00';  // Orange
                 } else if (data.state === 'FAILED') {
-                    displayElement.style.color = '#ff0000';  // Rot
+                    displayElement.style.color = '#ff0000';  // Red
                 }
             }
         });
 
-        // === ZENTRALER NOTIFICATION HANDLER ===
+        // === CENTRAL NOTIFICATION HANDLER ===
         socket.on('notification', function(data) {
             console.log(texts.console_unified_notification, data);
 
-            // Wenn bereits auf einem anderen Gerät gelesen/weggeklickt:
-            // nicht nochmal anzeigen (Cross-Device-Read-Sync, Stage 2).
+            // If already read/dismissed on another device:
+            // don't show it again (cross-device read sync, stage 2).
             if (data.id && window.__dismissedNotificationIds
                 && window.__dismissedNotificationIds.has(data.id)) {
                 console.log('⏭️ Notification already dismissed on another device:', data.id);
                 return;
             }
 
-            // ELECTRON-APP: Keine WebSocket-Notifications anzeigen!
-            // Electron bekommt Notifications via FCM Push (@eneris/push-receiver)
-            // Die Desktop-Notification wird dort in main.js angezeigt.
+            // ELECTRON APP: the socket does not draw anything -- it wakes.
+            //
+            // It used to be thrown away here ("Electron gets notifications via
+            // FCM push"), so the socket carried a message the app already had
+            // and did nothing with it. Meanwhile two ways led into the stack:
+            // straight from the push payload, and out of the store. Neither
+            // knew about the other, and they only met at the silent duplicate
+            // check inside `zeige()`.
+            //
+            // Now the socket only says "something changed" and the stack
+            // fetches from `/api/notifications/recent` -- the same source the
+            // page load already uses. One source, one way in.
+            //
+            // The desktop popup for a closed window stays with main.js and is
+            // untouched: there is no renderer then that could fetch.
             if (window.electronAPI) {
-                console.log('🖥️ [Electron] WebSocket notification ignored - using FCM instead');
+                if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                    window.NotificationStack.holeOffene();
+                } else {
+                    console.log('🖥️ [Electron] no stack on this page — nothing to fetch');
+                }
                 return;
             }
 
+            // The stack, in EVERY client — not just in Electron.
+            //
+            // The socket says WHEN, the store says WHAT: `holeOffene()` fetches
+            // from /api/notifications/recent, the same source a page load uses.
+            // Without this the browser got a system banner and the stack inside
+            // the app stayed empty until the next page load. Found 08sep26:
+            // printer switched on, the phone had it at once over FCM, the web
+            // only minutes later — when something else happened to refresh.
+            if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                window.NotificationStack.holeOffene();
+            }
+
             if ('Notification' in window && Notification.permission === 'granted') {
-                // Desktop Browser (nur Web, nicht Electron!)
+                // Desktop browser (web only, not Electron!)
                 const options = {
                     body: data.message,
                     icon: '/static/icon-192x192.png',
                     tag: data.type || 'general'
                 };
 
-                // Spezielle Optionen je nach Typ
+                // Special options depending on type
                 if (data.type === 'print_finish' || data.type === 'success') {
                     options.requireInteraction = true;
                     options.vibrate = [200, 100, 200];
@@ -632,7 +670,7 @@ class SocketManager {
 
                 const notif = new Notification(data.title, options);
 
-                // Markiere als gelesen wenn User auf die Browser-Notification klickt
+                // Mark as read when the user clicks the browser notification
                 if (data.id) {
                     const callApi = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
                     notif.onclick = function() {
@@ -641,43 +679,105 @@ class SocketManager {
                         }).catch(() => {});
                         notif.close();
                     };
-                    notif.onclose = function() {
-                        callApi(`/api/notifications/${encodeURIComponent(data.id)}/read`, {
-                            method: 'POST'
-                        }).catch(() => {});
-                    };
+                    // NO onclose reporter.
+                    //
+                    // The event doesn't say WHY the notification went away.
+                    // macOS hides browser notifications after a few seconds
+                    // on its own — that would then have been reported to the
+                    // server as "read", which cleans it up on all
+                    // devices, and the box in Electron would disappear
+                    // without anyone actually doing anything.
+                    //
+                    // The same trap as the DeleteIntent on Android
+                    // (NotificationDismissReceiver): a reporter without a reason
+                    // can't tell a user's gesture apart from a dismissal
+                    // by the system. Only what's proven to be an action gets
+                    // reported — the click
+                    // on it.
                 }
             }
         });
 
-        // Cross-Device Dismiss: ein anderes Gerät hat die Notification
-        // weggeklickt → lokal auch entfernen (falls noch sichtbar) und
-        // für zukünftige Echo-Pushes merken.
+        // Cross-device dismiss: another device has dismissed the notification
+        // → remove it locally too (if still visible) and
+        // remember it for future echo pushes.
         if (!window.__dismissedNotificationIds) {
             window.__dismissedNotificationIds = new Set();
         }
         function _onDismissFromPeer(data) {
             if (!data || !data.id) return;
             window.__dismissedNotificationIds.add(data.id);
-            // Electron: offene Custom-Notification-Windows mit gleicher ID
-            // auf diesem Desktop schließen, wenn ein anderer Client
-            // dismissed/read hat. Ohne das bleibt das Banner hängen bis
-            // der User hier auch nochmal klickt.
+            // Electron: close open custom-notification windows with the same ID
+            // on this desktop when another client
+            // dismissed/read it. Without this the banner stays stuck until
+            // the user clicks it here too.
             try {
                 if (window.electronAPI && window.electronAPI.closeNotificationsById) {
                     window.electronAPI.closeNotificationsById(data.id);
                 }
             } catch (_) {}
-            // Meldung im Stapel oben rechts wegnehmen, wenn sie von diesem
-            // Ereignis stammt. Seit 27aug26 landen Push-Meldungen dort statt
-            // im externen Popup — ohne diese Zeile blieben sie stehen,
-            // nachdem sie auf dem Handy weggewischt wurden.
+            // Remove the notification from the stack top-right if it comes from
+            // this event. Since 27aug26 push notifications land there instead
+            // of the external popup — without this line they stayed
+            // after being swiped away on the phone.
+            let weg = 0;
             try {
-                if (window.MeldungsStapel && window.MeldungsStapel.entferne) {
-                    window.MeldungsStapel.entferne(data.id);
+                if (window.NotificationStack && window.NotificationStack.entferne) {
+                    weg = window.NotificationStack.entferne(data.id) || 0;
                 }
             } catch (_) {}
+            return weg;
         }
+        /**
+         * Catch up on what happened during the disconnect.
+         *
+         * Electron and web learn via the socket that a notification
+         * was read elsewhere. If the machine sleeps, the connection
+         * drops — and the event never arrives. On waking up the
+         * banner would still be showing, even though it had long been
+         * gone on the phone (01sep26: read on Android at 16:48, still
+         * visible in Electron at 17:23 and dismissed by hand).
+         *
+         * `connect` also fires after every reconnect, so it's exactly
+         * the right moment. Same rule as the socket event:
+         * read OR dismissed, on whichever device, counts as gone.
+         */
+        async function gleicheMeldungenAb() {
+            try {
+                const ruf = window.apiCall || fetch;
+                const antwort = await ruf('/api/notifications/recent?limit=50',
+                                          { credentials: 'same-origin' });
+                if (!antwort || !antwort.ok) return;
+                const { notifications } = await antwort.json();
+                let weg = 0;
+                for (const n of (notifications || [])) {
+                    const gelesen = Object.keys(n.read_by || {}).length > 0;
+                    const geklickt = Object.keys(n.dismissed_by || {}).length > 0;
+                    if (!gelesen && !geklickt) continue;
+                    const kennung = n.event_id || n.id;
+                    if (!kennung) continue;
+                    // Already cleared in an earlier round? Then don't
+                    // send it through the whole chain again. `connect`
+                    // fires on EVERY reconnect, and the server reports
+                    // the same completed items again — without this line
+                    // the same thirty ids would run through IPC to
+                    // main.js and back again every time.
+                    if (window.__dismissedNotificationIds
+                        && window.__dismissedNotificationIds.has(kennung)) continue;
+                    weg += _onDismissFromPeer({ id: kennung }) || 0;
+                }
+                // Counted is what actually left the screen here — not
+                // what the server considers done. At startup the
+                // stack is empty, and no number belongs here then.
+                if (weg) console.log(`🔄 ${weg} Meldung(en) waren anderswo schon erledigt`);
+                // Restoring is done by the stack module — it lives on EVERY
+                // page, this connector only on the start page.
+                if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                    window.NotificationStack.holeOffene();
+                }
+            } catch (_) { /* without reconciliation it falls back to the old behavior */ }
+        }
+
         socket.on('notification_dismissed', _onDismissFromPeer);
         socket.on('notification_read', _onDismissFromPeer);
 
@@ -686,16 +786,16 @@ class SocketManager {
             console.log('📡 HMS Update received:', data);
             serverDismissedHMSErrors = data.dismissed_errors || [];
 
-            // Banner-Anzeige aktualisieren
+            // Update banner display
             const banner = document.getElementById('hms-error-banner');
             if (!banner) return;
 
             const currentErrorCode = banner.dataset.errorCode;
             const activeErrors = data.active_errors || [];
 
-            // Banner ausblenden wenn:
-            // 1. Keine aktiven Fehler mehr ODER
-            // 2. Der aktuell angezeigte Fehler dismissed wurde
+            // Hide banner when:
+            // 1. No more active errors OR
+            // 2. The currently shown error was dismissed
             if (activeErrors.length === 0) {
                 banner.classList.remove('active');
                 console.log('🧹 HMS Banner hidden - no active errors');
@@ -707,9 +807,9 @@ class SocketManager {
 
         setTimeout(() => {
             if (!socket.connected && !window.socketReconnecting) {
-                window.socketReconnecting = true;  // Flag setzen
+                window.socketReconnecting = true;  // Set flag
                 console.error(texts.console_socket_not_connected);
-                // Manueller Connect-Versuch
+                // Manual connect attempt
                 socket.connect();
                 setTimeout(() => { window.socketReconnecting = false; }, 1000);
             }
@@ -740,15 +840,15 @@ class SocketManager {
         return key;
     }
 
-    // stage.* → texts.stage_* (STATUS_CONTRACT §4/§7). Leerer/kein Key → ''.
+    // stage.* → texts.stage_* (STATUS_CONTRACT §4/§7). Empty/no key → ''.
     translateStageKey(key) {
         if (!key || typeof key !== 'string' || !key.startsWith('stage.')) return '';
         const texts = window.texts || {};
         return texts[key.replace(/\./g, '_')] || key;
     }
 
-    // Anzuzeigender Stage-Text aus stage_code + stage_custom (Decision A):
-    // bekannter Code → übersetzt; manual_setup → "Code · Anweisung"; sonst roh.
+    // Stage text to show, built from stage_code + stage_custom (Decision A):
+    // known code → translated; manual_setup → "Code · Instruction"; otherwise raw.
     stageLabel(data) {
         const custom = (data.stage_custom || '').trim();
         if (data.stage_code) {
@@ -759,14 +859,14 @@ class SocketManager {
     }
 
     /**
-     * Drucker-Grafik in der Karte: Plaketten fuellen, Glut schalten.
+     * Printer graphic on the card: fill in badges, switch the glow.
      *
-     * Kammer/Bett/aktive Duese kommen live aus dem Socket. Die beiden
-     * Einzel-Duesen liefert /api/status (printerControlManager.lastState)
-     * — der Poll laeuft ohnehin, fuer Temperaturen reicht der Takt.
+     * Chamber/bed/active nozzle come live from the socket. The two
+     * individual nozzles are supplied by /api/status (printerControlManager.lastState)
+     * — the poll runs anyway, its cadence is enough for temperatures.
      */
-    /** Druck-Aktionen (Bambu): ⏸/▶/■ je nach Zustand — auf der
-     *  Druckkarte (pcb-*) und in der Steuerungs-Uebersicht (ov-*). */
+    /** Print actions (Bambu): ⏸/▶/■ depending on state — on the
+     *  print card (pcb-*) and in the control overview (ov-*). */
     updatePcbActions(data) {
         const st = data.gcode_state;
         const laufend = st === 'RUNNING' || st === 'PREPARE';
@@ -775,11 +875,11 @@ class SocketManager {
             const e = document.getElementById(id);
             if (e) e.style.display = an ? '' : 'none';
         };
-        // Druckkarte: kleine runde Knoepfe mit Wrapper.
+        // Print card: small round buttons with wrapper.
         zeig('pcb-actions', laufend || pausiert);
         zeig('pcb-pause', laufend);
         zeig('pcb-resume', pausiert);
-        // Steuerungs-Uebersicht: Aktions-Karten direkt im Grid.
+        // Control overview: action cards directly in the grid.
         zeig('ov-pause', laufend);
         zeig('ov-resume', pausiert);
         zeig('ov-stop', laufend || pausiert);
@@ -802,15 +902,15 @@ class SocketManager {
 
         const bed = document.getElementById('pv-bed');
         if (bed) {
-            // Icon-Bild steht im Markup; nur den Text hinter dem Bild tauschen.
+            // Icon image is in the markup; only swap the text next to the image.
             const txt = mitZiel(data.bed_temp, data.bed_target);
             bed.childNodes.forEach(n => { if (n.nodeType === 3) n.textContent = txt; });
-            // Ohne Messwert ganz weg — wie die Kammer eine Zeile darueber.
-            // Sonst klebt am ausgeschalteten Drucker ein Bett-Symbol mit "--".
+            // Gone entirely without a reading — like the chamber one line above.
+            // Otherwise a bed icon with "--" sticks around on a powered-off printer.
             bed.style.display = (data.bed_temp != null) ? '' : 'none';
         }
 
-        // Einzel-Duesen aus dem /api/status-Zustand (Schluessel: 1=links, 0=rechts)
+        // Individual nozzles from the /api/status state (keys: 1=left, 0=right)
         const st = (window.printerControlManager && window.printerControlManager.lastState) || {};
         const temps = st.nozzle_temps || {};
         const ziele = st.nozzle_targets || {};
@@ -826,9 +926,9 @@ class SocketManager {
         const setzeSeite = (id, key, tipId) => {
             const el = document.getElementById(id);
             if (el) {
-                // Auch OHNE Werte schreiben, sonst bleibt der alte Text stehen:
-                // beim ausgeschalteten Drucker klebten hier "L 37° R 37°",
-                // waehrend Bett und Kammer laengst auf "--" standen (20aug26).
+                // Write even WITHOUT values, otherwise the old text stays:
+                // on a powered-off printer this used to stick at "L 37° R 37°",
+                // while bed and chamber already showed "--" (20aug26).
                 el.textContent = (key === 1 ? 'L ' : 'R ') + mitZiel(lesen(key), ziel(key));
                 el.classList.toggle('pv-active', dual && data.active_nozzle === key);
             }
@@ -840,21 +940,21 @@ class SocketManager {
         setzeSeite('pv-nozzle-l', 1, null);
         setzeSeite('pv-nozzle-r', 0, null);
 
-        // Zweite Duese nur zeigen, wenn der Drucker wirklich zwei meldet.
+        // Only show the second nozzle if the printer really reports two.
         const zweite = document.getElementById('pv-nozzle-r-col');
         if (zweite) zweite.style.display = dual ? '' : 'none';
 
         this._zeigeMaschinenbild(data);
         this._zeigeAmsAnbau(data);
-        // Hotend-Magazin (H2C). Die Karte blendet sich selbst aus, wenn der
-        // Drucker keine Magazinplaetze meldet.
+        // Hotend rack (H2C). The card hides itself when the
+        // printer doesn't report any rack slots.
         if (window.hotendRackCard) window.hotendRackCard.aktualisieren(data);
 
-        // Klick auf die Vorschau oeffnet den Historien-Eintrag dieses Drucks.
+        // Clicking the preview opens this print's history entry.
         const vorschau = document.getElementById('titelbild-container');
         if (vorschau) {
-            // Nach dem Druck bleibt die Vorschau stehen — dann soll der Klick
-            // weiter in den zuletzt beendeten Eintrag fuehren.
+            // The preview stays up after the print — then the click should
+            // keep leading to the most recently finished entry.
             const id = data.history_print_id || data.current_print_id;
             if (id) {
                 vorschau.style.cursor = 'pointer';
@@ -875,19 +975,19 @@ class SocketManager {
     handlePrintUpdate(data, source) {
         const texts = window.texts || {};
 
-        // Status speichern für nächsten Vergleich
+        // Save status for the next comparison
         const previousState = window.lastPrintState;
         window.lastPrintState = data.gcode_state;
         window.lastPrintData = data;
 
 
-        // Der Rumpf lag bis 20aug26 als 535 Zeilen am Stueck hier. Genau
-        // diese Unuebersichtlichkeit liess uebersehen, dass Knopf- und
-        // Geraete-Anzeige an einer ganz anderen Quelle hingen — der Fehler,
-        // der beim Abschalten des Polls sichtbar wurde.
+        // Up to 20aug26 the body sat here as one 535-line block. That very
+        // lack of overview is what let it slip that the button- and
+        // device-display hung off a completely different source — the bug
+        // that surfaced when the poll was switched off.
         //
-        // previousState wird durchgereicht: die einzige Groesse, die
-        // mehrere Abschnitte gemeinsam brauchen.
+        // previousState gets passed through: the one value that
+        // several sections need in common.
         this._zeigeAbschaltTimer(data, previousState);
         this._zeigeHomingKnopf(data, previousState);
         if (window.skTeileKnopfZeigen) window.skTeileKnopfZeigen(data);
@@ -901,28 +1001,28 @@ class SocketManager {
         this._zeigeKartenKnoepfe(data, previousState);
     }
 
-    /** Abschalt-Timer: Kopfzeile, Einstellungs-Fenster, Countdown */
+    /** Power-off timer: header, settings window, countdown */
     _zeigeAbschaltTimer(data, previousState) {
         const texts = window.texts || {};
-        // Power-Off Timer verarbeiten (falls im print_progress enthalten)
+        // Process power-off timer (if included in print_progress)
         if (data.power_off_timer) {
             const statusDiv = document.getElementById('power-off-status');
             const headerTimer = document.getElementById('power-off-header');
 
             if (data.power_off_timer.active) {
-                // Settings Modal Status
+                // Settings modal status
                 if (statusDiv) {
                     statusDiv.style.display = 'block';
                     const reasonEl = document.getElementById('power-off-reason');
                     if (reasonEl) reasonEl.textContent = data.power_off_timer.reason;
                 }
 
-                // Header Timer anzeigen
+                // Show header timer
                 if (headerTimer) {
                     headerTimer.style.display = 'inline-block';
                 }
 
-                // Countdown updaten
+                // Update countdown
                 const updateCountdown = () => {
                     const remaining = Math.max(0, data.power_off_timer.end_time - (Date.now() / 1000));
                     const minutes = Math.floor(remaining / 60);
@@ -940,13 +1040,13 @@ class SocketManager {
                     if (headerCountdown) {
                         headerCountdown.textContent = timeString;
 
-                        // Farbe ändern wenn wenig Zeit
+                        // Change color when time is low
                         if (minutes < 1) {
-                            headerTimer.style.color = '#ff4444';  // Rot
+                            headerTimer.style.color = '#ff4444';  // Red
                         } else if (minutes < 5) {
                             headerTimer.style.color = '#ff9800';  // Orange
                         } else {
-                            headerTimer.style.color = '#ffc107';  // Gelb
+                            headerTimer.style.color = '#ffc107';  // Yellow
                         }
                     }
 
@@ -958,7 +1058,7 @@ class SocketManager {
                 updateCountdown();
 
             } else {
-                // Timer deaktiviert - UI aufräumen
+                // Timer deactivated - clean up UI
                 if (statusDiv) {
                     statusDiv.style.display = 'none';
                 }
@@ -969,15 +1069,15 @@ class SocketManager {
         }
     }
 
-    /** Homing-Knopf zuruecksetzen, wenn das Homing durch ist */
+    /** Reset the homing button once homing is done */
     _zeigeHomingKnopf(data, previousState) {
         const texts = window.texts || {};
-        // Homing-Button zurücksetzen wenn Homing abgeschlossen (home_flag > 0)
+        // Reset homing button once homing is complete (home_flag > 0)
         if (data.home_flag && data.home_flag > 0) {
             const homingBtnMobile = document.getElementById('homing-btn-mobile');
             const homingBtnDesktop = document.getElementById('homing-btn-desktop');
 
-            // Nur zurücksetzen wenn Button aktuell auf "Läuft..." steht
+            // Only reset if the button currently shows "Running..."
             if (homingBtnMobile && homingBtnMobile.disabled) {
                 homingBtnMobile.disabled = false;
                 homingBtnMobile.innerHTML = window.skIcon('haus') + '<span>' + (texts.homing || 'Homing') + '</span>';
@@ -989,7 +1089,7 @@ class SocketManager {
         }
     }
 
-    /** Fortschrittsbalken und Prozentzahl */
+    /** Progress bar and percentage */
     _zeigeFortschritt(data, previousState) {
         const texts = window.texts || {};
         // ========== Progress Bar + Percentage (HelixScreen-Layout) ==========
@@ -1000,14 +1100,14 @@ class SocketManager {
         if (barFill) barFill.style.width = (data.progress || 0) + '%';
     }
 
-    /** Schichten, verbrauchtes Filament, Objekte */
+    /** Layers, filament used, objects */
     _zeigeSchichten(data, previousState) {
         const texts = window.texts || {};
         // ========== Layer / Filament-Used / Objects ==========
         const layerValue = document.getElementById('layer-value');
         if (layerValue) {
             const layerTxt = `Layer ${data.layer_num || '--'}/${data.total_layers || '--'}`;
-            // Z-Hoehe inline anhaengen wenn Klipper
+            // Append Z height inline when Klipper
             const z = data.z_position;
             layerValue.textContent = (z != null)
                 ? `${layerTxt} (${z.toFixed(1)}mm)`
@@ -1026,10 +1126,10 @@ class SocketManager {
         }
     }
 
-    /** Zeit-Reihe: vergangen, verbleibend, Ende, Prozent */
+    /** Time series: elapsed, remaining, end, percent */
     _zeigeZeiten(data, previousState) {
         const texts = window.texts || {};
-        // ========== Time-Reihe: elapsed · remaining · ETA · % ==========
+        // ========== Time series: elapsed · remaining · ETA · % ==========
         const elapsedValue = document.getElementById('elapsed-value');
         if (elapsedValue) {
             const sec = data.elapsed_seconds;
@@ -1054,9 +1154,9 @@ class SocketManager {
         }
         const etaInline = document.getElementById('eta-value-inline');
         if (etaInline) {
-            // ETA = jetzt + Restzeit, client-seitig berechnet (wie Android/KlipperStatusMapper).
-            // eta_time vom Server ist im Direct-Modus leer → aus remaining_time (Minuten) lokal
-            // ableiten, dann stimmt's mit der Geräte-Uhr und tickt ohne Server-Roundtrip.
+            // ETA = now + remaining time, computed client-side (like Android/KlipperStatusMapper).
+            // eta_time from the server is empty in Direct mode → derive it locally
+            // from remaining_time (minutes), so it matches the device clock and ticks without a server round trip.
             let _eta = data.eta_time;
             if (!_eta && data.remaining_time > 0) {
                 _eta = new Date(Date.now() + data.remaining_time * 60000)
@@ -1066,17 +1166,17 @@ class SocketManager {
         }
     }
 
-    /** Temperatur-Karte: Duese, Bett, Kammer */
+    /** Temperature card: nozzle, bed, chamber */
     _zeigeTemperaturen(data, previousState) {
         const texts = window.texts || {};
-        // ========== Temperature-Card (Düse / Bett / Chamber) ==========
+        // ========== Temperature card (nozzle / bed / chamber) ==========
         const nA = document.getElementById('temp-nozzle-actual');
         const nT = document.getElementById('temp-nozzle-target');
         if (nA) nA.textContent = (data.nozzle_temp != null) ? data.nozzle_temp.toFixed(1) : '--';
         if (nT) nT.textContent = (data.nozzle_target != null) ? Math.round(data.nozzle_target) : '--';
 
-        // Aktive Duese (X2D/H2D): 1 = links, 0 = rechts. Feld fehlt bei
-        // Einzelduesen-Geraeten — dann bleibt das Badge unsichtbar.
+        // Active nozzle (X2D/H2D): 1 = left, 0 = right. Field missing on
+        // single-nozzle devices — the badge just stays hidden then.
         const seite = document.getElementById('temp-nozzle-side');
         if (seite) {
             if (data.active_nozzle != null) {
@@ -1103,7 +1203,7 @@ class SocketManager {
             const tWrap = document.getElementById('temp-chamber-target-wrap');
             const humEl = document.getElementById('temp-chamber-humidity');
             if (data.chamber_humidity != null) {
-                // Sensor-Kammer (z.B. AHT20): Temp + Luftfeuchte statt Ziel (wie Android).
+                // Sensor chamber (e.g. AHT20): temp + humidity instead of target (like Android).
                 if (unitEl) unitEl.style.display = '';
                 if (tWrap) tWrap.style.display = 'none';
                 if (humEl) { humEl.style.display = ''; humEl.innerHTML = ' ' + window.skIcon('tropfen', 'hd-ic--xs') + ' ' + Math.round(data.chamber_humidity) + '%'; }
@@ -1114,8 +1214,8 @@ class SocketManager {
                 const cT = document.getElementById('temp-chamber-target');
                 if (cT) cT.textContent = Math.round(data.chamber_target);
             } else {
-                // Kammer ohne Ziel (keine oder ausgeschaltete Heizung): nur der
-                // Istwert. "/ 0°C" liest sich sonst wie ein Defekt.
+                // Chamber without a target (no heater, or heater switched off): just the
+                // actual value. "/ 0°C" otherwise reads like a fault.
                 if (unitEl) unitEl.style.display = '';
                 if (tWrap) tWrap.style.display = 'none';
                 if (humEl) humEl.style.display = 'none';
@@ -1125,13 +1225,13 @@ class SocketManager {
         }
     }
 
-    /** Drucker-Ansicht im Display-Stil */
+    /** Printer view in display style */
     _zeigeDruckerAnsicht(data, previousState) {
         const texts = window.texts || {};
-        // ========== Drucker-Ansicht (X2D-Display-Stil) ==========
+        // ========== Printer view (X2D display style) ==========
         this.updatePrinterVisual(data);
 
-        // Status-Pills (Bereit / Heizt / Kühlt / Aus)
+        // Status pills (Ready / Heating / Cooling / Off)
         const setPill = (id, status) => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -1155,7 +1255,7 @@ class SocketManager {
         setPill('bed-status-pill',     data.bed_status);
         setPill('chamber-status-pill', data.chamber_status);
 
-        // Per-Fan-Reihe
+        // Per-fan row
         const setFan = (cellId, valueId, pct) => {
             const cell = document.getElementById(cellId);
             const val = document.getElementById(valueId);
@@ -1170,7 +1270,7 @@ class SocketManager {
         setFan('fan-part-info',   'fan-part-value',   data.part_fan_percent);
         setFan('fan-hotend-info', 'fan-hotend-value', data.hotend_fan_percent);
         setFan('fan-aux-info',    'fan-aux-value',    data.aux_fan_percent);
-        // Separator nur sichtbar wenn beide Nachbarn da sind
+        // Separator only visible when both neighbors are present
         const sep1 = document.getElementById('fan-sep-1');
         if (sep1) sep1.style.display = (data.hotend_fan_percent != null) ? '' : 'none';
         const sep2 = document.getElementById('fan-sep-2');
@@ -1182,36 +1282,41 @@ class SocketManager {
         const speedValue = document.getElementById('speed-value');
         if (speedValue) {
             const speedPercent = data.speed_percent != null ? Number(data.speed_percent) : 100;
+            // These four names exist as keys, ever since the
+            // speed window started using them (speed-modal.js) -- before that
+            // they sat here hardcoded in German.
+            const st = window.texts || {};
             const speedName = Number.isFinite(speedPercent)
-                ? (speedPercent <= 75 ? 'Leise'
-                    : speedPercent <= 112 ? 'Standard'
-                    : speedPercent <= 145 ? 'Sport' : 'Verrückt')
-                : (data.speed_level_text || 'Standard');
+                ? (speedPercent <= 75 ? (st.speed_silent || 'Leise')
+                    : speedPercent <= 112 ? (st.speed_standard || 'Standard')
+                    : speedPercent <= 145 ? (st.speed_sport || 'Sport')
+                    : (st.speed_ludicrous || 'Verrückt'))
+                : (data.speed_level_text || st.speed_standard || 'Standard');
             speedValue.textContent = `${speedName} (${speedPercent}%)`;
         }
     }
 
-    /** Angebautes AMS neben dem Drucker einblenden */
-    /** Das Geraetebild der Druckkarte zum eingestellten Modell.
+    /** Show the attached AMS next to the printer */
+    /** The print card's device image for the configured model.
      *
-     *  Bis 26aug26 stand im Template fest `x2d.png` — richtig nur fuer genau
-     *  ein Geraet. Die Kennung kommt aus den Faehigkeiten (`model_id`), die
-     *  der Server aus dem Profil bildet; die Dateien heissen wie die Kennung
-     *  in Kleinschreibung.
+     *  Until 26aug26 the template hardcoded `x2d.png` — only correct for exactly
+     *  one device. The identifier comes from the capabilities (`model_id`), which
+     *  the server builds from the profile; the files are named after the identifier
+     *  in lowercase.
      */
     _zeigeMaschinenbild(data) {
         const bild = document.getElementById('pv-machine-img');
         if (!bild) return;
-        // Direkt aus dem Status-Paket: window.lastPrintData wird erst weiter
-        // unten gesetzt und traegt hier noch das vorige.
+        // Straight from the status packet: window.lastPrintData isn't set
+        // until further below and still carries the previous one here.
         const caps = (data && data.capabilities) || {};
         const kennung = (caps.model_id || '').toLowerCase();
-        if (!kennung) return;              // kein Modell gesetzt: altes Bild stehen lassen
+        if (!kennung) return;              // no model set: leave the old image as is
         const quelle = `/static/img/printers/${kennung}.png`;
         if (bild.dataset.modell === kennung) return;
         bild.dataset.modell = kennung;
-        // Gibt es das Bild nicht, bleibt das bisherige stehen statt eines
-        // kaputten Symbols.
+        // If the image doesn't exist, keep the current one instead of a
+        // broken icon.
         const probe = new Image();
         probe.onload = () => { bild.src = quelle; };
         probe.src = quelle;
@@ -1229,8 +1334,8 @@ class SocketManager {
             return;
         }
 
-        // Erste gemeldete Einheit zeigen. Mehrere nebeneinander waeren neben
-        // Drucker und Duese zu schmal — die Material-Zone listet ohnehin alle.
+        // Show the first reported unit. Several side by side would be
+        // too narrow next to printer and nozzle — the material zone lists all of them anyway.
         const e = einheiten[0];
         const ht = String(e.model || '').toUpperCase().includes('HT');
         const quelle = ht ? '/static/img/ams/ams_ht.png' : '/static/img/ams/ams.png';
@@ -1239,8 +1344,8 @@ class SocketManager {
             bild.alt = e.model || 'AMS';
         }
 
-        // Feuchte und Temperatur druntersetzen — beim AMS HT die
-        // interessanten Werte, weil es heizt.
+        // Put humidity and temperature underneath — for the AMS HT these are
+        // the interesting values, since it heats.
         if (schild) {
             const teile = [];
             if (e.humidity != null) teile.push(Math.round(e.humidity) + '%');
@@ -1248,9 +1353,9 @@ class SocketManager {
             schild.textContent = teile.join(' \u00b7 ');
             schild.hidden = teile.length === 0;
 
-            // Klick auf Feuchte/Temperatur oeffnet die Trocknung — denselben
-            // Dialog wie der Knopf in der Material-Zone. Nur bei Geraeten,
-            // die wirklich trocknen koennen (AMS 2 Pro / AMS HT).
+            // Clicking humidity/temperature opens drying — the same
+            // dialog as the button in the material zone. Only for devices
+            // that can actually dry (AMS 2 Pro / AMS HT).
             if (e.can_dry) {
                 schild.classList.add('pv-badge--click');
                 schild.title = (window.texts && window.texts.mz_dry) || 'Trocknen';
@@ -1268,23 +1373,23 @@ class SocketManager {
         behaelter.hidden = false;
     }
 
-    /** Bed-Mesh-Heatmap (Klipper) und Dateiname */
+    /** Bed-mesh heatmap (Klipper) and filename */
     _zeigeBedMesh(data, previousState) {
         const texts = window.texts || {};
-        // ============ Bed-Mesh-Heatmap (Klipper) ============
-        // Wird ueber /api/status mitgeliefert (NICHT im SocketIO klipper_state-
-        // Event — zu gross fuer 1Hz push). data.bed_mesh ist {matrix, mesh_min,
-        // mesh_max, profile_name} oder null. Falls null und wir haben schon
-        // gerendert: nichts tun (cache effect). Falls explicit {matrix:null}:
-        // verstecken.
+        // ============ Bed-mesh heatmap (Klipper) ============
+        // Delivered via /api/status (NOT in the SocketIO klipper_state
+        // event — too big for a 1Hz push). data.bed_mesh is {matrix, mesh_min,
+        // mesh_max, profile_name} or null. If null and we've already
+        // rendered: do nothing (cache effect). If explicitly {matrix:null}:
+        // hide it.
         if (data.bed_mesh && Array.isArray(data.bed_mesh.matrix)
             && data.bed_mesh.matrix.length > 0) {
             this._renderBedMeshHeatmap(data.bed_mesh);
         }
 
         const filamentValue = document.getElementById('filament-value');
-        // Ohne bekanntes Filament den ganzen Chip weglassen statt "--"
-        // anzuzeigen — wie Bett und Kammer im Drucker-Bild daneben.
+        // Without a known filament, drop the whole chip instead of showing "--"
+        // — same as bed and chamber in the printer image next to it.
         const filamentChip = document.getElementById('filament-info');
         if (filamentChip) {
             const bekannt = !!(data.filament_display
@@ -1330,9 +1435,9 @@ class SocketManager {
                             displayText = translationKey === 'no_print_active' ? 'Kein Druck aktiv' : '';
                         }
                     } else {
-                        // Voller Name — das CSS (text-overflow: ellipsis)
-                        // kuerzt nur, wenn wirklich kein Platz ist. Die harte
-                        // 40-Zeichen-Grenze schnitt trotz freier Breite ab.
+                        // Full name — the CSS (text-overflow: ellipsis)
+                        // only truncates when there's really no room. The hard
+                        // 40-character limit was cutting it off despite free width.
                         displayText = newFilename;
                     }
                     fileInfo.textContent = displayText;
@@ -1349,9 +1454,9 @@ class SocketManager {
             if (newSrc !== window.currentThumbnailUrl) {
                 titelbildImg.src = newSrc;
                 window.currentThumbnailUrl = newSrc;
-                // Nur das BILD schalten, nie den Container: der haelt den
-                // Platz frei, damit der Drucker nicht nach links rutscht,
-                // solange kein Thumbnail da ist.
+                // Only toggle the IMAGE, never the container: it holds the
+                // space so the printer doesn't shift left
+                // while no thumbnail is available yet.
                 titelbildImg.onload = () => titelbildImg.style.visibility = '';
                 titelbildImg.onerror = () => titelbildImg.style.visibility = 'hidden';
             }
@@ -1359,21 +1464,21 @@ class SocketManager {
             titelbildImg.style.visibility = 'hidden';
         }
 
-        // Laeuft ein Druck ohne Vorschaubild, steht dort sonst ein leerer
-        // grauer Kasten. Bei Drucken direkt aus Bambu Studio liegt die 3MF im
-        // internen Speicher des Druckers — dort kommt niemand heran, auch
-        // nicht die Home-Assistant-Integration. Statt Leere ein Symbol mit
-        // dem Grund daneben.
+        // If a print is running without a preview image, there'd otherwise be an empty
+        // gray box. For prints started directly from Bambu Studio, the 3MF sits in
+        // the printer's internal storage — nobody can reach it there, not even
+        // the Home Assistant integration. Instead of emptiness, show an icon with
+        // the reason next to it.
         if (titelbildContainer) {
             const laeuft = data.gcode_state === 'RUNNING' || data.gcode_state === 'PREPARE';
             const hatBild = !!(newThumbnailData && newThumbnailData !== 'undefined');
             const zeigeLeer = laeuft && !hatBild;
             titelbildContainer.classList.toggle('kein-bild', zeigeLeer);
-            // Die Vorschau der Druckkarte ist rund 110px gross — dort passt
-            // nur das Symbol. Der Grund steht im Tooltip und ausfuehrlich in
-            // der Historie.
-            // Der Klick oeffnet weiterhin die Historie — beide Hinweise
-            // stehen im Tooltip, statt dass einer den anderen ueberschreibt.
+            // The print card's preview is about 110px — only the icon
+            // fits there. The reason is in the tooltip and spelled out in
+            // the history.
+            // The click still opens the history — both hints
+            // live in the tooltip, instead of one overwriting the other.
             const t = window.texts || {};
             const klickHinweis = data.current_print_id
                 ? (t.history_open || 'Eintrag in der Historie öffnen') : '';
@@ -1384,66 +1489,66 @@ class SocketManager {
         }
     }
 
-    /** Status-Text, Pause/Fortsetzen und Filament-Wechsel-Knoepfe */
+    /** Status text, pause/resume and filament-change buttons */
     _zeigeStatusUndAktion(data, previousState) {
         const texts = window.texts || {};
-        // Status-Text Logik
+        // Status text logic
         const statusElement = document.getElementById('print-status');
         if (statusElement) {
             let statusText = texts.status_ready || 'Bereit';
 
-            // Filament-Change-Übergangs-Phase (nach "Fertig"-Klick, ams_status=0x0107)
-            // Dauert ca. 40s während Drucker letzten Purge macht + Düse zurückfährt.
-            // Überschreibt sowohl PAUSE- als auch RUNNING-Status während dieser Zeit.
+            // Filament-change transition phase (after clicking "Done", ams_status=0x0107)
+            // Takes about 40s while the printer does the final purge + retracts the nozzle.
+            // Overrides both the PAUSE and RUNNING status during this time.
             const fcFinishing = data.filament_change_finishing ||
                 (window.lastPrintData && window.lastPrintData.filament_change_finishing);
 
             if (data.gcode_state === 'IDLE') {
                 statusText = this.translateStatusKey(data.display_text) || this.translateStatusKey(data.status_text) || texts.status_ready || 'Bereit zum Drucken';
             } else if (fcFinishing) {
-                // Druck wird nach Filament-Wechsel fortgesetzt
+                // Print resumes after filament change
                 statusText = texts.status_filament_change_resuming || 'Druck wird fortgesetzt…';
-                // Buttons wie bei RUNNING zurücksetzen (wir kommen aus PAUSE)
+                // Reset buttons as for RUNNING (we're coming from PAUSE)
                 ['resume-btn-mobile', 'resume-btn-desktop', 'fc-retry-btn-mobile', 'fc-retry-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = 'none';
                 });
-                // display = '' → reset auf CSS-default (flex), nicht 'block'
+                // display = '' → reset to CSS default (flex), not 'block'
                 ['pause-btn-mobile', 'pause-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = '';
                 });
             } else if (data.gcode_state === 'RUNNING') {
                 statusText = this.translateStatusKey(data.status_text) || texts.status_printing || 'Druckt...';
-                // Stage (Soak/QGL/Mesh/Clean/...) aus stage_code/stage_custom anhängen
-                // (STATUS_CONTRACT §7). Producer hat schon gefiltert/klassifiziert.
+                // Append stage (Soak/QGL/Mesh/Clean/...) from stage_code/stage_custom
+                // (STATUS_CONTRACT §7). Producer has already filtered/classified it.
                 const _stageR = this.stageLabel(data);
                 if (_stageR) statusText = statusText + ' · ' + _stageR;
-                // Resume → Pause Buttons zurücksetzen (nach PAUSE/Farbwechsel)
+                // Reset Resume → Pause buttons (after PAUSE/color change)
                 ['resume-btn-mobile', 'resume-btn-desktop', 'fc-retry-btn-mobile', 'fc-retry-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = 'none';
                 });
-                // display = '' → reset auf CSS-default (flex), nicht 'block'
+                // display = '' → reset to CSS default (flex), not 'block'
                 ['pause-btn-mobile', 'pause-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = '';
                 });
             } else if (data.gcode_state === 'PREPARE') {
                 statusText = this.translateStatusKey(data.status_text) || texts.status_preparing || 'Vorbereitung...';
-                // Stage aus stage_code/stage_custom (STATUS_CONTRACT §7).
+                // Stage from stage_code/stage_custom (STATUS_CONTRACT §7).
                 const _stageP = this.stageLabel(data);
                 if (_stageP) statusText = statusText + ' · ' + _stageP;
             } else if (data.gcode_state === 'PAUSE') {
-                // Multi-Color External-Spool Filament-Change?
-                // Server liefert filament_change_phase:
-                //   0 = normale Pause
-                //   1 = User soll Filament wechseln → Resume-Button sendet Load-Sequence
-                //   2 = User soll Laden bestätigen → Resume-Button sendet ams_control done
-                //                                    + Retry-Button (eigener Button) für M620 P255+P254
-                // Der Backend-Endpoint /api/mqtt/print {command:"resume"} routet
-                // automatisch anhand der Phase — der Resume-Button selbst wechselt
-                // nur Icon/Text/Farbe.
+                // Multi-color external-spool filament change?
+                // Server delivers filament_change_phase:
+                //   0 = normal pause
+                //   1 = user should change filament → resume button sends load sequence
+                //   2 = user should confirm loading → resume button sends ams_control done
+                //                                    + retry button (own button) for M620 P255+P254
+                // The backend endpoint /api/mqtt/print {command:"resume"} routes
+                // automatically based on the phase — the resume button itself only
+                // changes icon/text/color.
                 const fcPhase = data.filament_change_phase ||
                     (window.lastPrintData && window.lastPrintData.filament_change_phase) || 0;
 
@@ -1455,36 +1560,36 @@ class SocketManager {
                     statusText = this.translateStatusKey(data.status_text) || texts.status_paused || 'Pausiert';
                 }
 
-                // Pause-Button ausblenden
+                // Hide pause button
                 ['pause-btn-mobile', 'pause-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = 'none';
                 });
 
-                // Phase-spezifische Labels für den Resume-Button.
-                // Icons + Text werden SEPARAT gesetzt (Icon in icon-span,
-                // Text in text-span). Translations enthalten absichtlich
-                // KEIN Emoji — sonst doppeltes Icon im Button.
+                // Phase-specific labels for the resume button.
+                // Icon + text are set SEPARATELY (icon in icon-span,
+                // text in text-span). Translations deliberately contain
+                // NO emoji — otherwise a duplicate icon in the button.
                 let resumeIcon, resumeLabel, resumeClass;
                 if (fcPhase === 1) {
                     resumeIcon = window.skIcon('runter');
                     resumeLabel = texts.filament_change_load || 'Filament laden';
-                    resumeClass = 'control-btn info';        // blau
+                    resumeClass = 'control-btn info';        // blue
                 } else if (fcPhase === 2) {
                     resumeIcon = window.skIcon('haken');
                     resumeLabel = texts.filament_change_done || 'Fertig';
-                    resumeClass = 'control-btn success';     // grün
+                    resumeClass = 'control-btn success';     // green
                 } else {
                     resumeIcon = window.skIcon('start');
                     resumeLabel = texts.resume || 'Fortsetzen';
-                    resumeClass = 'control-btn success';     // grün
+                    resumeClass = 'control-btn success';     // green
                 }
 
-                // Resume-Button anzeigen + Icon/Text/Farbe setzen.
-                // WICHTIG: display = '' (CSS-Reset), nicht 'block' —
-                // .control-btn hat als CSS-Default `display: flex`, was
-                // für Icon+Text-Alignment nötig ist. 'block' würde das
-                // Flex-Layout zerstören.
+                // Show resume button + set icon/text/color.
+                // IMPORTANT: display = '' (CSS reset), not 'block' —
+                // .control-btn has `display: flex` as its CSS default, which
+                // is needed for icon+text alignment. 'block' would break
+                // the flex layout.
                 ['mobile', 'desktop'].forEach(variant => {
                     const btn = document.getElementById(`resume-btn-${variant}`);
                     if (!btn) return;
@@ -1496,12 +1601,12 @@ class SocketManager {
                     if (text) text.textContent = resumeLabel;
                 });
 
-                // Retry-Button NUR in Phase 2 sichtbar (eigener 6. Button).
+                // Retry button ONLY visible in phase 2 (its own 6th button).
                 ['mobile', 'desktop'].forEach(variant => {
                     const retryBtn = document.getElementById(`fc-retry-btn-${variant}`);
                     if (!retryBtn) return;
                     if (fcPhase === 2) {
-                        retryBtn.style.display = '';   // Reset auf CSS-flex
+                        retryBtn.style.display = '';   // reset to CSS flex
                         const retryText = document.getElementById(`fc-retry-text-${variant}`);
                         if (retryText) retryText.textContent = texts.filament_change_retry || 'Erneut versuchen';
                     } else {
@@ -1509,17 +1614,17 @@ class SocketManager {
                     }
                 });
             } else if (data.gcode_state === 'FINISH') {
-                // Wenn der Druck gerade erst fertig wurde, zeige einen Zwischenstatus.
+                // If the print has only just finished, show an in-between status.
                 if (previousState === 'RUNNING') {
-                    statusText = 'Wird abgeschlossen...';
+                    statusText = texts.status_finishing || 'Wird abgeschlossen...';
 
                     setTimeout(() => {
-                        // Prüfe, ob der Status immer noch FINISH ist (und kein neuer Druck gestartet wurde)
+                        // Check whether the status is still FINISH (and no new print was started)
                         if (window.lastPrintData && window.lastPrintData.gcode_state === 'FINISH') {
                             console.log('⏳ Timeout: resetting the UI to IDLE.');
                             this.handlePrintUpdate({ gcode_state: 'IDLE' }, 'timeout_reset');
                         }
-                    }, 45000); // 45 Sekunden warten
+                    }, 45000); // wait 45 seconds
                 } else {
                     statusText = texts.status_print_completed || 'Fertig';
                 }
@@ -1527,20 +1632,70 @@ class SocketManager {
                 statusText = texts.status_print_failed || 'Fehler';
             }
 
-            // Status-Pill (HelixScreen): kompaktes "Status: <State>" OHNE Stage-Suffix.
-            // EINE Quelle = data.status_text (Key, vom Producer immer gesetzt) →
-            // übersetzt, ohne angehängten Doppelpunkt/Punkte. status_running entfällt
-            // (war die "Läuft"-vs-"Druckt"-Bug-Quelle). STATUS_CONTRACT §7.
+            // A command has been sent and the printer is still carrying
+            // it out.
+            //
+            // `gcode_state` has no such in-between value: during a pause in
+            // progress it still reads RUNNING, and only once the head has
+            // parked does it flip to PAUSE. In between, the button looks as
+            // if it did nothing -- so it gets pressed again.
+            //
+            // The printer does say it though: `print.job.job_state`, turned
+            // into `job_phase` by the server (printer_state.JOB_PHASES).
+            // Studio reads the same field for exactly this.
+            //
+            // Without the field (P1/A1 never send it) the phase is null and
+            // nothing happens here -- the old behaviour stands.
+            const phase = data.job_phase
+                || (window.lastPrintData && window.lastPrintData.job_phase) || null;
+            const phasenText = {
+                pausing: texts.status_pausing,
+                resuming: texts.status_resuming,
+                stopping: texts.status_stopping,
+                starting: texts.status_starting,
+                finishing: texts.status_finishing,
+            };
+            // Which button belongs to which phase. Starting and Finishing
+            // are deliberately absent: there is nothing to lock there, the
+            // text alone is enough.
+            const phasenKnopf = {
+                pausing: ['pause-btn-mobile', 'pause-btn-desktop'],
+                resuming: ['resume-btn-mobile', 'resume-btn-desktop'],
+                stopping: ['stop-btn-mobile', 'stop-btn-desktop'],
+            };
+            // Always release everything first, then set anew -- otherwise a
+            // button would stay locked when the phase ends while the page
+            // happens not to be looking.
+            Object.values(phasenKnopf).flat().forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.classList.remove('control-btn--laeuft');
+            });
+            if (phase) {
+                // The text only when no more specific one is already there:
+                // during a filament change the printer also reports
+                // "resuming", but "Resuming print" says more than
+                // "Resuming". The lock applies either way.
+                if (phasenText[phase] && !fcFinishing) statusText = phasenText[phase];
+                (phasenKnopf[phase] || []).forEach(id => {
+                    const btn = document.getElementById(id);
+                    if (btn) btn.classList.add('control-btn--laeuft');
+                });
+            }
+
+            // Status pill (HelixScreen): compact "Status: <State>" WITHOUT stage suffix.
+            // ONE source = data.status_text (key, always set by the producer) →
+            // translated, no trailing colon/dots appended. status_running is gone
+            // (it was the "Running"-vs-"Printing" bug source). STATUS_CONTRACT §7.
             const statusTextElement = document.getElementById('print-status-text');
             if (statusTextElement) {
-                // Steht die Steckdose auf aus, gibt es keinen Status —
-                // dann bleibt die Pille weg statt "Status: Bereit" an einem
-                // ausgeschalteten Drucker zu behaupten. Android macht das
-                // genauso (HomeViewModel.isPrinterOn blendet die Karten aus).
-                // Dass er aus ist, sagen daneben schon Kamera und Drucker-Knopf.
-                // Die ganze Pille ausblenden, nicht nur den Text — sie traegt
-                // den Statuspunkt und bliebe sonst als leerer grauer Stummel
-                // stehen.
+                // If the outlet is switched off, there's no status —
+                // then the pill just stays hidden instead of claiming "Status: Ready" on a
+                // printer that's powered off. Android does the
+                // same thing (HomeViewModel.isPrinterOn hides the cards).
+                // That it's off is already shown by the camera and printer button next to it.
+                // Hide the whole pill, not just the text — it carries
+                // the status dot and would otherwise be left as an empty gray
+                // stub.
                 const pille = document.getElementById('print-status') || statusTextElement;
                 if (data.switch === 'off') {
                     pille.style.display = 'none';
@@ -1553,8 +1708,8 @@ class SocketManager {
                 }
             }
 
-            // Pause/Fortsetzen/Abbrechen auf der Bambu-Druckkarte —
-            // seit dem Zonen-Umbau gibt es die alte Steuerungs-Card nicht mehr.
+            // Pause/resume/cancel on the Bambu print card —
+            // since the zone redesign the old control card no longer exists.
             this.updatePcbActions(data);
 
             // Update status dot color
@@ -1570,15 +1725,15 @@ class SocketManager {
         }
     }
 
-    /** Statuspunkt und Trocknen-Knopf */
+    /** Status dot and drying button */
     _zeigeKartenKnoepfe(data, previousState) {
         const texts = window.texts || {};
-        // Filament Trocknen Button deaktivieren während Druck läuft
+        // Disable filament-drying button while a print is running
         const startDryingBtn = document.getElementById('start-drying-btn');
         if (startDryingBtn) {
-            // NUR die Beschriftung anfassen: textContent auf dem Knopf
-            // wuerde das Zeichen daneben mit wegwerfen. Blass und Zeiger
-            // macht `.tr-knopf:disabled` im Stylesheet.
+            // ONLY touch the label: setting textContent on the button
+            // would throw away the icon next to it too. Fading and cursor
+            // are handled by `.tr-knopf:disabled` in the stylesheet.
             const beschriftung = document.getElementById('start-drying-text');
             const druckt = data.gcode_state === 'RUNNING' || data.gcode_state === 'PREPARE';
             startDryingBtn.disabled = druckt;
@@ -1590,26 +1745,26 @@ class SocketManager {
 
         this.applyHmsBanner(data);
 
-        // Multi-Color External-Spool: Kein separates Banner — der
-        // Pause/Resume-Button (handlePrintUpdate oben) passt seinen Text
-        // und sein Verhalten je nach filament_change_phase an.
+        // Multi-color external-spool: no separate banner — the
+        // pause/resume button (handlePrintUpdate above) adjusts its text
+        // and behavior depending on filament_change_phase.
     }
 
 
     /**
-     * HMS-Banner setzen. EINE Fassung fuer beide Wege.
+     * Set the HMS banner. ONE version for both paths.
      *
-     * Stand bis 20aug26 zweimal fast gleich da: hier fuer den Socket und in
-     * status-manager.applyStatus fuer den /api/status-Poll. Das waren die
-     * einzigen vier DOM-Elemente, die sich die beiden Bloecke teilten — und
-     * prompt liefen sie auseinander (nur diese Fassung kannte den
-     * synthetischen Klipper-Code).
+     * Up to 20aug26 it was here nearly twice: once for the socket and once in
+     * status-manager.applyStatus for the /api/status poll. Those were the
+     * only four DOM elements the two blocks shared — and
+     * they promptly diverged (only this version knew about the
+     * synthetic Klipper code).
      */
     applyHmsBanner(data) {
-        // Gezeichnet wird in hms-banner.js — dieselbe Routine, die auch
-        // Konsole, Historie und Einstellungen benutzen. Hier stehen nur die
-        // Dinge, die es NUR auf der Hauptseite gibt: die Quittungsliste vom
-        // Start und der Hinweis, dass sie schon da ist.
+        // Drawn in hms-banner.js — the same routine also used by
+        // the console, history and settings. Only what exists ONLY on the
+        // main page lives here: the acknowledgment list from
+        // startup and the notice that it's already there.
         if (!window.HmsBanner) return;
         window.HmsBanner.zeichne(data, {
             geladen: hmsStatusLoaded,
@@ -1619,13 +1774,13 @@ class SocketManager {
     }
 
     /**
-     * Rendert die Klipper bed_mesh-Matrix als 3D-Isometric-Surface im
-     * SVG-Element `#bed-mesh-svg`. Color-Gradient blau→gelb→rot (Hue 240°→0°
-     * via HSL). Z-Werte werden auf 0..1 normalisiert und mit Faktor verstärkt
-     * damit auch kleine Spreads (0.05-0.2 mm) sichtbar sind.
+     * Renders the Klipper bed_mesh matrix as a 3D isometric surface in
+     * the SVG element `#bed-mesh-svg`. Color gradient blue→yellow→red (hue 240°→0°
+     * via HSL). Z values are normalized to 0..1 and amplified by a factor
+     * so that even small spreads (0.05-0.2 mm) are visible.
      *
-     * Iso-Projektion: 30° X + 30° Y. Quads werden back-to-front sortiert
-     * gezeichnet (Painter's Algorithm) damit Vordergrund vorne ist.
+     * Iso projection: 30° X + 30° Y. Quads are drawn sorted
+     * back-to-front (Painter's Algorithm) so the foreground is in front.
      *
      * @param {{matrix: number[][], mesh_min?: number[], mesh_max?: number[],
      *          profile_name?: string}} bedMesh
@@ -1661,18 +1816,18 @@ class SocketManager {
         const spread = Math.max(vmax - vmin, 0.05);
 
         // ======= Iso-Projektion =======
-        // viewBox 200x140 — breit genug fuer das gekippte Grid.
+        // viewBox 200x140 — wide enough for the tilted grid.
         svg.setAttribute('viewBox', '0 0 200 140');
         const VW = 200, VH = 140;
 
-        // Iso-Achsen (30° Kippen, 30° Rotation)
+        // Iso axes (30° tilt, 30° rotation)
         const cos30 = Math.cos(Math.PI / 6);
         const sin30 = Math.sin(Math.PI / 6);
 
-        // Grid-Spannweite in Welt-Koordinaten (centered). Seitenverhältnis aus dem
-        // ECHTEN Mesh-Bereich (mesh_min/mesh_max) ableiten, sonst wirkt ein adaptives
-        // Mesh (z.B. breit & flach) fälschlich quadratisch wie ein Voll-Mesh.
-        const gridSize = 110;                   // längere Welt-Achse
+        // Grid span in world coordinates (centered). Derive the aspect ratio from the
+        // REAL mesh area (mesh_min/mesh_max), otherwise an adaptive
+        // mesh (e.g. wide & flat) would falsely look square like a full mesh.
+        const gridSize = 110;                   // longer world axis
         let worldW = gridSize, worldH = gridSize;   // X (cols) / Y (rows)
         const _mn = bedMesh.mesh_min, _mx = bedMesh.mesh_max;
         if (Array.isArray(_mn) && Array.isArray(_mx) && _mn.length >= 2 && _mx.length >= 2) {
@@ -1686,33 +1841,33 @@ class SocketManager {
         }
         const stepX = worldW / (cols - 1);
         const stepY = worldH / (rows - 1);
-        const zScale = 25;                      // Hoehen-Skalierung
-        const cx = VW / 2;                      // Welt-Origin auf Canvas
-        // cy zentriert den Mesh. Iso-Span fuer gx+gy ∈ [-gridSize, +gridSize]
-        // gibt vertikalen Range von ±gridSize*sin30 = ±55px plus z-Swing
-        // von ±zScale*0.5 = ±12.5px. Mit VH=140 passt cy=VH/2 perfekt:
+        const zScale = 25;                      // height scaling
+        const cx = VW / 2;                      // world origin on canvas
+        // cy centers the mesh. Iso span for gx+gy ∈ [-gridSize, +gridSize]
+        // gives a vertical range of ±gridSize*sin30 = ±55px plus a z swing
+        // of ±zScale*0.5 = ±12.5px. With VH=140, cy=VH/2 fits perfectly:
         // top  = 70 - 67.5 = +2.5
         // bot  = 70 + 67.5 = 137.5
-        // (Vorher cy = VH/2+25 → bottom-Corner @ 162 → clipped).
+        // (Previously cy = VH/2+25 → bottom corner @ 162 → clipped).
         const cy = VH / 2;
 
         const project = (gx, gy, z) => {
-            // gx/gy: Grid-Koordinaten centered (-gridSize/2 ... +gridSize/2)
+            // gx/gy: grid coordinates centered (-gridSize/2 ... +gridSize/2)
             // Iso: sx = (x - y) * cos30; sy = (x + y) * sin30 - z
             const sx = cx + (gx - gy) * cos30;
             const sy = cy + (gx + gy) * sin30 - z * zScale;
             return [sx, sy];
         };
 
-        // Vertices vorberechnen (rows x cols)
+        // Precompute vertices (rows x cols)
         const verts = [];
         for (let r = 0; r < rows; r++) {
             const row = [];
             for (let c = 0; c < cols; c++) {
                 const v = matrix[r][c];
                 if (typeof v !== 'number') { row.push(null); continue; }
-                // Y umkehren — Bed Y=0 unten in Welt, SVG Y=0 oben in Pixel.
-                // (Das ist die KORREKTE Orientierung, deckt sich mit Mainsail.)
+                // Flip Y — bed Y=0 is at the bottom in world space, SVG Y=0 at the top in pixels.
+                // (This is the CORRECT orientation, matching Mainsail.)
                 const gx = -worldW / 2 + c * stepX;
                 const gy = +worldH / 2 - r * stepY;
                 const tz = (v - vmin) / spread;            // 0..1
@@ -1720,11 +1875,11 @@ class SocketManager {
                 const [sx, sy] = project(gx, gy, z);
                 row.push({ sx, sy, gx, gy, z, t: tz, v });
             }
-            verts.push(row);  // <-- der fehlende push
+            verts.push(row);  // <-- the missing push
         }
 
-        // Quads bauen (rows-1) x (cols-1), mit Color = Avg(z) und Tiefen-Key
-        // (gx+gy am Quad-Mittelpunkt) fuer Painter's Sort.
+        // Build quads (rows-1) x (cols-1), with color = avg(z) and a depth key
+        // (gx+gy at the quad midpoint) for the painter's sort.
         const quads = [];
         for (let r = 0; r < rows - 1; r++) {
             for (let c = 0; c < cols - 1; c++) {
@@ -1735,9 +1890,9 @@ class SocketManager {
                 if (!a || !b || !d || !e) continue;
                 const avgT = (a.t + b.t + d.t + e.t) / 4;
                 const hue = 240 - avgT * 240;
-                // Tiefen-Key: Quads mit hohem (gx+gy) liegen weiter VORN
-                // (positive Y zeigt nach VORNE in Iso), also kleinere Key
-                // = weiter HINTEN — die zeichnen wir zuerst.
+                // Depth key: quads with a high (gx+gy) lie further in FRONT
+                // (positive Y points FORWARD in iso), so a smaller key
+                // means further BACK — those get drawn first.
                 const depth = (a.gx + a.gy + d.gx + d.gy) / 2;
                 quads.push({
                     points: `${a.sx.toFixed(2)},${a.sy.toFixed(2)} `
@@ -1750,16 +1905,16 @@ class SocketManager {
                 });
             }
         }
-        // Painter's: hinten zuerst (kleinste depth = ganz hinten in Iso)
+        // Painter's: back first (smallest depth = furthest back in iso)
         quads.sort((x, y) => x.depth - y.depth);
 
         // ===== Render =====
-        // Zuerst dezente Grid-Axes (Drahtgitter-Boden) als Reference-Frame.
+        // First, faint grid axes (wireframe floor) as a reference frame.
         const corners = [
-            project(-gridSize / 2, +gridSize / 2, -0.5),  // links vorne
-            project(+gridSize / 2, +gridSize / 2, -0.5),  // rechts vorne
-            project(+gridSize / 2, -gridSize / 2, -0.5),  // rechts hinten
-            project(-gridSize / 2, -gridSize / 2, -0.5),  // links hinten
+            project(-gridSize / 2, +gridSize / 2, -0.5),  // front-left
+            project(+gridSize / 2, +gridSize / 2, -0.5),  // front-right
+            project(+gridSize / 2, -gridSize / 2, -0.5),  // back-right
+            project(-gridSize / 2, -gridSize / 2, -0.5),  // back-left
         ];
         const floorPath = corners.map((p, i) =>
             (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ') + ' Z';
@@ -1809,13 +1964,13 @@ class SocketManager {
         document.addEventListener('visibilitychange', async () => {
             const now = Date.now();
 
-            // WICHTIG: Verhindere mehrfache Ausführung
+            // IMPORTANT: prevent multiple executions
             if (window.socketReconnectInProgress) {
                 console.log('⏸️ Socket reconnect already in progress');
                 return;
             }
 
-            // Throttle bleibt
+            // Throttle stays in effect
             if (now - this.lastVisibilityChange < 3000) {
                 console.log('⏸️ Visibility change throttled');
                 return;
@@ -1823,7 +1978,7 @@ class SocketManager {
             this.lastVisibilityChange = now;
 
             if (document.hidden) {
-                // Tab versteckt - Socket/Polling Cleanup (Stream wird von Handler 1 verwaltet)
+                // Tab hidden - socket/polling cleanup (stream is managed by handler 1)
                 console.log('📱 Tab versteckt - Socket Cleanup');
 
                 if (window.statusUpdateInterval) {
@@ -1832,7 +1987,7 @@ class SocketManager {
                 }
 
             } else if (!document.hidden) {
-                // Tab sichtbar - NUR EINMAL reconnecten
+                // Tab visible - reconnect ONLY ONCE
                 window.socketReconnectInProgress = true;
 
                 console.log('📱 Tab visible again');
@@ -1856,38 +2011,38 @@ class SocketManager {
                 if (window.socket && !window.socket.connected) {
                     console.log('🔄 Socket reconnect...');
 
-                    // Versuche normalen reconnect
+                    // Try a normal reconnect
                     window.socket.connect();
 
-                    // LÄNGER warten - 3 Sekunden statt 2
+                    // Wait LONGER - 3 seconds instead of 2
                     await new Promise(resolve => setTimeout(resolve, 3000));
 
                     if (!window.socket.connected) {
                         console.log('❌ Reconnect failed - creating a new socket');
 
-                        // Alte KOMPLETT killen
+                        // Kill the old one COMPLETELY
                         if (window.socket) {
                             window.socket.removeAllListeners();
                             window.socket.offAny();
                             if (window.socket.io) {
-                                window.socket.io.opts.reconnection = false;  // Reconnection stoppen
+                                window.socket.io.opts.reconnection = false;  // Stop reconnection
                                 window.socket.io._reconnection = false;
                                 window.socket.io.disconnect();
                             }
                             window.socket.disconnect();
-                            delete window.socket;  // Statt = null
+                            delete window.socket;  // instead of = null
                             window.socket = null;
                         }
 
-                        // NOCH länger warten
+                        // Wait EVEN longer
                         await new Promise(resolve => setTimeout(resolve, 500));
 
-                        // Neue erstellen
+                        // Create a new one
                         window.socket = io({
                             transports: ['websocket', 'polling'],
                             upgrade: true,
-                            reconnection: false,  // ERSTMAL AUS!
-                            timeout: 15000,       // Längerer Timeout
+                            reconnection: false,  // OFF FOR NOW!
+                            timeout: 15000,       // Longer timeout
                             forceNew: true,
                             auth: (cb) => {
                                 const token = localStorage.getItem('access_token');
@@ -1896,10 +2051,10 @@ class SocketManager {
                             }
                         });
 
-                        // Warte auf Verbindung
+                        // Wait for connection
                         window.socket.once('connect', () => {
                             console.log('✅ NEW socket connected:', window.socket.id);
-                            // Jetzt reconnection wieder aktivieren
+                            // Now re-enable reconnection
                             window.socket.io.opts.reconnection = true;
                         });
 
@@ -1907,11 +2062,11 @@ class SocketManager {
                             console.log('❌ New socket error:', error.message, error.type);
                         });
 
-                        // Nach 5 Sekunden prüfen
+                        // Check after 5 seconds
                         setTimeout(() => {
                             if (!window.socket.connected) {
                                 console.log('❌ New socket not connected after 5s');
-                                // Fallback: Seite neu laden
+                                // Fallback: reload the page
                                 showConfirmDialog(texts.confirm_reload_page, function() {
                                     location.reload();
                                 });
@@ -1920,13 +2075,13 @@ class SocketManager {
                     }
                 }
 
-                // Stream wird von Handler 1 (PAGE VISIBILITY) verwaltet - nicht hier!
+                // Stream is managed by handler 1 (PAGE VISIBILITY) - not here!
 
                 if (!window.statusUpdateInterval) {
-                    // Einmal sofort holen, damit die Oberflaeche nach dem
-                    // Sichtbarwerden nicht auf den ersten Push wartet.
-                    // Danach nur noch als Rueckfall pollen — der Socket
-                    // traegt inzwischen den vollen Stand (siehe app-init.js).
+                    // Fetch once immediately, so the UI doesn't wait for the
+                    // first push right after becoming visible.
+                    // After that, only poll as a fallback — the socket
+                    // already carries the full state by then (see app-init.js).
                     loadEverything();
                     window.statusUpdateInterval = setInterval(() => {
                         const online = window.socket && window.socket.connected
@@ -1935,21 +2090,21 @@ class SocketManager {
                     }, 8000);
                 }
 
-                // Flag zurücksetzen
+                // Reset flag
                 window.socketReconnectInProgress = false;
             }
         });
     }
 
     _setupSafariPWAFocusHandler() {
-        // Safari PWA: NUR für Kamera, NICHT für Socket!
-        // Der alte Safari-PWA-Focus-Handler ist raus: dataset.oldSrc wurde
-        // nirgends gesetzt (toter Code), und Kamera-Wiederaufnahme gehoert
-        // allein dem camera-manager (docs/kamera-architektur.md).
+        // Safari PWA: ONLY for the camera, NOT for the socket!
+        // The old Safari PWA focus handler is gone: dataset.oldSrc was never
+        // set anywhere (dead code), and resuming the camera belongs
+        // solely to camera-manager (docs/kamera-architektur.md).
     }
 
     _setupBeforeUnloadHandler() {
-        // Browser-Close Detection - WebSocket sauber schließen
+        // Browser-close detection - cleanly close the WebSocket
         window.addEventListener('beforeunload', function(event) {
             console.log('🔌 Browser schließt - WebSocket cleanup');
             if (window.socket && window.socket.connected) {

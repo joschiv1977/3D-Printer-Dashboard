@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ersteinrichtung</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <!-- Dasselbe Aussehen wie der Rest. Bis 31aug26 standen hier 529 Zeilen
-         eigenes CSS und kein einziger Hausbaustein — der allererste
-         Bildschirm sah aus wie eine andere Anwendung. -->
+    <!--Same look as the rest.-->
     <link rel="stylesheet" href="/static/css/design-tokens.css?v=3">
     <link rel="stylesheet" href="/static/css/base.css?v=3">
     <link rel="stylesheet" href="/static/css/shared-styles.css?v=3">
@@ -15,8 +13,8 @@
     <link rel="stylesheet" href="/static/css/einstellungen.css?v=3">
     <link rel="stylesheet" href="/static/font-awesome.min.css">
     <style>
-        /* Nur was ein Assistent braucht und die Einstellungen nicht kennen:
-           die Huelle, die Schrittanzeige und das Ein-/Ausblenden der Karten. */
+        /* Only what a wizard needs and the settings page doesn't know:
+           the shell, the step indicator, and showing/hiding the cards. */
         body { background: var(--bg-primary); color: var(--text-primary);
                min-height: 100vh; padding: max(16px, env(safe-area-inset-top)) 16px 32px; }
 
@@ -27,8 +25,8 @@
         .se-kopf .se-rechts { margin-left: auto; display: flex; gap: 8px; }
         .se-unterzeile { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
 
-        /* Schrittanzeige. Der Balken dahinter liegt hinter den Punkten,
-           damit er beim Umbruch nicht durch die Beschriftung laeuft. */
+        /* Step indicator. The bar behind it sits behind the dots
+           so it doesn't run through the label when it wraps. */
         .se-schritte { display: flex; position: relative; margin-bottom: 18px; }
         .se-schritte::before {
             content: ''; position: absolute; top: 15px; left: 12%; right: 12%;
@@ -69,7 +67,7 @@
         .se-hinweis.warn { background: rgba(255,152,0,.12);  color: #ff9800; }
         .se-hinweis.fehl { background: rgba(244,67,54,.12);  color: #f44336; }
 
-        /* Der Abdruck der Maschine — lang, darf umbrechen. */
+        /* The machine's fingerprint -- long, allowed to wrap. */
         .se-abdruck { font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
                       font-size: 12px; word-break: break-all; cursor: pointer;
                       background: var(--bg-secondary); padding: 9px 11px;
@@ -149,7 +147,7 @@
 
     <div id="hinweis" class="se-hinweis"></div>
 
-    <!-- ── 1: Lizenz ───────────────────────────────────────────────── -->
+    <!---- 1: License ------------------------------------------------->
     <div class="se-karte aktiv" id="schritt-1">
         <div class="es-karte">
             <div class="es-karte-kopf">
@@ -187,7 +185,7 @@
         </div>
     </div>
 
-    <!-- ── 2: Zugang ───────────────────────────────────────────────── -->
+    <!---- 2: Access -------------------------------------------------->
     <div class="se-karte" id="schritt-2">
         <div class="es-karte">
             <div class="es-karte-kopf">
@@ -234,7 +232,7 @@
         </div>
     </div>
 
-    <!-- ── 3: Drucker ──────────────────────────────────────────────── -->
+    <!---- 3: Printer ------------------------------------------------->
     <div class="se-karte" id="schritt-3">
         <div class="es-karte">
             <div class="es-karte-kopf">
@@ -263,6 +261,22 @@
 
             <!-- Bambu -->
             <form id="bambu-form" onsubmit="bambuSpeichern(event)">
+
+                <!--Printers announce themselves on the network every five
+                    seconds. Name, address and serial number are included
+                    verbatim -- nobody needs to copy them from the device by hand.-->
+                <div class="es-zeile">
+                    <div class="es-zeile-name">
+                        <b data-i18n="setup_discovery">Im Netz gefunden</b>
+                        <span data-i18n="setup_discovery_hint">Drucker melden sich von selbst. Übernehmen füllt Name, Adresse und Seriennummer.</span>
+                    </div>
+                    <div class="es-zeile-wert">
+                        <button type="button" class="es-knopf" onclick="setupSucheLaden()"
+                                data-i18n="setup_discovery_refresh">Neu suchen</button>
+                    </div>
+                </div>
+                <div id="setup-suche-liste"></div>
+
                 <div class="es-zeile">
                     <div class="es-zeile-name">
                         <label for="bambu-name" data-i18n="setup_printer_name">Name</label>
@@ -392,7 +406,7 @@
         </div>
     </div>
 
-    <!-- ── 4: Steckdose ────────────────────────────────────────────── -->
+    <!---- 4: Smart Plug ---------------------------------------------->
     <div class="se-karte" id="schritt-4">
         <div class="es-karte">
             <div class="es-karte-kopf">
@@ -498,21 +512,19 @@
     </div>
 </div>
 
-<!-- Dieselbe Themenverwaltung wie ueberall: sie kennt drei Zustaende
-     (automatisch/dunkel/hell) und zeichnet ihr Symbol selbst in
-     #theme-icon. Eine eigene Kopie hier waere der vierte Ort mit eigener
-     Vorstellung davon gewesen.
+<!--Same theme manager as everywhere else: it knows three states
+    (auto/dark/light) and draws its own icon into #theme-icon. A separate
+    copy here would have been a fourth place with its own idea of that.
 
-     Am ENDE, nicht im <head>: ihr Konstruktor ruft updateIcons() und
-     greift dabei auf #theme-icon zu. Steht das Element noch nicht, wirft
-     er — und `window.themeManager` wird nie gesetzt (31aug26 genau so
-     gemessen: skIcon da, themeManager undefined). -->
+    At the END, not in <head>: its constructor calls updateIcons() and
+    accesses #theme-icon while doing so. If the element does not exist
+    yet, it throws -- and `window.themeManager` never gets set. -->
 <script src="/static/js/modules/icons.js"></script>
 <script src="/static/js/modules/theme-manager.js"></script>
 <script>
 // ─────────────────────────────────────────────────────────────────────
-// Sprache. Derselbe Weg wie login.html: die Datei wird nachgeladen,
-// weil diese Seite VOR der Anmeldung laeuft und kein Buendel bekommt.
+// Language. Same approach as login.html: the file is loaded afterward
+// because this page runs BEFORE login and gets no bundle.
 // ─────────────────────────────────────────────────────────────────────
 let texte = {};
 const sprache = localStorage.getItem('language') || 'de';
@@ -536,14 +548,14 @@ function texteSetzen() {
              || window.translations_en || window.translations_de || {};
         texteSetzen();
     };
-    // Faellt die Datei aus, bleiben die deutschen Vorgaben im HTML stehen —
-    // besser als eine leere Seite.
+    // If the file fails to load, the German defaults baked into the HTML
+    // stay in place -- better than a blank page.
     s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
     document.head.appendChild(s);
 })();
 
 // ─────────────────────────────────────────────────────────────────────
-// Schritte
+// Steps
 // ─────────────────────────────────────────────────────────────────────
 let schritt = 1;
 
@@ -575,7 +587,7 @@ function arbeitet(knopf, ja, ruhetext) {
     knopf.innerHTML = ja ? '<span class="se-dreher"></span>' : ruhetext;
 }
 
-/** Der Kopf, den die Setup-Routen verlangen: Cookie plus CSRF-Marke. */
+/** The header the setup routes require: cookie plus CSRF token. */
 function kopfMitCsrf() {
     const marke = localStorage.getItem('csrf_token');
     if (!marke) throw new Error(t('setup_err_csrf', 'Nicht angemeldet — bitte neu laden.'));
@@ -583,7 +595,7 @@ function kopfMitCsrf() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// 1: Lizenz
+// 1: License
 // ─────────────────────────────────────────────────────────────────────
 let abdruckWert = '';
 
@@ -630,7 +642,7 @@ async function lizenzAktivieren(e) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// 2: Zugang
+// 2: Access
 // ─────────────────────────────────────────────────────────────────────
 function staerkePruefen() {
     const pw = document.getElementById('pw-neu').value;
@@ -680,6 +692,7 @@ async function passwortSetzen(e) {
 
         melde(t('setup_pw_ok', 'Passwort gesetzt.'), 'gut');
         await modelleLaden();
+        setupSucheLaden();
         setTimeout(function () { weiter(3); }, 700);
     } catch (err) {
         melde(err.message, 'fehl');
@@ -689,7 +702,7 @@ async function passwortSetzen(e) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// 3: Drucker
+// 3: Printer
 // ─────────────────────────────────────────────────────────────────────
 function typWechseln() {
     const typ = document.querySelector('input[name="druckertyp"]:checked').value;
@@ -699,7 +712,7 @@ function typWechseln() {
     document.getElementById('typ-label-klipper').classList.toggle('gewaehlt', typ === 'klipper');
 }
 
-/** Die Modelle kommen vom Server — dort werden neue gepflegt. */
+/** Models come from the server -- new ones are maintained there. */
 async function modelleLaden() {
     const wahl = document.getElementById('bambu-modell');
     try {
@@ -717,6 +730,79 @@ async function modelleLaden() {
     } catch (err) {
         wahl.innerHTML = '<option value="">' + t('setup_models_fail', 'Liste nicht ladbar') + '</option>';
         console.error('Modelle laden:', err);
+    }
+}
+
+/** Whatever is currently announcing itself on the network. Read-only. */
+async function setupSucheLaden() {
+    const ziel = document.getElementById('setup-suche-liste');
+    if (!ziel) return;
+    try {
+        const a = await fetch('/api/setup/drucker_suche', {
+            headers: kopfMitCsrf(), credentials: 'include'
+        });
+        const d = await a.json();
+        ziel.innerHTML = setupSucheHtml(d.drucker || []);
+    } catch (err) {
+        ziel.innerHTML = '';
+    }
+}
+
+function setupEsc(x) {
+    return String(x == null ? '' : x).replace(/[&<>"']/g, function (c) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
+                  '"': '&quot;', "'": '&#39;' })[c];
+    });
+}
+
+//: The most recently fetched list. The button carries only its index -- a
+//: whole record in the onclick attribute would mean squeezing JSON through
+//: HTML escaping, and sooner or later a name with quotation marks breaks it.
+let setupGefunden = [];
+
+function setupSucheHtml(liste) {
+    setupGefunden = liste;
+    if (!liste.length) {
+        return '<div class="es-zeile"><div class="es-zeile-name"><span>'
+             + setupEsc(t('setup_discovery_none', 'Noch kein Drucker gemeldet'))
+             + '</span></div></div>';
+    }
+    return liste.map(function (d, i) {
+        return '<div class="es-zeile">'
+             + '<div class="es-zeile-name"><b>'
+             + setupEsc(d.name || d.seriennummer) + ' · ' + setupEsc(d.ip) + '</b>'
+             + '<span>' + setupEsc(d.seriennummer) + '</span></div>'
+             + '<div class="es-zeile-wert">'
+             + '<button type="button" class="es-knopf" onclick="setupUebernehmen(' + i + ')">'
+             + setupEsc(t('setup_discovery_apply', 'Übernehmen'))
+             + '</button></div></div>';
+    }).join('');
+}
+
+/**
+ * Fill in name, address and serial number -- they come across verbatim
+ * in the announcement.
+ *
+ * The model only if the server knows the code. Bambu's internal
+ * identifier comes over the wire (`N6` for the X2D); a guessed model
+ * would pull in the wrong profiles, and the dropdown is right there anyway.
+ */
+function setupUebernehmen(index) {
+    const d = setupGefunden[index];
+    if (!d) return;
+    const setzen = function (id, wert) {
+        const feld = document.getElementById(id);
+        if (feld && wert) feld.value = wert;
+    };
+    setzen('bambu-name', d.name);
+    setzen('bambu-ip', d.ip);
+    setzen('bambu-serie', d.seriennummer);
+    const modell = document.getElementById('bambu-modell');
+    if (modell && d.modell_id) {
+        const passend = Array.prototype.some.call(modell.options, function (o) {
+            return o.value === d.modell_id;
+        });
+        if (passend) modell.value = d.modell_id;
     }
 }
 
@@ -785,7 +871,7 @@ async function klipperSpeichern(e) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// 4: Steckdose
+// 4: Smart Plug
 // ─────────────────────────────────────────────────────────────────────
 function stromFelder() {
     const art = document.getElementById('strom-art').value;
@@ -793,8 +879,8 @@ function stromFelder() {
     document.getElementById('meross-felder').style.display = art === 'meross' ? '' : 'none';
 }
 
-/** Beide Dienste in EINEM Aufruf setzen — der jeweils andere wird
- *  ausgeschaltet. Vorher stand dieselbe Folge dreimal im Quelltext. */
+/** Set both services in a single call -- the other one is disabled
+ *  at the same time. */
 async function stromSetzen(art) {
     const kopf = kopfMitCsrf();
     const ha = art === 'homeassistant'
@@ -837,7 +923,7 @@ async function abschliessen(knopf, ruhe) {
         return;
     }
 
-    // Der Server beendet sich mit Code 42, der Launcher startet ihn neu.
+    // The server exits with code 42; the launcher restarts it.
     let rest = 12;
     const zeigen = function () {
         melde(t('setup_done', 'Fertig. Der Server startet neu …') + ' (' + rest + 's)', 'gut');
@@ -867,13 +953,13 @@ async function stromSpeichern(e) {
 }
 
 async function stromUeberspringen() {
-    try { await stromSetzen('none'); } catch (err) { /* nichts zu retten */ }
+    try { await stromSetzen('none'); } catch (err) { /* nothing worth recovering */ }
     entwurfLoeschen();
     weiter(5);
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Zwischenspeichern
+// Draft storage
 // ─────────────────────────────────────────────────────────────────────
 //
 // A page reload must not throw away what has been typed. Every step writes
@@ -905,7 +991,7 @@ function entwurfSpeichern() {
         const typ = document.querySelector('input[name="druckertyp"]:checked');
         if (typ) d._typ = typ.value;
         sessionStorage.setItem('setup_entwurf', JSON.stringify(d));
-    } catch (e) { /* privates Fenster, voller Speicher - kein Beinbruch */ }
+    } catch (e) { /* private window, storage full -- not a big deal */ }
 }
 
 function entwurfLaden() {
@@ -920,7 +1006,7 @@ function entwurfLaden() {
             const el = document.getElementById(id);
             if (el) el.value = d[id];
         });
-    } catch (e) { /* nichts wiederherzustellen */ }
+    } catch (e) { /* nothing to restore */ }
 }
 
 function entwurfLoeschen() {
@@ -928,7 +1014,7 @@ function entwurfLoeschen() {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Schritt 5: der Abschluss
+// Step 5: the finish
 // ─────────────────────────────────────────────────────────────────────
 const ABSCHLUSS_TEXTE = {
     profile: ['setup_fin_profile', 'Slicer-Profile'],
@@ -973,7 +1059,7 @@ function abschlussVerfolgen(knopf, ruhe) {
         try {
             const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
             d = await a.json();
-        } catch (e) { return; }   // Netz zuckt - beim naechsten Mal wieder
+        } catch (e) { return; }   // network hiccup -- retried next time
         abschlussZeichnen(d.aufgaben);
         if (d.fertig) {
             clearInterval(uhr);
@@ -984,43 +1070,41 @@ function abschlussVerfolgen(knopf, ruhe) {
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// Start: dort weitermachen, wo es hing
+// Start: resume where it left off
 // ─────────────────────────────────────────────────────────────────────
 (async function starten() {
-    // Erst den Entwurf, dann die Felder danach ausrichten: der gespeicherte
-    // Druckertyp entscheidet, welche Bloecke sichtbar sind.
+    // Load the draft first, then align the fields to it: the stored
+    // printer type decides which blocks are visible.
     entwurfLaden();
     typWechseln();
     stromFelder();
-    // Ab jetzt jede Eingabe mitschreiben. Ein Neuladen darf nicht alles
-    // wegwerfen -- bis 01sep26 stand man danach wieder vor leeren Feldern.
+    // From here on, every input gets recorded -- a reload must not throw
+    // everything away.
     document.addEventListener('input', entwurfSpeichern);
     document.addEventListener('change', entwurfSpeichern);
     try {
         const a = await fetch('/api/setup/status');
         const d = await a.json();
-        // Der Statusbericht meldet seit 31aug26 echte Werte — vorher waren
-        // Lizenz und Passwort fest auf `true` verdrahtet.
-        // Der Strom-Schritt ist beantwortet, sobald power_control.mode steht --
-        // "Keine" ist eine Antwort. Ohne dieses Feld war sie von "noch nicht
-        // gefragt" nicht zu unterscheiden.
+        // The power step counts as answered as soon as power_control.mode is
+        // set -- "None" is itself an answer. Without this field, it couldn't
+        // be told apart from "not asked yet".
         if (d.finalize_done || d.power_configured) { schritt = 5; }
         else if (d.printer_configured) { schritt = 4; }
-        else if (d.password_changed) { schritt = 3; await modelleLaden(); }
+        else if (d.password_changed) { schritt = 3; await modelleLaden(); setupSucheLaden(); }
         else if (d.license_configured) { schritt = 2; }
         if (d.printer_type === 'klipper') {
             document.querySelector('input[name="druckertyp"][value="klipper"]').checked = true;
             typWechseln();
         }
     } catch (e) {
-        // Kein Status? Dann von vorn — das ist der Normalfall beim
-        // allerersten Start.
+        // No status? Then start from the beginning -- that's the normal
+        // case on the very first launch.
     }
     schritteZeichnen();
 
-    // Auf Schritt 5 nachsehen, ob der Abschluss schon laeuft oder durch ist.
-    // Nach einem Neuladen mitten in der Arbeit haengt sich die Seite so
-    // wieder an den laufenden Vorgang, statt ihn ein zweites Mal zu starten.
+    // On step 5, check whether the finish is already running or done.
+    // After a reload in the middle of it, this hooks the page back onto
+    // the running process instead of starting it a second time.
     if (schritt === 5) {
         try {
             const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
@@ -1031,7 +1115,7 @@ function abschlussVerfolgen(knopf, ruhe) {
                 if (k) arbeitet(k, true, k.textContent);
                 abschlussVerfolgen(k, k ? k.textContent : '');
             }
-        } catch (e) { /* dann eben per Knopf */ }
+        } catch (e) { /* the button will do it then */ }
     }
 })();
 </script>

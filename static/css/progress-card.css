@@ -21,7 +21,7 @@ body:not(.dark-mode) .progress-card {
 }
 
 .print-status {
-    font-size: var(--font-size-small);  /* 12px — wie andere Card-Subtitles */
+    font-size: var(--font-size-small);  /* 12px — like other card subtitles */
     display: flex;
     align-items: center;
     gap: 5px;
@@ -110,14 +110,14 @@ body:not(.dark-mode) .progress-card {
 
 @media (min-width: 1024px) {
 
-    /* Schriftgrößen kommen jetzt aus den CSS-Variablen (base) — keine
-       Desktop-Überschreibung nötig, die Variablen skalieren selbst. */
+    /* Font sizes now come from the CSS variables (base) — no
+       desktop override needed, the variables scale themselves. */
 }
 
 /* ============================================
  * HelixScreen-inspired Layout (Sovol 356C)
- * Linke Spalte: Thumbnail + Metadata-Overlay
- * Rechte Spalte: Temp/Speed/Fans/Buttons
+ * Left column: Thumbnail + Metadata-Overlay
+ * Right column: Temp/Speed/Fans/Buttons
  * ============================================ */
 
 .progress-card--helix {
@@ -232,8 +232,8 @@ body:not(.dark-mode) .progress-card__overlay {
     color: rgba(255, 255, 255, 0.55);
 }
 
-/* Bambu-Karte: Metazeile liegt auf hellem Kartengrund, nicht auf dem
- * dunklen Thumbnail-Overlay — weisser Text war im hellen Modus unsichtbar. */
+/* Bambu card: the meta row sits on the light card background, not on the
+ * dark thumbnail overlay — white text was invisible in light mode. */
 .progress-card--bambu .progress-card__muted {
     color: var(--text-secondary);
     opacity: 0.75;
@@ -415,7 +415,7 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
 
 /* ============================================
  * Bed-Mesh-Heatmap (Klipper-only)
- * Kompakte 2D-Top-Down-Heatmap unter Z-Extras
+ * Compact 2D top-down heatmap under Z-Extras
  * ============================================ */
 .helix-bed-mesh {
     margin: 4px 12px 0;
@@ -446,7 +446,7 @@ body.dark-mode .helix-bed-mesh {
 }
 .helix-bed-mesh__grid {
     width: 100%;
-    aspect-ratio: 200 / 140;  /* matches viewBox des SVGs */
+    aspect-ratio: 200 / 140;  /* matches the SVG's viewBox */
     max-height: 200px;
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.20);
@@ -506,22 +506,22 @@ body.dark-mode .helix-bed-mesh__grid {
     pointer-events: none;
 }
 
-/* Prozente auf dem BESCHNITTENEN Render (20aug26): der x2d.png hatte rundum
-   durchsichtigen Rand — der zaehlte optisch als Abstand zum AMS und schob
-   die Standlinie nach oben. Nach dem Beschneiden liegen Drucker und AMS
-   buendig, dafuer wandern die Plaketten mit. */
+/* Percentages are based on the CROPPED render: the x2d.png had a
+   transparent border all around, which visually read as extra spacing to
+   the AMS and pushed the baseline up. After cropping, printer and AMS sit
+   flush, so the badges move along with the image. */
 .pv-badge--chamber { left: 10.7%; top: 41%; }
 .pv-badge--bed     { left: 25.8%; top: 79.2%; }
 
-/* Duesen-Plaketten im Werkzeugkopf-Feld: unter der Grafik gestapelt */
+/* Nozzle badges in the tool-head field: stacked below the graphic */
 .pv-toolhead .pv-badge { position: static; }
 .pv-badge.pv-active { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
 
-/* Bambu zeigt die Grafik, die alten Textzeilen entfallen dort */
+/* Bambu shows the graphic; the old text lines are dropped there */
 body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
 
 /* ============================================================
- * Steuerungs-Uebersicht (X2D-Display-Stil) im Control-Modal
+ * Control overview (X2D display style) in the control modal
  * ============================================================ */
 .ov-layout {
     display: flex;
@@ -608,16 +608,16 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     .ov-machine { min-width: 0; }
 }
 
-/* Plaketten in der Grafik sind einzeln klickbar (Zonen-Dialog) */
+/* Badges in the graphic are individually clickable (zone dialog) */
 .pv-badge--click { pointer-events: auto; cursor: pointer; }
 .pv-badge--click:hover { border-color: rgba(59, 130, 246, 0.7); }
 
-/* Echte Renderings statt gezeichneter Grafik */
+/* Real renderings instead of a drawn graphic */
 .pv-img { width: 100%; height: auto; display: block; }
 
 .pv-nozzle-img {
-    /* Anteil der Zeilenhoehe statt fester 64px — sonst waechst die Duese
-       optisch mit, wenn die Karte kleiner gezogen wird. */
+    /* Share of the row height instead of a fixed 64px — otherwise the nozzle
+       visually grows along whenever the card is dragged smaller. */
     height: 58%;
     width: auto;
     display: block;
@@ -635,13 +635,13 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
 
 .pv-badge .pv-ic { filter: invert(1) brightness(1.6); width: 13px; height: 13px; }
 
-/* Plaketten-Positionen fuer das echte X2D-Render (354x354, 3/4-Ansicht):
-   Kammer mittig im Glas, Bett auf Hoehe der Druckplatte. */
+/* Badge positions for the real X2D render (354x354, 3/4 view):
+   chamber centered in the glass, bed at print-plate height. */
 .pv-badge--chamber { left: 26%; top: 46%; }
 .pv-badge--bed     { left: 32%; top: 66%; }
 
 /* ============================================================
- * Hauptseiten-Zonen (Variante B): Drucker links, Material rechts
+ * Main page zones (variant B): printer left, material right
  * ============================================================ */
 .ov-cards--zone { padding: 4px 2px; }
 
@@ -711,7 +711,7 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     margin-bottom: 8px;
 }
 
-/* Textspalte links, Knopf rechts — ueber beide Zeilen mittig. */
+/* Text column left, button right — centered across both lines. */
 .mz-unit-top {
     display: flex;
     align-items: center;
@@ -732,10 +732,10 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     color: var(--text-secondary);
 }
 
-/* Trocknungszeile unter dem Kopf. Eigene Zeile, weil sonst zwei
-   Gradzahlen nebeneinander stehen — die Feuchte des Faches und die
-   Solltemperatur des Programms — und beim Umbruch nicht mehr zu
-   unterscheiden sind (27aug26). */
+/* Drying row under the head. Its own row, because otherwise two
+   degree values end up side by side — the tray's humidity and the
+   program's target temperature — and become indistinguishable once they
+   wrap. */
 .mz-unit-dry {
     display: flex;
     align-items: center;
@@ -745,8 +745,8 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     margin-top: 3px;
 }
 
-/* Messspalten wie am AMS-Display: Zeichen und Kuerzel oben, Wert
-   darunter. Zwei davon nebeneinander, RH und Temp. */
+/* Measurement columns like on the AMS display: icon and abbreviation on
+   top, value below. Two side by side, RH and temp. */
 .mz-mess {
     display: flex;
     flex-direction: column;
@@ -770,15 +770,15 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     font-variant-numeric: tabular-nums;
 }
 
-/* Restzeit als eigene Zeile unter Programm und Ziel. Dadurch bleibt
-   rechts neben der Trocknungszeile Platz fuer den Stopp-Knopf. */
+/* Remaining time as its own row under program and target. This leaves
+   room to the right of the drying row for the stop button. */
 .mz-unit-rest {
     margin-top: -2px;
 }
 
 .mz-dry-btn {
-    /* Hoeher als die alte Pille (war 3px Polster): der Knopf soll neben
-       zwei Textzeilen bestehen, nicht darin untergehen. */
+    /* Taller than the old pill: the button needs to stand next to
+       two text lines, not get lost in them. */
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -811,16 +811,16 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     margin-top: 4px;
 }
 
-/* Speist gerade eine Duese: Fuellung + kraeftiger Rand — die duenne
-   Randlinie allein war kaum sichtbar. */
+/* Currently feeding a nozzle: fill + bold border — a thin
+   border line alone was barely visible. */
 .mz-slot.mz-active-slot {
     border: 2px solid #4ade80;
     background: rgba(74, 222, 128, 0.14);
     padding: 6px 9px;
 }
 
-/* Zielwahl im Filament-Tab: deutlich gefuellt + Haekchen-Badge — die
-   duenne Randlinie allein war kaum sichtbar. */
+/* Target selection in the filament tab: solid fill + checkmark badge — a
+   thin border line alone was barely visible. */
 .mz-slot.mz-ziel-slot {
     background: rgba(74, 222, 128, 0.16);
     border: 2px solid #4ade80;
@@ -848,10 +848,19 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     flex: 0 0 auto;
 }
 
+/* Tray with no filament. The printer reports it through tray_exist_bits;
+   type and colour stay put and are no help as a clue. Restrained rather than
+   hidden: the tray does exist, there is just nothing in it. */
+.mz-slot--leer { opacity: .55; }
+.mz-slot--leer .mz-slot-col {
+    background: transparent !important;
+    border-style: dashed;
+}
+
 .mz-slot-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mz-slot-pct { margin-left: auto; color: var(--text-secondary); font-size: 11.5px; flex: 0 0 auto; }
-/* K-Wert (Pressure Advance) am aktiven Fach — der Drucker meldet ihn je
-   Filament, nicht je Geraet. Dezent, er ist Beiwerk zum Namen. */
+/* K value (Pressure Advance) on the active tray — the printer reports it
+   per filament, not per device. Subtle, it's a side note to the name. */
 .mz-slot-k {
     flex: 0 0 auto; margin-left: 8px; font-size: 10.5px; font-weight: 600;
     color: var(--text-secondary); border: 1px solid var(--border-color);
@@ -868,7 +877,7 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     border-top: 1px solid rgba(128, 128, 128, 0.14);
 }
 
-/* Bambu: alte Knopf-Karten weichen den Zonen. Klipper unveraendert. */
+/* Bambu: the old button cards give way to the zones. Klipper unchanged. */
 body[data-active-printer="bambu"] #control-card-mobile,
 body[data-active-printer="bambu"] #control-card-desktop,
 body[data-active-printer="bambu"] #dev-control-card-mobile,
@@ -880,7 +889,7 @@ body[data-active-printer="klipper"] #material-zone-card-grid {
     display: none !important;
 }
 
-/* Druckkarte: Tempo-/Fluss- und Luefter-Zeilen im Chip-Stil */
+/* Print card: speed/flow and fan rows in chip style */
 body[data-active-printer="bambu"] .helix-inline-row,
 body[data-active-printer="bambu"] .helix-fan-row {
     background: rgba(128, 128, 128, 0.08);
@@ -892,15 +901,15 @@ body[data-active-printer="bambu"] .helix-fan-row {
 }
 
 /* ============================================================
- * Bambu-Druckkarte: Proportionen wie im Mockup — Geraet im
- * Zentrum, Thumbnail schmaler, Chips in einer Reihe
+ * Bambu print card: proportions as in the mockup — device in
+ * the center, thumbnail narrower, chips in one row
  * ============================================================ */
 body[data-active-printer="bambu"] .progress-card__cols {
     grid-template-columns: 2fr 3fr;
 }
 
 /* ============================================================
- * Bambu-Druckkarte im Display-Stil (progress-card--bambu)
+ * Bambu print card in display style (progress-card--bambu)
  * ============================================================ */
 .progress-card--bambu {
     display: flex;
@@ -910,10 +919,10 @@ body[data-active-printer="bambu"] .progress-card__cols {
     overflow: hidden;
 }
 
-/* Status-Pille sitzt oben LINKS ueber dem Thumbnail */
+/* Status pill sits top LEFT above the thumbnail */
 .progress-card--bambu .progress-card__status-pill { left: 10px; right: auto; }
 
-/* Druck-Aktionen oben rechts (Pause/Fortsetzen/Abbrechen) */
+/* Print actions top right (pause/resume/cancel) */
 .pcb-actions {
     position: absolute;
     top: 8px;
@@ -945,34 +954,34 @@ body[data-active-printer="bambu"] .progress-card__cols {
 .pcb-top {
     display: flex;
     gap: 10px;
-    /* MUSS stretch bleiben: nur dann haben die Spalten eine definierte
-       Hoehe, und nur dann loesen die Prozent-Hoehen der Geraetebilder darin
-       auf. Auf flex-end gestellt verloren Duese und AMS ihre Groesse und
-       standen fix in Pixeln da, waehrend der Drucker weiter mitskalierte.
-       Die gemeinsame Standlinie wird INNERHALB der Spalten gesetzt. */
+    /* MUST stay stretch: only then do the columns have a defined
+       height, and only then do the device images' percentage heights
+       resolve inside them. Set to flex-end, the nozzle and AMS lost their
+       sizing and sat fixed in pixels while the printer kept scaling along.
+       The shared baseline is set INSIDE the columns. */
     align-items: stretch;
-    /* EIN Regler fuer die Groesse aller drei Geraete. Die Anteile
-       untereinander (Drucker 100, AMS 60, Duese 30) sind die echten
-       Groessenverhaeltnisse und bleiben; hier wird nur gemeinsam gezoomt.
-       Sonst muesste ich drei Zahlen einzeln verstellen — und genau dabei
-       laufen sie auseinander. */
+    /* ONE control for the size of all three devices. The ratios
+       between them (printer 100, AMS 60, nozzle 30) are the real
+       size relationships and stay fixed; only the shared zoom changes here.
+       Otherwise you'd have to adjust three numbers individually — and
+       that's exactly where they'd drift apart. */
     --geraet: 0.78;
     flex: 1;
     min-height: 0;
 }
 
 .pcb-thumb {
-    /* Wie die Geraete an der Zeilenhoehe haengen, damit die Vorschau beim
-       Ziehen der Karte mitskaliert statt den freien Platz zu fluten.
-       Quadratisch, weil die Modellbilder in jedem Seitenverhaeltnis kommen. */
+    /* How the devices hang off the row height, so the preview scales along
+       when the card is resized instead of flooding the free space.
+       Square, because the model images come in every aspect ratio. */
     flex: 0 0 auto;
     align-self: flex-end;
     height: calc(88% * var(--geraet, 1));
     aspect-ratio: 1 / 1;
     min-width: 0;
-    /* Kein eigener Hintergrund und keine Ecken: die hoben sich vom
-       Kartenhintergrund ab, dadurch wirkte die Vorschau wie ein
-       aufgeklebtes Bild. Das Modell steht jetzt direkt auf der Karte. */
+    /* No background of its own and no rounded corners: they stood out
+       against the card background, making the preview look like a
+       pasted-on image. The model now sits directly on the card. */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -989,12 +998,12 @@ body[data-active-printer="bambu"] .progress-card__cols {
 }
 
 .pcb-mach {
-    /* NICHT schrumpfen. Der Drucker ist der Massstab: das AMS daneben wird
-       als Anteil der Zeilenhoehe bemessen, und das stimmt nur, solange der
-       Drucker die Zeilenhoehe wirklich ausfuellt. Liess man ihn von der
-       Breite einschnueren, war er kleiner als die Zeile — und das AMS
-       dadurch relativ zu ihm viel zu gross. Platz macht stattdessen die
-       Vorschau (siehe .pcb-thumb). */
+    /* Do NOT shrink. The printer is the scale reference: the AMS beside it
+       is sized as a share of the row height, and that's only correct as
+       long as the printer actually fills the row height. Letting the width
+       squeeze it made it smaller than the row — and the AMS relatively far
+       too large compared to it. The preview makes room instead
+       (see .pcb-thumb). */
     flex: 0 0 auto;
     min-width: 0;
     min-height: 0;
@@ -1003,47 +1012,46 @@ body[data-active-printer="bambu"] .progress-card__cols {
     justify-content: center;
 }
 
-/* Render ist quadratisch (354x354): Wrapper an die Spaltenhoehe binden,
-   damit die Maschine nie ueber Chips/Balken hinauswaechst. Die Plaketten
-   sitzen in % vom Wrapper — bei 1:1-Ratio deckungsgleich mit dem Bild. */
+/* Render is square (354x354): bind the wrapper to the column height,
+   so the machine never grows past the chips/bars. The badges
+   sit in % of the wrapper — at a 1:1 ratio, exactly aligned with the image. */
 .pcb-mach .pv-machine {
     flex: none;
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    /* Seitenverhaeltnis des BESCHNITTENEN Renders (234x241). Stand hier
-       1/1, obwohl das Bild nicht quadratisch ist — `object-fit: contain`
-       baute den durchsichtigen Rand dadurch wieder ein, den das
-       Beschneiden gerade entfernt hatte. Die Plaketten sitzen in Prozent
-       dieses Kastens, er muss also exakt aufs Bild passen. */
+    /* Aspect ratio of the CROPPED render (234x241). It must match the image
+       exactly — the badges are positioned in percent of this box, and a
+       mismatched ratio makes `object-fit: contain` reintroduce the
+       transparent border that cropping removed. */
     aspect-ratio: 234 / 241;
     width: auto;
 }
 
 .pcb-mach .pv-img { width: 100%; height: 100%; object-fit: contain; }
 
-/* Drucker: Massstab fuer die anderen beiden. */
+/* Printer: the scale reference for the other two. */
 .pcb-mach .pv-machine { height: calc(100% * var(--geraet, 1)); }
 
 .pcb-tool {
     flex: 0 0 auto;
-    /* Volle Zeilenhoehe, damit die Prozent-Hoehe des Bildes darin aufloest.
-       Der Inhalt sitzt unten — gemeinsame Standlinie mit Drucker und AMS. */
+    /* Full row height, so the image's percentage height resolves inside it.
+       Content sits at the bottom — shared baseline with printer and AMS. */
     align-self: stretch;
     justify-content: flex-end;
-    /* Schmal halten: jeder Pixel hier fehlt rechts beim AMS. */
+    /* Keep it narrow: every pixel here is missing on the right for the AMS. */
     min-width: 74px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Rahmen sitzt auf .pv-tool-box, nicht hier — sonst wuerde er ueber die
-       ganze Zeilenhoehe gezogen. */
+    /* The border sits on .pv-tool-box, not here — otherwise it would stretch
+       across the full row height. */
     cursor: pointer;
 }
 
 .pcb-tool:hover .pv-tool-box { border-color: rgba(59, 130, 246, 0.45); }
 
-/* Eine Duese: Bild oben, ihre Temperatur darunter. */
+/* One nozzle: image on top, its temperature below. */
 .pv-tool-one {
     height: 100%;
     display: flex;
@@ -1053,12 +1061,12 @@ body[data-active-printer="bambu"] .progress-card__cols {
     gap: 4px;
 }
 
-/* Der sichtbare Rahmen. Eigene, definierte Hoehe — damit loest die
-   Prozent-Hoehe des Duesenbildes darin auf, ohne dass der Rahmen die ganze
-   Zeile einnimmt. */
+/* The visible border. Its own, defined height — so the nozzle image's
+   percentage height resolves inside it, without the border taking up the
+   whole row. */
 .pv-tool-box {
     height: calc(96% * var(--geraet, 1));
-    /* Zwei Duesen nebeneinander — der X2D hat wirklich zwei. */
+    /* Two nozzles side by side — the X2D really has two. */
     flex-direction: row !important;
     gap: 8px;
     background: rgba(128, 128, 128, 0.06);
@@ -1143,15 +1151,15 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     flex: 0 0 auto;
 }
 
-/* Material-Zone: Spoolman kompakt — eine Infozeile statt Klotz */
+/* Material zone: Spoolman compact — one info row instead of a block */
 #spoolman-content #active-spool-info { padding: 6px 10px !important; margin-top: 7px !important; }
 #spoolman-content #spool-selector { padding: 7px 10px !important; font-size: 12.5px !important; }
 
 .mz-chip .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; }
 .card-title .hd-ic { opacity: 0.85; }
 
-/* Drucker-Zone: Titelzeile weg — nur ein schmaler Greifstreifen bleibt
-   (die Kopfzeile ist der Drag-Griff des Rasters). */
+/* Printer zone: title row gone — only a narrow grip strip remains
+   (the header is the grid's drag handle). */
 #printer-zone-card-grid .card-header {
     padding: 0 0 6px;
     min-height: 12px;
@@ -1159,8 +1167,8 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
 }
 #printer-zone-card-grid .card-title { display: none; }
 
-/* Systemleiste: drei Gruppen — Geraet | Steuerung | Ansichten.
-   Gruppen brechen als Einheit um, kein einsamer Chip in Zeile 2. */
+/* System bar: three groups — device | control | views.
+   Groups wrap as a unit, no lone chip on line 2. */
 .mz-sys { justify-content: flex-start; }
 .mz-sys-grp { display: flex; gap: 6px; flex-wrap: nowrap; }
 .mz-sys-div {
@@ -1171,42 +1179,41 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
 }
 
 /* ---------------------------------------------------------------------
-   Angebautes AMS neben dem Drucker
+   AMS unit attached beside the printer
    ---------------------------------------------------------------------
-   Nur sichtbar, wenn der Drucker eine Einheit meldet (das `hidden`-Attribut
-   setzt socket-manager).
+   Only visible when the printer reports a unit (the `hidden` attribute
+   is set by socket-manager).
 
-   Alles haengt an der ZEILENHOEHE, nichts an der Breite. Der Nutzer kann die
-   Karte in der Hoehe ziehen; frueher standen hier Prozent-Raender, und
-   Prozent rechnet CSS bei `margin` gegen die BREITE — Bildgroesse und
-   Abstand liefen dadurch bei jeder anderen Kartenhoehe auseinander.
+   Everything hangs off the ROW HEIGHT, nothing off the width. The user can
+   drag the card's height; CSS resolves `margin` percentages against the
+   WIDTH, not the height — so percentage margins would drift apart from the
+   image size at every other card height.
 
-   Die Renders sind auf ihren Inhalt beschnitten (kein durchsichtiger Rand
-   mehr), deshalb braucht es auch keine negativen Raender, um die Luecke zu
-   schliessen. */
+   The renders are cropped to their content (no more transparent border),
+   so no negative margins are needed to close the gap either. */
 .pcb-ams {
     flex: 0 0 auto;
     display: flex;
-    align-items: flex-end;      /* Standlinie mit dem Drucker */
+    align-items: flex-end;      /* Baseline with the printer */
     justify-content: center;
-    /* Nach unten druecken, egal ob die Duesen-Box daneben steht. Die wird
-       ausgeblendet, sobald der Drucker nur EINE Duesentemperatur meldet
-       (socket-manager: dual). Dann war das AMS das einzige Kind der Spalte,
-       und space-between setzt ein einzelnes Kind an den ANFANG — das AMS
-       rutschte waehrend eines Drucks sichtbar nach oben, weg von der
-       Standlinie des Druckers. */
+    /* Push to the bottom, regardless of whether the nozzle box sits beside it.
+       It gets hidden as soon as the printer reports only ONE nozzle
+       temperature (socket-manager: dual). Then the AMS was the column's
+       only child, and space-between puts a single child at the START — the
+       AMS visibly jumped up during a print, away from the printer's
+       baseline. */
     margin-top: auto;
 }
 
 .pcb-ams[hidden] { display: none; }
 
-/* Gemeinsamer Rahmen fuer Bild und Anzeige. Die Hoehe bestimmt die Groesse,
-   die Breite folgt dem Seitenverhaeltnis des Bildes. */
+/* Shared frame for image and display. The height determines the size,
+   the width follows the image's aspect ratio. */
 .pv-ams-wrap {
     position: relative;
-    /* Der Drucker fuellt die Zeile jetzt ganz aus (kein Quadrat-Rand mehr),
-       also ist der Anteil hier direkt das Groessenverhaeltnis der Geraete:
-       das AMS HT ist real rund 60 % so hoch wie der X2D. */
+    /* The printer now fills the row completely (no more square border),
+       so the share here is directly the devices' size ratio:
+       the AMS HT is really about 60% as tall as the X2D. */
     height: calc(92% * var(--geraet, 1));
     max-width: 100%;
     display: flex;
@@ -1216,14 +1223,14 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     height: 100%;
     width: auto;
     display: block;
-    /* Gleiche Anmutung wie die Duese daneben. */
+    /* Same look as the nozzle beside it. */
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
 }
 
-/* Feuchte und Temperatur auf der Frontblende — dort, wo das Geraet sie in
-   echt auch anzeigt. Prozent beziehen sich auf den Rahmen und damit exakt
-   auf das Bild. Das Bild ist gespiegelt (damit es zum Drucker schaut), die
-   Blende liegt also links unten. */
+/* Humidity and temperature on the front panel — right where the device
+   shows them in real life too. Percentages refer to the frame and thus
+   exactly to the image. The image is mirrored (so it faces the printer),
+   so the panel sits at the bottom left. */
 .pcb-ams .pv-badge {
     position: absolute;
     left: 22%;
@@ -1234,28 +1241,29 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     padding: 1px 6px;
 }
 
-/* Reihenfolge in der Druckerkarte: Duese, Drucker, AMS.
-   Ueber `order` statt Markup-Umbau — das Markup bedient auch Klipper und
-   Geraete ohne AMS, da will ich keine zweite Variante pflegen.
-   Die Vorschau bleibt ganz links; ohne laufenden Druck ist sie ausgeblendet,
-   dann steht die Duese aussen. */
+/* Order in the printer card: nozzle, printer, AMS.
+   Via `order` instead of restructuring the markup — the markup also serves
+   Klipper and devices without an AMS, and maintaining a second variant
+   isn't worth it. The preview stays on the far left; without an active
+   print it's hidden, so the nozzle ends up on the outside. */
 .pcb-top > .pcb-thumb { order: 0; }
 .pcb-top > .pcb-mach  { order: 1; }
 .pcb-top > .pcb-side  { order: 2; }
 
-/* Spalte rechts vom Drucker: Duese oben, AMS unten.
-   Wird auf Zeilenhoehe gedehnt — nur so loesen die Prozent-Hoehen der
-   beiden Kaesten darin auf. */
+/* Column to the right of the printer: nozzle on top, AMS below.
+   Stretched to the row height — only that way do the percentage heights
+   of the two boxes inside it resolve. */
 .pcb-side {
     flex: 0 0 auto;
     min-width: 0;
-    /* Platz fuer die Pause/Stop-Knoepfe, die absolut oben rechts in der
-       Karte sitzen (34px hoch, 8px vom Rand). Ohne den Abstand lagen sie
-       waehrend eines Drucks auf den Duesen. */
+    /* Room for the pause/stop buttons, which sit absolutely positioned top
+       right in the card (34px tall, 8px from the edge). Without this
+       spacing they overlapped the nozzles during a print. */
     padding-top: 46px;
-    /* Nach rechts, aber nicht bis an die Kante: alle Spalten haben feste
-       Breite, der freie Platz sammelte sich sonst komplett rechts vom AMS.
-       margin-left: auto schiebt hin, margin-right laesst Luft. */
+    /* To the right, but not all the way to the edge: all columns have a fixed
+       width, so the free space would otherwise all collect to the right of
+       the AMS. margin-left: auto pushes it over, margin-right leaves
+       breathing room. */
     margin-left: auto;
     margin-right: 4%;
     display: flex;
@@ -1264,15 +1272,32 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     justify-content: space-between;
 }
 
-/* Feste Anteile der Spaltenhoehe, damit die Kinder darin wieder eine
-   definierte Bezugsgroesse haben. */
+/* Fixed shares of the column height, so the children inside again have a
+   defined reference size. */
 .pcb-side > .pcb-tool { height: 46%; justify-content: flex-start; }
 .pcb-side > .pcb-ams  { height: 54%; align-items: flex-end; }
 
-/* Mit AMS daneben stellt sich der Drucker auf die Standlinie statt mittig in
-   seiner Spalte zu schweben — sonst steht das AMS sichtbar tiefer. Ohne AMS
-   bleibt er zentriert, dort gibt es keinen Bezugspunkt. */
+/* With an AMS beside it, the printer sits on the baseline instead of
+   floating centered in its column — otherwise the AMS would visibly sit
+   lower. Without an AMS it stays centered, since there's no reference
+   point there. */
 .pcb-top:has(#pv-ams:not([hidden])) > .pcb-mach {
     align-items: flex-end;
 }
 
+
+/* Tray without a Spoolman assignment.
+   Without an assignment, there is no humidity history for the tray. The
+   server no longer guesses assignments, so this needs to be visible right
+   here, where you're already looking. Restrained: a line on the side, no
+   exclamation mark. */
+.mz-slot--offen {
+    border-left: 3px solid var(--accent-orange, #f59e0b);
+    padding-left: 5px;
+}
+.mz-slot--offen .mz-slot-name::after {
+    content: "?";
+    margin-left: 6px;
+    font-weight: 700;
+    color: var(--accent-orange, #f59e0b);
+}

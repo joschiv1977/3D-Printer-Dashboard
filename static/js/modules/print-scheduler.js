@@ -9,17 +9,19 @@ class PrintSchedulerManager {
         this.scheduledFileName = '';
         this.scheduledFileLocation = '';
         this.cameFromScheduleManager = false;
-        this.editingScheduledId = null;   // Edit-Modus: id des zu ersetzenden Eintrags
+        this.editingScheduledId = null;   // Edit mode: id of the entry being replaced
+        /** Does the file picker show the archive instead of the live list? */
+        this.archivAktiv = false;
 
-        // Badge regelmäßig aktualisieren
+        // Refresh the badge periodically
         setInterval(() => this.updateScheduledPrintsBadge(), 30000);
     }
 
     // ========================================
     // schedulePrintFromSD — open schedule modal for a file
-    // prefill (optional): bestehender geplanter Druck (Frontend-Shape) —
-    // Modal wird mit dessen Zeit/Optionen vorbelegt und confirmSchedulePrint
-    // ersetzt den Eintrag (DELETE alt + POST neu, Steckdosen-Timer zieht mit).
+    // prefill (optional): an existing scheduled print (frontend shape) —
+    // the modal is pre-filled with its time/options, and confirmSchedulePrint
+    // replaces the entry (DELETE old + POST new, the outlet timer follows along).
     // ========================================
     schedulePrintFromSD(filename, location, prefill = null) {
         const texts = window.texts || {};
@@ -27,47 +29,47 @@ class PrintSchedulerManager {
 
         if (!prefill) delete window.pendingScheduleMapping;
 
-        // Edit-Modus merken (null = normales Neu-Planen)
+        // Remember edit mode (null = normal new scheduling)
         this.editingScheduledId = prefill ? prefill.id : null;
 
-        // NEU: Multi-Filament Check (beim Bearbeiten überspringen — die
-        // Spool-Zuordnung wurde beim ursprünglichen Planen schon gemacht)
+        // Multi-filament check (skipped when editing — the spool assignment
+        // was already made during the original scheduling)
         const fileData = window.sdDateiFinden ? window.sdDateiFinden(filename)
             : window.lastSDFiles?.find(f => f.name === filename);
 
-        // Klipper hat (Stand jetzt) keinen Multi-Filament-Wizard mit AMS-
-        // Tray-Mapping — Spool-Auswahl laeuft ueber Spoolman als Single-Spool.
+        // Klipper currently has no multi-filament wizard with AMS tray
+        // mapping — spool selection goes through Spoolman as a single spool.
         if (!prefill && !isKlipper && fileData && fileData.is_multifilament && fileData.all_filaments) {
-            if (!(window.spoolmanManager && window.spoolmanManager.connected)) {
-                window.skToast(texts.spoolman_required, 'warning');
+            // Same as on the direct print: the per-colour assignment needs
+            // Spoolman, the print itself does not. Without it the scheduling
+            // dialog opens as it does for a single filament.
+            if (window.spoolmanManager && window.spoolmanManager.connected) {
+                // The SAME modal, only with a different button text.
+                this.showMultiFilamentSpoolModal(fileData, location, 'schedule');
                 return;
             }
-
-            // WICHTIG: Nutze das GLEICHE Modal, aber mit anderem Button-Text!
-            this.showMultiFilamentSpoolModal(fileData, location, 'schedule');  // <-- mode parameter!
-            return;
         }
 
         this.scheduledFileName = filename;
         this.scheduledFileLocation = location;
 
-        // Modal öffnen
+        // Open the modal
         document.getElementById('schedulePrintModal').style.display = 'block';
-        // Nur der Rueckfall (Klipper-Direkt): sobald die Druckvorbereitung
-        // geladen hat, traegt ihre Datei-Karte den Namen samt Vorschau.
+        // Fallback only (Klipper-Direct): once print preparation has loaded,
+        // its file card carries the name along with the preview.
         this._zeigeDateiname(filename);
 
-        // Fehlerbereich ausblenden
+        // Hide error area
         document.getElementById('schedule-error').style.display = 'none';
 
-        // Forciere aktuelle Zeit bei jedem Öffnen (LOKALE Zeit, nicht UTC!)
-        // Beim Bearbeiten: geplante Zeit des Eintrags vorbelegen.
+        // Force current time on every open (LOCAL time, not UTC!)
+        // When editing: prefill with the entry's scheduled time.
         const currentTime = (prefill && prefill.scheduled_time)
             ? new Date(String(prefill.scheduled_time).replace(' ', 'T'))
             : new Date();
         if (!prefill) currentTime.setMinutes(currentTime.getMinutes() + 10);
 
-        // Formatiere lokales Datum (nicht UTC!)
+        // Format local date (not UTC!)
         const year = currentTime.getFullYear();
         const month = String(currentTime.getMonth() + 1).padStart(2, '0');
         const day = String(currentTime.getDate()).padStart(2, '0');
@@ -83,20 +85,20 @@ class PrintSchedulerManager {
             lokalZeit: currentTime.toLocaleString('de-DE')
         });
 
-        // Vorbereitung zeichnen — dieselbe Ansicht wie vor dem Sofortdruck:
-        // Vorschau, Platte, Filament je Duese und alle Optionen. Vorher standen
-        // hier eigene Haekchen UND eine zweite Plattenliste; beide konnten
-        // dasselbe und liefen auseinander (die dreistufigen Kalibrierungen
-        // fehlten hier zum Beispiel ganz).
+        // Render the preparation view — the same view as before an immediate print:
+        // preview, plate, filament per nozzle, and all options. A separate set of
+        // checkboxes and a second plate list used to live here; both did the
+        // same thing and drifted apart (for example, the three-stage
+        // calibrations were missing here entirely).
         //
-        // Beim Bearbeiten gewinnen die gespeicherten Werte des Eintrags ueber
-        // die Vorgaben aus der Konfiguration.
+        // When editing, the entry's saved values take precedence over
+        // the defaults from the configuration.
         if (prefill && prefill.auto_power !== undefined && prefill.auto_power !== null) {
             const ap = document.getElementById('schedule-auto-power');
             if (ap) ap.checked = !!prefill.auto_power;
         }
 
-        // Vortrocknung aufbauen und beim Bearbeiten wiederherstellen.
+        // Build the pre-drying block and restore it when editing.
         this.trocknungBlockAufbauen();
         if (prefill && prefill.dry_enabled) {
             const an = document.getElementById('schedule-dry-enabled');
@@ -111,9 +113,9 @@ class PrintSchedulerManager {
         this.trocknungHinweis();
         this.prepareHandle = null;
         if (window.printPrepare && !isKlipper) {
-            // Aufgeteilt auf die Karten: Datei, Platte, Filament, Optionen.
-            // Vorher lag alles in einem Block unter der Ueberschrift
-            // "Druckoptionen" — dort standen dann auch Vorschau und Eckdaten.
+            // Split across cards: file, plate, filament, options. Everything used
+            // to sit in one block under the heading "Print Options" — that's also
+            // where the preview and key data used to live.
             window.printPrepare.rendereIn(
                 document.getElementById('schedule-prepare'), filename, prefill || null,
                 {
@@ -129,12 +131,12 @@ class PrintSchedulerManager {
             });
         }
 
-        // Spoolman Container nur anzeigen wenn verbunden
+        // Only show the Spoolman container when connected
         const spoolContainer = document.getElementById('schedule-spool-container');
         if ((window.spoolmanManager && window.spoolmanManager.connected)) {
             spoolContainer.style.display = '';
 
-            // Spoolman Selector füllen
+            // Fill the Spoolman selector
             const scheduleSelector = document.getElementById('schedule-spool');
             scheduleSelector.innerHTML = `<option value="">${texts.no_spool_selected}</option>`;
 
@@ -145,7 +147,7 @@ class PrintSchedulerManager {
                     scheduleSelector.innerHTML += `<option value="${opt.value}">${opt.text}</option>`;
                 }
             }
-            // Edit-Modus oder aktive Spule vorselektieren.
+            // Preselect edit mode's spool, or the active spool.
             if (prefill && prefill.spool_id != null) {
                 scheduleSelector.value = String(prefill.spool_id);
             } else if (window.activeSpoolId != null) {
@@ -156,11 +158,11 @@ class PrintSchedulerManager {
                 .find(x => String(x.id) === scheduleSelector.value);
             this._spulKnopfBeschriften(vorgewaehlt || null);
 
-            // …und dann fragen, was die DATEI verlangt. Bisher stand hier
-            // stumpf die aktive Spule: eine PETG-Datei bekam die aktive
-            // PLA-Spule vorgeschlagen. Der Abgleich laeuft am Server
-            // (find_matching_spools) — dieselbe Funktion, die auch der
-            // Sofortdruck benutzt, damit es nicht zwei Meinungen gibt.
+            // ...and only then ask what the FILE requires. This used to just
+            // default to the active spool: a PETG file would get the active
+            // PLA spool suggested. The matching now runs on the server
+            // (find_matching_spools) — the same function the immediate print
+            // uses, so there's only one opinion.
             if (!(prefill && prefill.spool_id != null)) {
                 this._spuleVorschlagen(scheduleSelector);
             }
@@ -170,14 +172,14 @@ class PrintSchedulerManager {
         this._materialKarteZeigen();
         this._aktualisierePlanButton();
 
-        // Lade geplante Drucke
+        // Load scheduled prints
         this.loadScheduledPrints();
     }
 
     /**
-     * Die Spulenauswahl oeffnen — dasselbe Fenster wie in der
-     * Material-Karte, nur mit der Datei im Gepaeck: dann stehen die
-     * passenden Spulen oben und tragen ihr Abzeichen.
+     * Open the spool selection — the same window as in the
+     * material card, just with the file in tow: that way the matching
+     * spools appear at the top and carry their badge.
      */
     oeffneSpulenwahl() {
         const selector = document.getElementById('schedule-spool');
@@ -187,8 +189,8 @@ class PrintSchedulerManager {
             gewaehlt: selector && selector.value ? parseInt(selector.value, 10) : null,
             onWahl: (spule) => {
                 if (!spule || !selector) return;
-                // Die versteckte Liste bleibt die Wahrheit fuer den
-                // Sende-Weg — hier nur nachziehen.
+                // The hidden list stays the source of truth for the
+                // send path — this just follows along.
                 selector.value = String(spule.id);
                 this._spulKnopfBeschriften(spule);
                 this._aktualisierePlanButton();
@@ -196,7 +198,7 @@ class PrintSchedulerManager {
         });
     }
 
-    /** Der Knopf traegt die gewaehlte Spule: Farbpunkt, Name, Material, Rest. */
+    /** The button carries the chosen spool: color dot, name, material, remaining amount. */
     _spulKnopfBeschriften(spule) {
         const text = document.getElementById('schedule-spool-text');
         const punkt = document.getElementById('schedule-spool-punkt');
@@ -220,12 +222,12 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Passende Spule vorschlagen und den Hinweis darunter setzen.
+     * Suggest a matching spool and set the hint below it.
      *
-     * Drei Faelle, drei Aussagen — raten waere hier das Schlimmste:
-     *   genau einer   → auswaehlen, gruener Haken
-     *   mehrere       → besten auswaehlen, Zahl nennen
-     *   keiner        → nichts anfassen, warnen
+     * Three cases, three messages — guessing would be the worst thing to do here:
+     *   exactly one   → select it, green checkmark
+     *   several       → select the best one, name the count
+     *   none          → leave it alone, warn
      */
     _spuleVorschlagen(selector) {
         const datei = this.scheduledFileName;
@@ -265,7 +267,7 @@ class PrintSchedulerManager {
                         .replace('{n}', treffer.length).replace('{spool}', name);
                 hinweis.style.display = '';
             })
-            .catch(() => { /* ohne Spoolman gibt es nichts vorzuschlagen */ });
+            .catch(() => { /* nothing to suggest without Spoolman */ });
     }
 
     // ========================================
@@ -277,11 +279,11 @@ class PrintSchedulerManager {
         this.editingScheduledId = null;
         document.getElementById('schedulePrintModal').style.display = 'none';
 
-        // NEU: Wenn vom Schedule Manager gekommen, diesen neu erstellen
+        // If we came from the Schedule Manager, recreate it
         if (this.cameFromScheduleManager) {
             this.cameFromScheduleManager = false;  // Reset
 
-            // Schedule Manager Modal neu erstellen
+            // Recreate the Schedule Manager modal
             const modal = document.createElement('div');
             modal.id = 'scheduleManagerModal';
             modal.className = 'modal-overlay';
@@ -319,8 +321,8 @@ class PrintSchedulerManager {
         const time = document.getElementById('schedule-time').value;
         const autoPower = document.getElementById('schedule-auto-power').checked;
         const spoolId = document.getElementById('schedule-spool')?.value || null;
-        // Optionen und Platte kommen aus der Vorbereitung — dieselbe
-        // Sammelstelle wie beim Sofortdruck.
+        // Options and plate come from the preparation step — the same
+        // collection point as for the immediate print.
         const optionen = (typeof collectPrintOptions === 'function')
             ? collectPrintOptions(this.scheduledFileName) : {};
         const timelapse = optionen.timelapse !== false;
@@ -348,13 +350,13 @@ class PrintSchedulerManager {
             return;
         }
 
-        // Kombiniere zu lokalem DateTime String OHNE UTC Konvertierung
+        // Combine into a local DateTime string WITHOUT UTC conversion
         const scheduledTimeLocal = `${date} ${time}:00`;
 
-        // Prüfe ob in Zukunft (mit 1 Minute Toleranz)
+        // Check if it's in the future (with 1 minute tolerance)
         const scheduledDateTime = new Date(`${date}T${time}:00`);
         const now = new Date();
-        now.setSeconds(0, 0); // Sekunden ignorieren für Vergleich
+        now.setSeconds(0, 0); // Ignore seconds for comparison
 
         console.log(texts.console_time_comparison, {
             geplant: scheduledDateTime.toISOString(),
@@ -369,9 +371,9 @@ class PrintSchedulerManager {
             return;
         }
 
-        // Hole print_time und weight aus den gespeicherten SD-Dateien.
-        // Bambu liefert extended_meta.print_time_minutes (Minuten),
-        // Klipper/Moonraker liefert extended_meta.estimated_time (Sekunden).
+        // Get print_time and weight from the saved SD files.
+        // Bambu provides extended_meta.print_time_minutes (minutes),
+        // Klipper/Moonraker provides extended_meta.estimated_time (seconds).
         const fileData = window.sdDateiFinden ? window.sdDateiFinden(this.scheduledFileName)
             : window.lastSDFiles?.find(f => f.name === this.scheduledFileName);
 
@@ -389,17 +391,17 @@ class PrintSchedulerManager {
             print_time = `${hours}h ${remainingMinutes}min`;
         }
 
-        // Checkbox-Werte für alle Druckoptionen einsammeln. Backend hat's
-        // erwartet (routes/scheduled_prints.py) — aber bisher kam nur
-        // timelapse durch, alle anderen wurden stumm auf Config-Defaults
-        // gemapped. Jetzt gehen alle 7 Flags mit.
+        // Collect checkbox values for all print options. The backend expected
+        // them (routes/scheduled_prints.py) — but until now only timelapse
+        // actually got through, everything else was silently mapped to config
+        // defaults. Now all 7 flags go along.
         const useAms = optionen.use_ams ?? false;
         const layerInspect = optionen.layer_inspect ?? true;
         const vibrationCali = optionen.vibration_cali ?? false;
         const manualColorChange = optionen.manual_color_change ?? false;
-        // Dreistufig (0 aus, 1 ein, 2 automatisch) — die alten Wahrheitswerte
-        // gehen im Gleichklang mit, damit der Zeitplaner im Backend
-        // unveraendert damit rechnen kann.
+        // Three-valued (0 off, 1 on, 2 automatic) — the old boolean values are
+        // kept in sync so the backend scheduler can keep computing with them
+        // unchanged.
         const bedLevelingMode = optionen.bed_leveling_mode ?? 2;
         const flowCaliMode = optionen.flow_cali_mode ?? 2;
         const nozzleOffsetMode = optionen.nozzle_offset_mode ?? 0;
@@ -412,8 +414,8 @@ class PrintSchedulerManager {
             scheduled_time: scheduledTimeLocal,
             auto_power: autoPower,
             timelapse: timelapse,
-            // Vortrocknung. dry_duration in MINUTEN — der Planer rechnet
-            // damit den frueheren Einschaltzeitpunkt aus.
+            // Pre-drying. dry_duration in MINUTES — the scheduler uses it to
+            // calculate the earlier power-on time.
             ...this._trocknungsFelder(),
             use_ams: useAms,
             bed_leveling: bedLeveling,
@@ -427,13 +429,13 @@ class PrintSchedulerManager {
             spool_id: spoolId,
             spool_mapping: spoolMapping,
             plate: parseInt(plate),
-            print_time: print_time,  // Verwende konvertierte Zeit
+            print_time: print_time,  // Use the converted time
             weight: fileData?.weight || null
         };
 
-        // Edit-Modus: alten Eintrag zuerst zentral löschen (räumt auch den
-        // Steckdosen-Timer mit ab), dann neu anlegen — gleiche Semantik wie
-        // Android (updatePrint = delete + re-add, Timer zieht mit).
+        // Edit mode: first delete the old entry centrally (this also clears
+        // the outlet timer), then create a new one — same semantics as
+        // Android (updatePrint = delete + re-add, the timer follows along).
         const editId = this.editingScheduledId;
         this.editingScheduledId = null;
         const deleteOld = editId
@@ -447,7 +449,7 @@ class PrintSchedulerManager {
         }))
         .then(response => {
             if (response.status === 409) {
-                // 409 = Filament-Warnungen - Bestätigungsdialog anzeigen
+                // 409 = filament warnings - show confirmation dialog
                 return response.json().then(data => {
                     if (data.error_key === 'schedule_current_print_conflict') {
                         const template = texts.schedule_current_print_conflict || data.error;
@@ -464,7 +466,7 @@ class PrintSchedulerManager {
                     if (data.needs_confirmation && data.filament_warnings) {
                         this.showScheduleFilamentWarningDialog(data.filament_warnings, requestData, scheduledDateTime);
                     }
-                    throw new Error('Confirmation needed'); // Abbruch der Promise-Chain
+                    throw new Error('Confirmation needed'); // Abort the promise chain
                 });
             }
             return response.json();
@@ -476,8 +478,8 @@ class PrintSchedulerManager {
                 this.loadScheduledPrints();
                 delete window.pendingScheduleMapping;
             } else if (data.conflict) {
-                // Zeit-Konflikt (laufender oder anderer geplanter Druck) — nur
-                // eine Warnung, der User darf bewusst knapp planen.
+                // Time conflict (running or another scheduled print) — just a
+                // warning, the user may deliberately schedule tightly.
                 this.showScheduleConflictDialog(data.conflict, requestData, scheduledDateTime);
             } else if (data.error_key === 'schedule_drying_conflict') {
                 const template = texts.schedule_drying_conflict || data.error;
@@ -488,7 +490,7 @@ class PrintSchedulerManager {
                 if (errorText) errorText.textContent = message;
                 if (errorDiv) errorDiv.style.display = 'flex';
             } else if (data.error_key === 'schedule_existing_print_conflict') {
-                const template = texts.schedule_existing_print_conflict || 'Der geplante Druck "{file}" startet um {start} und dauert ungefähr {duration}.';
+                const template = texts.schedule_existing_print_conflict;
                 const duration = data.conflict_minutes >= 60
                     ? `${Math.floor(data.conflict_minutes / 60)} h ${data.conflict_minutes % 60} min`
                     : `${data.conflict_minutes} min`;
@@ -500,13 +502,13 @@ class PrintSchedulerManager {
                 if (errorText) errorText.textContent = message;
                 if (errorDiv) errorDiv.style.display = 'flex';
                             } else if (data.error) {
-                // Kritischer Fehler im Modal anzeigen
+                // Show critical error in the modal
                 const errorDiv = document.getElementById('schedule-error');
                 const errorText = document.getElementById('schedule-error-text');
                 errorText.textContent = data.error || 'Unbekannter Fehler';
                 errorDiv.style.display = 'block';
 
-                // Zeige auch Filament-Warnungen bei kritischem Fehler
+                // Also show filament warnings on a critical error
                 if (data.filament_warnings && data.filament_warnings.length > 0) {
                     errorText.textContent += '\n\n' + texts.filament_details + ':\n';
                     data.filament_warnings.forEach(warning => {
@@ -514,14 +516,14 @@ class PrintSchedulerManager {
                     });
                 }
 
-                // Nach 10 Sekunden ausblenden
+                // Hide after 10 seconds
                 setTimeout(() => {
                     errorDiv.style.display = 'none';
                 }, 10000);
             }
         })
         .catch(error => {
-            // Ignoriere "Confirmation needed" - das ist kein echter Fehler
+            // Ignore "Confirmation needed" - that's not a real error
             if (error.message === 'Confirmation needed' || error.message === 'Schedule conflict') {
                 return;
             }
@@ -537,16 +539,15 @@ class PrintSchedulerManager {
     // ========================================
     // showMultiFilamentSpoolModal
     // ========================================
-    /** Materialbezeichnungen vergleichbar machen: "PLA Basic", "pla-cf",
-     *  "PLA+" laufen alle auf PLA hinaus. Ohne das wuerde die Vorauswahl an
-     *  Schreibweisen scheitern, die Spoolman und der Slicer verschieden
-     *  fuehren. */
+    /** Normalize material names for comparison: "PLA Basic", "pla-cf",
+     *  "PLA+" all resolve to PLA. Without this, preselection would fail on
+     *  the different spellings that Spoolman and the slicer use. */
     _material(text) {
         return String(text || '').toUpperCase().replace(/[^A-Z0-9]/g, ' ').trim().split(' ')[0];
     }
 
-    /** Abstand zweier Farben (0 = gleich). Reicht, um Schwarz von Grün zu
-     *  trennen — mehr soll es nicht leisten. */
+    /** Distance between two colors (0 = identical). Enough to tell black
+     *  from green apart — it isn't meant to do more than that. */
     _farbAbstand(a, b) {
         const zerlege = (v) => {
             const h = String(v || '').replace('#', '').slice(0, 6);
@@ -559,13 +560,13 @@ class PrintSchedulerManager {
         return Math.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2 + (x[2]-y[2])**2);
     }
 
-    /** Beste Spule fuer ein Filament aus der Datei.
+    /** Best spool for a filament from the file.
      *
-     *  Das Material ist Bedingung, nicht Punktezahl: lieber keine Vorauswahl
-     *  als ASA mit einer PETG-Spule. Innerhalb des Materials entscheidet die
-     *  Farbe, dann Hersteller und Namensgleichheit, zuletzt der Restbestand.
-     *  Schon vergebene Spulen fallen raus — zwei Filamente aus derselben
-     *  Spule gehen nicht. */
+     *  Material is a requirement, not a score: better no preselection than
+     *  ASA with a PETG spool. Within the material, color decides, then
+     *  vendor and name match, and finally the remaining amount. Spools
+     *  already assigned drop out — two filaments can't share the same
+     *  spool. */
     _besteSpule(fil, spools, vergeben) {
         const mat = this._material(fil.type);
         const worte = String(fil.name || '').toUpperCase().split(/[^A-Z0-9]+/).filter(w => w.length > 2);
@@ -575,12 +576,12 @@ class PrintSchedulerManager {
             const f = spool.filament || {};
             if (this._material(f.material) !== mat || !mat) return;
             const abstand = this._farbAbstand(fil.color, f.color_hex);
-            let wert = 1000 - Math.min(abstand, 442);          // Farbe zuerst
+            let wert = 1000 - Math.min(abstand, 442);          // Color first
             const marke = String(f.vendor && f.vendor.name || '').toUpperCase();
-            if (marke && worte.includes(marke)) wert += 120;    // gleicher Hersteller
+            if (marke && worte.includes(marke)) wert += 120;    // same vendor
             const name = String(f.name || '').toUpperCase();
             worte.forEach(w => { if (w !== marke && name.includes(w)) wert += 40; });
-            wert += Math.min(spool.remaining_weight || 0, 1000) / 100;  // Rest als Stichentscheid
+            wert += Math.min(spool.remaining_weight || 0, 1000) / 100;  // remaining amount as tiebreaker
             if (wert > bestwert) { bestwert = wert; beste = spool; }
         });
         return beste;
@@ -589,12 +590,12 @@ class PrintSchedulerManager {
     async showMultiFilamentSpoolModal(fileData, location, mode = 'print') {
         const texts = window.texts || {};
 
-        // Hole Plate-Info (mit filament_ids pro Plate) parallel zur
-        // Spoolman-Abfrage. Wenn das 3MF Multi-Plate ist UND die Platten
-        // unterschiedliche Filamente benutzen, blenden wir oben im Modal
-        // einen Plate-Selector ein und zeigen nur die wirklich benutzten
-        // Filamente. Fuer Single-Plate / wenn plate_details leer sind,
-        // laeuft der alte Flow (alle Filamente).
+        // Fetch plate info (with filament_ids per plate) in parallel with the
+        // Spoolman query. If the 3MF is multi-plate AND the plates use
+        // different filaments, we show a plate selector at the top of the
+        // modal and only display the filaments actually used.
+        // For single-plate files, or when plate_details is empty,
+        // the old flow runs (all filaments).
         let plateDetails = [];
         let selectedPlateIdx = null;
         try {
@@ -607,7 +608,7 @@ class PrintSchedulerManager {
             plateDetails = [];
         }
 
-        // Helper: welche Filamente sind auf der aktuell gewaehlten Plate?
+        // Helper: which filaments are on the currently selected plate?
         const getVisibleFilaments = () => {
             if (selectedPlateIdx === null || !plateDetails.length) {
                 return fileData.all_filaments;
@@ -620,9 +621,7 @@ class PrintSchedulerManager {
             return fileData.all_filaments.filter(f => ids.has(f.index));
         };
 
-        // Aufbau wie die uebrigen Dialoge (ui-karte): der hier trug bis
-        // 21aug26 durchgehend eigene Inline-Stile und war damit die fuenfte
-        // Bauform im selben Programm.
+        // Structured like the other dialogs (ui-karte).
         const modal = document.createElement('div');
         modal.className = 'modal-overlay';
         modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;'
@@ -634,12 +633,12 @@ class PrintSchedulerManager {
         content.style.cssText = 'position:relative; width:92%; max-width:600px;'
             + 'max-height:85vh; overflow-y:auto; border-radius:12px; padding:0;';
 
-        // Plate-Selector nur zeigen wenn mehrere Platen mit filament_ids da sind
+        // Only show the plate selector when there are multiple plates with filament_ids
         const showPlateSelector = plateDetails.length > 1;
         if (plateDetails.length >= 1) {
-            // Default: erste Plate — auch bei Single-Plate-3MFs mit
-            // filament_ids-Info wollen wir filtern (es koennten weniger
-            // Filamente wirklich benutzt werden als im Projekt definiert).
+            // Default: first plate — even for single-plate 3MFs with
+            // filament_ids info we want to filter (fewer filaments might
+            // actually be used than defined in the project).
             selectedPlateIdx = plateDetails[0].index;
         }
 
@@ -691,7 +690,7 @@ class PrintSchedulerManager {
         modal.appendChild(content);
         document.body.appendChild(modal);
 
-        // Lade Spulen VOR der Schleife
+        // Load the spools BEFORE the loop
         let spools = [];
         try {
             const response = await authFetch('/api/spoolman/spools');
@@ -713,16 +712,16 @@ class PrintSchedulerManager {
 
         const renderFilamentList = () => {
             const visible = getVisibleFilaments();
-            // Jede Spule nur einmal vorschlagen.
+            // Suggest every spool only once.
             const vergeben = new Set();
             if (descEl) {
                 descEl.textContent = texts.multifilament_description.replace('{count}', visible.length);
             }
             listDiv.innerHTML = '';
             visible.forEach(fil => {
-                // Eine Zeile je Filament: links Farbe, Name und Typ,
-                // rechts die Spulenwahl. Vorher war jedes Filament ein
-                // eigener grauer Kasten mit Ueberschrift darin.
+                // One row per filament: colour, name and type on the left,
+                // the spool picker on the right. Every filament used to be a
+                // grey box of its own with a heading inside it.
                 const filDiv = document.createElement('div');
                 filDiv.className = 'ui-zeile';
                 filDiv.innerHTML = `
@@ -740,7 +739,7 @@ class PrintSchedulerManager {
 
                 const select = document.getElementById(`spool-select-${fil.index}`);
 
-                // Fülle Dropdown mit vorher geladenen Spulen
+                // Fill the dropdown with the spools loaded earlier
                 spools.forEach(spool => {
                     const filament = spool.filament || {};
                     const vendor = filament.vendor?.name || '';
@@ -755,17 +754,16 @@ class PrintSchedulerManager {
                     select.appendChild(option);
                 });
 
-                // Vorauswahl: passendes Material, dann naechste Farbe.
+                // Preselection: a matching material, then the nearest colour.
                 const treffer = this._besteSpule(fil, spools, vergeben);
                 if (treffer) {
                     select.value = String(treffer.id);
                     vergeben.add(treffer.id);
                 }
 
-                // Warnzeile unter der Wahl. Das Material des Drucks steht
-                // klein neben dem Namen — beim Ueberfliegen sieht man eine
-                // falsche Spule sonst nicht (21aug26: fast ASA mit PETG
-                // gedruckt).
+                // A warning row under the choice. The material of the print
+                // stands small beside the name -- skimming it, a wrong spool
+                // is otherwise invisible (ASA was nearly printed with PETG).
                 const warnung = document.createElement('div');
                 warnung.className = 'mf-warnung';
                 warnung.style.display = 'none';
@@ -820,9 +818,9 @@ class PrintSchedulerManager {
                 return;
             }
 
-            // Plate-Pick speichern damit der nachfolgende Druck-Start die
-            // Auswahl automatisch uebernimmt (spart dem User den 2. Plate-
-            // Picker) und der Backend-Code das richtige Gcode startet.
+            // Store the plate pick so the following print start takes the
+            // choice over automatically (sparing the user a second plate
+            // picker) and the backend starts the right gcode.
             if (selectedPlateIdx !== null) {
                 window.pendingPlateOverride = selectedPlateIdx;
             }
@@ -830,7 +828,7 @@ class PrintSchedulerManager {
             console.log(texts.console_multifilament_mapping, mapping);
 
             if (mode === 'schedule') {
-                // SCHEDULE MODUS: Speichere nur Mapping und öffne Schedule Modal
+                // SCHEDULE MODE: store only the mapping and open the schedule modal
                 window.pendingScheduleMapping = mapping;
                 this._aktualisierePlanButton();
                 modal.remove();
@@ -838,7 +836,7 @@ class PrintSchedulerManager {
                 this.scheduledFileName = fileData.name;
                 this.scheduledFileLocation = location;
 
-                // Öffne Schedule Modal MANUELL
+                // Open the schedule modal MANUALLY
                 document.getElementById('schedulePrintModal').style.display = 'block';
                 window.printScheduler._zeigeDateiname(fileData.name);
 
@@ -856,19 +854,19 @@ class PrintSchedulerManager {
                 // Spoolman Container verstecken (da Multi-Filament)
                 document.getElementById('schedule-spool-container').style.display = 'none';
 
-                // Vorbereitung zeichnen — dieselbe Ansicht wie sonst auch.
-                // Hier kommt der Mehrfarben-Weg an: die Spulenzuordnung ist
-                // schon getroffen, es fehlen nur noch Zeit und Optionen.
+                // Draw the preparation -- the same view as everywhere else.
+                // This is where the multi-colour path arrives: the spool
+                // assignment is already made, only time and options are left.
                 if (window.printPrepare) {
                     const self = window.printScheduler;
                     self.prepareHandle = null;
-                    // MIT Zielkarten, genau wie der einfarbige Weg weiter
-                    // oben. Ohne sie schreibt rendereIn den ganzen Stapel
-                    // (Datei, Platte, Filament, Optionen) in EINEN Block —
-                    // und weil die vier Karten daneben schon gefuellt waren,
-                    // standen die Druckoptionen zweimal im Dialog. Sichtbar
-                    // nur bei mehr als einem Filament, weil nur dieser Weg
-                    // hier vorbeikommt (28aug26 gemeldet).
+                    // WITH target cards, exactly like the single-colour path
+                    // above. Without them rendereIn writes the whole stack
+                    // (file, plate, filament, options) into ONE block -- and
+                    // because the four cards beside it were already filled,
+                    // the print options stood twice in the dialog. Visible
+                    // only with more than one filament, because only this
+                    // path comes past here.
                     window.printPrepare.rendereIn(
                         document.getElementById('schedule-prepare'), fileData.name, null,
                         {
@@ -881,7 +879,7 @@ class PrintSchedulerManager {
                 }
 
             } else {
-                // PRINT MODUS: Direkt drucken - OHNE Schedule-Zeug!
+                // PRINT MODE: print straight away -- without the schedule parts
                 window.pendingSpoolMapping = mapping;
                 modal.remove();
                 proceedWithPlateCheck(fileData.name, location);
@@ -897,11 +895,11 @@ class PrintSchedulerManager {
     // loadScheduledPrints
     // ========================================
     loadScheduledPrints() {
-        // Die Liste stand frueher im Anlege-Dialog und wurde hier gefuellt.
-        // Sie hat seit 21aug26 einen eigenen Bildschirm; der Aufruf bedeutet
-        // jetzt schlicht "die geplanten Drucke haben sich geaendert":
-        // Zaehler auffrischen und, falls die Uebersicht offen steht, sie neu
-        // zeichnen. Die vielen Aufrufer bleiben damit unveraendert richtig.
+        // The list used to sit in the create dialog and was filled here. It
+        // has had a screen of its own for a while; the call now simply means
+        // "the scheduled prints have changed": refresh the counter and, when
+        // the overview stands open, redraw it. The many callers therefore
+        // stay correct unchanged.
         this.updateScheduledPrintsBadge();
         if (document.getElementById('scheduleManagerModal')) {
             this.loadScheduleManagerList();
@@ -922,7 +920,7 @@ class PrintSchedulerManager {
                 const badgeZone = document.getElementById('mz-sched-badge');
 
                 if (data.prints && data.prints.length > 0) {
-                    // Badge anzeigen mit Anzahl
+                    // Show the badge with the count
                     const count = data.prints.length;
 
                     if (badgeMobile) {
@@ -938,7 +936,7 @@ class PrintSchedulerManager {
                         badgeZone.style.display = 'flex';
                     }
                 } else {
-                    // Badge verstecken wenn keine geplanten Drucke
+                    // Hide the badge when nothing is scheduled
                     if (badgeMobile) {
                         badgeMobile.style.display = 'none';
                     }
@@ -958,7 +956,7 @@ class PrintSchedulerManager {
     cancelScheduledPrint(printId) {
         const texts = window.texts || {};
 
-        showConfirmDialog(texts.confirm_delete_scheduled, function() {
+        showConfirmDialog({ text: texts.confirm_delete_scheduled, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
         apiCall(`/api/scheduled_prints/${printId}`, {method: 'DELETE'})
             .then(response => response.json())
             .then(data => {
@@ -979,9 +977,9 @@ class PrintSchedulerManager {
     // ========================================
     // showScheduleConflictDialog
     // ========================================
-    // Zeit-Konflikt: der Companion warnt, wenn der Termin in den laufenden
-    // Druck oder in einen anderen geplanten faellt. Bewusst KEINE Blockade —
-    // knapp planen ist erlaubt, es soll nur nicht unbemerkt passieren.
+    // A time conflict: the companion warns when the appointment falls into
+    // the running print or into another scheduled one. Deliberately NO block
+    // -- planning tightly is allowed, it should only not happen unnoticed.
     showScheduleConflictDialog(conflict, requestData, scheduledDateTime) {
         const texts = window.texts || {};
         const title = conflict.type === 'running'
@@ -990,7 +988,7 @@ class PrintSchedulerManager {
         const message = `\u26a0\ufe0f ${title}:\n\n${conflict.message}\n\n`
             + (texts.schedule_conflict_confirm || 'Trotzdem einplanen?');
 
-        showConfirmDialog(message, () => {
+        showConfirmDialog({ text: message, knopf: texts.confirm_schedule_anyway }, () => {
             requestData.force = true;
             apiCall('/api/schedule_print', {
                 method: 'POST',
@@ -1037,7 +1035,7 @@ class PrintSchedulerManager {
 
         const message = `${texts.filament_warning_title}:\n\n${warningLines}\n\n${texts.filament_warning_confirm}`;
 
-        showConfirmDialog(message, () => {
+        showConfirmDialog({ text: message, knopf: texts.confirm_schedule_anyway }, () => {
             console.log('User confirmed schedule with warnings - retrying with force=true');
             requestData.force = true;
 
@@ -1121,32 +1119,31 @@ class PrintSchedulerManager {
                 const container = document.getElementById('schedule-manager-list');
                 if (!container) return;
 
-                // NEU: Prüfe Drucker-Status und zeige SD-Dateien wenn keine Drucke geplant
+                    // Check the printer state and show the SD files when no prints are scheduled
                 if ((!data.prints || data.prints.length === 0)) {
-                    // Klipper: Host (SBC/RPi) ist meist permanent online, auch
-                    // wenn der Drucker-Strom aus ist — Files sind immer
-                    // verfuegbar. Wir ueberspringen den switch-Check.
+                    // Klipper: the host (SBC/RPi) is usually permanently
+                    // online, even with the printer power off -- the files are
+                    // always available. We skip the switch check.
                     if (isKlipper) {
                         this.showSDFilesInScheduleManager(container);
                         return;
                     }
-                    // Prüfe Drucker-Status
-                    // Ohne geplante Drucke gleich die Dateien zum Planen
-                    // zeigen — unabhaengig davon, ob der Drucker laeuft.
+                    // Without scheduled prints, show the files to schedule
+                    // right away -- regardless of whether the printer runs.
                     //
-                    // Vorher gab es bei laufendem Drucker nur den Hinweis
-                    // „Gehe zur SD-Karte": ein Klick schloss dieses Fenster,
-                    // oeffnete die normale Dateiliste, und dort musste man je
-                    // Datei nochmal auf „Planen". Drei Schritte fuer das, was
-                    // man beim Oeffnen von „Geplante Drucke" ohnehin vorhatte.
+                    // With the printer running there used to be only the hint
+                    // "go to the SD card": one click closed this window,
+                    // opened the normal file list, and there one had to press
+                    // "schedule" per file again. Three steps for what one
+                    // intended anyway when opening "scheduled prints".
                     this.showSDFilesInScheduleManager(container);
                     return; // Rest macht showSDFilesInScheduleManager
                 }
 
                 if (data.prints && data.prints.length > 0) {
-                    // Die Files-Liste immer mit anzeigen. Auch bei Bambu soll
-                    // man weitere Drucke planen koennen, waehrend der Drucker
-                    // eingeschaltet ist.
+                    // Always show the file list too. On Bambu as well one
+                    // should be able to schedule further prints while the
+                    // printer is switched on.
                     const appendFiles = () => {
                         const separator = document.createElement('hr');
                         separator.className = 'sched-separator';
@@ -1159,13 +1156,13 @@ class PrintSchedulerManager {
                         appendFiles();
                     };
 
-                    // Geplante Drucke 1:1 mit der SD-Card-Card rendern —
-                    // wir holen erst die volle Files-Liste (Klipper: Adapter,
-                    // Bambu: /api/mqtt/sdcard mit Metadata) und matchen jede
-                    // Plan-Zeile per filename. Bei Klipper greift bei Host-
-                    // offline automatisch der Cache aus /api/printer/files.
-                    // per_page=all: der Abgleich braucht ALLE Dateien,
-                    // nicht die erste Seite der Blaetterleiste.
+                    // Render the scheduled prints 1:1 with the SD card card --
+                    // we first fetch the full file list (Klipper: the adapter,
+                    // Bambu: /api/mqtt/sdcard with metadata) and match every
+                    // plan row by filename. On Klipper the cache from
+                    // /api/printer/files takes over automatically when the
+                    // host is offline. per_page=all: the match needs ALL
+                    // files, not the first page of the pager.
                     const filesPromise = isKlipper
                         ? window.printerAdapter.listFiles({ per_page: 'all' }).then(r => r.files || [])
                         : apiCall('/api/mqtt/sdcard?per_page=all').then(r => r.json()).then(d => d.files || []);
@@ -1176,7 +1173,7 @@ class PrintSchedulerManager {
                         (files || []).forEach(f => {
                             if (f && f.name) byName[f.name] = f;
                         });
-                        // State fuer Re-Render beim Sort-Wechsel
+                        // State for a re-render on a sort change
                         this.scheduledPrintsState = {
                             prints: data.prints,
                             byName,
@@ -1207,8 +1204,8 @@ class PrintSchedulerManager {
     }
 
     // ========================================
-    // renderScheduledPrintsCards — rendert die Cards aus scheduledPrintsState
-    // (wird beim Initial-Load UND beim Sort-Wechsel aufgerufen)
+    // renderScheduledPrintsCards -- renders the cards from
+    // scheduledPrintsState (called on the initial load AND on a sort change)
     // ========================================
     renderScheduledPrintsCards() {
         const state = this.scheduledPrintsState;
@@ -1222,7 +1219,7 @@ class PrintSchedulerManager {
                 case 'name':
                     return (a.filename || '').localeCompare(b.filename || '');
                 case 'print_time': {
-                    // print_time ist "1h 17min" — parsen zu Minuten.
+                    // print_time is "1h 17min" -- parse it to minutes.
                     const toMin = (s) => {
                         if (!s) return 0;
                         const m = /(\d+)h\s*(\d+)min/.exec(s);
@@ -1243,19 +1240,19 @@ class PrintSchedulerManager {
             }
         });
 
-        // Eigene Zeile statt der SD-Karten-Kachel: die trug Dateigroesse,
-        // Slicer-Version und Schichthoehe mit — Angaben, die beim Planen
-        // niemand braucht und die den Termin untergingen liessen.
+        // A row of its own instead of the SD card tile: that carried the file
+        // size, the slicer version and the layer height -- things nobody needs
+        // while scheduling, and which let the appointment get lost.
         listEl.className = 'sched-liste';
         listEl.innerHTML = prints.map(print =>
             this.geplanterEintragHtml(print, state.byName[print.filename])).join('');
     }
 
     // ========================================
-    // geplanterEintragHtml — eine Zeile der Uebersicht
+    // geplanterEintragHtml -- one row of the overview
     // ========================================
 
-    /** Datum als "Fr 21.08. · 07:30" in der Sprache der Oberflaeche. */
+    /** The date as "Fri 21.08. · 07:30" in the interface language. */
     _terminText(datum) {
         const spr = (window.i18nManager && window.i18nManager.currentLanguage) || 'de';
         const tag = datum.toLocaleDateString(spr, { weekday: 'short', day: '2-digit', month: '2-digit' });
@@ -1264,8 +1261,8 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Wie lange noch — "in 7 h", "morgen", "in 3 Tagen". Die Zeit ist der
-     * Grund, warum der Eintrag existiert; bisher musste man selbst rechnen.
+     * How long to go -- "in 7 h", "tomorrow", "in 3 days". The time is the
+     * reason the entry exists; one used to have to work it out oneself.
      */
     _restText(datum) {
         const texts = window.texts || {};
@@ -1296,12 +1293,12 @@ class PrintSchedulerManager {
         const name = (window.cleanPrintName ? window.cleanPrintName(print.filename)
                                             : print.filename.replace(/\.(gcode\.)?3mf$/, ''));
 
-        // Vorschau: dieselbe Quelle wie die SD-Liste.
+        // Preview: the same source as the SD list.
         const bild = (datei && datei.has_thumbnail !== false)
             ? `<img src="/api/sd_thumbnail/${encodeURIComponent(print.filename)}" alt=""
                     onerror="this.style.display='none'">` : '';
 
-        // Zeile 1 der Angaben: was der Druck IST.
+        // Line 1 of the details: what the print IS.
         const fakten = [];
         const zeit = print.print_time || (datei && datei.print_time);
         if (zeit) fakten.push(ic(IC_ZEIT) + e(zeit));
@@ -1314,8 +1311,8 @@ class PrintSchedulerManager {
                 : e(print.spool_name)));
         }
 
-        // Zeile 2: was EINGESTELLT ist. Bett, Fluss und Duesenversatz zu
-        // einem Eintrag gebuendelt — dreimal derselbe Standardwert half nie.
+        // Line 2: what's CONFIGURED. Bed, flow and nozzle offset bundled
+        // into one entry — showing the same default three times never helped.
         const marken = [];
         if (print.dry_enabled && print.dry_duration > 0) {
             const start = new Date(datum.getTime() - (print.dry_duration + 10) * 60000);
@@ -1376,8 +1373,6 @@ class PrintSchedulerManager {
         const title = isKlipper
             ? (texts.klipper_files_to_schedule || 'Drucker-Dateien zum Planen')
             : texts.sd_files_to_schedule;
-        // Der Untertitel behauptete frueher „Drucker ist ausgeschaltet" —
-        // diese Liste kommt jetzt aber auch bei laufendem Drucker.
         const subtitle = texts.schedule_pick_file_hint
             || texts.klipper_schedule_hint
             || 'Datei auswählen und für einen späteren Zeitpunkt einplanen';
@@ -1389,6 +1384,14 @@ class PrintSchedulerManager {
                     <h3 class="sched-sd-title">${icon} ${title}</h3>
                     <p class="sched-sd-subtitle">${subtitle}</p>
                 </div>
+                ${isKlipper ? '' : `
+                <button class="sd-header-btn${this.archivAktiv ? ' sd-header-btn--an' : ''}"
+                        onclick="schedArchivUmschalten()"
+                        title="${texts.sd_archive_hint || ''}">
+                    <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v9h14v-9M10 14h4"/></svg>
+                    <span>${this.archivAktiv ? (texts.sd_archive_live || 'Live')
+                                             : (texts.sd_archive || 'Archiv')}</span>
+                </button>`}
                 <button class="sd-header-btn" onclick="refreshSDInSchedule()">
                     <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg>
                     <span>${texts.refresh}</span>
@@ -1402,7 +1405,7 @@ class PrintSchedulerManager {
             </div>
         `;
 
-        // Lade SD-Dateien
+        // Load SD files
         this.loadSDFilesForScheduling();
     }
 
@@ -1412,15 +1415,23 @@ class PrintSchedulerManager {
     loadSDFilesForScheduling() {
         const texts = window.texts || {};
 
-        // Klipper: /api/printer/files liefert das Bambu-kompatible Format
-        // bereits inklusive Metadata (filament_type, weight, slicer,
-        // estimated_time, layer_count, ...). Direkt durchreichen, NICHT
-        // mappen — sonst verlieren wir die Metadaten und die Cards sehen
-        // anders aus als im SD-Modal.
-        // per_page=all: die Dateiwahl im Planer zeigt den ganzen Bestand.
+        // Klipper: /api/printer/files already returns the Bambu-compatible
+        // format, including metadata (filament_type, weight, slicer,
+        // estimated_time, layer_count, ...). Pass it straight through, do NOT
+        // remap it — otherwise we lose the metadata and the cards look
+        // different from the SD modal.
+        // per_page=all: the file picker in the scheduler shows the entire set.
+        //
+        // The archive belongs in here as much as the live list does. Without
+        // it only what currently sits on the printer could be scheduled --
+        // and putting a file into the archive is exactly what one does with
+        // something that is to be printed again later. Klipper has no
+        // archive; there the switch does not exist.
         const fetchPromise = (window.isKlipperMode && window.isKlipperMode())
             ? window.printerAdapter.listFiles({ per_page: 'all' }).then(r => ({ files: r.files || [] }))
-            : apiCall('/api/mqtt/sdcard?per_page=all').then(r => r.json());
+            : this.archivAktiv
+                ? apiCall('/api/sd/archiv?per_page=all').then(r => r.json())
+                : apiCall('/api/mqtt/sdcard?per_page=all').then(r => r.json());
 
         fetchPromise
             .then(data => {
@@ -1448,9 +1459,9 @@ class PrintSchedulerManager {
 
                     html += '<div class="sd-file-list" id="schedule-files-list"></div>';
                     container.innerHTML = html;
-                    // Initial-Render ueber sortScheduleSDFiles damit der
-                    // Default-Sort (Datum, neueste zuerst) auch greift —
-                    // sonst kommen die Files in der Backend-Reihenfolge.
+                    // Initial render goes through sortScheduleSDFiles so the default
+                    // sort (date, newest first) also applies —
+                    // otherwise the files come in backend order.
                     this.sortScheduleSDFiles();
                 } else {
                     container.innerHTML = `
@@ -1517,9 +1528,9 @@ class PrintSchedulerManager {
         if (!container) return;
         container.innerHTML = '';
 
-        // Identisch zur SD-Modal-Card (Thumbnail, Filament, Layer-Height,
-        // Slicer, ...) — nur die Action-Buttons sind auf "Planen" reduziert.
-        // Renderer kommt aus dem SDCardManager-Singleton.
+        // Identical to the SD modal card (thumbnail, filament, layer height,
+        // slicer, ...) — only the action buttons are reduced to "Schedule".
+        // The renderer comes from the SDCardManager singleton.
         files.forEach(file => {
             container.insertAdjacentHTML(
                 'beforeend',
@@ -1552,7 +1563,7 @@ class PrintSchedulerManager {
     schedulePrintFromScheduleManager(filename, location) {
         this.cameFromScheduleManager = true;
 
-        // SD-Dateien laden falls nicht vorhanden — bei Klipper unified Files
+        // Load SD files if not already present — unified files for Klipper
         if (!window.lastSDFiles) {
             const fetchP = (window.isKlipperMode && window.isKlipperMode())
                 ? window.printerAdapter.listFiles({ per_page: 'all' }).then(r => ({
@@ -1568,23 +1579,23 @@ class PrintSchedulerManager {
                 this.schedulePrintFromSD(filename, location);
             });
         } else {
-            // Normal weiter
+            // Continue normally
             document.getElementById('scheduleManagerModal').remove();
             this.schedulePrintFromSD(filename, location);
         }
     }
 
     // ========================================
-    // editScheduledPrint — geplanten Druck bearbeiten: Schedule-Modal mit
-    // den gespeicherten Werten öffnen, Bestätigen ersetzt den Eintrag.
+    // editScheduledPrint — edit a scheduled print: open the schedule
+    // modal with the saved values; confirming replaces the entry.
     // ========================================
     editScheduledPrint(printId) {
         const print = this.scheduledPrintsState?.prints?.find(p => p.id === printId);
         if (!print) return;
 
         this.cameFromScheduleManager = true;
-        // Files-Cache für Metadaten (print_time/weight) sicherstellen —
-        // die Manager-Liste hat sie schon geladen.
+        // Ensure the files cache for metadata (print_time/weight) —
+        // the manager list has already loaded it.
         if (!window.lastSDFiles && window.lastScheduleSDFiles) {
             window.lastSDFiles = window.lastScheduleSDFiles;
         }
@@ -1598,7 +1609,7 @@ class PrintSchedulerManager {
     deleteScheduledPrint(printId) {
         const texts = window.texts || {};
 
-        showConfirmDialog(texts.confirm_delete_scheduled, function() {
+        showConfirmDialog({ text: texts.confirm_delete_scheduled, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
             apiCall(`/api/scheduled_prints/${printId}`, {method: 'DELETE'})
                 .then(response => response.json())
                 .then(data => {
@@ -1610,14 +1621,15 @@ class PrintSchedulerManager {
         });
     }
     /**
-     * Die Material-Karte haelt zwei Dinge, die beide fehlen koennen: die
-     * Spulenwahl (nur mit Spoolman) und das Filament je Duese (nur wenn die
-     * Datei welches meldet). Ohne beides bliebe eine leere Karte stehen.
+     * The material card holds two things, either of which can be missing: the
+     * spool choice (only with Spoolman) and the filament per nozzle (only if
+     * the file reports one). Without either, an empty card would be left
+     * standing.
      */
     /**
-     * Dateiname als Rueckfall. Im Bambu-Modus zeichnet die Druckvorbereitung
-     * gleich darauf eine Datei-Karte mit Vorschau, Name und Eckdaten und
-     * blendet diese Zeile wieder aus — sonst stuende der Name doppelt.
+     * Filename as a fallback. In Bambu mode, print preparation immediately
+     * renders a file card with preview, name, and key data right after this
+     * and hides this line again — otherwise the name would appear twice.
      */
     _zeigeDateiname(name) {
         const el = document.getElementById('schedule-filename');
@@ -1650,10 +1662,10 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Kann dieser Drucker Filament trocknen? Bevorzugt die Live-Meldung,
-     * sonst die Faehigkeitsliste des Servers (die sich ein einmal gesehenes
-     * heizendes AMS merkt und den Einstellungs-Haken kennt). Klipper-Direkt
-     * hat kein heizendes AMS.
+     * Can this printer dry filament? Prefers the live report, otherwise the
+     * server's capability list (which remembers a heating AMS it has seen
+     * once, and knows the settings checkbox). Klipper-Direct has no heating
+     * AMS.
      */
     _kannTrocknen() {
         if (window.isKlipperMode && window.isKlipperMode()) return false;
@@ -1664,7 +1676,7 @@ class PrintSchedulerManager {
         return faehig.ams_drying === true;
     }
 
-    /** Werte des Trocknungs-Blocks fuer die Anfrage. */
+    /** Values of the pre-drying block for the request. */
     _trocknungsFelder() {
         const an = document.getElementById('schedule-dry-enabled');
         if (!an || !an.checked) return { dry_enabled: false };
@@ -1678,10 +1690,9 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Trocknungs-Block aufbauen: Haken nur zeigen, wenn ein
-     * trocknungsfaehiges AMS gemeldet wird, Filamentliste aus den
-     * vorhandenen Voreinstellungen, und die errechnete Einschaltzeit
-     * anzeigen.
+     * Build the pre-drying block: only show the checkbox when a drying-capable
+     * AMS is reported, fill the filament list from the existing presets, and
+     * show the calculated power-on time.
      */
     trocknungBlockAufbauen() {
         const haken = document.getElementById('schedule-dry-check');
@@ -1695,10 +1706,10 @@ class PrintSchedulerManager {
                 || 'Filament vorher trocknen';
         }
 
-        // Filamentliste ZUERST fuellen — sie haengt nicht am Drucker,
-        // sondern an den Studio-Voreinstellungen. Vorher stand sie hinter
-        // dem Sichtbarkeits-Check und blieb beim Bearbeiten leer, sobald der
-        // Drucker aus war.
+        // Fill the filament list FIRST — it doesn't depend on the printer,
+        // only on the Studio presets. It used to sit behind the
+        // visibility check and stayed empty when editing as soon as the
+        // printer was off.
         const sel = document.getElementById('schedule-dry-filament');
         if (sel && !sel.options.length) {
             const presets = window.BAMBU_DRY_PRESETS || {};
@@ -1710,10 +1721,10 @@ class PrintSchedulerManager {
             sel.onchange = () => this._trocknungVoreinstellung(true);
         }
 
-        // Sichtbarkeit aus den Faehigkeiten, nicht aus den Live-AMS-Daten:
-        // ein ausgeschalteter Drucker meldet keine Einheiten, und genau dann
-        // plant man. capabilities.ams_drying kennt zusaetzlich das einmal
-        // gesehene AMS und den Haken "AMS verwenden" aus den Einstellungen.
+        // Visibility comes from the capabilities, not from the live AMS
+        // data: a powered-off printer reports no units, and that's exactly
+        // when you'd schedule. capabilities.ams_drying also remembers an
+        // AMS seen once and the "Use AMS" checkbox from the settings.
         const kannTrocknen = this._kannTrocknen();
         haken.style.display = kannTrocknen ? '' : 'none';
         if (!kannTrocknen) { felder.style.display = 'none'; an.checked = false; return; }
@@ -1732,15 +1743,15 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Temperatur und Dauer aus der Voreinstellung des gewaehlten Typs.
-     * BAMBU_DRY_PRESETS haelt je Typ zwei Paare [Grad, Stunden]: [0] fuer
-     * den ruhenden Drucker, [1] waehrend eines Drucks. Vorgetrocknet wird
-     * vor dem Druck, also immer [0] — dieselbe Wahl wie im Dialog der
-     * Material-Zone.
+     * Temperature and duration from the preset of the selected type.
+     * BAMBU_DRY_PRESETS holds two pairs [degrees, hours] per type: [0] for
+     * the idle printer, [1] during a print. Pre-drying happens before the
+     * print, so always [0] — the same choice as in the material zone's
+     * dialog.
      *
-     * @param {boolean} ueberschreiben Bei der Typwahl gewinnt die
-     *        Voreinstellung; beim blossen Aktivieren bleiben eingetragene
-     *        Werte (und die eines bearbeiteten Eintrags) stehen.
+     * @param {boolean} ueberschreiben When the type is chosen, the preset
+     *        wins; when merely enabling, entered values (and those of an
+     *        entry being edited) are left as they are.
      */
     _trocknungVoreinstellung(ueberschreiben = false) {
         const typ = document.getElementById('schedule-dry-filament')?.value;
@@ -1753,9 +1764,9 @@ class PrintSchedulerManager {
     }
 
     /**
-     * Zeigt, wann der Drucker dafuer angehen muss — und warnt, wenn das
-     * schon vorbei ist. Kein hartes Verbot: eine kurze Trocknung kann
-     * gewollt sein.
+     * Shows when the printer needs to switch on for it — and warns if that
+     * time has already passed. Not a hard block: a short pre-drying can be
+     * intentional.
      */
     trocknungHinweis() {
         const strahl = document.getElementById('schedule-dry-strahl');
@@ -1766,7 +1777,7 @@ class PrintSchedulerManager {
         if (!an.checked) { box.textContent = ''; return; }
 
         const texts = window.texts || {};
-        const PUFFER = 10;   // Minuten fuers Hochfahren, Homing und Parken
+        const PUFFER = 10;   // Minutes for powering up, homing, and parking
         const std = parseFloat(document.getElementById('schedule-dry-std')?.value) || 0;
         const datum = document.getElementById('schedule-date')?.value;
         const uhr = document.getElementById('schedule-time')?.value;
@@ -1778,8 +1789,8 @@ class PrintSchedulerManager {
         const hhmm = (d) => String(d.getHours()).padStart(2, '0') + ':' +
                             String(d.getMinutes()).padStart(2, '0');
 
-        // Zu knapp: der Drucker muesste jetzt schon laufen. Kein Verbot —
-        // eine kurze Trocknung kann gewollt sein.
+        // Too tight: the printer would already need to be running now. Not a
+        // block — a short pre-drying can be intentional.
         if (start <= new Date()) {
             box.className = 'sched-dry-hinweis warnung';
             box.textContent = (texts.schedule_dry_too_late ||
@@ -1825,6 +1836,47 @@ function showSDFilesInScheduleManager(container) { window.printScheduler.showSDF
 function loadSDFilesForScheduling() { window.printScheduler.loadSDFilesForScheduling(); }
 function refreshSDInSchedule() { window.printScheduler.refreshSDInSchedule(); }
 function schedulePrintFromScheduleManager(filename, location) { window.printScheduler.schedulePrintFromScheduleManager(filename, location); }
+
+/** Switch the file picker between the live list and the archive. */
+window.schedArchivUmschalten = function () {
+    const planer = window.printScheduler;
+    planer.archivAktiv = !planer.archivAktiv;
+    const behaelter = document.querySelector('.sched-sd-header')?.parentElement;
+    if (behaelter) planer.showSDFilesInScheduleManager(behaelter);
+};
+
+/**
+ * Schedule a file that lies in the archive.
+ *
+ * Fetch it back first, then the normal path. After that it is an ordinary
+ * cache file and travels the way a freshly uploaded one does: the sync at
+ * power-on carries it onto the printer. Archived it would stay put — the
+ * sync leaves the archive alone on purpose.
+ */
+window.schedulePrintFromArchive = async function (filename) {
+    const texts = window.texts || {};
+    try {
+        const antwort = await apiCall('/api/sd/archiv/zurueckholen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: filename })
+        });
+        const daten = await antwort.json();
+        if (!daten || !daten.success) {
+            skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+            return;
+        }
+        skToast(texts.sched_archive_restored
+                || 'Aus dem Archiv geholt — geht beim Einschalten auf den Drucker', 'success');
+        // Back to the live list, otherwise the picker still shows the archive
+        // while the file is no longer in it.
+        window.printScheduler.archivAktiv = false;
+        schedulePrintFromScheduleManager(filename, 'root');
+    } catch (fehler) {
+        skToast(texts.toast_error || 'Fehler', 'error');
+        console.error('Archiv/Planen:', fehler);
+    }
+};
 function editScheduledPrint(printId) { window.printScheduler.editScheduledPrint(printId); }
 function deleteScheduledPrint(printId) { window.printScheduler.deleteScheduledPrint(printId); }
 function sortScheduleSDFiles() { window.printScheduler.sortScheduleSDFiles(); }

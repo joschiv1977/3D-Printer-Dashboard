@@ -60,10 +60,9 @@
     align-items: center;
 }
 
-/* Kopfknoepfe neutral. Vorher trug "Datei laden" Gruen und "Aktualisieren"
-   Blau — zwei Farben fuer zwei gleichrangige Werkzeuge, waehrend die Farbe
-   in der Liste darunter der eigentlichen Handlung (Drucken) gehoert.
-   Der Hebe-Effekt beim Ueberfahren ist raus: Kopfzeilen springen nicht. */
+/* Header buttons stay neutral: color belongs to the real action
+   in the list below (printing), not to two equally-ranked tools up here.
+   The hover-lift effect is gone: headers don't jump. */
 .sd-header-btn {
     padding: var(--knopf-polster);
     min-height: var(--knopf-hoehe);
@@ -108,9 +107,9 @@ body.dark-mode .sd-close-btn {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* Aktion in der Kopfzeile eines Fensters, links vom Kreuz. Gleiche Hoehe,
-   gleicher Rahmen, gleiche Rundung wie das Kreuz — nur breit genug fuer
-   ein Wort. */
+/* Action in a window's header, left of the close cross. Same height,
+   same border, same corner radius as the cross — just wide enough for
+   one word. */
 .sd-kopf-knopf {
     height: 36px;
     padding: 0 13px;
@@ -174,7 +173,21 @@ body.dark-mode .sd-close-btn:hover {
     gap: 10px;
     padding: 10px 0;
     margin-bottom: 12px;
-    flex-wrap: wrap;
+    /* ONE row for as long as there is space. It used to be allowed to wrap,
+       and then the spool display jumped into a second row depending on the
+       content: with the archive button and "39 files" it no longer fitted in
+       the live view, while "1 file" in the archive did. What shrinks here is
+       the search box — that goes unnoticed, a jumping box does not. */
+    flex-wrap: nowrap;
+}
+
+/* Everything except the search field keeps its width. */
+.sd-toolbar > * { flex: 0 0 auto; }
+
+/* Below this width one row can no longer be held — better to wrap cleanly
+   than to squeeze everything together. */
+@media (max-width: 700px) {
+    .sd-toolbar { flex-wrap: wrap; }
 }
 
 .sd-toolbar-label {
@@ -224,8 +237,11 @@ body.dark-mode .sd-sort-select {
 /* Search Input */
 .sd-search-wrap {
     position: relative;
-    flex: 1;
-    min-width: 120px;
+    /* The search box gives way so the rest of the bar stays put.
+       `min-width: 0` is the decisive part: without it a flex child refuses to
+       shrink, and the bar wraps after all. */
+    flex: 1 1 auto;
+    min-width: 0;
     max-width: 280px;
 }
 
@@ -703,9 +719,9 @@ body.dark-mode .sd-popover {
 }
 
 /* ============================================
- * Druckvorbereitung — Blatt vor dem Start
- * Nutzt dieselben Bausteine wie die uebrigen Dialoge (modal-overlay /
- * modal-panel) und die Segment-Knoepfe der Optionsliste (.sd-popover-tri).
+ * Print preparation — a sheet before starting
+ * Uses the same building blocks as the other dialogs (modal-overlay /
+ * modal-panel) and the segment buttons from the options list (.sd-popover-tri).
  * ============================================ */
 .prep-section-title {
     font-size: 12px;
@@ -763,8 +779,8 @@ body.dark-mode .sd-popover {
 
 .prep-filament__name { opacity: 0.75; }
 
-/* Schalter in der Vorbereitung — gleiche Anmutung wie die Segment-Knoepfe
-   daneben, damit die Zeilen zusammen ruhig wirken. */
+/* Toggle in the prep sheet — same look as the segment buttons
+   next to it, so the rows feel calm together. */
 .prep-switch input { position: absolute; opacity: 0; pointer-events: none; }
 
 .prep-switch span {
@@ -793,6 +809,16 @@ body.dark-mode .sd-popover {
 .prep-switch input:checked + span { background: var(--accent-blue); }
 .prep-switch input:checked + span::after { transform: translateX(18px); }
 
+/* Both plate lists go through this: the print-prepare modal and the schedule
+   dialog. The modal used to carry the grid as an inline style on its id, so
+   the dialog -- which builds the container by class -- had no grid at all and
+   every tile grew to the full width of the panel. */
+.prep-plates {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 10px;
+}
+
 .prep-plate {
     background: var(--bg-secondary);
     border: 2px solid transparent;
@@ -820,9 +846,10 @@ body.dark-mode .sd-popover {
     color: var(--text-primary);
 }
 
-/* Druckvorbereitung ueber die volle Breite (Planen-Dialog): Vorschau links,
-   Angaben rechts daneben, Optionen darunter in zwei Spalten — sonst steht
-   alles in einer schmalen Saeule und daneben bleibt es leer. */
+/* Print prep across the full width (schedule dialog): preview on the
+   left, details beside it on the right, options below in two columns —
+   otherwise everything sits in one narrow column with empty space
+   beside it. */
 .prep-wide .prep-rows {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -830,9 +857,9 @@ body.dark-mode .sd-popover {
     gap: 0 24px;
 }
 
-/* Die drei Auto/Ein/Aus-Reihen (Bett/Fluss/Duesenversatz) stapeln in der
-   rechten Spalte untereinander, die einfachen Schalter links — sonst
-   stehen die Dreifach-Schalter kreuz und quer im Raster. */
+/* The three auto/on/off rows (bed/flow/nozzle offset) stack in the
+   right column, the simple toggles on the left — otherwise the
+   three-way switches sit scattered across the grid. */
 .prep-wide .prep-row--sw { grid-column: 1; }
 .prep-wide .prep-row--tri { grid-column: 2; }
 
@@ -840,12 +867,6 @@ body.dark-mode .sd-popover {
     .prep-wide .prep-rows { grid-template-columns: 1fr; }
 }
 
-/* ======================================================================
-   Dateiliste — Aufbau vom 21aug26
-   Vorher trug jede Datei ein Datenblatt aus elf Angaben in zwei Spalten,
-   eine Spulen-Auswahl ueber die volle Breite und drei gleich grosse
-   farbige Knoepfe. Bei neun Dateien war das eine Wand.
-   ====================================================================== */
 .sd-liste {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -895,7 +916,7 @@ body.dark-mode .sd-popover {
     margin-bottom: 3px;
 }
 
-/* Die vier Angaben, nach denen man eine Datei sucht. */
+/* The four fields you search a file by. */
 .sd-zeile-fakten {
     display: flex;
     flex-wrap: wrap;
@@ -952,9 +973,9 @@ body.dark-mode .sd-popover {
     color: #c0392b;
 }
 
-/* Woher die Datei kommt — Stick oder interner Speicher des Druckers.
-   Bewusst zurueckhaltend: eine Herkunft ist kein Zustand wie "neu" oder
-   "korrupt", sie soll die farbigen Marken daneben nicht ueberstimmen. */
+/* Where the file comes from — USB stick or the printer's internal
+   storage. Deliberately restrained: an origin is not a state like "new"
+   or "corrupt", it shouldn't outshine the colored badges next to it. */
 .sd-marke--speicher {
     background: rgba(33, 150, 243, 0.10);
     border-color: rgba(33, 150, 243, 0.28);
@@ -966,7 +987,17 @@ body.dark-mode .sd-marke--neu { color: #8bd18e; }
 body.dark-mode .sd-marke--gedruckt { color: #ffb74d; }
 body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
 
-/* Details bleiben da, nur zusammengeklappt. */
+/* No print job in the file — a plain project. Amber rather than red: the
+   file is not broken, it is just not sliced yet. */
+.sd-marke--ungeschnitten {
+    background: rgba(214, 137, 16, 0.13);
+    border-color: rgba(214, 137, 16, 0.35);
+    color: #b3730d;
+}
+
+body.dark-mode .sd-marke--ungeschnitten { color: #e8b563; }
+
+/* Details stay in place, just collapsed. */
 .sd-mehr {
     border: 0;
     background: none;
@@ -1011,8 +1042,8 @@ body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
 .sd-zeile.offen .sd-zeile-spule { display: flex; }
 .sd-zeile-spule .sd-spool-select { flex: 1; min-width: 0; }
 
-/* Drucken traegt Farbe, Planen und Loeschen sind Symbole — drei gleich
-   grosse farbige Knoepfe zogen mehr Blick auf sich als die Dateien. */
+/* Print carries color, schedule and delete are icons — three equally
+   sized colored buttons drew more attention than the files themselves. */
 .sd-zeile-akt {
     display: flex;
     align-items: center;
@@ -1063,28 +1094,35 @@ body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
 .sd-iknopf:hover { background: var(--bg-card-variant); color: var(--text-primary); }
 .sd-iknopf--rot:hover { border-color: #e5534b; color: #e5534b; }
 
-/* Werkzeugleiste: Suche vorn und breit, Rest kompakt.
-   min-width NICHT auf 0 setzen — dann schrumpft das Feld in der engen
-   Zeile auf die Breite der Lupe zusammen und die Sortierung schiebt sich
-   darueber (21aug26 in Chrome gesehen). */
+/* Toolbar: search up front and wide, the rest compact.
+   Do NOT set min-width to 0 — then the field shrinks in the tight
+   row down to the width of the magnifying glass and the sort control
+   slides over it. */
 .sd-toolbar .sd-search-wrap {
     flex: 1 1 200px;
     min-width: 170px;
     max-width: none;
 }
 
-/* Der Spulen-Chip haelt das rechte Ende. Ohne das sammelte sich der freie
-   Platz beim Suchfeld und die Zeile stand bei voller Modalbreite exakt auf
-   Kante — ein Zeichen mehr im Spulennamen und sie brach um. */
-.sd-toolbar .sd-aktive-spule { margin-left: auto; }
+/* The spool chip holds the right end. Without it, the free space
+   collected at the search field and the row sat exactly on the edge at
+   full modal width — one more character in the spool name and it wrapped. */
+.sd-toolbar .sd-aktive-spule {
+    margin-left: auto;
+    /* Stays put on the right and truncates the name if needed, instead of
+       pushing the whole bar apart. */
+    max-width: 42%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
 @media (max-width: 560px) {
     .sd-zeile { flex-wrap: wrap; }
     .sd-zeile-akt { width: 100%; justify-content: flex-end; }
 }
 
-/* Aktive Spule in der Werkzeugleiste. Stand frueher als Auswahlfeld in
-   JEDER Dateikarte, ueberall mit demselben Wert. */
+/* Active spool in the toolbar. */
 .sd-aktive-spule {
     display: inline-flex;
     align-items: center;
@@ -1106,7 +1144,7 @@ body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
 .sd-aktive-spule:hover { border-color: var(--color-blue, #2196F3); }
 .sd-aktive-spule--leer { color: var(--text-secondary); font-style: italic; }
 
-/* Hinweis unter einer Option — z.B. warum die Trocknung vorgeschlagen wird. */
+/* Note under an option — e.g. why drying is being suggested. */
 .prep-hinweis {
     grid-column: 1 / -1;
     font-size: 12px;
@@ -1114,9 +1152,9 @@ body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
     padding: 2px 0 8px;
 }
 
-/* Spulen-Empfehlung in der Dateizeile: welche Spule passt zu dieser Datei?
-   Ruhig gehalten — sie steht neben Dauer, Gewicht und Material und darf
-   die Zeile nicht uebernehmen. */
+/* Spool recommendation in the file row: which spool fits this file?
+   Kept calm — it sits next to duration, weight and material and must
+   not take over the row. */
 .sd-spulwahl {
     display: inline-flex;
     align-items: center;
@@ -1130,33 +1168,12 @@ body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
 body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
 
 /* ==========================================================================
-   Abgleich mit dem Drucker  (24aug26)
+   Sync with the printer
    --------------------------------------------------------------------------
-   Er zeigte sich frueher als Block MITTEN in der Liste: erschien, schob
-   alles nach unten, verschwand, alles rutschte zurueck. Bei zwei Sekunden
-   Dauer war das nur Gezappel.
-
-   Jetzt laeuft ein duenner Faden unter der Kopfzeile, und der
-   Aktualisieren-Knopf fuellt sich — die Rueckmeldung sitzt da, wo man
-   gedrueckt hat, und verdeckt nichts.
+   The refresh button fills in — the feedback sits where you clicked,
+   and covers nothing.
    ========================================================================== */
 .sd-modal-header { position: relative; }
-
-.sd-sync-faden {
-    position: absolute;
-    left: 0; right: 0; bottom: -1px;
-    height: 2px;
-    background: rgba(128, 128, 128, 0.18);
-    overflow: hidden;
-}
-
-.sd-sync-faden > i {
-    display: block;
-    height: 100%;
-    width: 0;
-    background: var(--accent-blue);
-    transition: width .25s ease-out;
-}
 
 .sd-refresh--laeuft {
     position: relative;
@@ -1164,7 +1181,7 @@ body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
     background: rgba(33, 150, 243, 0.10);
     border-color: rgba(33, 150, 243, 0.35);
     color: var(--accent-blue);
-    opacity: 1;             /* NICHT abblenden — er ist die Anzeige */
+    opacity: 1;             /* Do NOT dim it — it is the display */
     cursor: default;
 }
 
@@ -1178,8 +1195,8 @@ body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
 
 .sd-refresh--laeuft > *:not(.sd-refresh-fuell) { position: relative; }
 
-/* Erstes Oeffnen, noch keine Liste: dort darf der Abgleich die Flaeche
-   haben — er schiebt nichts weg, weil nichts da ist. */
+/* First open, no list yet: there the sync indicator can have the whole
+   area — it pushes nothing away, because nothing is there. */
 .sd-sync-gross { padding: 40px 18px; text-align: center; }
 .sd-sync-titel { margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
 .sd-sync-rest { margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
@@ -1214,16 +1231,16 @@ body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
 @keyframes sd-dreh { to { transform: rotate(360deg); } }
 
 /* ============================================
- * Blaetterleiste unter der Dateiliste
+ * Pagination bar under the file list
  *
- * Der Server schneidet die Liste in Seiten (routes/sdcard.py
- * _seitenweise) — hier steht, auf welcher man ist und wie man
- * weiterkommt. Suche, Filter und Sortierung laufen serverseitig ueber
- * den GANZEN Bestand, nicht nur ueber die sichtbare Seite.
+ * The server slices the list into pages (routes/sdcard.py
+ * _seitenweise) — this shows which page you're on and how to
+ * move on. Search, filter and sort run server-side over the
+ * WHOLE set, not just the visible page.
  *
- * Die Leiste versteckt sich selbst, wenn es nur eine Seite gibt
- * (.sd-blaettern--eine) — bei einer Handvoll Dateien soll da nichts
- * stehen.
+ * The bar hides itself when there is only one page
+ * (.sd-blaettern--eine) — with a handful of files there should be
+ * nothing there.
  * ============================================ */
 
 .sd-blaettern {
@@ -1271,7 +1288,7 @@ body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
     background: rgba(127, 127, 127, 0.10);
 }
 
-/* Aktiv = Flaeche + Rand, nicht nur eine duenne Linie. */
+/* Active = fill + border, not just a thin line. */
 .sd-seiten button.an {
     background: rgba(33, 150, 243, 0.12);
     border-color: rgba(33, 150, 243, 0.25);
@@ -1299,3 +1316,15 @@ body.dark-mode .sd-seiten button.an {
     .sd-blaettern { gap: 8px; }
     .sd-blaettern-luecke { flex-basis: 100%; height: 0; }
 }
+
+
+/* Archive toggle in the header bar. It looks like "Load file" and "Refresh"
+   next to it — until it is on: then it carries fill AND border, like every
+   active state in this house. A thin border line on its own is not enough,
+   that was rejected once already. */
+.sd-header-btn--an {
+    background: var(--accent-soft, rgba(59,130,246,.16));
+    border-color: var(--accent, #3b82f6);
+    color: var(--accent, #3b82f6);
+}
+.sd-header-btn--an svg { color: var(--accent, #3b82f6); }

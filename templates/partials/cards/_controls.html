@@ -35,7 +35,7 @@
               </div>
           </div>
 
-          <!-- Developer Control Card (Mobile only, initial versteckt) -->
+          <!--Developer Control Card (Mobile only, hidden initially)-->
           <div class="grid-stack-item control-card-mobile" gs-w="12" gs-h="4" gs-x="0" gs-y="14" id="dev-control-card-mobile" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card">
@@ -54,14 +54,14 @@
                               <span id="resume-icon-mobile"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg></span>
                               <span id="resume-text-mobile"></span>
                           </button>
-                          <!-- Filament-Change Retry (nur in Phase 2 sichtbar) -->
+                          <!--Filament-change retry (only visible in Phase 2)-->
                           <button class="control-btn warning" onclick="window.filamentChangeAction('retry')" id="fc-retry-btn-mobile" style="display:none;">
                               <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                               <span id="fc-retry-text-mobile"></span>
                           </button>
-                          <!-- Einzelne Teile fallen lassen statt den ganzen
-                               Druck abzubrechen (skip_objects, fun-Bit 49).
-                               Sichtbarkeit steuert die Faehigkeitsabfrage. -->
+                          <!--Drop individual objects instead of aborting the
+                               whole print (skip_objects, fun-bit 49).
+                               Visibility is controlled by the capability check.-->
                           <button class="control-btn warning" onclick="teileUeberspringenOeffnen()" id="skip-btn-mobile" style="display:none;">
                               <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 4v16"/></svg>
                               <span id="skip-text-mobile"></span>
@@ -132,7 +132,7 @@
               </div>
           </div>
 
-          <!-- Developer Control Card (Desktop only, initial versteckt) -->
+          <!--Developer Control Card (Desktop only, hidden initially)-->
           <div class="grid-stack-item control-card-desktop" gs-w="4" gs-h="12" gs-x="8" gs-y="0" gs-min-w="3" gs-min-h="4" gs-max-w="6" gs-max-h="20" id="dev-control-card-desktop" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card">
@@ -151,14 +151,14 @@
                               <span id="resume-icon-desktop"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg></span>
                               <span id="resume-text-desktop"></span>
                           </button>
-                          <!-- Filament-Change Retry (nur in Phase 2 sichtbar) -->
+                          <!--Filament-change retry (only visible in Phase 2)-->
                           <button class="control-btn warning" onclick="window.filamentChangeAction('retry')" id="fc-retry-btn-desktop" style="display:none;">
                               <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
                               <span id="fc-retry-text-desktop"></span>
                           </button>
-                          <!-- Einzelne Teile fallen lassen statt den ganzen
-                               Druck abzubrechen (skip_objects, fun-Bit 49).
-                               Sichtbarkeit steuert die Faehigkeitsabfrage. -->
+                          <!--Drop individual objects instead of aborting the
+                               whole print (skip_objects, fun-bit 49).
+                               Visibility is controlled by the capability check.-->
                           <button class="control-btn warning" onclick="teileUeberspringenOeffnen()" id="skip-btn-desktop" style="display:none;">
                               <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 4v16"/></svg>
                               <span id="skip-text-desktop"></span>

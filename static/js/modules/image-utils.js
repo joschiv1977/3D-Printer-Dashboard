@@ -1,20 +1,20 @@
-// Notnagel fuer skIcon (icons.js): Seiten, die nur einen Teil der Module
-// laden — und ein Buendel, das nach einer neuen Moduldatei noch nicht neu
-// gebaut wurde — sollen kein Symbol bekommen, aber auch nicht abstuerzen.
+// A stopgap for skIcon (icons.js): pages that load only some of the modules --
+// and a bundle that has not been rebuilt after a new module file -- should get
+// no symbol, but should not crash either.
 window.skIcon = window.skIcon || function () { return ''; };
 
 /**
- * Bildtyp aus Base64-Daten bestimmen.
+ * Determine the image type from base64 data.
  *
- * Thumbnails kommen aus zwei Quellen: freigestellte Slicer-Vorschauen (PNG,
- * mit Transparenz) und Kamera-Schnappschuesse (JPEG). Vorher stand der Typ
- * an jeder Anzeigestelle fest verdrahtet — und damit an einer davon falsch.
+ * Thumbnails come from two sources: cut-out slicer previews (PNG, with
+ * transparency) and camera snapshots (JPEG). The type used to be hard-wired at
+ * every place that shows one -- and was therefore wrong at one of them.
  */
 (function (global) {
     'use strict';
 
-    // Signaturen am Anfang der Base64-Zeichenkette: PNG beginnt mit \x89PNG,
-    // JPEG mit \xFF\xD8\xFF, GIF mit "GIF8".
+    // The signatures at the start of the base64 string: PNG begins with
+    // \x89PNG, JPEG with \xFF\xD8\xFF, GIF with "GIF8".
     const SIGNATURES = [
         ['iVBORw0KGgo', 'image/png'],
         ['/9j/', 'image/jpeg'],

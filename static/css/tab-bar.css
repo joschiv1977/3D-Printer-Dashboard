@@ -49,7 +49,7 @@ body.dark-mode .tab-item:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* Deaktivierter Tab (z.B. Mainsail bei offline): ausgegraut + nicht klickbar */
+/* Disabled tab (e.g. Mainsail when offline): grayed out + not clickable */
 .tab-item.tab-disabled {
     opacity: 0.4;
     pointer-events: none;

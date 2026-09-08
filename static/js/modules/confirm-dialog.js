@@ -3,11 +3,11 @@
  * Custom confirmation dialog replacing native confirm()
  */
 /**
- * Ein Fenster ueber alles legen, was gerade sichtbar ist.
+ * Put one window above everything that is visible right now.
  *
- * Feste z-index-Zahlen gehen schief, sobald ein Dialog aus einem Dialog
- * aufgeht: die Bestaetigung stand auf 9999, der Fach-Dialog auf 10050 —
- * also lag die Frage dahinter und war nicht zu sehen.
+ * Fixed z-index numbers go wrong as soon as a dialog opens out of a dialog:
+ * the confirmation sat at 9999 and the tray dialog at 10050 -- so the question
+ * lay behind it and could not be seen.
  */
 window.skNachVorn = function (el, mindestens) {
     let oben = mindestens || 1000;
@@ -23,12 +23,35 @@ window.skNachVorn = function (el, mindestens) {
 };
 
 class ConfirmDialogManager {
-    show(message, onConfirm, onCancel) {
+    /**
+     * Ask a yes/no question.
+     *
+     * `optionen.knopf` is the label of the confirming button and
+     * `optionen.gefaehrlich` paints it as destructive. Both used to be
+     * fixed: every caller got `texts.confirm_ok`, and that key reads
+     * "Delete" in all five languages. So the question "not enough filament
+     * -- print anyway?" was answered with a red DELETE, and so were the
+     * emergency stop, the page reload and the power-off. Deleting is now
+     * something a caller asks for; the default is a plain yes.
+     */
+    show(message, onConfirm, onCancel, optionen = {}) {
+        // A caller may hand in { text, knopf, gefaehrlich } instead of a bare
+        // string. The button belongs to the question, and the closing brace of
+        // a callback is an awkward place to append an argument.
+        if (message && typeof message === 'object') {
+            optionen = message;
+            message = optionen.text;
+        }
+
         // Remove any existing confirm dialog
         const existing = document.getElementById('customConfirmDialog');
         if (existing) existing.remove();
 
         const texts = window.texts || {};
+        const knopfText = optionen.knopf || texts.confirm_yes || 'OK';
+        const knopfStil = optionen.gefaehrlich
+            ? 'background:rgba(244,67,54,0.12); border-color:rgba(244,67,54,0.25); color:#c62828;'
+            : '';
 
         const modal = document.createElement('div');
         modal.id = 'customConfirmDialog';
@@ -47,7 +70,7 @@ class ConfirmDialogManager {
                     <div style="color:var(--text-primary); font-size:14px; line-height:1.6; white-space:pre-wrap;">${message}</div>
                     <div class="temp-actions" style="margin-top:20px;">
                         <button class="temp-btn temp-btn--cancel" id="confirm-cancel-btn">${texts.cancel || 'Abbrechen'}</button>
-                        <button class="temp-btn temp-btn--apply" id="confirm-ok-btn" style="background:rgba(244,67,54,0.12); border-color:rgba(244,67,54,0.25); color:#c62828;">${texts.confirm_ok || 'OK'}</button>
+                        <button class="temp-btn temp-btn--apply" id="confirm-ok-btn" style="${knopfStil}">${knopfText}</button>
                     </div>
                 </div>
             </div>
@@ -76,11 +99,13 @@ class ConfirmDialogManager {
 window.confirmDialogManager = new ConfirmDialogManager();
 
 // Backwards compatibility
-window.showConfirmDialog = (message, onConfirm, onCancel) => window.confirmDialogManager.show(message, onConfirm, onCancel);
+window.showConfirmDialog = (message, onConfirm, onCancel, optionen) =>
+    window.confirmDialogManager.show(message, onConfirm, onCancel, optionen);
 
-// Promise-Variante (statt nativem confirm): `if (!await skConfirm(msg)) return;`
-// SELBSTSTÄNDIG (eigene Inline-Styles) → funktioniert auf JEDER Seite, auch ohne
-// das App-CSS (Unterseiten wie settings/slicer/maintenance laden es nicht).
+// The promise variant (instead of the native confirm):
+// `if (!await skConfirm(msg)) return;`
+// SELF-CONTAINED (its own inline styles) -> it works on EVERY page, even without
+// the app CSS (subpages like settings, slicer and maintenance do not load it).
 window.skConfirm = (message, opts) => new Promise((resolve) => {
     const o = opts || {};
     const texts = window.texts || {};
@@ -117,18 +142,18 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
     ok.focus();
 });
 
-// Selbststaendiger Toast (ersetzt natives alert()). Bringt eigenes CSS mit
-// und laeuft daher auf JEDER Seite gleich — auch auf den Unterseiten
-// (settings, logs, slicer), die das App-CSS nicht laden.
+// A self-contained toast (it replaces the native alert()). It brings its own
+// CSS and therefore behaves the same on EVERY page -- including the subpages
+// (settings, logs, slicer) that do not load the app CSS.
 //
-// Aufbau seit 21aug26 nach dem freigegebenen Entwurf: oben rechts statt unten
-// mittig, Typ an Farbstreifen und Symbol erkennbar, zweite Zeile fuer den
-// Bezug ("Spule aktiviert" allein sagt nicht welche), optionale Handlung
-// daneben, Restzeit als Balken, Stapel statt Ueberschreiben.
+// The layout follows the approved design: top right instead of bottom centre,
+// the type recognisable from a colour stripe and an icon, a second line for the
+// context ("spool activated" alone does not say which one), an optional action
+// beside it, the remaining time as a bar, stacking instead of overwriting.
 //
-// skToast(text)                      — wie bisher
-// skToast(text, 'success')           — Typ erzwingen
-// skToast(text, 'success', 6000)     — Dauer in ms (Rueckwaertskompatibel)
+// skToast(text)                      -- as before
+// skToast(text, 'success')           -- force the type
+// skToast(text, 'success', 6000)     -- duration in ms (backwards compatible)
 // skToast(text, 'success', { detail, farbe, aktion: {text, onClick}, dauer })
 (function () {
     'use strict';
@@ -186,9 +211,9 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         const o = (drittes && typeof drittes === 'object') ? drittes : {};
         const dauer = (typeof drittes === 'number' ? drittes : o.dauer) || 4000;
 
-        // Typ aus fuehrendem Status-Emoji ableiten und das Emoji entfernen —
-        // der Toast bringt sein eigenes Symbol mit. So bleibt jeder alte
-        // Aufruf skToast('…', 'success') unveraendert richtig.
+        // Derive the type from a leading status emoji and strip the emoji --
+        // the toast brings its own icon. That keeps every old call
+        // skToast('…', 'success') correct, unchanged.
         let msg = String(message == null ? '' : message);
         const m = msg.match(/^\s*(✅|✔️?|⚠️?|❌|⛔|🚫|ℹ️?|🖨️?|📹|🌡️?|🔌|💧|⏹️?|🎨|📥|🧵)\s*/u);
         if (m) {
@@ -237,7 +262,7 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
             <button class="sk-toast-zu" aria-label="${sicher(hole('cancel') || 'Schliessen')}">×</button>
             <div class="sk-toast-balken"></div>`;
 
-        // Neueste oben — man liest von oben.
+        // The newest on top -- people read from the top.
         host.insertBefore(el, host.firstChild);
         requestAnimationFrame(() => el.classList.add('sk-an'));
 
@@ -265,8 +290,8 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         };
 
         laufen();
-        // Mit der Maus darauf haelt die Zeit an — sonst verschwindet die
-        // Meldung genau dann, wenn man sie liest.
+        // With the mouse on it the clock stops -- otherwise the message
+        // disappears exactly while it is being read.
         el.addEventListener('mouseenter', anhalten);
         el.addEventListener('mouseleave', () => {
             const anteil = parseFloat(balken.style.width) || 0;
@@ -286,18 +311,17 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
 })();
 
 /**
- * Erfolgs- und Fehlermeldungen der Unterseiten.
+ * Success and error messages on the subpages.
  *
- * Vorher hatte jede Seite ihren eigenen Weg: Wartung und Benutzer zeigten
- * einen Balken im Seitenfluss, der den Inhalt verschob; lief die Seite in
- * der Electron-App, uebernahm deren window.showToast und blendete einen
- * Dialog MITTEN ins Bild, den man wegklicken musste — fuer ein "erledigt
- * markiert". Jetzt ueberall derselbe Stapel oben rechts wie bei allen
- * anderen Meldungen.
+ * Every page used to have its own way: maintenance and users showed a bar in
+ * the page flow that pushed the content down; when the page ran inside the
+ * Electron app, its window.showToast took over and put a dialog RIGHT in the
+ * middle of the screen that had to be dismissed -- for a "marked as done". Now
+ * it is the same stack at the top right everywhere, like every other message.
  *
- * Bewusst ein eigener Name: window.showSuccess/showToast belegt die
- * Electron-App selbst, je nach Ladereihenfolge gewinnt mal die eine, mal
- * die andere Fassung.
+ * Deliberately a name of its own: window.showSuccess/showToast is taken by the
+ * Electron app itself, and depending on the load order one or the other version
+ * wins.
  */
 (function () {
     'use strict';
@@ -307,7 +331,7 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
             window.skToast(String(text || ''), art, titel ? { detail: '' } : undefined);
             return;
         }
-        // Ohne Toast-System (sollte nicht vorkommen): wenigstens die Konsole.
+        // Without the toast system (which should not happen): at least the console.
         console[art === 'error' ? 'error' : 'log'](text);
     }
 

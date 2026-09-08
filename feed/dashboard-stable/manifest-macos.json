@@ -1,0 +1,25 @@
+{
+  "manifest": {
+    "product": "dashboard",
+    "channel": "stable",
+    "platform": "macos",
+    "version": "2.2.20",
+    "files": [
+      {
+        "name": "Dashboard-2.2.20-arm64-mac.zip",
+        "sha256": "4b5f2c70f0f1ccbee1ed0562d99c8afa3bbda9516f8642e09765e69c7311a060",
+        "size": 118190979,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-2.2.20-arm64-mac.zip"
+      },
+      {
+        "name": "Dashboard-2.2.20-arm64-mac.zip.blockmap",
+        "sha256": "1d7561818a3a064560ed523f326608f19a0e2d5f52916f609862b962258b039d",
+        "size": 122633,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-2.2.20-arm64-mac.zip.blockmap"
+      }
+    ],
+    "notes": null,
+    "issued": 1788879537
+  },
+  "signature": "vF+jkvGXOkpZe9JrJxYqbLg99gk3qeGIaWSPrbLKZRffbSygKPfohH/MlBJa9M4ILB0dxZ+NH7GFG+jER6GFCA=="
+}

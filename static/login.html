@@ -6,13 +6,11 @@
     <title id="page-title">3D Printer Dashboard - Login</title>
     <link rel="stylesheet" href="/static/css/design-tokens.css">
     <style>
-        /* Der Anmeldebildschirm hing als einziger nicht am Design-System:
-           eigener Farbverlauf, eigene Farben, kein Dunkelmodus. Jetzt
-           dieselben Tokens wie ueberall — damit passt er automatisch mit,
-           wenn sich die Palette aendert. */
+        /* Uses the same design tokens as the rest of the app, so it stays
+           in sync automatically whenever the palette changes. */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* Setzt der Vorab-Schnipsel im Kopf, damit beim Laden nicht kurz
-           eine helle Flaeche aufblitzt, bevor die Klasse am body sitzt. */
+        /* Set by the pre-paint snippet in the head, so no light flash
+           briefly appears on load before the class lands on body. */
         html.dark-vorab { background: #0F1419; }
         body {
             font-family: var(--font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
@@ -45,8 +43,8 @@
             opacity: .55;
         }
         .lang-btn:hover { opacity: .85; }
-        /* Aktiv heisst Flaeche UND Rand — duenne Randlinien allein waren zu
-           wenig (abgenommenes Muster vom 20aug26). */
+        /* Active means fill AND border — thin border lines alone were
+           not enough. */
         .lang-btn.active {
             opacity: 1;
             border-color: var(--accent-blue);
@@ -91,8 +89,8 @@
         }
     </style>
     <script>
-        // Dieselbe Entscheidung wie in app-init.js: gespeicherte Wahl, sonst
-        // die des Systems. Laeuft VOR dem Zeichnen, damit es nicht flackert.
+        // Same decision as in app-init.js: use the stored choice, otherwise
+        // the system's. Runs BEFORE paint so it doesn't flicker.
         (function () {
             try {
                 var wahl = localStorage.getItem('theme');
@@ -102,7 +100,7 @@
                 document.addEventListener('DOMContentLoaded', function () {
                     if (dunkel) document.body.classList.add('dark-mode');
                 });
-            } catch (e) { /* localStorage gesperrt — dann eben hell */ }
+            } catch (e) { /* localStorage blocked — fall back to light theme */ }
         })();
     </script>
 </head>
@@ -229,10 +227,10 @@
 
     <script>
         // ============================================
-        // Auto-Login für Electron App
+        // Auto-login for Electron app
         // ============================================
         async function tryAutoLogin() {
-            // Prüfe ob Electron App läuft
+            // Check whether the Electron app is running
             if (!window.electronAPI) {
                 console.log('[Auto-Login] Kein Electron - Skip Auto-Login');
                 return false;
@@ -255,12 +253,12 @@
                 console.log('[Auto-Login] Credentials gefunden für User:', credentials.username);
                 console.log('[Auto-Login] Versuche Auto-Login mit Device Token...');
 
-                // Zeige Status-Nachricht
+                // Show status message
                 const successMsg = document.getElementById('successMessage');
                 successMsg.textContent = 'Automatische Anmeldung läuft...';
                 successMsg.style.display = 'block';
 
-                // Verwende Device Token für Login
+                // Use device token for login
                 const language = localStorage.getItem('language') || 'de';
                 const response = await fetch('/api/auth/device/login', {
                     method: 'POST',
@@ -278,7 +276,7 @@
                 if (response.ok && data.username) {
                     console.log('[Auto-Login] ✅ Auto-Login erfolgreich!');
 
-                    // Speichere User-Daten
+                    // Store user data
                     localStorage.setItem('username', data.username);
                     localStorage.setItem('role', data.role);
 
@@ -287,7 +285,7 @@
                         localStorage.setItem('csrf_token', data.csrf_token);
                     }
 
-                    // Redirect zum Dashboard
+                    // Redirect to dashboard
                     const urlParams = new URLSearchParams(window.location.search);
                     const nextUrl = urlParams.get('next') || '/';
 
@@ -298,10 +296,10 @@
                     console.log('[Auto-Login] ❌ Auto-Login fehlgeschlagen:', data.error);
                     console.log('[Auto-Login] Fallback zu manuellem Login');
 
-                    // Verstecke Status-Nachricht
+                    // Hide status message
                     successMsg.style.display = 'none';
 
-                    // Fülle Username-Feld vor
+                    // Pre-fill username field
                     document.getElementById('username').value = credentials.username;
                     return false;
                 }
@@ -311,14 +309,14 @@
             }
         }
 
-        // Versuche Auto-Login sobald DOM geladen ist
+        // Attempt auto-login as soon as the DOM is loaded
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('[Auto-Login] DOM geladen, starte Auto-Login...');
             await tryAutoLogin();
         });
 
         // ============================================
-        // Manuelles Login-Formular
+        // Manual login form
         // ============================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -327,13 +325,12 @@
             const language = localStorage.getItem('language') || 'de';
 
             try {
-                // Gerätekennung mitschicken, dieselbe wie bei allen
-                // weiteren Anfragen (auth-handler.js). Der Server haengt sie
-                // an die Sitzung — nur so laesst sich spaeter erkennen, dass
-                // die Anmeldung im Fenster und das registrierte Geraet
-                // dasselbe sind. Die Electron-App legt hier ihre eigene
-                // Kennung ab und erscheint dadurch als EIN Eintrag statt als
-                // zwei.
+                // Send the device id along, the same one used for all other
+                // requests (auth-handler.js). The server attaches it to the
+                // session — that's the only way to later recognize that the
+                // login in this window and the registered device are one and
+                // the same. The Electron app stores its own id here and
+                // therefore shows up as ONE entry instead of two.
                 let geraeteKennung = localStorage.getItem('web_device_id');
                 if (!geraeteKennung) {
                     const zufall = (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -356,8 +353,8 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // SECURITY: Token wird als HttpOnly Cookie vom Server gesetzt
-                    // Wir speichern NUR nicht-sensitive Daten in localStorage
+                    // SECURITY: the token is set by the server as an HttpOnly cookie
+                    // We store ONLY non-sensitive data in localStorage
                     if (data.username) {
                         localStorage.setItem('username', data.username);
                         localStorage.setItem('role', data.role);
@@ -369,12 +366,12 @@
                     }
 
                     // ============================================
-                    // Electron: Device Token registrieren für Auto-Login
+                    // Electron: register device token for auto-login
                     // ============================================
                     if (window.electronAPI) {
                         try {
                             console.log('[Auto-Login] Registriere Device für Auto-Login...');
-                            // Device-Info von Electron holen (wie in preload.js)
+                            // Get device info from Electron (as in preload.js)
                             let deviceInfo = {};
                             if (window.electronAPI.fcm && window.electronAPI.fcm.getDeviceInfo) {
                                 deviceInfo = await window.electronAPI.fcm.getDeviceInfo();
@@ -398,12 +395,9 @@
                                 const registerData = await registerResponse.json();
                                 console.log('[Auto-Login] ✅ Device Token erhalten:', registerData.device_token.substring(0, 20) + '...');
 
-                                // Speichere nur Benutzername und Geraetetoken.
-                                // NICHT das Passwort: saveCredentials nimmt genau
-                                // zwei Argumente (preload.js), das dritte fiel
-                                // frueher weg — womit das Passwort im Feld
-                                // deviceToken landete und der Auto-Login mit 401
-                                // scheiterte, weil er ein Passwort als Token schickte.
+                                // Store only username and device token.
+                                // NOT the password: saveCredentials takes exactly
+                                // two arguments (preload.js).
                                 await window.electronAPI.saveCredentials(
                                     username,
                                     registerData.device_token
@@ -417,12 +411,12 @@
                         }
                     }
 
-                    // FIX: Warte bis Cookie wirklich mitgeschickt wird.
-                    // Der 100ms-setTimeout reichte bei HTTPS+self-signed-cert in
-                    // Safari nicht — der navigierte GET / kam manchmal noch ohne
-                    // neuen access_token-Cookie an → Redirect zurück zu /login.
-                    // Stattdessen: test-fetch auf /api/auth/me mit credentials,
-                    // erst bei 200 navigieren. Fallback nach 2s hart navigieren.
+                    // FIX: Wait until the cookie is actually sent along.
+                    // A 100ms setTimeout wasn't enough for HTTPS+self-signed-cert
+                    // in Safari — the navigated GET / sometimes still arrived
+                    // without the new access_token cookie → redirect back to
+                    // /login. Instead: test-fetch /api/auth/me with credentials,
+                    // only navigate on 200. Fallback: hard-navigate after 2s.
                     const urlParams = new URLSearchParams(window.location.search);
                     const nextUrl = urlParams.get('next') || '/';
 

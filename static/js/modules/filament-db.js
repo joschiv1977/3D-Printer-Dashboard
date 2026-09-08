@@ -1,6 +1,6 @@
-// Automatisch erzeugt aus den Bambu-Studio-Filamentprofilen
-// (resources/profiles/BBL/filament, 20aug26) + pybambu filaments.json.
-// [tray_info_idx, Anzeigename, tray_type, nozzle_temp_min, nozzle_temp_max]
+// Generated automatically from the Bambu Studio filament profiles
+// (resources/profiles/BBL/filament) and pybambu's filaments.json.
+// [tray_info_idx, display name, tray_type, nozzle_temp_min, nozzle_temp_max]
 window.BAMBU_FILAMENT_DB = [
   ['GFB00', 'Bambu ABS', 'ABS', 240, 280],
   ['GFB50', 'Bambu ABS-GF', 'ABS-GF', 240, 280],
@@ -84,16 +84,16 @@ window.BAMBU_FILAMENT_DB = [
 ];
 
 /**
- * Trocknungs-Vorgaben vom Server uebernehmen (/api/filament/db).
+ * Take the drying presets from the server (/api/filament/db).
  *
- * Die Tabelle darunter ist ab 28aug26 nur noch der Rueckfall: dieselben
- * Zahlen lagen bis dahin fuenfmal im Baum (Server, hier, ZWEIMAL auf
- * Android, iOS). Sie waren zwar alle gleich — nachgemessen —, aber vier
- * Kopien, die niemand vergleicht. Jetzt fuehrt der Server sie, und wer sie
- * braucht, hat sie nach dem ersten Abruf der Profilliste.
+ * The table below is only the fallback now: the same numbers used to sit in the
+ * tree five times over (the server, here, TWICE on Android, and iOS). They were
+ * all identical -- that was checked -- but they were four copies nobody
+ * compares. The server keeps them now, and whoever needs them has them after
+ * the first call for the profile list.
  *
- * Form vom Server: {PLA: {idle: {temp, hours}, printing: {temp, hours}}}
- * Form hier:       {PLA: [[Grad, Stunden] idle, [Grad, Stunden] im Druck]}
+ * The shape from the server: {PLA: {idle: {temp, hours}, printing: {temp, hours}}}
+ * The shape here:            {PLA: [[degrees, hours] idle, [degrees, hours] printing]}
  */
 window.uebernehmeTrocknung = function (vomServer) {
     if (!vomServer || typeof vomServer !== 'object') return;
@@ -108,11 +108,11 @@ window.uebernehmeTrocknung = function (vomServer) {
     if (Object.keys(raus).length) window.BAMBU_DRY_PRESETS = raus;
 };
 
-// Trocknungs-Empfehlung je Materialtyp — AMS HT (n3s) aus den Studio-
-// Profilen (filament_dev_ams_drying_temperature/-_time, Index 1 = idle,
-// Index 3 = waehrend des Drucks; im Druck niedriger, z.B. ABS 75 statt 80,
-// damit das Filament nicht zu weich in den Extruder laeuft).
-// typ: [[Grad, Stunden] idle, [Grad, Stunden] im Druck]
+// The drying recommendation per material type -- AMS HT (n3s) from the Studio
+// profiles (filament_dev_ams_drying_temperature/-_time, index 1 = idle,
+// index 3 = during a print; lower while printing, ABS 75 instead of 80 for
+// instance, so the filament does not run into the extruder too soft).
+// type: [[degrees, hours] idle, [degrees, hours] printing]
 window.BAMBU_DRY_PRESETS = {
   PLA: [[45, 12], [45, 12]], PETG: [[65, 12], [55, 12]], PET: [[65, 12], [55, 12]],
   PCTG: [[65, 12], [55, 12]], ABS: [[80, 8], [75, 8]], ASA: [[80, 8], [80, 8]],

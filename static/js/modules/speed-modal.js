@@ -7,10 +7,10 @@ class SpeedModalManager {
         const texts = window.texts || {};
         document.getElementById('speedModal').style.display = 'block';
 
-        // Null-sicher: im Bambu-Template existieren Hint/Cancel/Apply und
-        // der Slider nicht (Klipper-Zweig) — harte getElementById-Zugriffe
-        // crashten open() VOR dem Karten-Code (deshalb fehlten Markierung
-        // und Hinweistext komplett).
+        // Null-safe: in the Bambu template the hint, cancel, apply and the
+        // slider do not exist (they are the Klipper branch) -- hard
+        // getElementById accesses crashed open() BEFORE the card code, which is
+        // why the selection and the hint text were missing entirely.
         const setze = (id, v) => { const e = document.getElementById(id); if (e && v) e.textContent = v; };
         setze('speed-modal-title', texts.speed_control);
         setze('speed-modal-hint', texts.speed_hint);
@@ -21,7 +21,7 @@ class SpeedModalManager {
         const labels = document.getElementById('speed-level-labels');
         this._klipper = !!(window.isKlipperMode && window.isKlipperMode());
 
-        // Bambu (Display-Stil): vier Stufen-Karten, Klick setzt sofort.
+        // Bambu (in the display style): four step cards, a tap sets it right away.
         if (!this._klipper && document.getElementById('ds-grid')) {
             const namen = {1: texts.speed_silent, 2: texts.speed_standard,
                            3: texts.speed_sport, 4: texts.speed_ludicrous};
@@ -38,8 +38,9 @@ class SpeedModalManager {
             const hint = document.getElementById('ds-hint');
             if (hint) hint.textContent = texts.speed_hint
                 || 'Wirkt sofort auf den laufenden Druck.';
-            // Aktive Stufe: der Bambu-Status traegt sie unter speed.speed_level
-            // (lastPrintData ist der Klipper-Weg und hier leer).
+            // The active level: the Bambu status carries it under
+            // speed.speed_level (lastPrintData is the Klipper route and empty
+            // here).
             const st = (window.printerControlManager
                 && window.printerControlManager.lastState) || {};
             const lvl = (st.speed && st.speed.speed_level)
@@ -50,14 +51,14 @@ class SpeedModalManager {
 
         if (!slider) return;
         if (this._klipper) {
-            // Klipper: stufenloser Geschwindigkeitsfaktor 1–200 % (M220), wie Mainsail.
+            // Klipper: a continuous speed factor of 1-200% (M220), as in Mainsail.
             if (labels) labels.style.display = 'none';
             slider.min = 1; slider.max = 200; slider.step = 1;
             const cur = Math.round((window.lastPrintData && window.lastPrintData.speed_percent) || 100);
             slider.value = Math.min(200, Math.max(1, cur));
             this.updateDisplay(slider.value);
         } else {
-            // Bambu: 4 Stufen mit Labels.
+            // Bambu: 4 levels with labels.
             if (labels) labels.style.display = '';
             slider.min = 1; slider.max = 4; slider.step = 1;
             document.getElementById('speed-label-silent').textContent = texts.speed_silent;
@@ -81,7 +82,7 @@ class SpeedModalManager {
         }
     }
 
-    /** Bambu-Karten: Stufe waehlen und sofort senden. */
+    /** The Bambu cards: pick a level and send it straight away. */
     pick(stufe) {
         const texts = window.texts || {};
         this._markiere(stufe);
@@ -102,7 +103,7 @@ class SpeedModalManager {
     updateDisplay(value) {
         const texts = window.texts || {};
         if (this._klipper) {
-            // Stufenlos: nur „X %" anzeigen.
+            // Continuous: show only "X %".
             const display = document.getElementById('speed-display');
             display.textContent = value + '%';
             display.style.color = 'var(--accent-blue)';
@@ -129,11 +130,11 @@ class SpeedModalManager {
         const slider = document.getElementById('speed-slider');
         let percent, speedText;
         if (this._klipper) {
-            // Klipper: Slider-Wert = Prozent direkt → M220.
+            // Klipper: the slider value is the percentage directly -> M220.
             percent = parseInt(slider.value, 10) || 100;
             speedText = percent + '%';
         } else {
-            // Bambu: 4 Levels → Prozent (Backend mappt zurück).
+            // Bambu: 4 levels -> a percentage (the backend maps it back).
             const speedLevel = parseInt(slider.value, 10);
             percent = {1: 50, 2: 100, 3: 124, 4: 166}[speedLevel] || 100;
             const names = ['', texts.speed_silent, texts.speed_standard,

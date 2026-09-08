@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/static/css/base.css?v=2">
     <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
 
-    <!-- Sprachdateien -->
+    <!--Language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -35,8 +35,8 @@
     <style>
         html, body { height: 100%; margin: 0; }
         body { background: var(--bg-primary, #1e1e1e); overflow: hidden; }
-        /* Webview fuellt den ganzen Bereich; das Dock schwebt (Apple-Style)
-           drueber — kein reservierter Streifen, kein weisser Balken. */
+        /* The webview fills the whole area; the dock floats over it in
+           Apple style -- no reserved strip, no white bar. */
         #ms-wrap { position: fixed; inset: 0; }
         #ms-view { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
         .ms-overlay {
@@ -45,7 +45,7 @@
             gap: 16px; text-align: center; padding: 24px;
             color: var(--text-primary, #eee); background: var(--bg-primary, #1e1e1e);
         }
-        /* Dock garantiert ueber der Webview halten (Apple-Style schwebend). */
+        /* Keep the dock reliably above the webview (floating, Apple style). */
         .floating-tab-bar { z-index: 2147483000 !important; }
         .ms-overlay .ms-icon { font-size: 48px; opacity: .55; }
         .ms-overlay .ms-msg { font-size: 16px; max-width: 440px; line-height: 1.4; }
@@ -74,20 +74,20 @@
 
     <script>
     (function () {
-        // Dock rendern (wie alle anderen Seiten — sonst bleibt das Dock leer).
+        // Render the dock (as on every other page, or it stays empty).
         if (window.tabBarManager) window.tabBarManager.render();
 
         const wrap = document.getElementById('ms-wrap');
         const overlay = document.getElementById('ms-overlay');
         const T = (k, fb) => (window.texts && window.texts[k]) || fb;
-        // <webview> gibt es nur in der Electron-App; im normalen Browser Fallback.
+        // <webview> exists only in the Electron app; a fallback in a normal browser.
         const isElectron = /electron/i.test(navigator.userAgent);
 
         function showOverlay(html) { overlay.innerHTML = html; overlay.style.display = 'flex'; }
         function hideOverlay() { overlay.style.display = 'none'; }
 
-        // klipper_base_url zeigt auf Moonraker (Port 7125). Die native Web-UI
-        // (Mainsail) laeuft auf Port 80 → Port strippen, nur Protokoll+Host.
+        // klipper_base_url points at Moonraker (port 7125). The native web UI
+        // (Mainsail) runs on port 80, so strip the port and keep protocol and host.
         function buildTarget(baseUrl) {
             try { const u = new URL(baseUrl); return u.protocol + '//' + u.hostname + '/'; }
             catch (_) { return baseUrl; }
@@ -112,11 +112,12 @@
             view.setAttribute('src', target);
             if (isElectron) {
                 view.setAttribute('allowpopups', '');
-                // WebGL im Webview explizit an (3D-Heightmap/Bed-Mesh in Mainsail).
+                // WebGL explicitly on in the webview (the 3D heightmap in Mainsail).
                 view.setAttribute('webpreferences', 'webgl=yes');
                 view.addEventListener('did-fail-load', (ev) => {
-                    // Sub-Resources und ERR_ABORTED (-3) ignorieren; nur echter
-                    // Mainframe-Fehler (Drucker aus/unerreichbar) → Offline-Overlay.
+                    // Ignore sub-resources and ERR_ABORTED (-3); only a real
+                    // main-frame error (printer off or unreachable) shows the
+                    // offline overlay.
                     if (ev.isMainFrame === false) return;
                     if (ev.errorCode === -3) return;
                     showOffline(target);
@@ -124,8 +125,8 @@
                 view.addEventListener('did-stop-loading', hideOverlay);
             } else {
                 view.addEventListener('load', hideOverlay);
-                // Im Browser kann das Einbetten an Mixed-Content/X-Frame-Options
-                // scheitern → nach kurzem Timeout den Fallback anbieten.
+                // In a browser the embedding can fail on mixed content or
+                // X-Frame-Options, so offer the fallback after a short timeout.
                 setTimeout(() => { if (overlay.style.display !== 'none') showOffline(target); }, 6000);
             }
             wrap.insertBefore(view, overlay);

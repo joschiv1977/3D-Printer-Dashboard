@@ -1,5 +1,5 @@
 /* ============================================
- * Printer Control Modal (Drucker Steuerung)
+ * Printer Control Modal
  * ============================================ */
 
 /* Camera Preview */
@@ -41,7 +41,7 @@
 
 .ctrl-camera-light-btn:hover { background: rgba(0, 0, 0, 0.8); }
 
-/* An = gruener Rand, gleiche Sprache wie der Licht-Knopf in der Uebersicht. */
+/* On = green border, same language as the light button in the overview. */
 .ctrl-camera-light-btn.ctrl-licht-an {
     border-color: #4ade80;
     box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35);
@@ -98,6 +98,16 @@
     color: var(--text-primary);
     border-bottom-color: var(--accent-blue);
 }
+
+/* Locked while the printer is off. Dimmed rather than hidden: the tab is
+   still part of the machine, it just has nothing to offer right now, and a
+   row that changes length every time the power drops is worse than a grey
+   entry. */
+.ctrl-tab--aus {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+.ctrl-tab--aus:hover { background: none; color: var(--text-secondary); }
 
 body.dark-mode .ctrl-tab:hover {
     background: rgba(33, 150, 243, 0.08);
@@ -334,9 +344,9 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 }
 
 /* ============================================================
- * Klipper-Direct Steuerung (Achsen/Extruder/Maschine) —
- * Parität zur Android-App (Mainsail-Stil). Nur im Klipper-Modus
- * per JS in die Tabs injiziert (printer-control.js buildKlipperControl).
+ * Klipper-Direct control (axes/extruder/machine) —
+ * Parity with the Android app (Mainsail style). Only injected into
+ * the tabs via JS in Klipper mode (printer-control.js buildKlipperControl).
  * ============================================================ */
 .kctrl-pos-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .kctrl-pos {
@@ -390,10 +400,10 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 .kctrl-macro-empty { color: var(--text-secondary); padding: 4px; }
 
 /* ============================================================
- * Display-Stil fuers Steuerungs-Fenster (Mockup 18aug26)
+ * Display style for the control window
  * ============================================================ */
 
-/* Tabs als Segmente statt Unterstrich-Reiter */
+/* Tabs as segments instead of underline tabs */
 .ctrl-tabs {
     background: rgba(128, 128, 128, 0.08);
     border-radius: 12px;
@@ -416,7 +426,7 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     font-weight: 600;
 }
 
-/* --- Geraetekalibrierung: Haekchenliste wie in Studios Dialog --- */
+/* --- Device calibration: checklist like in Studio's dialog --- */
 .cali-schritte {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
     gap: 6px 16px; margin-bottom: 12px;
@@ -433,14 +443,14 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 }
 .cali-fuss .ext-sub { flex: 1 1 240px; }
 
-/* Die Einzellaeufe: untereinander, volle Breite der Karte — anders als
-   der Sammelknopf, weil hier jede Zeile ein eigener Durchgang ist. */
+/* The individual runs: stacked, full card width — unlike
+   the combined button, because each row here is its own pass. */
 .cali-laeufe {
     display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
 }
 .cali-laeufe .cali-lauf-btn { width: 100%; text-align: center; }
 
-/* Laufender Durchgang im Kalibrier-Reiter */
+/* Running pass in the calibration tab */
 .cali-stufe {
     font-size: 14px; font-weight: 600; color: var(--text-primary);
     margin-bottom: 10px;
@@ -459,7 +469,7 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     font-variant-numeric: tabular-nums;
 }
 
-/* --- Achsen: rundes Jog-Pad --- */
+/* --- Axes: round jog pad --- */
 .jog-layout { display: flex; gap: 12px; }
 .jog-panel { flex: 1; display: flex; flex-direction: column; align-items: center; }
 .jog-pad { width: 230px; max-width: 100%; }
@@ -478,6 +488,215 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 .jog-home text { fill: #4ade80; font-size: 17px; cursor: pointer; }
 .jog-lbl { fill: var(--text-secondary); font-size: 12px; pointer-events: none; }
 .jog-lbl--s { font-size: 10px; opacity: 0.7; }
+
+/* -- Map view: bed from above, machine from the side ------------------ */
+
+/* The switch sits above both layouts, so neither panel owns it. */
+.jog-switch {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 0 0 12px;
+    padding: 3px;
+    background: rgba(128, 128, 128, 0.10);
+    border-radius: 10px;
+    width: fit-content;
+    margin-inline: auto;
+}
+.jog-switch-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 16px;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+/* Active state carries fill AND border -- a thin rule alone was rejected
+   as too quiet to read at a glance. */
+.jog-switch-btn--on {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.55);
+    color: var(--text-primary);
+}
+
+.bed-map {
+    width: 240px;
+    max-width: 100%;
+    cursor: crosshair;
+}
+/* The plate, drawn the way Studio shows it from above. Dark in both themes:
+   it IS dark, and a light rectangle would only be a white hole in the panel. */
+.bed-platte { fill: #26282e; }
+.bed-lasche { fill: #26282e; }
+
+/* The frame around the printable area. */
+.bed-area {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.22);
+}
+/* 10 mm barely there, 50 mm readable -- close and you see structure, at a
+   glance you see the fifties. */
+.bed-grid {
+    stroke: rgba(255, 255, 255, 0.055);
+    stroke-width: 1;
+}
+.bed-grid--stark { stroke: rgba(255, 255, 255, 0.16); }
+
+/* The strip only one nozzle reaches. Lighter than the plate, not coloured:
+   it is not a warning, it is a property of the machine. */
+.bed-nur-eine { fill: rgba(255, 255, 255, 0.07); }
+.bed-nur-eine-text {
+    fill: rgba(255, 255, 255, 0.42);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Simon Says. The fields are barely there while quiet and clearly lit when
+   they are the answer -- the plate has to stay a plate, not become a board. */
+.bed-feld {
+    fill: rgba(255, 255, 255, 0.05);
+    stroke: rgba(255, 255, 255, 0.22);
+}
+.bed-feld--an {
+    fill: rgba(29, 158, 117, 0.45);
+    stroke: #1d9e75;
+}
+
+/* The label bar on the plate's front edge -- light, like the printed one. */
+.bed-leiste { fill: rgba(255, 255, 255, 0.72); }
+.bed-leiste-text {
+    fill: #3a3d44;
+    font-size: 6.4px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.bed-plattenname {
+    fill: rgba(255, 255, 255, 0.32);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+}
+.bed-empty {
+    fill: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Unreferenced axes: the map is covered rather than merely refusing clicks.
+   A target in millimetres is meaningless before homing -- the printer counts
+   from wherever it stands -- so the surface must not invite the click in the
+   first place. */
+.bed-sperre {
+    fill: rgba(20, 24, 34, 0.86);
+    stroke: rgba(240, 160, 60, 0.55);
+    stroke-dasharray: 5 4;
+}
+.bed-sperre-text {
+    fill: #f0b46a;
+    font-size: 12px;
+    font-weight: 600;
+}
+.bed-map--gesperrt { cursor: not-allowed; }
+
+input[type="range"].z-slider--gesperrt {
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.45;
+}
+
+/* The mark says one of two things, and has to look like it: a commanded
+   target is drawn hollow and dashed, a measured position solid with a
+   centre dot. Same geometry, so the eye compares shape, not position. */
+.bed-mark { pointer-events: none; }
+.bed-mark circle { fill: none; stroke-width: 2; }
+.bed-mark line { stroke-width: 1.5; }
+.bed-mark text { font-size: 11px; font-weight: 600; }
+
+.bed-mark--target circle { stroke: #ba7517; stroke-dasharray: 4 3; }
+.bed-mark--target line   { stroke: #ba7517; stroke-dasharray: 4 3; }
+.bed-mark--target text   { fill: #ba7517; }
+
+.bed-mark--live circle { stroke: #1d9e75; }
+.bed-mark--live line   { stroke: #1d9e75; }
+.bed-mark--live text   { fill: #1d9e75; }
+.bed-mark-core { fill: #1d9e75; stroke: none; }
+
+.bed-note {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin: 10px 0 0;
+    text-align: center;
+}
+.bed-note b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.z-side-wrap {
+    align-items: stretch;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.z-side { height: 240px; width: 120px; }
+.side-frame {
+    fill: rgba(128, 128, 128, 0.06);
+    stroke: rgba(128, 128, 128, 0.30);
+}
+.side-nozzle { fill: rgba(128, 128, 128, 0.55); }
+.side-bed { stroke: #1d9e75; stroke-width: 4; stroke-linecap: round; }
+
+/* Vertical, because the axis it drives is vertical -- a horizontal slider
+   for Z reads backwards next to the side view.
+   
+   The selector names the element on purpose. base.css styles EVERY range as
+   a flat 8px bar with a blue round thumb, and `input[type="range"]` (0,1,1)
+   beats a bare class (0,1,0) whatever the load order -- so a plain `.z-slider`
+   lost its height and its orientation, and the thumb ended up outside the
+   panel. */
+input[type="range"].z-slider {
+    accent-color: #1d9e75;
+    background: rgba(128, 128, 128, 0.18);
+    border-radius: 5px;
+    cursor: pointer;
+    /* No direction:rtl -- 0 belongs at the top and the maximum at the bottom,
+       the way the side view draws it: Z counts from the nozzle downwards, so
+       pushing the handle down drops the bed. With rtl the two ran against
+       each other. */
+    /* Two mechanisms on purpose: Chrome 121 removed slider-vertical and
+       orients by writing-mode, older engines only know the property. */
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    writing-mode: vertical-lr;
+    /* Same 240 as the side view beside it, so bed line and handle share a
+       scale. min-height keeps it standing if a parent ever shrinks it. */
+    height: 240px;
+    min-height: 240px;
+    width: 24px;
+}
+
+/* base.css paints the thumb in the blue accent; next to the green bed line
+   that reads as a second, unrelated control. */
+input[type="range"].z-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: #1d9e75;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"].z-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: #1d9e75;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    cursor: pointer;
+}
 
 .jog-zcol { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 190px; }
 .jog-zbtn {
@@ -505,8 +724,8 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     font-family: inherit;
 }
 .jog-abtn:hover { background: rgba(59, 130, 246, 0.24); }
-/* Gesperrt: waehrend eines Drucks oder einer laufenden Kalibrierung weist
-   der Server denselben Befehl ohnehin ab (action_guards). */
+/* Locked: during a print or a running calibration the server rejects
+   the same command anyway (action_guards). */
 .jog-abtn:disabled { opacity: 0.4; cursor: not-allowed; }
 .jog-abtn:disabled:hover { background: rgba(59, 130, 246, 0.14); }
 .jog-abtn--home { background: rgba(240, 160, 60, 0.14); color: #f0b46a; }
@@ -549,15 +768,15 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 /* --- Filament --- */
 .fil-actions { display: flex; gap: 9px; margin-top: 12px; }
 .fil-abtn { flex: 1; text-align: center; padding: 10px 8px; }
-/* Waehrend Druck/laufendem Filament-Ablauf gesperrt */
+/* Locked during a print / a running filament flow */
 .fil-abtn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
-/* Laufender Filament-Ablauf: der Knopf traegt den aktuellen Schritt
-   („Düse erhitzen", „Filament schneiden") — dieselbe Auskunft wie der
-   Bildschirm des Druckers. Er bleibt gesperrt, darf aber NICHT ausgegraut
-   sein: ausgerechnet im aussagekraeftigsten Moment waere er am schlechtesten
-   zu lesen. Volle Deckkraft, abgesetzter Rand, ruhiges Pulsieren als Zeichen,
-   dass etwas laeuft. */
+/* Running filament flow: the button carries the current step
+   ("heating nozzle", "cutting filament") — the same information as the
+   printer's own screen. It stays locked, but must NOT be grayed out:
+   right at its most informative moment it would be hardest to read.
+   Full opacity, a set-off border, a calm pulse as a sign that something
+   is running. */
 .fil-abtn--laeuft:disabled {
     opacity: 1;
     color: var(--accent-blue, #2196f3);
@@ -574,12 +793,12 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     .fil-abtn--laeuft:disabled { animation: none; }
 }
 
-/* Ganzer Tab gesperrt (Achsen/Extruder waehrend des Drucks) */
+/* Whole tab locked (axes/extruder during a print) */
 .ctrl-gesperrt { opacity: 0.35; pointer-events: none; }
 
-/* Kamera und Hinweis nebeneinander. Das Bild ist auf 380 px begrenzt,
-   daneben bleibt Platz — dort steht der Hinweis, statt sich unter den
-   Reitern zwischen die Rahmen zu quetschen. */
+/* Camera and notice side by side. The image is capped at 380px,
+   leaving room beside it — the notice sits there instead of squeezing
+   between the frames under the tabs. */
 .ctrl-kopfzeile {
     display: flex;
     align-items: center;
@@ -588,11 +807,11 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     flex-wrap: wrap;
 }
 .ctrl-kopfzeile .ctrl-camera-wrap { margin-bottom: 0; }
-/* Der Abstand, den vorher die Kamera selbst mitbrachte. */
+/* Replaces the spacing the camera itself used to contribute via its own margin. */
 .ctrl-kopfzeile { margin-bottom: 16px; }
 
-/* Sagt, warum gerade nichts geht. Eine graue Flaeche ohne Begruendung
-   sieht nach kaputt aus. */
+/* Says why nothing is happening right now. A gray box with no
+   explanation looks broken. */
 .ctrl-busy-hinweis {
     flex: 0 1 240px;
     padding: 12px 14px;
@@ -605,14 +824,14 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     text-align: center;
 }
 
-/* Schmales Fenster: der Hinweis rutscht unter das Bild und nimmt die
-   volle Breite — nebeneinander waere dort beides zu schmal. */
+/* Narrow window: the notice slides under the image and takes the
+   full width — side by side, both would be too narrow there. */
 @media (max-width: 720px) {
     .ctrl-busy-hinweis { flex: 1 1 100%; }
 }
 #fil-slots .mz-sec:first-child { margin-top: 0; }
 
-/* --- Geraet-Tab: Panels im kv-Listen-Look --- */
+/* --- Device tab: panels in key-value list look --- */
 #device-tab .ctrl-panel {
     background: rgba(128, 128, 128, 0.06);
     border: 1px solid rgba(128, 128, 128, 0.12);
@@ -628,12 +847,12 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 #device-tab .dev-row:last-child,
 #device-tab .dev-fan-row:last-child { border-bottom: none; }
 
-/* Geraet-Tab: zwei Spalten wie im Mockup */
+/* Device tab: two columns as in the mockup */
 .dev-cols { display: flex; gap: 10px; align-items: flex-start; }
 .dev-col { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 @media (max-width: 560px) { .dev-cols { flex-direction: column; } }
 
-/* Schalter-Optik (Anzeige, xcam ist nicht setzbar) */
+/* Toggle look (display only, xcam is not settable) */
 .dev-sw {
     width: 34px; height: 19px;
     background: rgba(128, 128, 128, 0.25);
@@ -654,12 +873,12 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 .dev-sw--click { cursor: pointer; }
 .dev-sw--click:hover { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35); }
 
-/* Geraet-Tab: kompakter, Duesen untereinander statt gequetscht */
+/* Device tab: more compact, nozzles stacked instead of squeezed */
 #device-tab .ctrl-panel { padding: 10px 12px; }
 #device-tab .ctrl-panel-title { margin-bottom: 6px; font-size: 13px; }
 #device-tab .dev-nozzle-grid { grid-template-columns: 1fr; gap: 8px; }
 
-/* Dropdowns im Steuerungs-Fenster im App-Stil (wie Einstellungen) */
+/* Dropdowns in the control window in app style (like settings) */
 #printerControlModal select {
     background: var(--input-bg, var(--bg-secondary));
     color: var(--text-primary);
@@ -672,8 +891,8 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     cursor: pointer;
 }
 
-/* Geraet-Tab Feinschliff: Titel links + klein wie im Mockup,
-   Kammerheizung als kompakte Zeile statt Riesen-Anzeige */
+/* Device tab polish: title left + small as in the mockup,
+   chamber heating as a compact row instead of a giant display */
 #device-tab .ctrl-panel-title {
     text-align: left;
     font-size: 12px;
@@ -713,15 +932,15 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 
 #device-tab .dev-nozzle-temp { font-size: 16px; }
 
-/* An/Aus-Knoepfe der Zusatzlichter kompakt rechtsbuendig */
+/* On/off buttons for the auxiliary lights, compact and right-aligned */
 #dev-lights-panel .dev-row span:last-child { display: inline-flex; gap: 6px; }
 #dev-lights-panel .ams-rfid-btn { padding: 3px 12px; font-size: 12px; border-radius: 999px; }
 
 .hd-ic--lg { width: 20px; height: 20px; }
 .ctrl-tab .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; opacity: 0.85; }
 
-/* Druck-Aktionen als Karten im Uebersichts-Grid — der wiederverwendbare
- * Aktions-Baustein: .ov-card--btn + Farbvariante (--warn/--ok/--danger). */
+/* Print actions as cards in the overview grid — the reusable
+ * action building block: .ov-card--btn + color variant (--warn/--ok/--danger). */
 .ov-card--btn {
     display: flex;
     align-items: center;
@@ -762,8 +981,8 @@ body.dark-mode .ov-card--ok { color: #a5d6a7; }
 body.dark-mode .ov-card--danger { color: #f87171; }
 
 /* ============================================================
- * Display-Stil-Fenster (Temperatur / Luefter / Tempo / Luftfuehrung)
- * Bausteine: dsp-card (Wert-Karte), dsp-chip (Preset), dsp-step
+ * Display-style windows (temperature / fan / speed / airflow)
+ * Building blocks: dsp-card (value card), dsp-chip (preset), dsp-step
  * ============================================================ */
 .dsp-card {
     background: rgba(128, 128, 128, 0.09);
@@ -791,7 +1010,7 @@ body.dark-mode .dsp-active { color: #a5d6a7; }
 .dt-grid2 .dsp-card:only-child { grid-column: span 2; }
 .df-slider { width: 100%; cursor: pointer; accent-color: var(--accent-blue); margin-top: 2px; }
 
-/* Tempo: vier Stufen-Karten */
+/* Speed: four step cards */
 .ds-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .ds-card { text-align: center; padding: 16px 10px 14px; position: relative; cursor: pointer; }
 .ds-card .hd-ic { width: 22px; height: 22px; color: var(--text-secondary); }
@@ -811,9 +1030,9 @@ body.dark-mode .dsp-active { color: #a5d6a7; }
 .da-card.dsp-on .hd-ic { color: #e65100; }
 .da-card.dsp-on--cool .hd-ic { color: var(--accent-blue); }
 
-/* Temperatur-Fenster: gleiche Display-Stage wie das Luefter-Fenster.
- * Zonen-Details klappen unter dem Eintrag aus — zwei buendige
- * Segmentleisten (Stepper, Presets) im Stil des Modus-Toggles. */
+/* Temperature window: same display stage as the fan window.
+ * Zone details expand below the entry — two flush
+ * segment bars (stepper, presets) in the style of the mode toggle. */
 .dtx-hw { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 .dtx-detail { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 .dfx-col--l .dtx-detail { align-items: flex-end; }
@@ -848,8 +1067,8 @@ body.dark-mode .dsp-active { color: #a5d6a7; }
 .dtx-seg button:hover { background: rgba(128, 128, 128, 0.12); }
 .dtx-seg button.dtx-on { background: rgba(59, 130, 246, 0.16); color: var(--accent-blue, #3b82f6); }
 
-/* Luefter-Fenster im X2D-Display-Layout: Modus-Toggle, Maschine mittig,
- * Eintraege aussen mit gepunkteten Linien zur Maschine. */
+/* Fan window in the X2D display layout: mode toggle, machine centered,
+ * entries on the outside with dotted lines to the machine. */
 .dfx-modes { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
 .dfx-mode {
     display: inline-flex; align-items: center; gap: 8px;
@@ -880,9 +1099,10 @@ body.dark-mode .dfx-mode--on { color: #4ade80; }
 body.dark-mode .dfx-fan-note { color: #ffb74d; }
 .dfx-slider { max-width: 150px; margin-top: 6px; }
 
-/* Gepunktete Verbindungslinien wie am X2D-Display: vom Eintrag horizontal,
- * dann Knick senkrecht ans Bauteil, offener Kreis als Endpunkt. Das SVG
- * liegt als Overlay ueber der ganzen Stage (dfxDrawWires in fan-modal.js). */
+/* Dotted connector lines like on the X2D display: horizontal from the
+ * entry, then a bend down to the component, an open circle as the
+ * endpoint. The SVG sits as an overlay over the whole stage
+ * (dfxDrawWires in fan-modal.js). */
 .dfx-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .dfx-wires polyline {
     fill: none;
@@ -895,9 +1115,9 @@ body.dark-mode .dfx-fan-note { color: #ffb74d; }
 body.dark-mode .dfx-wires polyline { stroke: rgba(220, 220, 220, 0.55); }
 body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 
-/* --- Filament-Editor (Tray-Edit) — Aufbau wie das Display
-   (wiki screen-operation/015.png): Formularzeilen mit zwei Dropdowns,
-   Farbquadrat, Temp-Anzeige, unten Abbrechen | Bestaetigen. --- */
+/* --- Filament editor (tray edit) — laid out like the display
+   (wiki screen-operation/015.png): form rows with two dropdowns,
+   color square, temp display, cancel | confirm at the bottom. --- */
 .tray-edit-overlay {
     position: fixed; inset: 0; z-index: 10050;
     background: rgba(0, 0, 0, 0.45);
@@ -913,17 +1133,17 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
     display: flex; flex-direction: column; gap: 18px;
 }
 .tray-edit-box h4 { margin: 0; font-size: 17px; display: flex; align-items: baseline; }
-/* Laufende Trocknung: Werte links, AMS-Bild rechts im freien Platz. */
+/* Active drying: values left, AMS image right in the free space. */
 .dry-inhalt { display: flex; align-items: center; gap: 18px; }
 .dry-werte { flex: 1; min-width: 0; }
-/* Messspalten wie in der Materialkarte, hier als 2x2. Nebeneinander
-   passten neben das AMS-Bild nur drei — die vierte ("fertig um") stand
-   dann allein in einer zweiten Reihe. */
+/* Measurement columns like in the material card, here as 2x2. Side by
+   side, only three fit next to the AMS image — the fourth ("done at")
+   ended up alone on a second row. */
 .dry-mess { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 13px 22px; }
-/* Die Faecher dieser Einheit — Farbpunkt und Typ, wie in der Karte.
-   Mit Ueberschrift, sonst ist nicht zu erkennen, wofuer die Plaketten
-   stehen. */
+/* This unit's trays — color dot and type, like in the card.
+   With a heading, otherwise it's not clear what the badges
+   stand for. */
 .dry-faecher-titel { margin-top: 14px; margin-bottom: 5px; font-size: 11px;
             color: var(--text-secondary); opacity: 0.85; }
 .dry-faecher { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -935,9 +1155,9 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 .dry-fach .mz-slot-col { width: 13px; height: 13px; border-radius: 50%;
             border: 1px solid rgba(128,128,128,0.35); }
 
-/* --- Feuchte-Gedaechtnis im AMS-Dialog ------------------------------------
-   Der Momentwert oben sagt nicht, ob getrocknet werden muss. Die Kurve zeigt
-   den Verlauf, die Zeile darunter das Urteil je Fach. */
+/* --- Humidity memory in the AMS dialog ------------------------------------
+   The current value up top doesn't say whether drying is needed. The curve
+   shows the trend, the row below it the verdict per tray. */
 .fk-block { margin: 12px 0 4px; }
 .fk-block:empty { display: none; }
 .fk-kopf { display: flex; align-items: baseline; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
@@ -949,16 +1169,16 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
             letter-spacing: 0; opacity: 0.75; }
 .fk-kurve { display: block; width: 100%; height: 46px;
             border-radius: 8px; background: rgba(128,128,128,0.08); }
-/* Gefuellt wird nur ueber der Grenze. Eine Flaeche vom Wert bis zum Boden
-   sah bei jeder ruhigen Spule gleich aus — ein halb blauer Kasten. */
+/* Only fills above the threshold. A fill from the value down to the
+   bottom looked the same for every calm spool — just a half-blue box. */
 .fk-nass { fill: rgba(239,68,68,0.20); stroke: none; }
 .fk-linie { fill: none; stroke: #3b82f6; stroke-width: 1.6;
             vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .fk-schwelle { stroke: #ef4444; stroke-width: 1; stroke-dasharray: 4 3;
             vector-effect: non-scaling-stroke; opacity: 0.55; }
-/* Schild am Zeiger: eigenes Element am body, nicht im Fenster — sonst
-   schnitte es der Rahmen ab und der z-index des Fensters haette es unter
-   der Spulenauswahl versteckt. */
+/* Tooltip on the pointer: its own element on body, not inside the
+   window — otherwise the frame would clip it, and the window's z-index
+   would hide it behind the spool selection. */
 .fk-schild {
     position: fixed; z-index: 2147483646; display: none;
     pointer-events: none;
@@ -989,20 +1209,20 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 .fk-detail { min-width: 0; overflow: hidden; text-overflow: ellipsis;
              white-space: nowrap; }
 
-/* Gemessener Hinweis in der Druckvorbereitung: er schlaegt den geschaetzten
-   aus der Lagerzeit, also darf er nicht wie eine Nebenbemerkung aussehen. */
+/* Measured notice in print prep: it overrides the estimate derived from
+   storage time, so it must not look like a side remark. */
 .prep-hinweis--mess { color: #b45309; font-weight: 600; }
 
-/* Getrocknetes Filament als Plakette — es ist eine Eigenschaft des Laufs,
-   keine Messgroesse, deshalb nicht als vierte Spalte. */
+/* Dried filament as a badge — it's a property of the run,
+   not a measured value, so not a fourth column. */
 .dry-chip-kopf { font-size: 10.5px; font-weight: 600; opacity: 0.7;
             margin-right: 7px; text-transform: uppercase; letter-spacing: 0.03em; }
 .dry-chip { display: inline-flex; align-items: center; margin-bottom: 12px;
             padding: 4px 11px; border-radius: 999px; font-size: 12.5px;
             font-weight: 650; background: rgba(128,128,128,0.12);
             color: var(--text-primary); }
-/* Nicht an den rechten Rand geklebt — das Bild steht eingerueckt, so
-   wie die Werte links auch Abstand zum Rand haben. */
+/* Not glued to the right edge — the image sits indented, just as
+   the values on the left also keep distance from the edge. */
 .dry-ams { flex: none; width: 105px; height: auto; object-fit: contain;
            margin-right: 34px; }
 .tray-edit-zeile {
@@ -1021,8 +1241,8 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
     background: var(--bg-secondary, #f2f3f5);
     color: var(--text-primary, #222);
     padding: 9px 30px 9px 10px;
-    /* Eigener Pfeil statt des Zeichens vom Betriebssystem — eine Quelle
-       fuer alle Oberflaechen, siehe `--pfeil` in design-tokens.css. */
+    /* Own arrow instead of the operating system's glyph — one source
+       for all UIs, see `--pfeil` in design-tokens.css. */
     appearance: none; -webkit-appearance: none; -moz-appearance: none;
     background-image: var(--pfeil);
     background-repeat: no-repeat;
@@ -1030,10 +1250,10 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
     background-size: 15px;
     cursor: pointer;
 }
-/* Die Spoolman-Rolle ist dieselbe Entscheidung wie Hersteller und Sorte
-   darueber, nur aus der anderen Quelle — also sieht sie auch so aus.
-   Als nackter Knopf griff nur die Hintergrundfarbe: die Masse stehen in
-   `.tray-edit-actions button`, und dort steht er nicht. */
+/* The Spoolman spool is the same kind of choice as manufacturer and type
+   above it, just from a different source — so it looks the same way too.
+   As a bare button, only the background color applied: the sizing lives in
+   `.tray-edit-actions button`, and it isn't part of that group. */
 .tray-edit-spoolknopf {
     flex: 1; min-width: 0;
     display: flex; align-items: center; gap: 9px;
@@ -1079,13 +1299,13 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 }
 .tray-edit-cancel { background: rgba(128, 128, 128, 0.15); color: var(--text-primary, #222); }
 .tray-edit-save { background: #4ade80; color: #fff; }
-/* Leert das Fach — muss sich von "Abbrechen" unterscheiden.
-   Beide trugen dieselbe Klasse und standen nebeneinander. */
+/* Empties the tray — must be visually distinct from "Cancel":
+   the two sit right next to each other. */
 .tray-edit-danger { background: rgba(220, 38, 38, 0.10); color: #c62828;
     box-shadow: inset 0 0 0 1.5px rgba(220, 38, 38, 0.45); }
 body.dark-mode .tray-edit-danger { color: #ff8a80; }
 
-/* Stift-Knopf in den Fach-Zeilen des Filament-Tabs */
+/* Pencil button in the tray rows of the filament tab */
 .mz-edit-btn {
     margin-left: 6px; flex: 0 0 auto;
     border: 1px solid rgba(128, 128, 128, 0.35);
@@ -1094,7 +1314,7 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 }
 .mz-edit-btn:hover { color: var(--text-primary, #222); }
 
-/* Trocknungs-Dialog (014): Feuchte-Zeile + Grad/Stunden-Felder */
+/* Drying dialog (014): humidity row + degree/hours fields */
 .dry-feuchte { font-size: 14px; color: var(--text-secondary, #777); }
 .dry-feld {
     display: inline-flex; align-items: center; gap: 4px;
@@ -1109,9 +1329,9 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 }
 .dry-einheit { font-size: 12.5px; color: var(--text-secondary, #777); }
 
-/* Drehen waehrend des Trocknens. Steht unter den Zahlen und nicht neben
-   ihnen: es ist eine Entscheidung, kein Messwert, und in einer Zeile mit
-   °C und h wuerde es als dritter Wert gelesen. */
+/* Rotate while drying. Sits below the numbers, not beside
+   them: it's a decision, not a measured value, and on one line with
+   °C and h it would read as a third value. */
 .dry-drehen {
     display: flex; align-items: center; gap: 9px;
     margin: 10px 0 2px; font-size: 13px; cursor: pointer;
@@ -1119,9 +1339,9 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 }
 .dry-drehen input { width: 16px; height: 16px; accent-color: var(--color-blue, #2196F3); }
 
-/* „Drucker abkuehlen" — steht neben den Modus-Knoepfen, traegt aber keine
-   Auswahl-Bedeutung: es ist eine Handlung, kein Zustand. Darum blau
-   getoent statt mit Auswahlpunkt. */
+/* "Cool printer down" — sits next to the mode buttons but carries no
+   selection meaning: it's an action, not a state. Hence tinted blue
+   instead of using a selection dot. */
 .dfx-kuehlen {
     gap: 7px;
     background: rgba(33, 150, 243, 0.10);
@@ -1131,8 +1351,8 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 
 .dfx-kuehlen:hover { background: rgba(33, 150, 243, 0.18); }
 
-/* Laeuft die Kuehlung, traegt der Knopf die Warnfarbe: er beendet dann
-   etwas, statt es zu starten. */
+/* While cooling is running, the button carries the warning color: it then
+   stops something instead of starting it. */
 .dfx-kuehlen--an {
     background: rgba(255, 152, 0, 0.12);
     border-color: rgba(255, 152, 0, 0.40);
@@ -1142,13 +1362,13 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 .dfx-kuehlen--an:hover { background: rgba(255, 152, 0, 0.20); }
 body.dark-mode .dfx-kuehlen--an { color: #ffb74d; }
 
-/* Der Kuehl-Knopf steht mittig unter der Maschine, nicht in der
-   Modus-Zeile: die beiden Modi sind eine Auswahl, das hier eine Handlung. */
+/* The cooling button sits centered below the machine, not in the
+   mode row: the two modes are a selection, this here is an action. */
 .dfx-kuehl-zeile { display: flex; justify-content: center; margin-top: 14px; }
 
-/* Rueckfrage des Druckers nach dem Laden — nur sichtbar, solange er wartet
-   (Filament-Schritt 8). Abgesetzt, damit sie nicht wie eine weitere
-   Aktionszeile aussieht. */
+/* The printer's follow-up question after loading — visible only while it
+   waits (filament step 8). Set apart so it doesn't look like another
+   action row. */
 .fil-confirm {
     margin-top: 10px;
     padding: 10px;
@@ -1156,8 +1376,8 @@ body.dark-mode .dfx-kuehlen--an { color: #ffb74d; }
     border-radius: 10px;
     text-align: center;
 }
-/* Die zwei Knoepfe mittig und nur so breit wie noetig — sie sollen nicht wie
-   die Aktionszeile darueber die volle Breite fuellen. */
+/* The two buttons centered and only as wide as needed — they shouldn't
+   fill the full width like the action row above them. */
 .fil-confirm .fil-actions {
     justify-content: center;
 }

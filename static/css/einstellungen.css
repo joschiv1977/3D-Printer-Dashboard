@@ -1,18 +1,16 @@
 /* ==========================================================================
-   Einstellungen  (21aug26)
+   Settings
    --------------------------------------------------------------------------
-   Vorher: 27 Menuepunkte, 1613 Zeilen CSS in der HTML-Datei, 277 Emoji,
-   jeder Abschnitt eigenhaendig gebaut. Jetzt 11 Abschnitte in derselben
-   Bauform wie Wartung, Historie und die Dialoge: Karte mit Zeilen,
-   Beschriftung links, Bedienelement rechts.
+   11 sections in the same construction as maintenance, history and the
+   dialogs: a card with rows, label on the left, control on the right.
 
-   Alle Klassen tragen das Praefix es-, damit sie sich nicht mit den
-   Restbestaenden aus der alten Seite beissen.
+   All classes carry the es- prefix, so they don't clash with the
+   leftovers from the old page.
    ========================================================================== */
 
 .es-huelle { max-width: 1200px; margin: 0 auto; padding: 14px 20px 90px; }
 
-/* --- Kopfzeile: gleiche Masse wie Historie, Wartung, Slicer, Benutzer --- */
+/* --- Header: same dimensions as history, maintenance, slicer, users --- */
 .es-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; }
 .es-kopf-titel {
     margin: 0; font-size: 17px; font-weight: 650;
@@ -48,7 +46,7 @@
 body.dark-mode .es-knopf--haupt { background: rgba(33, 150, 243, .2); color: #90caf9; }
 body.dark-mode .es-knopf--warn { color: #ef9a9a; }
 
-/* --- Zwei Spalten: Verzeichnis links, Inhalt rechts --- */
+/* --- Two columns: directory left, content right --- */
 .es-rahmen { display: grid; grid-template-columns: 236px 1fr; gap: 14px; align-items: start; }
 
 .es-verz {
@@ -60,8 +58,8 @@ body.dark-mode .es-knopf--warn { color: #ef9a9a; }
     position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
     color: var(--text-secondary); pointer-events: none; z-index: 1;
 }
-/* Spezifischer als die allgemeinen Feldregeln der Seite — sonst gewinnt
-   deren Polster und das Lupensymbol liegt auf dem Text. */
+/* More specific than the page's general field rules — otherwise their
+   padding wins and the magnifying-glass icon sits on top of the text. */
 .es-suche input[type=text] {
     width: 100%; border: 1px solid var(--border-color); background: var(--bg-card-variant);
     color: var(--text-primary); border-radius: 9px; padding: 7px 9px 7px 32px;
@@ -81,7 +79,6 @@ body.dark-mode .es-knopf--warn { color: #ef9a9a; }
 }
 .es-verz-eintrag:hover { background: var(--bg-hover, rgba(128, 128, 128, .08)); }
 .es-verz-eintrag svg { color: var(--text-secondary); }
-/* Aktiv: Fuellung + Rand + Haken — wie am 20aug26 abgenommen */
 .es-verz-eintrag.an {
     background: rgba(33, 150, 243, .12); border-color: rgba(33, 150, 243, .25);
     color: #1565c0; font-weight: 600;
@@ -132,8 +129,8 @@ body.dark-mode .es-verz-eintrag.an svg { color: #90caf9; }
 .es-wert { font-size: 13.5px; font-weight: 600; }
 .es-wert--matt { color: var(--text-secondary); font-weight: 500; font-size: 12.5px; }
 
-/* Felder in den Zeilen. !important, weil die alten Regeln der Seite
-   input/select global mit voller Breite und 10px Polster setzen. */
+/* Fields in the rows. !important, because the page's old rules set
+   input/select globally with full width and 10px padding. */
 .es-karte input[type=text],
 .es-karte input[type=number],
 .es-karte input[type=password],
@@ -153,7 +150,7 @@ body.dark-mode .es-verz-eintrag.an svg { color: #90caf9; }
     .es-karte input.es-breit, .es-karte select.es-auswahl { width: 150px !important; }
 }
 
-/* Schalter — gleiche Bauform wie die uebrigen Seiten */
+/* Toggle — same construction as the other pages */
 .es-schalter { position: relative; width: 40px; height: 23px; flex: none; display: inline-block; }
 .es-schalter input {
     position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2;
@@ -201,8 +198,8 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
 .es-hinweis svg { margin-top: 1px; flex: 0 0 auto; }
 .es-karte > .es-hinweis:first-child { border-top: 0; }
 
-/* Zwei Spalten, solange jede mindestens 360px bekommt — darunter
-   quetschen sich Feld und Knopf sonst in drei Zeilen. */
+/* Two columns, as long as each gets at least 360px — below that,
+   field and button squeeze into three lines instead. */
 .es-raster { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 12px; }
 
 .es-stat-raster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--linie, var(--border-color)); }
@@ -210,13 +207,13 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
 .es-stat b { display: block; font-size: 17px; font-weight: 700; }
 .es-stat span { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .05em; }
 
-/* Freier Block in einer Karte — fuer Listen, die JavaScript fuellt
-   (Token-Karten, Materialien, Lizenztexte, Kameras). */
+/* Free-form block in a card — for lists that JavaScript fills
+   (token cards, materials, license texts, cameras). */
 .es-block { padding: 12px 14px; }
 .es-block:not(:last-child) { border-bottom: 1px solid var(--linie, var(--border-color)); }
 
-/* Speicherleiste: erscheint erst, wenn etwas geaendert wurde. Ersetzt den
-   runden Knopf unten rechts, der nicht sagte, was offen ist. */
+/* Save bar: appears only once something has changed. Replaces the
+   round button in the bottom right, which didn't say what was pending. */
 .es-fuss {
     position: sticky; bottom: 14px; display: none; align-items: center; gap: 9px;
     padding: 9px 14px; background: var(--bg-card); border: 1px solid var(--border-color);
@@ -268,13 +265,11 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
                      background: currentColor; }
 .ed-quelle--alt { color: var(--text-secondary); }
 
-/* ---- Aufklapper in einer Zeile ----
-   Fuer alles, was selten gebraucht wird und ausgeklappt die halbe Karte
-   fuellt. Der Signaturschluessel stand mit vier Feldern dauerhaft offen
-   und schob die MakerWorld-Zeile aus dem Blick (31aug26).
+/* ---- Expander in a row ----
+   For anything rarely needed that fills half the card when expanded.
 
-   Gleiches Muster wie `.sl-aufklapp` im Slicer: Chevron links, Titel,
-   Zustandsmarke rechts. Kein eigener Rahmen — die Zeile traegt ihn schon. */
+   Same pattern as `.sl-aufklapp` in the slicer: chevron left, title,
+   state badge right. No border of its own — the row already carries one. */
 .es-aufklapp { width: 100%; }
 .es-aufklapp > summary {
     display: flex; align-items: center; gap: 8px; cursor: pointer;
@@ -298,7 +293,7 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
     max-width: 62ch;
 }
 
-/* Ein Feld mit seiner Beschriftung darueber. */
+/* A field with its label above it. */
 .es-feld { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
 .es-feld > label { font-size: 11px; color: var(--text-secondary); }
 .es-feld > textarea, .es-feld > input {
@@ -312,19 +307,15 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
 .es-feld > textarea { resize: vertical; }
 
 /* ---- Dropdowns ----
-   Bis 31aug26 blieb hier der System-Pfeil des Betriebssystems stehen: ein
-   Kasten in Hausfarben mit einem fremden Zeichen darin, und je nach
-   Plattform eine andere Hoehe als die Knoepfe daneben. Deshalb wird der
-   Pfeil selbst gezeichnet, und die Groesse kommt aus denselben Marken wie
-   die Knoepfe — sonst steht das Feld hoeher als alles daneben.
+   The arrow is drawn by hand instead of using the operating system's own:
+   its box sits in the wrong colors, carries a foreign glyph, and its
+   height differs from the buttons beside it depending on the platform.
+   The size comes from the same tokens as the buttons — otherwise the
+   field sits taller than everything next to it.
 
-   (Das alte `.custom-dropdown` in components.css war die Vorlage. Es hatte
-   keinen Nutzer mehr — die Auswahlfelder des Planers heissen seit laengerem
-   `sd-spool-select` — und ist am 31aug26 entfallen.)
-
-   `!important` und diese Reihenfolge muessen sein: die Regel darueber setzt
-   `background` als Kurzform mit `!important`, und eine Kurzform loescht das
-   Hintergrundbild mit. Erst danach gesetzt, gewinnt der Pfeil. */
+   `!important` and this order are required: the rule above sets
+   `background` as a shorthand with `!important`, and a shorthand also
+   clears the background image. Only set after that does the arrow win. */
 .es-karte select {
     appearance: none !important; -webkit-appearance: none !important;
     -moz-appearance: none !important;

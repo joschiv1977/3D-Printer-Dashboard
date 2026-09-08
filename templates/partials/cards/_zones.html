@@ -1,10 +1,10 @@
-          <!-- ==================================================================
-               Display-Zonen (nur Bambu): Drucker links, Material rechts.
-               Ersetzen Steuerung/Schnellzugriff/Spoolman auf der Hauptseite —
-               die alten Karten bleiben im DOM (Klipper nutzt sie weiter, und
-               die Status-Logik haengt an ihren Knopf-IDs), werden im
-               Bambu-Betrieb aber per CSS ausgeblendet.
-               ================================================================== -->
+          <!--==================================================================
+              Display zones (Bambu only): printer on the left, material on
+              the right. Replace controls/quick-access/Spoolman on the main
+              page -- the old cards stay in the DOM (Klipper still uses them,
+              and the status logic hangs off their button IDs), but are
+              hidden via CSS in Bambu mode.
+              ==================================================================-->
           <div class="grid-stack-item bambu-only" gs-w="7" gs-h="10" gs-x="0" gs-y="10" gs-min-w="4" gs-min-h="6" gs-max-w="12" gs-max-h="20" id="printer-zone-card-grid">
               <div class="grid-stack-item-content">
                   <div class="card">
@@ -68,22 +68,22 @@
                       <div class="card-header">
                           <h3 class="card-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg> <span id="mz-mat-title">Material</span></h3>
                       </div>
-                      <div id="mz-ams-list"><!-- AMS-Einheiten (JS) --></div>
+                      <div id="mz-ams-list"><!--AMS units (JS)--></div>
                       <div class="mz-sec" id="mz-spools-title" style="display:none;">Externe Spulen</div>
-                      <div class="mz-spool-row" id="mz-spools"><!-- externe Spulen (JS) --></div>
+                      <div class="mz-spool-row" id="mz-spools"><!--external spools (JS)--></div>
 
-                      <!-- Spoolman lebt jetzt hier: gleiche IDs wie frueher in der
-                           eigenen Karte, die Logik (spoolman-manager) bleibt unveraendert. -->
+                      <!--Spoolman now lives here: the logic (spoolman-manager)
+                          is unchanged.-->
                       <div class="mz-sec" style="margin-top:12px;">
                           <a href="#" onclick="openSpoolmanWeb(); return false;" id="spoolman-title" style="color:inherit; text-decoration:none; cursor:pointer;">Spoolman</a>
                           <span class="spoolman-status" id="spoolman-connection" style="width:8px;height:8px;border-radius:50%;display:inline-block;">●</span>
                       </div>
                       <div id="spoolman-content" style="display:none;">
-                          <!-- Die Auswahl liegt jetzt im eigenen Fenster: dort
-                               zeigt jede Spule Farbe und Restmenge als Rad,
-                               und die zur Datei passenden stehen oben. Die
-                               Liste bleibt versteckt bestehen — mehrere
-                               Stellen lesen sie noch (Planen, SD-Karte). -->
+                          <!--Selection now happens in its own window: there each
+                              spool shows color and remaining amount as a wheel,
+                              and the ones matching the file are listed first. The
+                              list stays hidden in the DOM -- several
+                              places still read it (schedule, SD card).-->
                           <button type="button" class="mz-spulknopf" onclick="window.openSpoolPicker()">
                               <span id="mz-spulknopf-punkt" class="mz-spulknopf__punkt"></span>
                               <span id="mz-spulknopf-text" data-i18n="spool_choose">Spule wählen</span>

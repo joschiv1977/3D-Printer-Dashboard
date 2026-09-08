@@ -1,6 +1,6 @@
-// Lüfter-Steuerung (Klipper-Direct) — 1:1 wie Android FanControlDialog.
-// Grid aus Lüfter-Karten: 270°-Gauge + (Slider | „Ⓐ Automatisch"). Pollt /api/fans
-// alle 2s solange offen, setzt via POST /api/fans/set (M106/M107 bzw. SET_FAN_SPEED).
+// Fan control (Klipper direct) -- 1:1 like Android FanControlDialog.
+// A grid of fan cards: a 270° gauge plus a slider or "Ⓐ automatic". It polls
+// /api/fans every 2 s while open, setting via POST /api/fans/set.
 (function () {
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const R = 38;
@@ -8,19 +8,19 @@
   const ARC = C * 0.75;        // sichtbarer 270°-Bogen
   let timer = null;
   let dragging = null;         // object-Name dessen Slider gerade gezogen wird
-  // Frisch gesetzte Werte: der Drucker meldet den neuen Stand erst einen
-  // Poll spaeter — solange halten wir den Sollwert fest, sonst springt der
-  // Regler einmal zurueck und wieder vor.
+  // Freshly set values: the printer reports the new state only one poll
+  // later -- until then we hold the target, or the slider jumps back once
+  // and forward again.
   const pending = {};          // object -> { value, until }
   const cards = {};            // object -> {prog, txt, rpm, slider}
   let curKeys = '';
 
   function t(key, fb) { return (window.getText ? window.getText(key, fb) : fb); }
 
-  // ===== Verbindungslinien wie am X2D-Display: vom Eintrag horizontal,
-  // Knick senkrecht ueber dem Bauteil, offener Kreis als Endpunkt. Jeder
-  // Eintrag traegt sein Ziel als data-anker="x,y" (Prozent im Maschinenbild).
-  // Wird auch vom Temperatur-Fenster benutzt (gleiche Stage). =====
+  // ===== Connection lines as on the X2D display: horizontal from the entry,
+  // a bend vertically above the component, an open circle as the endpoint.
+  // Every entry carries its target as data-anker="x,y" (per cent in the
+  // machine image). The temperature window uses it too (the same stage). =====
   window.dfxDrawWires = function (stage) {
     if (!stage || !stage.isConnected) return;
     const img = stage.querySelector('.dfx-mitte img');
@@ -57,7 +57,7 @@
     svg.innerHTML = teile;
   };
 
-  // Neu zeichnen sobald sich das Layout bewegt (Aufklappen, Resize, Bild da).
+  // Redraw as soon as the layout moves (unfolding, resize, image arriving).
   window.dfxWatchStage = function (stage) {
     const neu = () => window.requestAnimationFrame(() => window.dfxDrawWires(stage));
     const img = stage.querySelector('.dfx-mitte img');
@@ -91,8 +91,8 @@
     card.style.cssText = 'background:var(--bg-secondary); border-radius:12px; padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:6px;';
 
     const label = document.createElement('div');
-    // Bambu liefert i18n-Schluessel (fan_part, ...), Klipper fertige Namen —
-    // t() faellt bei unbekanntem Schluessel auf den Text selbst zurueck.
+    // Bambu delivers i18n keys (fan_part, …), Klipper finished names --
+    // t() falls back to the text itself on an unknown key.
     label.textContent = t(fan.label, fan.label);
     label.title = fan.object;
     label.style.cssText = 'font-size:13px; font-weight:600; color:var(--text-primary); text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; line-height:1.2;';
@@ -131,10 +131,10 @@
         const pct = parseInt(slider.value, 10) || 0;
         dragging = null;
         pending[fan.object] = { value: pct, until: Date.now() + 6000 };
-        // apiCall setzt den CSRF-Token — roher fetch wurde vom Server mit
-        // "CSRF Token missing" abgelehnt und der Regler sprang nach dem
-        // naechsten Poll auf den echten Wert zurueck. Klipper-Direct hat
-        // kein apiCall und keine CSRF-Pruefung → fetch als Rueckfall.
+        // apiCall sets the CSRF token -- a raw fetch was refused by the
+        // server with "CSRF Token missing" and the slider jumped back to the
+        // real value on the next poll. Klipper direct has no apiCall and no
+        // CSRF check, so fetch is the fallback there.
         const anfrage = {
           method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
@@ -154,7 +154,7 @@
       }
     } else {
       const auto = document.createElement('div');
-      // note (z.B. fan_recirc im Heiz-Modus) erklaert WARUM nicht regelbar.
+      // note (fan_recirc in heating mode, say) explains WHY it is not controllable.
       auto.innerHTML = fan.note
         ? window.skIcon('hitze', 'hd-ic--xs') + ' ' + t(fan.note, fan.note)
         : window.skIcon('auto', 'hd-ic--xs') + ' ' + t('fan_automatic', 'Automatisch');
@@ -169,12 +169,12 @@
   function updateCard(fan) {
     const c = cards[fan.object];
     if (!c) return;
-    // Sollwert-Schonfrist: gemeldeten Altwert ignorieren, bis der Drucker
-    // den neuen bestaetigt (oder 6s um sind — dann gilt die Realitaet).
+    // A grace period for the target: ignore the reported old value until the
+    // printer confirms the new one (or 6 s pass -- then reality counts).
     const p = pending[fan.object];
     let anzeige = fan.speed_percent;
     if (p) {
-      // Der Drucker rastet auf Zehnerschritte — kleine Abweichung = bestaetigt.
+      // The printer snaps to steps of ten -- a small deviation counts as confirmed.
       if (Math.abs(fan.speed_percent - p.value) <= 5 || Date.now() > p.until) {
         delete pending[fan.object];
       } else {
@@ -186,9 +186,9 @@
     if (c.slider && dragging !== fan.object) c.slider.value = String(anzeige);
   }
 
-  // ===== Bambu: Display-Layout wie am X2D ("Luftmanagement: Modi und
-  // Luefter") — Modus-Toggle oben, Maschine mittig, Luefter aussen mit
-  // gepunkteten Linien zu ihren Positionen. Klick klappt den Regler aus. =====
+  // ===== Bambu: the display layout as on the X2D ("air management: modes
+  // and fans") -- the mode toggle on top, the machine in the middle, the fans
+  // outside with dotted lines to their positions. A click unfolds the slider. =====
   function sende(fan, pct) {
     pending[fan.object] = { value: pct, until: Date.now() + 6000 };
     const anfrage = {
@@ -202,7 +202,7 @@
     ).catch(() => {});
   }
 
-  // Bauteil-Positionen im x2d.png (Prozent): dahin zeigen die Linien.
+  // Component positions in x2d.png (per cent): that is where the lines point.
   const ANKER = {
     part: '44,34', aux_l: '26,50', aux: '26,50',
     aux_r: '58,36', chamber: '72,34', hotend: '48,29',
@@ -283,25 +283,25 @@
   }
 
   /**
-   * Kammer- und AUX-Luefter auf 100 %.
+   * Chamber and AUX fans to 100 %.
    *
-   * Nur was der Drucker gerade regeln laesst: im Heiz-Modus gehoeren die
-   * AUX-Pfade zum Umluftkreis der Kammerheizung und faellt AUX links ganz
-   * aus der Liste (19aug26 gemessen). Deshalb wird nicht blind gesetzt,
-   * sondern gegen die gemeldete Liste geprueft und gesagt, was ging.
+   * Only what the printer currently lets one control: in heating mode the
+   * AUX paths belong to the recirculation circuit of the chamber heater, and
+   * AUX left drops out of the list entirely. So nothing is set blindly; it is
+   * checked against the reported list, and what worked is said.
    */
   const KUEHL_LUEFTER = ['chamber', 'aux_l', 'aux_r', 'aux'];
 
-  /** Die regelbaren Kuehl-Luefter aus der zuletzt gemeldeten Liste. */
+  /** The controllable cooling fans from the last reported list. */
   function kuehlLuefter() {
     return (letzteFans || []).filter(
       f => KUEHL_LUEFTER.includes(f.object) && f.controllable !== false);
   }
 
   /**
-   * Laeuft die Abkuehlung? Wenn ALLE regelbaren Kuehl-Luefter auf 100
-   * stehen. Damit stimmt der Knopf auch nach einem Neuladen der Seite —
-   * er haengt am Zustand des Druckers, nicht an einem Merker.
+   * Is the cool-down running? When ALL controllable cooling fans stand at
+   * 100. That way the button is right after a page reload too -- it hangs off
+   * the printer state, not off a flag.
    */
   function kuehltGerade() {
     const l = kuehlLuefter();
@@ -309,12 +309,12 @@
   }
 
   /**
-   * Was der Nutzer sieht: der eben gesendete Wert, solange der Drucker ihn
-   * noch nicht bestaetigt hat, sonst der gemeldete.
+   * What the user sees: the value just sent, while the printer has not
+   * confirmed it yet, otherwise the reported one.
    *
-   * Ohne das dauerte es bis zu acht Sekunden, bis der Knopf auf „Kuehlung
-   * abbrechen" umsprang — so lange braucht die Runde ueber MQTT und den
-   * 2-s-Takt. Die Regler daneben rechnen laengst so.
+   * Without that it took up to eight seconds for the button to flip to
+   * "cancel cooling" -- that is how long the round over MQTT and the 2 s
+   * beat takes. The sliders beside it have long computed that way.
    */
   function angezeigterWert(fan) {
     const p = pending[fan.object];
@@ -322,7 +322,7 @@
     return fan.speed_percent || 0;
   }
 
-  /** Werte vor der Abkuehlung, damit „abbrechen" sie zurueckholt. */
+  /** Values from before the cool-down, so "cancel" brings them back. */
   const vorKuehlung = {};
 
   function kuehleAb() {
@@ -340,10 +340,10 @@
   }
 
   /**
-   * Zurueck auf die Werte von vorher. Sind keine gemerkt (Seite neu
-   * geladen, Fenster zwischendurch zu), dann aus — das ist die Erwartung
-   * bei „Kühlung abbrechen", und ein geratener Zwischenwert waere
-   * schlechter als ein klarer Zustand.
+   * Back to the earlier values. Where none are remembered (the page was
+   * reloaded, the window closed in between) it goes off -- that is what one
+   * expects from "cancel cooling", and a guessed middle value would be worse
+   * than a clear state.
    */
   function brichAb() {
     const treffer = kuehlLuefter();
@@ -352,7 +352,7 @@
     skToast(t('fan_cooldown_stopped', 'Kühlung beendet'), 'info');
   }
 
-  /** Beschriftung des Knopfes an den Zustand haengen. */
+  /** Hang the button label off the state. */
   function zeigeKuehlKnopf() {
     const b = document.getElementById('dfx-abkuehlen');
     if (!b) return;
@@ -370,12 +370,11 @@
     });
   }
 
-  /** Zuletzt gemeldete Luefter — „Drucker abkuehlen" prueft dagegen. */
+  /** The fans last reported -- "cool the printer down" checks against them. */
   let letzteFans = [];
 
   function renderBambu(fans) {
     letzteFans = fans || [];
-    zeigeKuehlKnopf();
     const grid = document.getElementById('fan-cards');
     if (!grid) return;
     const st = (window.printerControlManager && window.printerControlManager.lastState) || {};
@@ -405,7 +404,7 @@
         ziel.appendChild(fanEintrag(f, ziel === links ? 'l' : 'r'));
       });
 
-      // Kammer-Temperatur wie am Display als eigener Eintrag rechts unten.
+      // Chamber temperature as on the display, an entry of its own bottom right.
       const kt = document.createElement('div');
       kt.className = 'dfx-fan dfx-fan--r';
       kt.dataset.anker = '54,76';
@@ -425,10 +424,9 @@
       stage.appendChild(rechts);
       grid.appendChild(stage);
 
-      // „Drucker abkuehlen" unter der Maschine, mittig. In der Modus-Zeile
-      // stand er zwischen zwei Knoepfen, die eine AUSWAHL sind — hier ist
-      // es eine Handlung. Am Telefon blieb dort ausserdem nur „Druck…"
-      // uebrig (24aug26 am Geraet gesehen).
+      // "Cool the printer down" under the machine, centred. In the mode row
+      // it stood between two buttons that are a CHOICE -- this is an action.
+      // On the phone only "coo…" was left there as well.
       const kuehlZeile = document.createElement('div');
       kuehlZeile.className = 'dfx-kuehl-zeile';
       const kuehl = document.createElement('button');
@@ -466,6 +464,15 @@
         if (c.slider) c.slider.value = String(anzeige || 0);
       }
     });
+
+    // Label LAST, not first.
+    //
+    // The call used to sit at the top of this function — that is, before the
+    // button had even been built. On the first open it found nothing, bailed
+    // out, and the button appeared afterwards with no icon and no text: an
+    // empty area that only the next status round filled in. Down here the
+    // button is finished in every case.
+    zeigeKuehlKnopf();
   }
 
   function render(fans) {
@@ -478,7 +485,7 @@
       return;
     }
     if (empty) empty.style.display = 'none';
-    // Bambu: Display-Stil mit Maschinen-Render. Klipper: Gauge-Grid.
+    // Bambu: display style with the machine render. Klipper: a gauge grid.
     if (!(window.isKlipperMode && window.isKlipperMode())) {
       renderBambu(fans);
       return;
@@ -517,7 +524,7 @@
     dragging = null;
   };
 
-  // Klick auf den abgedunkelten Hintergrund schließt das Modal.
+  // A click on the dimmed background closes the modal.
   document.addEventListener('DOMContentLoaded', () => {
     const m = document.getElementById('fanModal');
     if (m) m.addEventListener('click', (e) => { if (e.target === m) window.closeFanControl(); });

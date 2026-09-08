@@ -1,17 +1,19 @@
-// analytics.js — Port von Android HistoryAnalytics.kt (1:1) für die Web-Statistik.
-// Reine Berechnung auf der Druckliste (snake_case-Felder vom Companion). Deep-
-// Analysen (aggregateDeep) arbeiten auf den pro Druck geladenen Detail-JSONs.
+// analytics.js -- a 1:1 port of Android's HistoryAnalytics.kt for the web
+// statistics. Pure computation on the print list (snake_case fields from the
+// companion). The deep analyses (aggregateDeep) work on the detail JSONs loaded
+// per print.
 (function () {
   'use strict';
 
   const GRAMS_PER_METER = 2.98; // PLA 1,75 mm ≈ 2,98 g/m
 
-  // Range-Key → Tage (null = alle). Trend-Granularität: ≤30T Tag, 90T Woche, sonst Monat.
+  // Range key -> days (null = all). Trend granularity: <=30d by day, 90d by
+  // week, otherwise by month.
   const RANGE_DAYS = { D7: 7, D30: 30, D90: 90, Y1: 365, ALL: null };
   function rangeDays(key) { return RANGE_DAYS[key] !== undefined ? RANGE_DAYS[key] : 30; }
   function trendMode(key) { return (key === 'D7' || key === 'D30') ? 'day' : (key === 'D90' ? 'week' : 'month'); }
 
-  // Material-Kategorie — spezifischere zuerst (PETG-CF vor PETG …).
+  // The material category -- the more specific first (PETG-CF before PETG …).
   const CATS = ['PAHT-CF', 'PA-CF', 'PET-CF', 'PETG-CF', 'PLA-CF', 'PETG', 'PLA',
     'ABS', 'ASA', 'TPU', 'TPE', 'PVA', 'HIPS', 'NYLON', 'PC', 'PA'];
   function materialCategory(raw) {
@@ -42,11 +44,12 @@
   function ym(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); }
 
   const filPrice = (p, def) => (p.filament_price_per_kg && p.filament_price_per_kg > 0) ? p.filament_price_per_kg : def;
-  // Gespeicherte Kosten BEVORZUGEN (inkl. Strom, Multi-Filament je Spule) —
-  // die Formel ist nur Fallback fuer Drucke ohne gespeicherten Wert.
+  // PREFER the stored cost (electricity included, multi filament per spool) --
+  // the formula is only the fallback for prints without a stored value.
   const printCost = (p, def, pwr) => (p.cost_eur && p.cost_eur > 0) ? num(p.cost_eur)
       : num(p.filament_grams) / 1000 * filPrice(p, def) + num(p.power_kwh) * pwr;
-  // Filament-Anteil eines Drucks: gespeicherte Kosten minus Strom, sonst Formel.
+  // The filament share of a print: the stored cost minus electricity,
+  // otherwise the formula.
   const printFilCost = (p, def, pwr) => (p.cost_eur && p.cost_eur > 0)
       ? Math.max(0, num(p.cost_eur) - num(p.power_kwh) * pwr)
       : num(p.filament_grams) / 1000 * filPrice(p, def);
@@ -58,18 +61,18 @@
     return all.filter(p =>
       (cutoffDay == null || dayKey(p) >= cutoffDay) &&
       (filter.material == null || materialCategory(p.filament_material || p.filament_type) === filter.material) &&
-      // Systemlauf ist kein Status: eine Kalibrierung kann genauso gelingen
-      // oder scheitern wie ein Druck. "Erfolgreich" meint deshalb Drucke,
-      // nicht die geglueckte Kalibrierung von vorhin.
+      // A system run is not a status: a calibration can succeed or fail just
+      // like a print. "Successful" therefore means prints, not the calibration
+      // that went well a moment ago.
       (filter.status == null
         || (filter.status === 'system' ? !!p.is_system_run
                                        : (p.status === filter.status && !p.is_system_run)))
     );
   }
 
-  // ---- Labels (lokalisiert über Browser-Locale) ----
-  // Numerisch statt "17. Aug.": unter einer Saeule von 34px Breite klebte der
-  // Monatsname am naechsten Label.
+  // ---- Labels (localised through the browser locale) ----
+  // Numeric instead of "17 Aug": under a 34px wide column the month name stuck
+  // to the next label.
   const fmtDay = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'numeric' });
   const fmtMonth = new Intl.DateTimeFormat(undefined, { month: 'short', year: 'numeric' });
   function shortLabel(key, mode) {
@@ -115,17 +118,17 @@
     });
     const mk = (k, ps) => {
       const c = ps.length;
-      // Ein laufender Druck ist weder gelungen noch gescheitert. Vorher zaehlte
-      // er als Misserfolg — die Erfolgslinie stuerzte am aktuellen Tag auf 0 %,
-      // sobald der Drucker lief.
+      // A running print has neither succeeded nor failed. It used to count as
+      // a failure -- the success line dropped to 0% on the current day as soon
+      // as the printer was running.
       const fertig = ps.filter(x => x.status !== 'running');
       const s = fertig.filter(x => x.status === 'success').length;
       return {
         key: k,            // Bucket-Key (Tagesmodus = YYYY-MM-DD → Lookup in dayPrints)
         prints: ps,        // Drucke dieses Buckets (Tag/Woche/Monat) für den Klick-Dialog
         label: shortLabel(k, mode), count: c,
-        // Leerer Tag (oder nur laufende Drucke) → successRate null: die Linie
-        // ueberbrueckt die Luecke, statt auf 0 % zu fallen.
+        // An empty day (or only running prints) -> successRate null: the line
+        // bridges the gap instead of falling to 0%.
         successRate: fertig.length > 0 ? Math.floor(s * 100 / fertig.length) : null,
         cost: ps.reduce((a, p) => a + printCost(p, filDef, pwr), 0),
         filamentG: ps.reduce((a, p) => a + num(p.filament_grams), 0)
@@ -133,9 +136,9 @@
     };
     let list;
     if (mode === 'day' && groups.size) {
-      // Tages-Modus: leere Tage zwischen erstem und letztem Druck-Tag mit count=0
-      // auffüllen, damit der Verlauf die echten Lücken zeigt statt sie
-      // zusammenzuschieben.
+      // Day mode: fill the empty days between the first and the last print day
+      // with count=0, so the curve shows the real gaps instead of squeezing
+      // them together.
       const keys = [...groups.keys()].sort();
       const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       const cur = new Date(keys[0] + 'T00:00:00'), end = new Date(keys[keys.length - 1] + 'T00:00:00');
@@ -212,7 +215,7 @@
     prints.forEach(p => {
       const k = dayKey(p); cal[k] = (cal[k] || 0) + 1;
       const wd = weekdayOf(p); if (wd == null) return;
-      // Laufende Drucke zaehlen fuer die Quote nicht mit (siehe oben).
+      // Running prints do not count towards the rate (see above).
       if (p.status !== 'running') { weekday[wd]++; if (p.status === 'success') weekdayOk[wd]++; }
       const h = hourOf(p); if (h != null && h >= 0 && h <= 23) hw[wd][h]++;
     });
@@ -232,10 +235,10 @@
     const dayPrints = {};
     prints.forEach(p => { const k = dayKey(p); (dayPrints[k] = dayPrints[k] || []).push(p); });
 
-    // Gleiche Regel fuer die Gesamtquote: sie bezieht sich auf die
-    // abgeschlossenen Drucke. Sonst passte die Prozentzahl nicht zu den
-    // Zahlen daneben — bei 7 erfolgreichen, 0 fehlgeschlagenen und einem
-    // laufenden Druck standen dort 87 %, obwohl nichts misslungen war.
+    // The same rule for the overall rate: it refers to the finished prints.
+    // Otherwise the percentage did not match the numbers beside it -- with 7
+    // successful, 0 failed and one running print it read 87%, although nothing
+    // had gone wrong.
     const laufend = prints.filter(p => p.status === 'running').length;
     const abgeschlossen = n - laufend;
     return {
@@ -245,12 +248,12 @@
       filamentKg: grams / 1000, filamentMeters: grams / GRAMS_PER_METER, avgFilamentG: n > 0 ? grams / n : 0,
       powerKwh: kwh, totalCost, avgCost: n > 0 ? totalCost / n : 0, filamentCost, powerCost,
       wastedGrams: wastedG, wastedCost,
-      // WANN die Fehlschlaege passierten. Eine Erfolgsquote allein wirft
-      // zusammen, was verschiedene Ursachen hat: ein Abbruch vor der ersten
-      // Schicht (Haftung, Kalibrierung, Filament nicht geladen) und einer in
-      // Schicht 47 (gerissen, verstopft, abgeloest) sind nicht dasselbe
-      // Problem. Die Phase rechnet der Server aus dem Verlauf; `unbekannt`
-      // sind Drucke ohne aufgezeichneten Verlauf — die werden nicht geraten.
+      // WHEN the failures happened. A success rate alone throws together things
+      // with different causes: an abort before the first layer (adhesion,
+      // calibration, filament not loaded) and one in layer 47 (snapped, clogged,
+      // came loose) are not the same problem. The server works the phase out
+      // from the history; `unbekannt` are prints without a recorded history --
+      // those are not guessed at.
       fehlerPhasen: (() => {
         const z = { pre_first_layer: 0, first_layers: 0, later: 0, unbekannt: 0 };
         wasted.forEach(p => {
@@ -270,7 +273,7 @@
     };
   }
 
-  // ---- Deep-Analysen aus Detail-JSONs ----
+  // ---- Deep analyses from the detail JSONs ----
   function evtMinutes(events, from, to) {
     const a = events.find(e => e.type === from); const b = events.find(e => e.type === to);
     if (!a || !b) return null;
@@ -298,10 +301,10 @@
       phase('print', 'printing_start', 'print_end')
     ].filter(Boolean);
 
-    // Bambu kennt die Klipper-Phasen-Events nicht — dort kommen die Phasen
-    // aus den stage_change-Events: Dauer einer Stage = Zeit bis zum
-    // naechsten Stage-Wechsel. Label ist der (bereits uebersetzte)
-    // Stage-Text ohne fuehrendes Icon.
+    // Bambu does not know the Klipper stage events -- there the stages come
+    // from the stage_change events: the duration of a stage is the time until
+    // the next stage change. The label is the (already translated) stage text
+    // without its leading icon.
     if (!phases.length) {
       const agg = new Map();
       details.forEach(d => {
@@ -357,8 +360,8 @@
       if (estSec == null || act == null || estSec <= 0 || act <= 0) return null;
       return act / (estSec / 60);
     }).filter(v => v != null);
-    // MEDIAN statt Mittelwert: robust gegen Ausreißer (Drucke mit absurder
-    // Schätzung/Dauer würden den Mittelwert zerschießen).
+    // The MEDIAN rather than the mean: robust against outliers (prints with an
+    // absurd estimate or duration would wreck the mean).
     let slicerDev = null;
     if (ratios.length) {
       const s = ratios.slice().sort((a, b) => a - b);
@@ -374,7 +377,6 @@
       avgChamberTemp: avg(s => nz(s.avg_chamber_temp)), maxChamberTemp: mx(s => nz(s.max_chamber_temp)),
       avgChamberHum: avg(s => nz(s.avg_chamber_humidity)),
       avgPowerW: avg(s => nz(s.avg_power_consumption)),
-      avgSuccessScore: (() => { const v = avg(s => nz(s.success_score)); return v == null ? null : Math.round(v); })(),
       phases, correlations,
       slicerDeviationPct: slicerDev, slicerSamples: ratios.length
     };

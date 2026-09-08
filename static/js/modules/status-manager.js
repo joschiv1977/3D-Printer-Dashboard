@@ -3,12 +3,12 @@
  * Handles printer status loading, display updates, and control toggles
  * (power switch, light, MQTT, developer mode).
  */
-// Meldet einen Knopf-Zustand NUR, wenn er sich geaendert hat.
+// Reports a button state ONLY when it changed.
 //
-// Die Sichtbarkeits-Logik laeuft an jedem Statuspaket. In der
-// Electron-Konsole stand „Druck laeuft - verstecke gefaehrliche Buttons"
-// am 27aug26 rund 150-mal hintereinander; echte Meldungen gehen darin
-// unter.
+// The visibility logic runs on every incoming status packet. In the
+// Electron console, "print running - hide dangerous buttons" showed up
+// about 150 times in a row on 27aug26; real messages get buried
+// in the noise.
 let _letzterKnopfzustand = null;
 function _melde_knopfzustand(lage, text) {
     if (_letzterKnopfzustand === lage) return;
@@ -26,19 +26,19 @@ class StatusManager {
     // ========================================
     // updateBothButtons — update desktop + mobile button pair
     // ========================================
-    /** Knopfinhalt aus Symbolname und Beschriftung — spart das Markup an
-     *  jeder der rund dreissig Aufrufstellen und haelt die Symbole an einer
-     *  Stelle (icons.js). Frueher stand hier ueberall ein Emoji im String. */
+    /** Button content from an icon name and label — saves duplicating this
+     *  markup across roughly thirty call sites and keeps the icons in one
+     *  place (icons.js). */
     knopfInhalt(symbol, text) {
         const ic = (typeof window.skIcon === 'function') ? window.skIcon(symbol) : '';
         return ic + '<span>' + text + '</span>';
     }
 
-    /** Alle Lichtknoepfe auf denselben Stand: die beiden alten
-     *  (.control-btn, Klipper-Karten), der in der Uebersicht des
-     *  Steuerungs-Fensters und der am Kamerabild, der in jedem Reiter
-     *  erreichbar ist. Beschriftung ist die Handlung: leuchtet es,
-     *  steht "Licht aus" drauf. */
+    /** Keeps every light button in sync: the two legacy ones
+     *  (.control-btn, Klipper cards), the one in the control window
+     *  overview, and the one on the camera view, which is reachable from
+     *  every tab. The label names the action: when the light is on, it
+     *  reads "turn off". */
     setzeLichtKnoepfe(an) {
         const texts = window.texts || {};
         const label = an ? (texts.light_off || 'Licht aus')
@@ -60,10 +60,10 @@ class StatusManager {
     }
 
     updateBothButtons(baseId, className, innerHTML) {
-        // WICHTIG: className/innerHTML nur schreiben wenn sie sich tatsächlich
-        // geändert haben. Andernfalls ersetzt das Polling während einer
-        // Mausinteraktion die Kind-Nodes des Buttons, was den Klick verschluckt
-        // (z.B. Licht-Button: Klick ging erst nach Maus-wegbewegen durch).
+        // IMPORTANT: only write className/innerHTML when they actually
+        // changed. Otherwise polling during a mouse interaction replaces
+        // the button's child nodes, which swallows the click
+        // (e.g. light button: the click only registered after moving the mouse away).
         const desktopBtn = document.getElementById(baseId);
         const mobileBtn = document.getElementById(baseId + '-mobile');
 
@@ -78,7 +78,7 @@ class StatusManager {
     }
 
     // ========================================
-    // loadStatus — holt /api/status und wendet ihn an
+    // loadStatus — fetches /api/status and applies it
     // ========================================
     loadStatus() {
         const texts = window.texts || {};
@@ -89,21 +89,22 @@ class StatusManager {
     }
 
     // ========================================
-    // applyStatus — EINE Stelle, die einen Status auf die Oberflaeche legt
+    // applyStatus — the ONE place that applies a status to the UI
     // ========================================
     /**
-     * Frueher stand das im then-Block von loadStatus() und lief damit nur,
-     * wenn /api/status geholt wurde. Als der 8-Sekunden-Poll wegfiel, hoerte
-     * unter anderem der Licht-Knopf auf, sich nachzufuehren: der Server hatte
-     * den neuen Stand binnen ~1,3 s, aber niemand trug ihn mehr in den Knopf.
+     * This used to live in loadStatus()'s then-block and only ran when
+     * /api/status was fetched. When the 8-second poll was dropped, the
+     * light button (among other things) stopped following along: the
+     * server had the new state within ~1.3s, but nothing wrote it into
+     * the button anymore.
      *
-     * Der Socket-Push traegt seit 20aug26 dieselben 95 Schluessel wie
-     * /api/status, deshalb kann er hier direkt hinein — genau so, wie es der
-     * Klipper-Pfad in printer-adapter.js schon macht.
+     * The socket push has carried the same 95 keys as /api/status since
+     * 20aug26, so it can feed directly into this — exactly like the
+     * Klipper path in printer-adapter.js already does.
      */
     /**
-     * Verlauf-Chip in der Zonen-Leiste. Der hatte bisher gar keine
-     * Sichtbarkeitslogik und stand auch bei ausgeschaltetem Drucker da.
+     * History chip in the zone bar. It previously had no visibility
+     * logic at all and stayed shown even with the printer off.
      */
     _zeigeVerlaufChip(zeigen) {
         const chip = document.getElementById('mz-sys-charts');
@@ -111,51 +112,50 @@ class StatusManager {
     }
 
     applyStatus(data) {
-        // Faehigkeiten merken. Sie kommen sowohl ueber /api/status als auch
-        // ueber den Socket-Push, window.lastPrintData dagegen NUR ueber den
-        // Push — Dialoge, die vor dem ersten Push aufgehen, standen sonst
-        // ohne da (der Trocknungs-Haken fehlte bei ausgeschaltetem Drucker).
+        // Remember capabilities. They arrive both via /api/status and
+        // via the socket push, whereas window.lastPrintData only arrives
+        // via the push — dialogs opened before the first push otherwise had
+        // nothing to go on (the drying flag was missing while the printer was off).
         if (data && data.capabilities) window.lastCapabilities = data.capabilities;
 
-        // Reihenfolge wie frueher im then-Block von loadStatus.
+        // Same order as previously in loadStatus's then-block.
         this._zeigeKopf(data);
         this._zeigeHmsBanner(data);
         this._zeigeAktualisierungUndKnoepfe(data);
     }
 
-    /** Knoepfe, Geraete-Tab und Druckername */
+    /** Buttons, device tab, and printer name */
     _zeigeKopf(data) {
         const texts = window.texts || {};
         this.updateStatusDisplay(data);
 
-        // Geraet-Tab mitversorgen. Auf Bambu gibt es kein
-        // printer_state-Ereignis (das ist der Klipper-Weg) — dort ist
-        // /api/status die einzige Quelle fuer Duesen, Spulen, Speicher
-        // und den Rest des device_report.
+        // Also feed the device tab. Bambu has no
+        // printer_state event (that's the Klipper path) — there,
+        // /api/status is the only source for nozzles, spools, storage,
+        // and the rest of the device_report.
         if (window.printerControlManager && typeof window.printerControlManager.applyStatusPayload === 'function') {
             try { window.printerControlManager.applyStatusPayload(data); }
             catch (e) { console.error('Device tab not updated:', e); }
         }
 
-        // Drucker-Name setzen (nur einmal)
+        // Set the printer name (once only)
         if (data.printer_name && !window.printerNameSet) {
-            // Der Name steht im Browser-Tab; ein Feld dafuer gibt es seit
-            // dem Entfernen des App-Headers nicht mehr.
+            // The name shows in the browser tab; there hasn't been a dedicated
+            // field for it since the app header was removed.
             document.title = data.printer_name;
             window.printerNameSet = true;
         }
     }
 
-    /** NEUE ERWEITERTE MQTT-DATEN ANZEIGEN */
-    /** HMS-Banner nachziehen.
+    /** Keep the HMS banner in sync.
      *
-     *  Hier standen bis 21aug26 acht Methoden (_zeigeDruckDetails,
+     *  Up until 21aug26, this held eight methods (_zeigeDruckDetails,
      *  _zeigeFilament, _zeigeLuefter, _zeigeKammer, _zeigeBeleuchtung,
-     *  _zeigeAms, _zeigeSystem, _zeigeWarteschlange) mit zusammen rund 250
-     *  Zeilen, die ausnahmslos in Elemente schrieben, die es im Markup nicht
-     *  gibt — Reste der alten Detailtafel. Ihre Inhalte stehen heute in der
-     *  Druck-, Material- und Zonen-Karte. Uebrig bleibt der einzige Aufruf
-     *  mit Wirkung.
+     *  _zeigeAms, _zeigeSystem, _zeigeWarteschlange) totaling around 250
+     *  lines, all writing into elements that don't exist in the markup —
+     *  leftovers from the old detail panel. Their content now lives in
+     *  the print, material, and zone cards. What's left is the one call
+     *  that still does anything.
      */
     _zeigeHmsBanner(data) {
         if (window.socketManager && typeof window.socketManager.applyHmsBanner === 'function') {
@@ -169,10 +169,10 @@ class StatusManager {
         this._zeigeKnoepfe(data);
     }
 
-    /** MQTT-Wiederverbindung anstossen, wenn der Drucker an ist */
+    /** Kick off MQTT reconnection when the printer is on */
     _pflegeAutoConnect(data) {
         const texts = window.texts || {};
-        // Auto-Connect Timer starten wenn Drucker an und MQTT nicht verbunden
+        // Start the auto-connect timer when the printer is on and MQTT is not connected
         if (data.switch === 'on' && !data.mqtt && !window.mqttManuallyDisconnected) {
             if (!window.autoConnectTimer) {
 
@@ -183,7 +183,7 @@ class StatusManager {
         }
     }
 
-    /** Kamera an der Steckdose ausrichten */
+    /** Align the camera with the socket state */
     _pflegeKamera(data) {
         const texts = window.texts || {};
         // Without a socket there is no switch to follow, and the live
@@ -223,7 +223,7 @@ class StatusManager {
         }
     }
 
-    /** Steuerungs-Knoepfe nach Strom- und Druckerzustand */
+    /** Control buttons based on power and printer state */
     _zeigeKnoepfe(data) {
         const texts = window.texts || {};
         // No socket set up means there IS no power state -- and no state is
@@ -238,8 +238,8 @@ class StatusManager {
         // Is the printer there? With a socket that is the socket's answer;
         // without one it is the live connection -- the only evidence left.
         const druckerDa = ohneDose ? !!data.mqtt : (switchState === 'on');
-        // Boot-Phase: Button zeigt „Drucker startet…" (setzt
-        // updateStatusDisplay) — hier nicht mit Ein/Aus überschreiben.
+        // Boot phase: the button reads "printer starting…" (set by
+        // updateStatusDisplay) — don't overwrite it with on/off here.
         if (!window.printerBooting && data.status_text !== 'status.booting') {
             const switchBtns = ['switch-btn', 'switch-btn-mobile'];
             if (ohneDose) {
@@ -264,27 +264,27 @@ class StatusManager {
                 });
             }
 
-            // Verlauf + SD-Card Buttons nur anzeigen wenn Drucker AN ist.
-            // Die SD-Karte haengt NICHT am Druckerstrom: der Server haelt
-            // einen vollstaendigen Dateispiegel, und
-            // /api/mqtt/sdcard?cache_only=true liefert die Liste ohne jede
-            // Druckerverbindung. Am always-on-Host (host_mode=external)
-            // liegen die G-Codes ohnehin auf dem Host. Der Knopf bleibt
-            // deshalb immer sichtbar; gesperrt werden nur die Aktionen, die
-            // den Drucker wirklich brauchen (sd-card-manager.js).
+            // Only show the history + SD card buttons when the printer is ON.
+            // The SD card is NOT tied to printer power: the server keeps
+            // a complete file mirror, and
+            // /api/mqtt/sdcard?cache_only=true returns the list without any
+            // printer connection. On the always-on host (host_mode=external)
+            // the G-code files live on the host anyway. So the button stays
+            // visible at all times; only the actions that actually need the
+            // printer are locked (sd-card-manager.js).
             //
-            // Vorher stand er in zwei Listen, die sich widersprachen: dieser
-            // Block blendete ihn am externen Host ein, der Live-Status-Pfad
-            // weiter unten gleich wieder aus — was man sah, hing davon ab,
-            // welcher zuletzt lief.
+            // It used to live in two lists that contradicted each other: this
+            // block showed it on the external host, while the live-status path
+            // further down immediately hid it again — what you saw depended on
+            // whichever ran last.
             const externalHost = data.host_mode === 'external';
-            // Global merken: die Tab-Bar braucht es fuer den
-            // Mainsail-Tab, der sonst bei ausgeschaltetem Drucker
-            // ausgegraut wird — obwohl Mainsail auf dem always-on-Host
-            // laeuft und erreichbar bleibt.
+            // Remember it globally: the tab bar needs it for the
+            // Mainsail tab, which would otherwise gray out while the
+            // printer is off — even though Mainsail runs on the always-on
+            // host and stays reachable.
             window.lastHostMode = data.host_mode || null;
             const printerOnlyBtns = ['verlauf-btn', 'verlauf-btn-mobile'];
-            // SD-Karte: immer bedienbar, egal ob der Drucker an ist.
+            // SD card: always usable, regardless of whether the printer is on.
             ['sd-btn-desktop', 'sd-btn-mobile'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) {
@@ -307,11 +307,11 @@ class StatusManager {
                     }
                 });
 
-                // Developer Cards nur anzeigen wenn Drucker AN UND Developer Mode aktiv
+                // Only show developer cards when the printer is ON and developer mode is active
                 this.checkDeveloperMode();
             } else {
-                // Drucker AUS. Am externen Host bleiben Verlauf + SD-Karte
-                // bedienbar (Dateien liegen auf dem Host), sonst verstecken.
+                // Printer OFF. On the external host, history + SD card stay
+                // usable (files live on the host); otherwise hide them.
                 printerOnlyBtns.forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) {
@@ -320,14 +320,14 @@ class StatusManager {
                     }
                 });
 
-                // Developer Cards komplett ausblenden bei Drucker AUS
+                // Completely hide developer cards when the printer is OFF
                 const devCardMobile = document.getElementById('dev-control-card-mobile');
                 const devCardDesktop = document.getElementById('dev-control-card-desktop');
                 if (devCardMobile) devCardMobile.style.display = 'none';
                 if (devCardDesktop) devCardDesktop.style.display = 'none';
             }
 
-            // Licht Status
+            // Light status
             if (data.light !== null && !window.lightToggleInProgress) {
                 if (data.light === 'on') {
                     this.setzeLichtKnoepfe(true);
@@ -336,7 +336,7 @@ class StatusManager {
                 }
             }
 
-            // MQTT Status
+            // MQTT status
             if (data.mqtt !== undefined) {
                 if (data.mqtt) {
                     this.updateBothButtons('mqtt-btn', 'control-btn active', this.knopfInhalt('funk', texts.mqtt_button_connected));
@@ -359,16 +359,16 @@ class StatusManager {
     // ========================================
     updateStatusDisplay(status) {
         const texts = window.texts || {};
-            // Vorkonditionierung: eigenes Zustandsbanner, eigene Datei.
+            // Preconditioning: has its own state banner, its own file.
             try {
-                if (window.vorkonditionierung) window.vorkonditionierung.aktualisiere(status);
+                if (window.preconditioning) window.preconditioning.aktualisiere(status);
             } catch (_) {}
-            // Speichere letzten bekannten Switch-Status
+            // Store the last known switch state
             if (status.switch !== null && status.switch !== undefined) {
                 window.lastKnownSwitchState = status.switch;
             }
 
-            // Speichere MQTT Status
+            // Store the MQTT status
             if (status.mqtt !== null && status.mqtt !== undefined) {
                 window.lastMqttStatus = status.mqtt;
             }
@@ -386,16 +386,16 @@ class StatusManager {
                 ? (window.lastMqttStatus === true)
                 : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
 
-            // Cards aktualisieren die vom Drucker-Status abhängen
+            // Update cards that depend on printer status
             if (typeof updatePrinterDependentCards === 'function') {
                 updatePrinterDependentCards();
             }
 
-            // Verwende letzten bekannten Status wenn aktueller null ist
+            // Use the last known status when the current one is null
             const effectiveSwitchState = status.switch !== null ? status.switch : window.lastKnownSwitchState;
 
-            // „Drucker startet…" (Boot-Watchdog nach dem Einschalten, Android
-            // PrinterBootingCard): Button gesperrt, bis Moonraker verbunden ist.
+            // "Printer starting…" (post-power-on boot watchdog, Android
+            // PrinterBootingCard): button stays locked until Moonraker is connected.
             const isBooting = status.state === 'booting' || status.status_text === 'status.booting';
             window.printerBooting = isBooting;
             if (isBooting) {
@@ -416,7 +416,7 @@ class StatusManager {
             if (status.switch !== null) {
                 const switchBtns = ['switch-btn', 'switch-btn-mobile'];
                 if (status.switch === 'on') {
-                    // NEU: Prüfe ob Power-Off Timer läuft
+                    // Check whether the power-off timer is running
                     if (window.powerOffTimerActive) {
                         return;
                     }
@@ -430,8 +430,8 @@ class StatusManager {
                         }
                     });
                 } else {
-                    // Drucker AUS
-                    // Nur "HA nicht verfügbar" anzeigen wenn HA in Config aktiviert ist
+                    // Printer OFF
+                    // Only show "HA unavailable" when HA is enabled in the config
                     if (status.ha_enabled && status.ha_available === false) {
                         switchBtns.forEach(id => {
                             const btn = document.getElementById(id);
@@ -459,10 +459,10 @@ class StatusManager {
                 }
             }
 
-            // MQTT Button - NUR Bambu-Mode (Klipper hat kein MQTT). Im
-            // Klipper-Mode versteckt CSS [data-bambu-only] den Button schon,
-            // aber wir wollen auch nicht aktiv visibility:visible drueber-
-            // setzen — sonst sieht's wie ein Race aus.
+            // MQTT button - Bambu mode ONLY (Klipper has no MQTT). In
+            // Klipper mode, CSS [data-bambu-only] already hides the button,
+            // but we don't want to actively force visibility:visible over
+            // it either — otherwise it looks like a race.
             if (!(window.isKlipperMode && window.isKlipperMode())) {
                 const mqttBtns = ['mqtt-btn', 'mqtt-btn-mobile'];
                 mqttBtns.forEach(id => {
@@ -478,7 +478,7 @@ class StatusManager {
                     }
                 });
 
-                // MQTT Status updaten wenn sichtbar
+                // Update MQTT status when visible
                 if (effectiveSwitchState === 'on' && status.mqtt !== undefined) {
                     if (status.mqtt) {
                         this.updateBothButtons('mqtt-btn', 'control-btn active', this.knopfInhalt('funk', texts.mqtt_button_connected || 'MQTT'));
@@ -488,7 +488,7 @@ class StatusManager {
                 }
             }
 
-            // MQTT Status
+            // MQTT status
             if (status.mqtt !== undefined) {
                 if (status.mqtt) {
                     this.updateBothButtons('mqtt-btn', 'control-btn active', this.knopfInhalt('funk', texts.mqtt_button_connected || 'MQTT'));
@@ -497,10 +497,10 @@ class StatusManager {
                 }
             }
 
-            // Buttons sichtbar wenn: Drucker war/ist AN ODER MQTT verbunden
+            // Buttons visible when: printer was/is ON OR MQTT connected
             const shouldShowButtons = effectiveSwitchState === 'on' || status.mqtt === true;
 
-            // Licht Button
+            // Light button
             const lightBtns = ['light-btn', 'light-btn-mobile'];
             lightBtns.forEach(id => {
                 const btn = document.getElementById(id);
@@ -516,7 +516,7 @@ class StatusManager {
                 }
             });
 
-            // Licht Status
+            // Light status
             if (shouldShowButtons && !window.lightToggleInProgress) {
                 if (status.light === 'on') {
                     this.setzeLichtKnoepfe(true);
@@ -525,10 +525,10 @@ class StatusManager {
                 }
             }
 
-            // Verlauf-Knoepfe. Zusaetzlich zum Drucker-Zustand zaehlt, ob es
-            // ueberhaupt etwas zu zeigen gibt: lief der Drucker in der letzten
-            // Stunde nicht, ist die Historie leer und der Knopf fuehrt auf
-            // leere Achsen. has_sensor_history sagt es (status_builder).
+            // History buttons. Besides the printer state, it also matters
+            // whether there's anything to show at all: if the printer hasn't
+            // run in the last hour, the history is empty and the button leads
+            // to blank axes. has_sensor_history tells us that (status_builder).
             const hatVerlauf = status.has_sensor_history !== false;
             this._zeigeVerlaufChip(shouldShowButtons && hatVerlauf);
 
@@ -548,11 +548,11 @@ class StatusManager {
                 }
             });
 
-            // SD-Karte: immer bedienbar. Die Liste kommt aus dem Dateispiegel
-            // des Servers und braucht den Drucker nicht — gesperrt werden nur
-            // Drucken und Loeschen (sd-card-manager.js). Dieser Zweig hat den
-            // Knopf frueher wieder versteckt, sobald der Drucker aus war, und
-            // damit die Ausnahme im loadStatus-Pfad ausgehebelt.
+            // SD card: always usable. The list comes from the server's file
+            // mirror and doesn't need the printer — only printing and
+            // deleting are locked (sd-card-manager.js). This branch used to
+            // hide the button again as soon as the printer was off, undoing
+            // the exception made in the loadStatus path.
             ['sd-btn-desktop', 'sd-btn-mobile'].forEach(id => {
                 const btn = document.getElementById(id);
                 if (btn) {
@@ -562,7 +562,7 @@ class StatusManager {
                 }
             });
 
-            // Update Filament Card Sichtbarkeit basierend auf Drucker-Status
+            // Update filament card visibility based on printer status
             if (typeof updateFilamentCardVisibility === 'function') {
                 updateFilamentCardVisibility();
             }
@@ -574,12 +574,12 @@ class StatusManager {
     async toggleSwitch() {
         const texts = window.texts || {};
         try {
-            // Reset MQTT manual disconnect flag wenn Drucker aus/an geschaltet wird
+            // Reset the MQTT manual-disconnect flag when the printer is switched off/on
             window.mqttManuallyDisconnected = false;
 
-            // Ausschalten braucht einen Moment (Meross-Cloud-Login der Bridge) →
-            // sofortiges Feedback auf dem Button: „Schalte aus…" + disabled.
-            // Quelle: lastKnownSwitchState (lastPrintData hat KEIN switch-Feld).
+            // Powering off takes a moment (the bridge's Meross cloud login) →
+            // immediate feedback on the button: "Turning off…" + disabled.
+            // Source: lastKnownSwitchState (lastPrintData has NO switch field).
             const wasOn = window.lastKnownSwitchState === 'on';
             if (wasOn) {
                 ['switch-btn', 'switch-btn-mobile'].forEach(id => {
@@ -594,14 +594,15 @@ class StatusManager {
             const response = await apiCall('/api/switch', { method: 'POST' });
             const data = await response.json();
 
-            // HA nicht verfügbar
+            // HA unavailable
             if (data.ha_unavailable) {
                 window.skToast(texts.alert_ha_unavailable, 'warning');
                 return;
             }
 
             if (data.needs_confirmation) {
-                showConfirmDialog(texts.confirm_printer_printing_poweroff, async () => {
+                showConfirmDialog({ text: texts.confirm_printer_printing_poweroff,
+                    knopf: texts.confirm_power_off, gefaehrlich: true }, async () => {
                     await apiCall('/api/switch?force=true', { method: 'POST' });
                     setTimeout(() => loadStatus(), 2000);
                 });
@@ -611,7 +612,7 @@ class StatusManager {
             setTimeout(() => loadStatus(), 2000);
         } catch (error) {
             window.skToast(texts.alert_connection_error);
-            // Button-Zustand aus dem echten Status wiederherstellen.
+            // Restore the button state from the actual status.
             try { loadStatus(); } catch (_) {}
         }
     }
@@ -622,8 +623,8 @@ class StatusManager {
     async toggleLight() {
         const texts = window.texts || {};
         // === OPTIMISTIC UI ===
-        // 3s-Lock damit das State-Polling den optimistisch gesetzten Zustand
-        // nicht ueberschreibt waehrend der Backend-Call laeuft.
+        // 3s lock so state polling doesn't overwrite the optimistically set
+        // state while the backend call is in flight.
         window.lightToggleInProgress = true;
         if (window._lightPollingLockTimer) clearTimeout(window._lightPollingLockTimer);
         window._lightPollingLockTimer = setTimeout(() => {
@@ -641,7 +642,7 @@ class StatusManager {
             this.setzeLichtKnoepfe(false);
         }
 
-        // Unified action — Backend dispatcht zum richtigen Controller.
+        // Unified action — the backend dispatches to the right controller.
         try {
             const r = await window.printerAdapter.setLight(newOn);
             if (!r.ok) {
@@ -666,19 +667,19 @@ class StatusManager {
     async toggleMQTT() {
         const texts = window.texts || {};
         try {
-            // Stoppe eventuell laufenden Auto-Connect Timer
+            // Stop any auto-connect timer that might be running
             if (this.mqttCountdownInterval) {
                 clearInterval(this.mqttCountdownInterval);
                 this.mqttCountdownInterval = null;
             }
 
-            // Prüfe aktuellen Status über API
+            // Check the current status via the API
             const statusResponse = await apiCall('/api/status');
             const statusData = await statusResponse.json();
 
             if (statusData.mqtt) {
-                // MQTT ist verbunden -> Trennen
-                window.mqttManuallyDisconnected = true;  // Flag setzen!
+                // MQTT is connected -> disconnect
+                window.mqttManuallyDisconnected = true;  // Set flag!
                 this.updateBothButtons('mqtt-btn', 'control-btn', this.knopfInhalt('funk', 'MQTT'));
 
                 const response = await apiCall('/api/mqtt/connect', { method: 'POST' });
@@ -688,15 +689,15 @@ class StatusManager {
                     this.updateBothButtons('mqtt-btn', 'control-btn', this.knopfInhalt('funk', 'MQTT'));
                     skToast(texts.mqtt_disconnected_msg, 'info');
 
-                    // Developer Cards komplett ausblenden bei MQTT Disconnect
+                    // Completely hide developer cards on MQTT disconnect
                     const devCardMobile = document.getElementById('dev-control-card-mobile');
                     const devCardDesktop = document.getElementById('dev-control-card-desktop');
                     if (devCardMobile) devCardMobile.style.display = 'none';
                     if (devCardDesktop) devCardDesktop.style.display = 'none';
                 }
             } else {
-                // MQTT ist getrennt -> Verbinden
-                window.mqttManuallyDisconnected = false;  // Flag zurücksetzen!
+                // MQTT is disconnected -> connect
+                window.mqttManuallyDisconnected = false;  // Reset flag!
                 this.updateBothButtons('mqtt-btn', 'control-btn', this.knopfInhalt('funk', `${texts.mqtt_button_connecting} <span class="hourglass-spinning">⏳</span>`));
 
                 const response = await apiCall('/api/mqtt/connect', { method: 'POST' });
@@ -706,7 +707,7 @@ class StatusManager {
                     this.updateBothButtons('mqtt-btn', 'control-btn active', this.knopfInhalt('funk', texts.mqtt_button_connected || 'MQTT'));
                     skToast(texts.mqtt_connected_msg, 'success');
 
-                    // Developer Mode prüfen NACH erfolgreicher MQTT Verbindung
+                    // Check developer mode AFTER a successful MQTT connection
                     this.checkDeveloperMode();
                 }
             }
@@ -727,17 +728,17 @@ class StatusManager {
     // ========================================
     startMQTTCountdown() {
         const texts = window.texts || {};
-        // Prüfe ob manuell getrennt wurde (kein Countdown bei manuellem Trennen)
+        // Check whether it was manually disconnected (no countdown on manual disconnect)
         if (window.mqttManuallyDisconnected) {
             return;
         }
 
-        // Prüfe ob bereits läuft
+        // Check whether it's already running
         if (this.mqttCountdownInterval) {
             return;
         }
 
-        // Animierte Sanduhr anzeigen
+        // Show the animated hourglass
         this.updateBothButtons('mqtt-btn', 'control-btn', this.knopfInhalt('funk', `${texts.mqtt_button_connecting} <span class="hourglass-spinning">⏳</span>`));
     }
 
@@ -749,17 +750,17 @@ class StatusManager {
         const devCardMobile = document.getElementById('dev-control-card-mobile');
         const devCardDesktop = document.getElementById('dev-control-card-desktop');
 
-        // Helper: Card + Buttons zusammen verstecken
+        // Helper: hide card + buttons together
         function hideDevCards() {
             if (devCardMobile) devCardMobile.style.display = 'none';
             if (devCardDesktop) devCardDesktop.style.display = 'none';
         }
 
-        // Helper: Card + Buttons zusammen anzeigen
+        // Helper: show card + buttons together
         function showDevCards() {
             if (devCardMobile) devCardMobile.style.display = '';
             if (devCardDesktop) devCardDesktop.style.display = '';
-            // Opacity/Transform zurücksetzen (falls vorher fade-out war)
+            // Reset opacity/transform (in case there was a fade-out before)
             [devCardMobile, devCardDesktop].forEach(card => {
                 if (!card) return;
                 const grid = card.querySelector('.control-grid');
@@ -770,15 +771,15 @@ class StatusManager {
             });
         }
 
-        // Klipper-Mode: Dev-Card hat universelle Steuerung (Pause/Resume/
-        // Stop/Home/Move/Speed/Temp) — alles via printerAdapter. Sichtbar NUR
-        // wenn der Drucker online ist (Moonraker erreichbar → switch='on' &&
-        // mqtt=true, beide vom Direct-Adapter aus connected gemappt). Drucker
-        // aus → ausblenden (sonst flackert die Karte mit jedem Status-Poll und
-        // zeigt Steuerung für einen toten Drucker).
+        // Klipper mode: the dev card has universal controls (Pause/Resume/
+        // Stop/Home/Move/Speed/Temp) — all via printerAdapter. Visible ONLY
+        // when the printer is online (Moonraker reachable → switch='on' &&
+        // mqtt=true, both mapped from connected by the direct adapter). Printer
+        // off → hide it (otherwise the card flickers on every status poll and
+        // shows controls for a dead printer).
         if (window.isKlipperMode && window.isKlipperMode()) {
-            // Ohne eingerichtete Steckdose entscheidet die Verbindung -- die
-            // Antwort steht in status-manager.js, hier wird sie nur gelesen.
+            // Without a configured socket, the connection decides -- the
+            // answer lives in status-manager.js, here it's only read.
             const printerOnline = (typeof window.druckerDa === 'boolean') ? window.druckerDa
             : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
             if (window.isFilamentDrying || !printerOnline) {
@@ -789,18 +790,18 @@ class StatusManager {
             return;
         }
 
-        // Aus dem Socket-Stand lesen statt zu holen.
+        // Read from the socket state instead of fetching it.
         //
-        // Diese Funktion braucht genau drei Werte: gcode_state, mqtt und
-        // developer_mode. Die ersten beiden stehen im Push (window.lastPrintData
-        // traegt seit 20aug26 alle 95 Schluessel), der dritte ist statische
-        // Konfiguration und aendert sich zur Laufzeit nie.
+        // This function needs exactly three values: gcode_state, mqtt, and
+        // developer_mode. The first two are in the push (window.lastPrintData
+        // has carried all 95 keys since 20aug26), the third is static
+        // configuration and never changes at runtime.
         //
-        // Vorher holte jeder Aufruf beides frisch — und die Trocknungs-Kachel
-        // ruft alle 10 Sekunden hierher durch (FilamentDryingManager.updateStatus
-        // → _applyControlsVisibility → hier). Das waren dauerhaft 6 Anfragen pro
-        // Minute mit je 6,7 KB, nur um zu entscheiden, ob ein paar Knoepfe
-        // sichtbar sind.
+        // It used to fetch both fresh on every call — and the drying tile
+        // calls through here every 10 seconds (FilamentDryingManager.updateStatus
+        // → _applyControlsVisibility → here). That was a steady 6 requests per
+        // minute at 6.7 KB each, just to decide whether a few buttons
+        // are visible.
         const ausSocket = (window.lastPrintData && window.lastPrintData.gcode_state !== undefined)
             ? window.lastPrintData : null;
         const statusHolen = ausSocket
@@ -822,42 +823,42 @@ class StatusManager {
                     : (texts.print_now || texts.print || 'Drucken');
             });
 
-            // Prüfe ob Filament-Trocknung aktiv ist
+            // Check whether filament drying is active
             if (window.isFilamentDrying) {
                 console.log(texts.console_drying_active_cards_hidden);
                 hideDevCards();
                 return;
             }
 
-            // MQTT nicht verbunden oder Developer Mode nicht aktiv -> verstecken
+            // MQTT not connected or developer mode not active -> hide
             if (data.mqtt !== true || config.mqtt.developer_mode !== true) {
                 hideDevCards();
                 return;
             }
 
-            // Developer Mode aktiv + MQTT verbunden -> Card UND Buttons sofort anzeigen
+            // Developer mode active + MQTT connected -> show card AND buttons immediately
             showDevCards();
 
-            // Teile ueberspringen: dieselbe Funktion wie im Socket-Weg,
-            // damit die beiden Wege nicht auseinanderlaufen.
+            // Parts: same function as in the socket path,
+            // so the two paths don't drift apart.
             if (window.skTeileKnopfZeigen) window.skTeileKnopfZeigen(data);
 
             if (isPrinting) {
-                // Homing bleibt während des Drucks gesperrt; SD-Karte und
-                // Steuerung bleiben sichtbar.
+                // Homing stays locked during printing; SD card and
+                // control stay visible.
                 _melde_knopfzustand('druck', texts.console_print_running_hide_buttons);
                 ['homing-btn-mobile', 'homing-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = 'none';
                 });
-                // Steuerung bleibt sichtbar: seit dem Uebersicht-Tab ist das
-                // Fenster auch waehrend des Drucks nuetzlich (Temperaturen,
-                // Luefter, Licht). Bewegen sperrt moveAxis selbst.
+                // Control stays visible: since the overview tab, the window
+                // has also been useful during printing (temperatures,
+                // fan, light). Movement is locked by moveAxis itself.
                 document.querySelectorAll('button[onclick*="openPrinterControl"]').forEach(btn => {
                     btn.style.display = '';
                 });
             } else if (isPaused) {
-                // PAUSE: Homing bleibt gesperrt, SD-Karte und Steuerung bleiben sichtbar.
+                // PAUSE: homing stays locked, SD card and control stay visible.
                 _melde_knopfzustand('pause',
                     'Druck pausiert - Steuerung bleibt sichtbar für Filament-Wechsel');
                 ['homing-btn-mobile', 'homing-btn-desktop'].forEach(id => {
@@ -868,7 +869,7 @@ class StatusManager {
                     btn.style.display = '';
                 });
             } else {
-                // IDLE: Alle Buttons anzeigen
+                // IDLE: show all buttons
                 document.querySelectorAll('button[onclick*="showSDFiles"]').forEach(btn => {
                     btn.style.display = '';
                 });

@@ -26,7 +26,7 @@
     <!-- Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -43,7 +43,7 @@
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
     <style>
-        /* Sprach-Dropdown mit Flaggen (Port aus users.html — „genau so" wie dort) */
+        /* Language dropdown with flags (ported from users.html — kept identical) */
         .lang-dropdown { position: relative; width: 100%; max-width: 360px; }
         .lang-dropdown-selected {
             width: 100%; padding: 10px 12px; border: 1px solid var(--input-border, rgba(255,255,255,0.1));
@@ -68,8 +68,8 @@
         .lang-dropdown-item.selected { background: rgba(33,150,243,0.12); color: var(--accent-blue, #2196f3); }
         .lang-flag { width: 22px; height: 16px; border-radius: 2px; object-fit: cover; flex-shrink: 0; }
 
-        /* Klipper-Direct: Kamera-Liste + Bearbeiten-Dialog (scoped — NICHT .btn/.card,
-           die sind hier 100%-breit bzw. glasig-transparent und zerschießen das Layout) */
+        /* Klipper direct: camera list and edit dialog (scoped -- NOT .btn/.card,
+           those are 100% wide or glassy here and wreck the layout) */
         .cam-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border-color, rgba(127,127,127,0.15)); }
         .cam-row:last-child { border-bottom: none; }
         .cam-row-info { flex: 1; min-width: 0; }
@@ -99,7 +99,7 @@
         }
         .cam-rot-btn.active { background: rgba(102,126,234,0.22); border-color: rgba(102,126,234,0.5); font-weight: 600; }
 
-        /* CSS Variablen für Themes — Glassmorphism Design */
+        /* CSS variables for the themes -- glassmorphism design */
         :root {
             --safe-area-inset-top: env(safe-area-inset-top, 0px);
             --safe-area-inset-right: env(safe-area-inset-right, 0px);
@@ -393,9 +393,9 @@
             padding: 10px 0;
         }
 
-        /* Raster statt waagerechtem Streifen: am Schreibtisch ohne
-           Wischgeste war das Ziehen mit gedrueckter Maustaste die einzige
-           Art, an die hinteren Modelle zu kommen. */
+        /* Grid instead of a horizontal strip: on desktop without a swipe
+           gesture, dragging with the mouse held down would be the only
+           way to reach the models further back. */
         .printer-gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -407,9 +407,9 @@
             display: flex; align-items: center; gap: 16px;
             padding: 4px 2px 10px;
         }
-        /* Steht die Zeile allein da, darf das Bild gross sein — man soll
-           auf einen Blick sehen, welcher Drucker eingetragen ist. Klappt
-           das Raster auf, schrumpft es, damit die Auswahl oben bleibt. */
+        /* When the row stands alone the picture may be large -- one should
+           see at a glance which printer is entered. When the grid unfolds it
+           shrinks, so the choice stays on top. */
         .modell-zeile img {
             width: 120px; height: 120px; object-fit: contain; flex: none;
             border-radius: 12px; background: var(--bg-card-variant);
@@ -1154,7 +1154,7 @@
 
         <div class="es-rahmen">
 
-            <!-- ============ Verzeichnis ============ -->
+            <!--============ Index ============-->
             <div class="es-verz" id="settings-nav-panel">
                 <div class="es-suche">
                     <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -1169,7 +1169,7 @@
                 </button>
                 <button class="es-verz-eintrag" id="nav-drucker" onclick="switchSection('drucker')">
                     <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
-                    <span data-i18n="settings_at_printer">Drucker</span>
+                    <span data-i18n="settings_device">Gerät</span>
                     <svg class="es-ic es-ic--sm es-haken" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                 </button>
                 <button class="es-verz-eintrag" id="nav-kamera" onclick="switchSection('kamera')">
@@ -1221,27 +1221,28 @@
                     <span data-i18n="settings_security_ssh">Sicherheit</span>
                     <svg class="es-ic es-ic--sm es-haken" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                 </button>
+                <button class="es-verz-eintrag" id="nav-aktualisierung" onclick="switchSection('aktualisierung')">
+                    <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                    <span data-i18n="update_title">Aktualisierung</span>
+                    <svg class="es-ic es-ic--sm es-haken" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                </button>
                 <button class="es-verz-eintrag an" id="nav-system" onclick="switchSection('system')">
                     <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
-                    <span data-i18n="settings_system_license">System &amp; Lizenz</span>
+                    <span data-i18n="settings_system">System</span>
                     <svg class="es-ic es-ic--sm es-haken" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                 </button>
             </div>
 
-            <!-- ============ Inhalt ============ -->
+            <!--============ Content ============-->
             <div class="es-inhalt">
-                <!-- ---------- Verbindung ---------- -->
+                <!------------ Connection ------------>
                 <div class="es-abschnitt" id="section-verbindung">
 
-                    <!-- Bambu-Cloud: fuer das, was im LAN nicht rauskommt
-                         (interne Modellablage). Das Passwort geht an Bambu
-                         und wird nirgends abgelegt — nur das Token, und das
-                         in den Keychain. -->
-                    <!-- Am 28aug26 ausgeblendet, weil der Drucker LAN-only lief
-                         und die Cloud nichts beitrug. Seit 29aug26 wieder da:
-                         MakerWorld haengt am selben Konto, und die Modelle
-                         kommen nur mit Anmeldung heraus. -->
-                    <div class="es-karte" id="karte-cloud">
+                    <!--Bambu Cloud: for what does not come through on the LAN
+                        (internal model storage). The password goes to Bambu
+                        and is never stored -- only the token, and that
+                        in the keychain.-->
+                    <div class="es-karte" data-requires="server" id="karte-cloud">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.6A4 4 0 0 1 18 18z"/></svg>
                             <span data-i18n="settings_cloud">Bambu-Cloud</span>
@@ -1348,8 +1349,8 @@
                         </div>
                     </div>
 
-                    <!-- Bambu-Drucker: Name, Modell, Zugang -->
-                    <div class="es-karte" id="karte-bambu">
+                    <!--Bambu printer: name, model, access-->
+                    <div class="es-karte" data-requires="server" id="karte-bambu">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
                             <span id="card-mqtt-title" data-i18n="settings_printer">Drucker</span>
@@ -1369,8 +1370,8 @@
                             <div class="es-zeile-name" style="margin-bottom:8px">
                                 <b id="label-printer-model" data-i18n="settings_field_printer_model">Modell</b>
                             </div>
-<!-- Zusammenfassung: welches Modell steht drin. Das Raster klappt nur
-     zum Wechseln auf. -->
+<!--Summary: which model is set. The grid only expands
+     to change it.-->
 <div class="modell-zeile" id="modell-gewaehlt">
     <img id="modell-bild" alt="">
     <div class="modell-text">
@@ -1384,10 +1385,8 @@
 <div class="printer-gallery-container" id="modell-auswahl" style="display:none;">
                                 <label class="printer-gallery-label" style="display:none">Modell</label>
                                 <div class="printer-gallery-wrapper">
-                                    <!-- Karten baut initPrinterGallery() aus
-                                         /api/printer/models. Vorher standen hier
-                                         zwoelf feste Bloecke — ohne A2L, und die
-                                         Schreibweisen liefen gegen die Serverliste. -->
+                                    <!--Cards are built by initPrinterGallery() from
+                                        /api/printer/models.-->
                                     <div class="printer-gallery" id="printer-gallery"></div>
                                 </div>
                             </div>
@@ -1410,8 +1409,23 @@
                             </div>
                         </div>
 
-                        <!-- Bambu-spezifische Felder -->
+                        <!--Bambu-specific fields-->
                         <div id="printer-fields-bambu" class="printer-type-fields">
+
+                            <!--Printers announce themselves on the network (SSDP).
+                                The serial number stays the same, the address does not --
+                                so this shows what is currently being heard.-->
+                            <div class="es-zeile">
+                                <div class="es-zeile-name">
+                                    <b data-i18n="settings_discovery">Im Netz gefunden</b>
+                                    <span data-i18n="settings_discovery_hint">Drucker melden sich von selbst. Die Seriennummer bleibt, die Adresse nicht.</span>
+                                </div>
+                                <div class="es-zeile-wert">
+                                    <button class="es-knopf" onclick="druckerSucheLaden()" data-i18n="settings_discovery_refresh">Neu suchen</button>
+                                </div>
+                            </div>
+                            <div id="drucker-suche-liste"></div>
+
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
                                     <label for="bambu_ip" id="label-bambu-ip" data-i18n="settings_field_ip">IP-Adresse</label>
@@ -1433,7 +1447,7 @@
                             </div>
                         </div>
 
-                        <!-- Klipper-spezifische Felder (Backend-Klipper-Modus) -->
+                        <!--Klipper-specific fields (Klipper backend mode)-->
                         <div id="printer-fields-klipper" class="printer-type-fields" style="display:none;">
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
@@ -1457,9 +1471,9 @@
                         </div>
                     </div>
 
-                    <!-- Drucker (Klipper-Direct): Moonraker/Companion-Verbindung.
-                         Wird vom Direct-Adapter eingeblendet — im Bambu-Modus
-                         gibt es diese Felder nicht. -->
+                    <!--Printer (Klipper-Direct): Moonraker/Companion connection.
+                        Shown by the Direct adapter -- in Bambu mode these
+                        fields do not exist.-->
                     <div class="es-karte" id="section-printer-direct" style="display:none;">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
@@ -1529,12 +1543,37 @@
                         </div>
                     </div>
 
-                    <!-- Was steckt dran? Kommt aus resolve() (services/
-                         printer_capabilities.py): was das Geraet meldet, gewinnt;
-                         das Datenblatt fuellt nur, was nur am Modell haengt.
-                         Bewusst zum Lesen und nicht zum Schalten — ein Schalter
-                         waere eine zweite Wahrheit neben dem Drucker. -->
-                    <div class="es-karte" id="karte-angeschlossen">
+                    <!--What is attached? Comes from resolve() (services/
+                        printer_capabilities.py): whatever the device reports wins;
+                        the datasheet only fills in what is purely model-dependent.
+                        Deliberately read-only, not a toggle -- a toggle
+                        would be a second source of truth next to the printer.-->
+
+                    <!--Printer maintenance notifications-->
+                </div>
+                <!------------ Camera ------------>
+                <div class="es-abschnitt" id="section-drucker">
+
+                    <!-- Everything the printer keeps in its own settings —
+                         the same switches as on its screen. The values are
+                         read from the printer, so this window shows how old
+                         that reading is instead of pretending to be config. -->
+                    <div class="es-karte">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
+                            <span data-i18n="settings_at_printer">Drucker</span>
+                            <span class="es-rechts"><span class="ed-quelle ed-quelle--alt" id="ed-quelle" data-i18n="settings_at_printer_reading">Wird gelesen…</span></span>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <span data-i18n="settings_at_printer_hint">Diese Einstellungen stehen im Drucker, nicht in der App — es sind dieselben wie auf seinem Display. Änderungen gehen sofort an das Gerät.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ed-bereiche" id="ed-bereiche"></div>
+                    <div id="ed-inhalt"></div>
+                    <div class="es-karte" data-requires="server" id="karte-angeschlossen">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v6M15 2v6"/><path d="M6 8h12v4a6 6 0 0 1-12 0z"/><path d="M12 18v4"/></svg>
                             <span data-i18n="settings_attached">Angeschlossen</span>
@@ -1570,90 +1609,11 @@
                             <div class="es-zeile-wert"><span class="es-marke" id="ang-luft">—</span></div>
                         </div>
                     </div>
-
-                    <!-- Wartungsmeldungen des Druckers -->
-                    <div class="es-karte" id="karte-wartungsmeldungen">
-                        <div class="es-karte-kopf">
-                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg>
-                            <span id="label-maintenance-notifications" data-i18n="settings_maintenance_notifications">Wartungsmeldungen des Druckers</span>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
-                                <b id="label-maintenance-enable" data-i18n="settings_maintenance_enable">Meldungen zeigen</b>
-                                <span data-i18n="settings_maintenance_enable_hint">Düse verschlissen, Riemen prüfen, Filter tauschen</span>
-                            </div>
-                            <div class="es-zeile-wert">
-                                <label class="es-schalter"><input type="checkbox" id="maintenance_notifications_enabled"><span></span></label>
-                            </div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
-                                <label for="maintenance_notification_frequency" id="label-maintenance-frequency" data-i18n="settings_maintenance_frequency">Wie oft</label>
-                            </div>
-                            <div class="es-zeile-wert">
-                                <select id="maintenance_notification_frequency" class="es-auswahl">
-                                    <option value="3" data-i18n="settings_every_3h">Alle 3 Stunden</option>
-                                    <option value="6" selected data-i18n="settings_every_6h">Alle 6 Stunden</option>
-                                    <option value="12" data-i18n="settings_every_12h">Alle 12 Stunden</option>
-                                    <option value="24" data-i18n="settings_once_daily">Einmal täglich</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
-                                <label for="maintenance_notification_start_hour" id="label-maintenance-start-hour" data-i18n="settings_maintenance_start">Ab wann</label>
-                            </div>
-                            <div class="es-zeile-wert">
-                                <select id="maintenance_notification_start_hour" class="es-auswahl">
-                                    <option value="0" selected>00:00</option>
-                                    <option value="6">06:00</option>
-                                    <option value="7">07:00</option>
-                                    <option value="8">08:00</option>
-                                    <option value="9">09:00</option>
-                                    <option value="10">10:00</option>
-                                    <option value="12">12:00</option>
-                                    <option value="14">14:00</option>
-                                    <option value="16">16:00</option>
-                                    <option value="18">18:00</option>
-                                    <option value="20">20:00</option>
-                                    <option value="21">21:00</option>
-                                    <option value="22">22:00</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="es-hinweis">
-                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
-                            <span id="maintenance-notification-info" data-i18n="settings_maintenance_info">Beispiel: alle 6 Stunden ab 00:00 meldet der Drucker um 00:00, 06:00, 12:00 und 18:00.</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- ---------- Kamera ---------- -->
-                <div class="es-abschnitt" id="section-drucker">
-
-                    <!-- Everything the printer keeps in its own settings —
-                         the same switches as on its screen. The values are
-                         read from the printer, so this window shows how old
-                         that reading is instead of pretending to be config. -->
-                    <div class="es-karte">
-                        <div class="es-karte-kopf">
-                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.5"/></svg>
-                            <span data-i18n="settings_at_printer">Drucker</span>
-                            <span class="es-rechts"><span class="ed-quelle ed-quelle--alt" id="ed-quelle" data-i18n="settings_at_printer_reading">Wird gelesen…</span></span>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
-                                <span data-i18n="settings_at_printer_hint">Diese Einstellungen stehen im Drucker, nicht in der App — es sind dieselben wie auf seinem Display. Änderungen gehen sofort an das Gerät.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ed-bereiche" id="ed-bereiche"></div>
-                    <div id="ed-inhalt"></div>
                 </div>
 
                 <div class="es-abschnitt" id="section-kamera">
 
-                    <!-- Bambu: eingebaute Kamera -->
+                    <!--Bambu: built-in camera-->
                     <div class="es-karte" id="karte-kamera-bambu">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-2h6l2 2h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg>
@@ -1682,7 +1642,7 @@
                         </div>
                     </div>
 
-                    <!-- Bambu-Kamera: Zustand + Neustart -->
+                    <!--Bambu camera: status + restart-->
                     <div class="es-karte" id="karte-kamera-status">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -1727,7 +1687,7 @@
                         </div>
                     </div>
 
-                    <!-- Klipper-Direct: Moonraker-Kameras (Liste + an/aus + Bearbeiten) -->
+                    <!--Klipper-Direct: Moonraker cameras (list + on/off + edit)-->
                     <div class="es-karte" id="camera-direct-info" style="display:none;">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h4l2-2h6l2 2h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg>
@@ -1739,7 +1699,7 @@
                         </div>
                     </div>
 
-                    <!-- Klipper-Direct: Timelapse-Offline-Cache -->
+                    <!--Klipper-Direct: timelapse offline cache-->
                     <div class="es-karte" id="timelapse-cache-card" style="display:none;">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3z"/></svg>
@@ -1824,9 +1784,9 @@
 
                     
                 </div>
-                <!-- ---------- Druck-Standards ---------- -->
+                <!------------ Print Defaults ------------>
                 <div class="es-abschnitt" id="section-standards">
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
                             <span id="card-print-defaults-title" data-i18n="settings_print_defaults_title">Vorgaben für jeden neuen Druck</span>
@@ -1840,11 +1800,11 @@
                             <div class="es-zeile-name"><b id="label-use-ams" data-i18n="settings_pd_ams">AMS benutzen</b></div>
                             <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="print_use_ams"><span></span></label></div>
                         </div>
-                        <!-- Bettnivellierung, Flussdynamik und Duesenversatz kennt der
-                             Drucker dreistufig (automatisch / ein / aus), nicht als
-                             Schalter — so steht es auch auf seinem Display. Am 18aug26
-                             an echten Studio-Befehlen gemessen: 0 = aus, 1 = ein,
-                             2 = automatisch. -->
+                        <!--Bed leveling, flow dynamics and nozzle offset are three-state
+                             on the printer (auto / on / off), not a plain toggle --
+                             that is how it appears on its display too. Confirmed
+                             against real Studio commands: 0 = off, 1 = on,
+                             2 = auto.-->
                         <div class="es-zeile">
                             <div class="es-zeile-name">
                                 <label id="label-bed-leveling" for="print_bed_leveling_mode" data-i18n="settings_pd_bed_leveling">Bett vermessen</label>
@@ -1889,9 +1849,9 @@
                     </div>
                 </div>
 
-                <!-- ---------- Filament ---------- -->
+                <!------------ Filament ------------>
                 <div class="es-abschnitt" id="section-filament">
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="config_store">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg>
                             <span id="card-spoolman-title">Spoolman</span>
@@ -1932,7 +1892,7 @@
                         </div>
                     </div>
 
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="config_store">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/></svg>
                             <span id="card-filament-drying-title" data-i18n="settings_drying">Trocknung</span>
@@ -1969,9 +1929,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- ---------- Automatisierung ---------- -->
+                <!------------ Automation ------------>
                 <div class="es-abschnitt" id="section-automatik">
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.4 5.6a9 9 0 1 1-12.8 0M12 3v9"/></svg>
                             <span id="card-automation-title" data-i18n="settings_auto_power">Drucker ausschalten</span>
@@ -1990,8 +1950,8 @@
                                 <span class="es-wert--matt" data-i18n="settings_minutes">min</span>
                             </div>
                         </div>
-                        <!-- ABS, ASA und Co. lassen Kammer und Teil heiss
-                             zurueck — dafuer eine eigene Wartezeit. -->
+                        <!--ABS, ASA and friends leave the chamber and part hot
+                             -- hence a dedicated wait time.-->
                         <div class="es-zeile">
                             <div class="es-zeile-name">
                                 <label for="power_off_delay_hot" data-i18n="settings_after_print_hot">Nach dem Druck (ABS, ASA)</label>
@@ -2010,7 +1970,7 @@
                         </div>
                     </div>
 
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg>
                             <span data-i18n="settings_light">Licht</span>
@@ -2037,7 +1997,7 @@
                         </div>
                     </div>
 
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg>
                             <span data-i18n="settings_hardware_button">Hardware-Knopf</span>
@@ -2054,7 +2014,7 @@
 
                 <!-- ---------- Smart Home ---------- -->
                 <div class="es-abschnitt" id="section-smarthome">
-                    <div class="es-karte" id="karte-homeassistant">
+                    <div class="es-karte" data-requires="server" id="karte-homeassistant">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg>
                             <span id="card-ha-title">Home Assistant</span>
@@ -2166,27 +2126,169 @@
                     </div>
                 </div>
 
-                <!-- ---------- Benachrichtigungen ---------- -->
+                <!------------ Notifications ------------>
+                <!------------ Notifications ------------>
                 <div class="es-abschnitt" id="section-meldungen">
                     <div class="es-karte">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
                             <span data-i18n="nav_notifications">Benachrichtigungen</span>
                             <span class="es-rechts">
-                                <button id="notif-filter-all" class="es-knopf es-knopf--haupt" onclick="setNotifFilter('all')" data-i18n="notifications_filter_all">Alle</button>
-                                <button id="notif-filter-unread" class="es-knopf" onclick="setNotifFilter('unread')" data-i18n="notifications_filter_unread">Ungelesen</button>
-                                <button class="es-knopf" onclick="loadNotificationsUI()">
-                                    <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
-                                    <span data-i18n="refresh">Aktualisieren</span>
-                                </button>
+                                <button id="meldungen-reiter-verlauf" class="es-knopf es-knopf--haupt"
+                                        onclick="zeigeMeldungsReiter('verlauf')"
+                                        data-i18n="settings_meldungen_verlauf">Verlauf</button>
+                                <button id="meldungen-reiter-geraete" class="es-knopf"
+                                        onclick="zeigeMeldungsReiter('geraete')"
+                                        data-i18n="settings_meldungen_geraete">Geräte</button>
                             </span>
                         </div>
-                        <div class="es-block">
-                            <div id="notif-list" class="notif-list"></div>
+
+                        <!--Verlauf: what has arrived. The first thing you want when
+                            you open this section, so it is the tab that shows.-->
+                        <div id="meldungen-inhalt-verlauf">
+                            <div class="es-zeile">
+                                <div class="es-zeile-name">
+                                    <span data-i18n="settings_meldungen_verlauf_hint">Was angekommen ist — auf allen Geräten</span>
+                                </div>
+                                <div class="es-zeile-wert">
+                                    <button id="notif-filter-all" class="es-knopf es-knopf--haupt" onclick="setNotifFilter('all')" data-i18n="notifications_filter_all">Alle</button>
+                                    <button id="notif-filter-unread" class="es-knopf" onclick="setNotifFilter('unread')" data-i18n="notifications_filter_unread">Ungelesen</button>
+                                    <button class="es-knopf" onclick="loadNotificationsUI()">
+                                        <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                                        <span data-i18n="refresh">Aktualisieren</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="es-block">
+                                <div id="notif-list" class="notif-list"></div>
+                            </div>
+                        </div>
+
+                        <!--Geraete: who gets what. Every device folded shut by
+                            default -- eight switches times four devices is a wall,
+                            and you come here to change ONE thing.-->
+                        <div id="meldungen-inhalt-geraete" style="display:none;">
+                            <div class="es-zeile">
+                                <div class="es-zeile-name">
+                                    <span data-i18n="settings_geraete_meldungen_hint">Was ausgeschaltet ist, schickt der Server gar nicht erst</span>
+                                </div>
+                                <div class="es-zeile-wert">
+                                    <button class="es-knopf" onclick="ladeGeraeteMeldungen()">
+                                        <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                                        <span data-i18n="refresh">Aktualisieren</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!--This computer. Only in the desktop app: a plain browser
+                                has no push token, and that is not how it is used.-->
+                            <div class="es-zeile" id="desk-notify-card" style="display:none;">
+                                <details class="es-aufklapp">
+                                    <summary>
+                                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                                        <span class="es-aufklapp-titel" data-i18n="settings_desk_notify">Meldungen auf diesem Gerät</span>
+                                    </summary>
+                                    <div class="es-aufklapp-inhalt">
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name">
+                                        <span data-i18n="settings_desk_notify_hint">Gilt nur für diesen Rechner — das Telefon hat seine eigenen Schalter</span>
+                                    </div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_printer_power">Drucker Ein/Aus</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_printer_power" data-notify-key="notify_printer_power"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_print_started">Druck gestartet</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_started" data-notify-key="notify_print_started"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_milestones">Milestones (25%, 50%, 75%, 100%)</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_milestones" data-notify-key="notify_milestones"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_print_finished">Druck beendet</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_finished" data-notify-key="notify_print_finished"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_print_failed">Druck fehlgeschlagen</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_failed" data-notify-key="notify_print_failed"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_printer_error">Druckerfehler</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_hms_error" data-notify-key="notify_hms_error"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_filament_drying">Filament Trocknung</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_filament_drying" data-notify-key="notify_filament_drying"><span></span></label></div>
+                                </div>
+                                <div class="es-zeile">
+                                    <div class="es-zeile-name"><b data-i18n="settings_notify_maintenance">Wartungsmeldungen</b></div>
+                                    <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_maintenance" data-notify-key="notify_maintenance"><span></span></label></div>
+                                </div>
+                                    </div>
+                                </details>
+                            </div>
+
+                            <div class="es-block" id="geraete-meldungen-liste"></div>
+                        </div>
+                    </div>
+                    <div class="es-karte" data-requires="server" id="karte-wartungsmeldungen">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg>
+                            <span id="label-maintenance-notifications" data-i18n="settings_maintenance_notifications">Wartungsmeldungen des Druckers</span>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <b id="label-maintenance-enable" data-i18n="settings_maintenance_enable">Meldungen zeigen</b>
+                                <span data-i18n="settings_maintenance_enable_hint">Düse verschlissen, Riemen prüfen, Filter tauschen</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <label class="es-schalter"><input type="checkbox" id="maintenance_notifications_enabled"><span></span></label>
+                            </div>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <label for="maintenance_notification_frequency" id="label-maintenance-frequency" data-i18n="settings_maintenance_frequency">Wie oft</label>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <select id="maintenance_notification_frequency" class="es-auswahl">
+                                    <option value="3" data-i18n="settings_every_3h">Alle 3 Stunden</option>
+                                    <option value="6" selected data-i18n="settings_every_6h">Alle 6 Stunden</option>
+                                    <option value="12" data-i18n="settings_every_12h">Alle 12 Stunden</option>
+                                    <option value="24" data-i18n="settings_once_daily">Einmal täglich</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <label for="maintenance_notification_start_hour" id="label-maintenance-start-hour" data-i18n="settings_maintenance_start">Ab wann</label>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <select id="maintenance_notification_start_hour" class="es-auswahl">
+                                    <option value="0" selected>00:00</option>
+                                    <option value="6">06:00</option>
+                                    <option value="7">07:00</option>
+                                    <option value="8">08:00</option>
+                                    <option value="9">09:00</option>
+                                    <option value="10">10:00</option>
+                                    <option value="12">12:00</option>
+                                    <option value="14">14:00</option>
+                                    <option value="16">16:00</option>
+                                    <option value="18">18:00</option>
+                                    <option value="20">20:00</option>
+                                    <option value="21">21:00</option>
+                                    <option value="22">22:00</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="es-hinweis">
+                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
+                            <span id="maintenance-notification-info" data-i18n="settings_maintenance_info">Beispiel: alle 6 Stunden ab 00:00 meldet der Drucker um 00:00, 06:00, 12:00 und 18:00.</span>
                         </div>
                     </div>
                 </div>
-                <!-- ---------- Darstellung ---------- -->
+                <!------------ Appearance ------------>
                 <div class="es-abschnitt" id="section-darstellung">
                     <div class="es-karte">
                         <div class="es-karte-kopf">
@@ -2206,8 +2308,8 @@
                             </div>
                         </div>
 
-                        <!-- Sprache: im Direct-Modus eingeblendet, sonst versteckt.
-                             Die Sprache steht sonst auf der Benutzer-Seite. -->
+                        <!--Language: shown in Direct mode, otherwise hidden.
+                             Language otherwise lives on the user page.-->
                         <div class="es-block" id="section-language" style="display:none;">
                             <div class="es-zeile-name" style="margin-bottom:8px">
                                 <b id="lang-label" data-i18n="settings_language">Sprache</b>
@@ -2247,7 +2349,7 @@
                             <span class="section-title" style="display:none">Sprache</span>
                         </div>
 
-                        <!-- Nur in der Electron-Desktop-App sichtbar (Tray/Menueleiste) -->
+                        <!--Only visible in the Electron desktop app (tray/menu bar)-->
                         <div class="es-zeile" id="quit-behavior-group" style="display:none;">
                             <div class="es-zeile-name">
                                 <label id="label-quit-behavior" for="quit_behavior" data-i18n="settings_quit">Beim Beenden</label>
@@ -2264,52 +2366,6 @@
                     </div>
 
 
-                    <!-- Nur in der Electron-Desktop-App sichtbar. Die Schalter
-                         liegen bewusst auf DIESEM Geraet, nicht am Server: am
-                         Schreibtisch will man anderes sehen als am Telefon. -->
-                    <div class="es-karte" id="desk-notify-card" style="display:none;">
-                        <div class="es-karte-kopf">
-                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v4l-2 3h16l-2-3V9a6 6 0 0 0-6-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
-                            <span data-i18n="settings_desk_notify">Meldungen auf diesem Gerät</span>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
-                                <span data-i18n="settings_desk_notify_hint">Gilt nur für diesen Rechner — das Telefon hat seine eigenen Schalter</span>
-                            </div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_printer_power">Drucker Ein/Aus</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_printer_power" data-notify-key="notify_printer_power"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_print_started">Druck gestartet</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_started" data-notify-key="notify_print_started"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_milestones">Milestones (25%, 50%, 75%, 100%)</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_milestones" data-notify-key="notify_milestones"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_print_finished">Druck beendet</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_finished" data-notify-key="notify_print_finished"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_print_failed">Druck fehlgeschlagen</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_print_failed" data-notify-key="notify_print_failed"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_printer_error">Druckerfehler</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_hms_error" data-notify-key="notify_hms_error"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_filament_drying">Filament Trocknung</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_filament_drying" data-notify-key="notify_filament_drying"><span></span></label></div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name"><b data-i18n="settings_notify_maintenance">Wartungsmeldungen</b></div>
-                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="desk_notify_maintenance" data-notify-key="notify_maintenance"><span></span></label></div>
-                        </div>
-                    </div>
                     <div class="es-karte">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
@@ -2337,9 +2393,9 @@
                     </div>
                 </div>
 
-                <!-- ---------- Kosten ---------- -->
+                <!------------ Costs ------------>
                 <div class="es-abschnitt" id="section-kosten">
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="config_store">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15 9.5A3 3 0 0 0 12 8c-3 0-3 4 0 4s3 4 0 4a3 3 0 0 1-3-1.5M12 6.5v11"/></svg>
                             <span id="card-costs-title" data-i18n="settings_costs_title">Rechnung je Druck</span>
@@ -2369,9 +2425,9 @@
                         </div>
                     </div>
                 </div>
-                <!-- ---------- Sicherheit ---------- -->
+                <!------------ Security ------------>
                 <div class="es-abschnitt" id="section-sicherheit">
-                    <div class="es-karte">
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"/></svg>
                             <span id="card-security-title" data-i18n="settings_access">Zugriff</span>
@@ -2389,8 +2445,8 @@
                         </div>
                     </div>
 
-                    <!-- Geraete und Schluessel: eine Karte statt sechs Menuepunkten -->
-                    <div class="es-karte">
+                    <!--Devices and keys: one card instead of six menu items-->
+                    <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/></svg>
                             <span id="card-token-management-title" data-i18n="settings_devices_keys">Geräte und Schlüssel</span>
@@ -2469,11 +2525,105 @@
                     </div>
                 </div>
 
-                <!-- ---------- System & Lizenz ---------- -->
+                <!------------ System & License ------------>
+                <!--Update: server and client are two different machines with two
+                    different rules, so this gets a page and not a corner of one.-->
+                <div class="es-abschnitt" id="section-aktualisierung">
+                    <div class="es-karte" data-requires="server" id="update-karte">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                            <span data-i18n="update_title">Aktualisierung</span>
+                        </div>
+                        <div class="es-zeile" id="update-zeile-server">
+                            <div class="es-zeile-name">
+                                <b data-i18n="update_server">Server</b>
+                                <span id="update-text">—</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <span id="update-marke" class="es-marke">—</span>
+                                <button class="es-knopf" id="update-suchen" onclick="sucheUpdate()">
+                                    <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                                    <span data-i18n="update_check">Nach Update suchen</span>
+                                </button>
+                                <button class="es-knopf es-knopf--haupt" id="update-einspielen"
+                                        style="display:none" onclick="spieleUpdateEin()">
+                                    <span data-i18n="update_install">Einspielen</span>
+                                </button>
+                                <button class="es-knopf es-knopf--warn" id="update-abbrechen"
+                                        style="display:none" onclick="brichUpdateAb()">
+                                    <span data-i18n="update_cancel">Abbrechen</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="es-zeile" id="update-zeile-app" style="display:none">
+                            <div class="es-zeile-name">
+                                <b data-i18n="update_app">App</b>
+                                <span id="update-app-text">—</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <span id="update-app-marke" class="es-marke">—</span>
+                                <button class="es-knopf" id="update-app-suchen"
+                                        onclick="sucheClientUpdate()">
+                                    <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                                    <span data-i18n="update_check">Nach Update suchen</span>
+                                </button>
+                                <button class="es-knopf es-knopf--haupt" id="update-app-knopf"
+                                        style="display:none" onclick="clientUpdateTat()">
+                                    <span id="update-app-knopf-text">—</span>
+                                </button>
+                                <button class="es-knopf es-knopf--warn" id="update-app-abbrechen"
+                                        style="display:none" onclick="brichClientUpdateAb()">
+                                    <span data-i18n="update_cancel">Abbrechen</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!--The channel. One switch for everything that updates:
+                            the server, this app, the desktop app, the phone.
+                            It stood in four places before, and none of them
+                            could be changed without a rebuild.-->
+                        <div class="es-zeile" id="update-zeile-kanal">
+                            <div class="es-zeile-name">
+                                <b data-i18n="update_channel">Kanal</b>
+                                <span data-i18n="update_channel_hint">Beta bekommt Neues frueher — und Fehler frueher</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <select id="update-kanal" class="es-auswahl" onchange="setzeUpdateKanal(this.value)">
+                                    <option value="stable" data-i18n="update_channel_stable">Stabil</option>
+                                    <option value="beta" data-i18n="update_channel_beta">Beta</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--Where from. Everyone gets the published releases; the
+                            licence server is the developer's own route while
+                            something is still being tested. No falling back
+                            between the two — a client that finds nothing on
+                            GitHub stays where it is instead of knocking on a
+                            domestic line.-->
+                        <div class="es-zeile" id="update-zeile-quelle" style="display:none">
+                            <div class="es-zeile-name">
+                                <b data-i18n="update_source">Quelle</b>
+                                <span data-i18n="update_source_hint">Woher die Fassungen kommen</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <select id="update-quelle" class="es-auswahl" onchange="setzeUpdateQuelle(this.value)">
+                                    <option value="github" data-i18n="update_source_github">Veroeffentlichte Fassungen</option>
+                                    <option value="lizenzserver" data-i18n="update_source_license">Eigener Lizenzserver</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="es-abschnitt an" id="section-system">
 
-                    <!-- Zustand: Uebersicht und Systemprüfung in einer Karte -->
-                    <div class="es-karte" id="health-status-card">
+                    <!--Update: two things can be out of date, and they are
+                        not the same thing. The SERVER decides for itself when
+                        to install (only while no print is running); this app
+                        is a viewer on top of it and can update whenever. So
+                        each gets its own row, and the button asks both.-->
+
+                    <!--Status: overview and system check in one card-->
+                    <div class="es-karte" data-requires="server" id="health-status-card">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
                             <span data-i18n="settings_state">Zustand</span>
@@ -2527,8 +2677,8 @@
                             </div>
                             <div class="es-zeile-wert"><span class="es-marke" id="overview-drying-status">-</span></div>
                         </div>
-                        <!-- Werte, die die Systemprüfung fuellt, aber niemand als
-                             eigene Zeile braucht — sie stecken in den Meldungen. -->
+                        <!--Values the system check fills in but nobody needs
+                             as its own row -- they are folded into the messages.-->
                         <div style="display:none">
                             <span id="mqtt-initialized-status"></span><span id="mqtt-disconnect-code"></span>
                             <span id="mqtt-reconnect-attempts"></span><span id="mqtt-reconnect-progress"></span>
@@ -2541,7 +2691,7 @@
                         </div>
                     </div>
 
-                    <div class="es-karte" id="health-issues-card" style="display:none;">
+                    <div class="es-karte" data-requires="server" id="health-issues-card" style="display:none;">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg>
                             <span data-i18n="settings_issues">Auffälligkeiten</span>
@@ -2550,8 +2700,8 @@
                     </div>
 
                     <div class="es-raster">
-                        <!-- Lizenz -->
-                        <div class="es-karte" id="karte-lizenz">
+                        <!--License-->
+                        <div class="es-karte" data-requires="server" id="karte-lizenz">
                             <div class="es-karte-kopf">
                                 <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                 <span id="card-license-title" data-i18n="settings_license">Lizenz</span>
@@ -2580,9 +2730,9 @@
                                     <div class="es-zeile-name"><b id="license-activated-label" data-i18n="settings_license_activated">Freigeschaltet am</b></div>
                                     <div class="es-zeile-wert"><span class="es-wert" id="license-activated-value">-</span></div>
                                 </div>
-                                <!-- Seit Phase 2 verwaltet der macOS-Launcher die
-                                     Hardware-Kennung; der Server antwortet dann
-                                     "managed_by_app". Nichts zum Kopieren — Zeile weg. -->
+                                <!--The macOS launcher manages the hardware ID; the
+                                    server then responds "managed_by_app". Nothing to
+                                    copy -- so the row is gone.-->
                                 <div class="es-zeile" id="license-hwid-row" style="display:none;">
                                     <div class="es-zeile-name">
                                         <b id="license-hwid-label" data-i18n="settings_hwid">Hardware-Kennung</b>
@@ -2619,8 +2769,55 @@
                             </div>
                         </div>
 
-                        <!-- Werkzeuge: Protokoll, Tests, Rechtliches, Neustart -->
-                        <div class="es-karte" id="karte-werkzeuge">
+                        <!--Backup: download and restore-->
+                        <div class="es-karte" data-requires="server" id="karte-sicherung">
+                            <div class="es-karte-kopf">
+                                <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+                                <span data-i18n="settings_backup">Sicherung</span>
+                            </div>
+
+                            <!--Only visible while a restore is pending-->
+                            <div class="es-zeile" id="sicherung-aussteht" style="display:none">
+                                <div class="es-zeile-name">
+                                    <b id="sicherung-aussteht-text" data-i18n="settings_backup_pending">Eine Sicherung liegt bereit und wird beim nächsten Serverstart übernommen.</b>
+                                    <span id="sicherung-aussteht-details"></span>
+                                </div>
+                                <div class="es-zeile-wert">
+                                    <button class="es-knopf es-knopf--warn" onclick="sicherungVerwerfen()" data-i18n="settings_backup_discard">Verwerfen</button>
+                                </div>
+                            </div>
+
+                            <div class="es-block">
+                                <div class="es-zeile-name" style="margin-bottom:8px">
+                                    <label for="sicherung-passwort" data-i18n="settings_backup_create">Sicherung herunterladen</label>
+                                    <span data-i18n="settings_backup_create_hint">Druckhistorie und alle Einstellungen als eine Datei</span>
+                                </div>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                    <input type="password" id="sicherung-passwort" autocomplete="new-password"
+                                           data-i18n-placeholder="settings_backup_pw" placeholder="Passwort für die Zugangsdaten"
+                                           style="flex:1; min-width:200px;">
+                                    <button class="es-knopf" id="btn-sicherung-erstellen" onclick="sicherungErstellen()" data-i18n="settings_backup_download">Herunterladen</button>
+                                </div>
+                                <span class="es-wert--matt" style="display:block; margin-top:6px" data-i18n="settings_backup_pw_hint">Schützt Drucker-Zugangscode, Meross-Passwort und HA-Token in der Datei. Leer lassen heißt: diese drei kommen nicht mit.</span>
+                            </div>
+
+                            <div class="es-block">
+                                <div class="es-zeile-name" style="margin-bottom:8px">
+                                    <label for="sicherung-datei" data-i18n="settings_backup_restore">Sicherung einspielen</label>
+                                    <span data-i18n="settings_backup_restore_hint">Wird beim nächsten Serverstart übernommen. Der bisherige Stand bleibt daneben liegen.</span>
+                                </div>
+                                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                    <input type="file" id="sicherung-datei" accept=".zip" style="flex:1; min-width:200px;">
+                                    <input type="password" id="sicherung-passwort-ein" autocomplete="new-password"
+                                           data-i18n-placeholder="settings_backup_pw" placeholder="Passwort für die Zugangsdaten"
+                                           style="flex:1; min-width:180px;">
+                                    <button class="es-knopf" id="btn-sicherung-einspielen" onclick="sicherungEinspielen()" data-i18n="settings_backup_apply">Einspielen</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Tools: log, tests, legal, restart-->
+                        <div class="es-karte" data-requires="server" id="karte-werkzeuge">
                             <div class="es-karte-kopf">
                                 <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
                                 <span id="card-debug-title" data-i18n="settings_tools">Werkzeuge</span>
@@ -2689,7 +2886,7 @@
                     </div>
                 </div>
 
-                <!-- ---------- Rechtliches (aus Werkzeuge geoeffnet) ---------- -->
+                <!------------ Legal (opened from Tools) ------------>
                 <div class="es-abschnitt" id="section-rechtliches">
                     <div class="es-karte">
                         <div class="es-karte-kopf">
@@ -2724,7 +2921,7 @@
             </div>
         </div>
 
-        <!-- Speicherleiste: erscheint erst, wenn etwas geaendert wurde -->
+        <!--Save bar: only appears once something has changed-->
         <div class="es-fuss" id="es-fuss">
             <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>
             <span id="es-fuss-text" data-i18n="settings_unsaved">Änderungen noch nicht gespeichert</span>
@@ -2744,13 +2941,14 @@
     <script src="/static/js/modules/tab-bar-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
     <script src="/static/js/modules/legal-data.js"></script>
-    <script src="/static/js/modules/benachrichtigungen-liste.js"></script>
+    <script src="/static/js/modules/device-names.js"></script>
+    <script src="/static/js/modules/notification-list.js"></script>
 
     <script src="/static/js/modules/confirm-dialog.js"></script>
     <script src="/static/auth-handler.js"></script>
-    <!-- Socket.IO für WebSocket Notifications -->
+    <!--Socket.IO for WebSocket notifications-->
     <script src="/static/socket.io.js"></script>
-    <!-- Sprachinitialisierung -->
+    <!--Language initialization-->
     <script>
         // Global variables for translations
         let hasUnsavedChanges = false;
@@ -2767,11 +2965,94 @@
         const texts = translationsMap[currentLang] || translationsMap['en'] || {};
 
         // Helper: Safe access to translations
+        // Own escaper: the `esc` further down in this file is defined
+        // INSIDE other functions and isn't visible here.
+        function dsEsc(t) {
+            return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+                return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;',
+                          '"': '&quot;', "'": '&#39;' })[c];
+            });
+        }
+
+        // ==================== Printers on the network ====================
+        //
+        // Printers broadcast unsolicited SSDP announcements (port 2021, not
+        // 1900) with serial number, model, name, and current address. The
+        // server listens; this only shows what it has heard.
+        //
+        // Nothing is applied automatically: which address is used is the
+        // user's decision. The one exception lives in the server and isn't
+        // a decision but a repair — if the configured address stops
+        // responding, the MQTT connection follows the serial number to
+        // wherever it is now announcing itself.
+        async function druckerSucheLaden() {
+            const ziel = document.getElementById('drucker-suche-liste');
+            if (!ziel) return;
+            try {
+                const r = await apiCall('/api/drucker/suche');
+                const j = await r.json();
+                ziel.innerHTML = druckerSucheHtml(j.drucker || []);
+            } catch (e) {
+                ziel.innerHTML = '';
+            }
+        }
+
+        function druckerSucheHtml(liste) {
+            if (!liste.length) {
+                return '<div class="es-zeile"><div class="es-zeile-name">'
+                     + '<span class="es-wert--matt">'
+                     + dsEsc(getText('settings_discovery_none', 'Noch kein Drucker gemeldet'))
+                     + '</span></div></div>';
+            }
+            return liste.map(function (d) {
+                const name = d.name || d.seriennummer;
+                const marke = d.ist_eingerichtet
+                    ? ' <b>(' + dsEsc(getText('settings_discovery_current', 'eingerichtet')) + ')</b>'
+                    : '';
+                // The configured printer showing up under a DIFFERENT
+                // address is exactly the case this handles.
+                const abweichung = d.adresse_weicht_ab
+                    ? '<span class="es-wert--matt">'
+                      + dsEsc(getText('settings_discovery_moved',
+                                    'Meldet sich jetzt unter einer anderen Adresse.'))
+                      + '</span>'
+                    : '<span class="es-wert--matt">'
+                      + dsEsc(getText('settings_discovery_seen', 'vor {n} s gemeldet')
+                            .replace('{n}', Math.round(d.vor_sekunden)))
+                      + '</span>';
+                return '<div class="es-zeile">'
+                     + '<div class="es-zeile-name"><b>' + dsEsc(name) + ' · '
+                     + dsEsc(d.modell) + ' · ' + dsEsc(d.ip) + '</b>' + marke
+                     + abweichung + '</div>'
+                     + '<div class="es-zeile-wert"><button class="es-knopf'
+                     + (d.adresse_weicht_ab ? ' es-knopf--haupt' : '') + '" '
+                     + 'onclick="druckerUebernehmen(' + JSON.stringify(d.ip).replace(/"/g, '&quot;')
+                     + ',' + JSON.stringify(d.seriennummer).replace(/"/g, '&quot;') + ')" '
+                     + 'data-i18n="settings_discovery_apply">'
+                     + dsEsc(getText('settings_discovery_apply', 'Übernehmen'))
+                     + '</button></div></div>';
+            }).join('');
+        }
+
+        // Only fills the fields. As always, saving only happens via the
+        // Save button — a click here shouldn't change anything the user
+        // hasn't seen yet.
+        function druckerUebernehmen(ip, seriennummer) {
+            const feldIp = document.getElementById('bambu_ip');
+            const feldSerie = document.getElementById('bambu_serial');
+            if (feldIp) feldIp.value = ip;
+            if (feldSerie && seriennummer) feldSerie.value = seriennummer;
+            if (window.skToast) {
+                window.skToast(getText('settings_discovery_taken',
+                                       'Eingetragen — noch nicht gespeichert.'), 'info');
+            }
+        }
+
         function getText(key, fallback = '') {
             return texts && texts[key] ? texts[key] : fallback;
         }
 
-        // Translations werden im DOMContentLoaded Event angewendet (siehe unten)
+        // Translations are applied in the DOMContentLoaded event (see below)
     </script>
     <script>
 
@@ -2795,9 +3076,10 @@
             if (sectionId === 'meldungen' && typeof loadNotificationsUI === 'function') {
                 loadNotificationsUI();
             }
-            // The companion only exists in Klipper direct mode. In Bambu
-            // mode the card is hidden and /api/companion/status answers 404.
-            if (sectionId === 'verbindung' && typeof ladeAngeschlossen === 'function') {
+            // "Angeschlossen" sits on the device page, not on the
+            // connection page — it is about what the printer has, not about
+            // how we reach it.
+            if (sectionId === 'drucker' && typeof ladeAngeschlossen === 'function') {
                 ladeAngeschlossen();
             }
             if (sectionId === 'verbindung' && typeof cloudStand === 'function') cloudStand();
@@ -2813,6 +3095,7 @@
             if (sectionId === 'system' && typeof loadHealthStatus === 'function') {
                 loadHealthStatus();
             }
+            if (sectionId === 'aktualisierung') ladeUpdateStand();
             // The printer camera state is only polled while someone is
             // looking — otherwise a request would run every five seconds.
             if (typeof startBambuStatusRefresh === 'function') {
@@ -2830,7 +3113,7 @@
         // ===== "Am Drucker" ==================================================
         // Settings that live in the printer, not in the app — the same ones
         // as on its display. The server decodes them out of the MQTT bit
-        // fields (services/ueberwachung.py) and delivers them under
+        // fields (services/print_detections.py) and delivers them under
         // device_report.monitoring and device_report.printer_settings,
         // each entry with a support flag.
         //
@@ -3150,15 +3433,16 @@
                  + edPaKarte();
         }
 
-        // --- Druckvorschub (PA) --------------------------------------------
+        // --- Pressure Advance (PA) --------------------------------------------
         //
-        // Der Drucker fuehrt seine PA-Profile je Kombination aus Filament UND
-        // Duese — bei zwei Duesen also zwei Saetze je Rolle. Was gerade gilt,
-        // steht am Fach als cali_idx; ist dort keins hinterlegt, druckt er mit
-        // Bambus festem Standardwert, und den gibt er nicht heraus.
+        // The printer keeps its PA profiles per combination of filament AND
+        // nozzle — so with two nozzles, two sets per spool. Which one is
+        // currently active is stored on the slot as cali_idx; if none is
+        // set there, it prints with Bambu's fixed default value, which it
+        // doesn't expose.
         //
-        // Nur Anzeige: Messen kostet einen echten Druck, das gehoert nicht
-        // hinter einen Schalter in den Einstellungen.
+        // Display only: measuring costs a real print, so it doesn't belong
+        // behind a toggle in settings.
         let edPaStand = null;
 
         function edPaKarte() {
@@ -3169,12 +3453,12 @@
                 const name = a.standard
                     ? edText('settings_pa_default', 'Standardwert')
                     : (a.name || edText('settings_pa_own', 'Eigenes Profil'));
-                // Kein Messen-Knopf: der X2D lehnt den eigenstaendigen
-                // Kalibrierlauf ab ("Unsupport", 29aug26 dreimal geprueft —
-                // beide Befehlsformen, mit geladenem Filament, mit seiner
-                // eigenen Fachnummer). Er kalibriert nur waehrend eines
-                // Drucks, ueber die Fluss-Kalibrierung im Druckdialog.
-                // Die Route bleibt bestehen, falls andere Modelle es koennen.
+                // No measure button: the X2D rejects the standalone
+                // calibration run ("Unsupported" — verified across both
+                // command forms, with filament loaded, and with its own
+                // slot number). It only calibrates during a print, via
+                // flow calibration in the print dialog. This route stays
+                // in place in case other models support it.
                 const knopf = '';
                 return {
                     name: (f.material || '?') + ' · ' + (f.duese || '?'),
@@ -3184,11 +3468,11 @@
                     bedienung: '<span class="es-wert">' + wert + '</span>' + knopf,
                 };
             });
-            // Ein Lauf laesst sein Ergebnis im Drucker liegen, bis es
-            // uebernommen wird — egal, wer ihn gestartet hat. Bei einem
-            // Drucker, der keinen eigenen Lauf annimmt, ist das der Weg:
-            // Fluss-Kalibrierung im Druckdialog einschalten, danach hier
-            // abholen.
+            // A run leaves its result on the printer until it's applied —
+            // no matter who started it. For a printer that won't accept
+            // a standalone run of its own, this is the way: enable flow
+            // calibration in the print dialog, then fetch the result
+            // here.
             if ((edPaStand.faecher || []).length) {
                 zeilen.push({
                     name: edText('settings_pa_result', 'Ergebnis abholen'),
@@ -3252,7 +3536,7 @@
                     edText('settings_pa_no_result', 'Kein Ergebnis hinterlegt'), 'info');
                 return;
             }
-            // Erster Eintrag: der Lauf misst ein Fach auf einmal.
+            // First entry: the run measures one slot at a time.
             const e = liste[0];
             const k = Number(e.k_value), n = Number(e.n_coef || 0);
             const fach = (edPaStand.faecher || [])[0] || {};
@@ -3290,7 +3574,7 @@
                 if (!antwort.ok) return;
                 edPaStand = await antwort.json();
                 if (edBereich === 'ams') edZeichne();
-            } catch (e) { /* Drucker aus oder Abfrage nicht beantwortet */ }
+            } catch (e) { /* printer off, or the query went unanswered */ }
         }
 
         function edGeraet(einst) {
@@ -3467,8 +3751,8 @@
                     bedienung: edSchalterHtml(an, 'edDruckAblage(this.checked)'),
                 });
             }
-            // Wohin die Timelapse geht. Nur angezeigt, nicht geschaltet:
-            // gelesen ist das Bit gemessen, geschrieben waere es geraten.
+            // Where the timelapse goes. Display only, not a toggle:
+            // reading the bit is measuring it, writing it would be guessing.
             if (einst.timelapse_intern) {
                 const intern = !!einst.timelapse_intern.on;
                 zeilen.push({
@@ -3605,10 +3889,9 @@
                     g.software, g.neu || edNeueFassung(fw, g.name)));
             });
 
-            // Liegt eine Aktualisierung bereit, laesst sie sich hier auch
-            // starten. Bis heute konnten wir sie nur anzeigen. Zwei Faelle:
-            // fragt der Drucker nach zusammenpassenden Versionen, muss das
-            // zuerst bestaetigt werden — sonst die Aktualisierung selbst.
+            // If an update is ready, it can also be started here. Two
+            // cases: if the printer asks for matching versions, that must
+            // be confirmed first — otherwise, the update itself.
             const stand = (edStand || {});
             const wartet = (fw.geraete || []).some(g => g.neu) || !!fw.neu;
             const konsistenz = !!stand.upgrade_consistency_request;
@@ -3669,8 +3952,8 @@
             }
             if (edBereich === 'ueberwachung') ziel.innerHTML = edUeberwachung(mon, erk);
             else if (edBereich === 'ams') {
-                // Die PA-Tabelle liegt im Drucker, nicht im Status — einmal
-                // holen, wenn dieser Bereich zum ersten Mal gezeigt wird.
+                // The PA table lives on the printer, not in status — fetch
+                // it once, when this section is shown for the first time.
                 if (edPaStand === null && edLive) { edPaStand = {}; edPaLaden(); }
                 ziel.innerHTML = edAms(einst);
             }
@@ -3964,9 +4247,9 @@
             edAktion('start_calibration_run', { name: name });
         }
 
-        // Suche: filtert das Verzeichnis und die Zeilen des offenen
-        // Abschnitts. Bei elf Abschnitten weiss man trotzdem nicht
-        // auswendig, wo "Nach dem Druck ausschalten" steht.
+        // Search: filters the directory and the rows of the open
+        // section. Even with eleven sections, you still won't remember
+        // by heart where "Turn off after print" lives.
         function esSuchen(q) {
             q = (q || '').trim().toLowerCase();
             document.querySelectorAll('.es-verz-eintrag').forEach(b => {
@@ -3992,18 +4275,16 @@
             if (sidebar) sidebar.classList.toggle('mobile-open');
         }
 
-        // Dark Mode Toggle (für Kompatibilität mit altem Code)
+        // Dark mode toggle (for compatibility with old code)
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
-            // Nutze neues Theme System
             const isDark = document.body.classList.contains('dark-mode');
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            // Entferne altes darkMode flag
             localStorage.removeItem('darkMode');
         }
 
-        // Offene Aenderungen: Leiste unten ein- oder ausblenden. Vorher ein
-        // runder Knopf unten rechts, der nicht sagte, was offen ist.
+        // Unsaved changes: show or hide the bottom bar — this states what's
+        // actually open, unlike an icon-only button would.
         function esFussZeigen(an) {
             const f = document.getElementById('es-fuss');
             if (f) f.classList.toggle('an', !!an);
@@ -4014,14 +4295,13 @@
             esFussZeigen(true);
         }
 
-        // Dark Mode beim Laden anwenden
+        // Apply dark mode on load
         function applyStoredTheme() {
-            // Migration: Altes darkMode System zu neuem Theme System
+            // Migration: old darkMode system to new theme system
             const oldDarkMode = localStorage.getItem('darkMode');
             let theme = localStorage.getItem('theme');
 
             if (!theme && oldDarkMode !== null) {
-                // Migriere altes System
                 theme = oldDarkMode === 'true' ? 'dark' : 'light';
                 localStorage.setItem('theme', theme);
                 localStorage.removeItem('darkMode');
@@ -4052,7 +4332,6 @@
             }
         }
 
-        // Theme beim Laden anwenden
         applyStoredTheme();
 
         // System Theme Changes listener
@@ -4070,15 +4349,15 @@
         }
 
         // ===== Printer Gallery (Swipe Cards) =====
-        // Modellwahl: Zusammenfassung + Raster zum Aufklappen.
+        // Model selection: summary + grid to expand.
         //
-        // Vorher lagen die 13 Modelle in einem waagerechten Streifen, den man
-        // mit gedrueckter Maustaste ziehen musste — am Schreibtisch ohne
-        // Wischgeste kam man an die hinteren Modelle sonst nicht heran.
-        // Die Modelle kommen vom Server (/api/printer/models) — eine Liste
-        // fuer alle Oberflaechen. Bis 26aug26 standen sie hier als festes
-        // HTML, in Android, in iOS und zweimal in der macOS-App; die
-        // Schreibweisen liefen auseinander und der A2L fehlte ueberall.
+        // A grid instead of a horizontal strip you'd have to drag with the
+        // mouse held down — on desktop, without a swipe gesture, that was
+        // the only way to reach the models further back.
+        // The models come from the server (/api/printer/models) — one list
+        // for all surfaces, instead of separate hardcoded copies in
+        // Android, iOS, and twice in the macOS app, which drifted out of
+        // sync and were missing the A2L everywhere.
         let galerieBereit = null;
 
         function modellMerkmale(m) {
@@ -4130,8 +4409,8 @@
                     else zeigeGewaehltesModell();
                 })
                 .catch(err => {
-                    // Ohne Liste keine erfundenen Karten — die Auswahl bleibt
-                    // leer und sagt das auch.
+                    // No list means no made-up cards — the selection stays
+                    // empty and says so.
                     console.error('Modell-Liste nicht ladbar:', err);
                     gallery.innerHTML = '<div class="printer-card-specs">'
                         + getText('settings_models_unavailable', getText('set_models_unavailable', 'Modell-Liste nicht verfügbar'))
@@ -4160,7 +4439,7 @@
             zeigeGewaehltesModell();
         }
 
-        // Raster auf- oder zuklappen. Ohne Argument umschalten.
+        // Expand or collapse the grid. Toggles when called without an argument.
         function modellAuswahlUmschalten(auf) {
             const raster = document.getElementById('modell-auswahl');
             if (!raster) return;
@@ -4176,7 +4455,7 @@
             }
         }
 
-        // Zusammenfassung aus der gewaehlten Karte fuellen.
+        // Fill the summary from the selected card.
         function zeigeGewaehltesModell() {
             const gallery = document.getElementById('printer-gallery');
             if (!gallery) return;
@@ -4195,7 +4474,7 @@
         function updatePrinterGallery(modelId) {
             const gallery = document.getElementById('printer-gallery');
             if (!gallery) return;
-            // Beim Laden der Config kann die Liste noch unterwegs sein.
+            // The list may still be loading while the config is being loaded.
             if (galerieBereit && !gallery.querySelector('.printer-card')) {
                 galerieBereit.then(() => updatePrinterGallery(modelId));
                 return;
@@ -4208,9 +4487,9 @@
             }
         }
 
-        // Drucker-Typ-Toggle: blendet Bambu- vs Klipper-Felder ein/aus.
-        // Single-Printer-Modus — die App zeigt einen Drucker auf einmal,
-        // also genau einen Block sichtbar.
+        // Printer type toggle: shows/hides Bambu vs Klipper fields.
+        // Single-printer mode — the app shows one printer at a time, so
+        // exactly one block is visible.
         function applyPrinterTypeVisibility(type) {
             const bambu = document.getElementById('printer-fields-bambu');
             const klipper = document.getElementById('printer-fields-klipper');
@@ -4230,11 +4509,11 @@
         });
 
         // Load Settings from Server
-        // Hinweiszeile unter dem Nur-LAN-Schalter: sagt, was der aktuelle
-        // Zustand bedeutet — an und aus haben unterschiedliche Konsequenzen.
-        // Zuletzt vom Server gemeldeter Zustand des lokalen Weges
-        // (lan_ready / lan_ip / key_ready). Steht hier, damit die
-        // Hinweiszeile ihn auch beim Umlegen des Schalters noch kennt.
+        // Hint line under the local-network-only switch: explains what
+        // the current state means — on and off have different
+        // consequences. Last state of the local path reported by the
+        // server (lan_ready / lan_ip / key_ready). Stored here so the
+        // hint line still knows it even after the switch is flipped.
         var merossBrueckenStand = {};
 
         function updateMerossLanHint() {
@@ -4242,9 +4521,9 @@
             var sw = document.getElementById('meross_lan_only');
             var lbl = document.getElementById('label-meross-lan-only');
             if (!el || !sw) return;
-            // Das Label benennt den AKTUELLEN Modus, nicht die Option — sonst
-            // liest man bei ausgeschaltetem Schalter "Nur lokales Netz" und
-            // haelt das faelschlich fuer den Ist-Zustand.
+            // The label names the CURRENT mode, not the option — otherwise,
+            // with the switch off, you'd read "Local network only" and
+            // mistake it for the actual state.
             if (lbl) {
                 lbl.textContent = sw.checked
                     ? getText('meross_mode_lan', 'Local network only (no cloud)')
@@ -4254,8 +4533,8 @@
                 ? getText('meross_lan_only_on', 'The socket is switched directly on the network only; the Meross cloud is never contacted.')
                 : getText('meross_lan_only_off', 'Switching is tried locally first; if that fails, the cloud takes over.');
 
-            // Dazu, woran der lokale Weg gerade steht. Ohne das raet man,
-            // warum "nur lokal" nichts schaltet.
+            // Also shows where the local path currently stands. Without
+            // this, it's a guess why "local only" isn't switching anything.
             var b = merossBrueckenStand || {};
             if (b.lan_ip_manual) {
                 text += ' ' + getText('meross_lan_manual', 'Address entered by hand: {ip}.')
@@ -4281,6 +4560,18 @@
                 }
                 const config = await response.json();
                 populateFields(config);
+                const kanal = document.getElementById('update-kanal');
+                if (kanal) kanal.value = (config.update && config.update.channel) || 'stable';
+                const quelle = document.getElementById('update-quelle');
+                if (quelle) quelle.value = (config.update && config.update.source) || 'github';
+                // The row only where the server says it belongs: the other
+                // route leads to the developer's licence server, and an
+                // installation out there has no business asking for it.
+                const quelleZeile = document.getElementById('update-zeile-quelle');
+                if (quelleZeile) {
+                    quelleZeile.style.display =
+                        (config.update && config.update.source_switch) ? '' : 'none';
+                }
             } catch (error) {
                 console.error('Error loading settings:', error);
                 showError(texts.error_loading_settings || 'Error loading settings');
@@ -4364,7 +4655,7 @@
             // Update Overview
             updateOverview(config);
 
-            // Drucker-Typ-Toggle (Multi-Printer Phase 3)
+            // The printer type toggle (multi-printer phase 3)
             const activeType = config.active_printer_type || 'bambu';
             const typeRadio = document.getElementById('active_printer_type_' + activeType);
             if (typeRadio) typeRadio.checked = true;
@@ -4384,9 +4675,10 @@
                 document.getElementById('maintenance_notifications_enabled').checked = config.mqtt.maintenance_notifications?.enabled !== false;
                 document.getElementById('maintenance_notification_frequency').value = config.mqtt.maintenance_notifications?.frequency || 6;
                 document.getElementById('maintenance_notification_start_hour').value = config.mqtt.maintenance_notifications?.start_hour || 0;
+                druckerSucheLaden();
             }
 
-            // Klipper-Drucker (Single-Printer-Modus: erster Eintrag)
+            // The Klipper printer (in single-printer mode: the first entry)
             const klipperList = config.klipper_printers || [];
             const klipperFirst = klipperList[0] || {};
             document.getElementById('klipper_id').value = klipperFirst.id || '';
@@ -4430,8 +4722,8 @@
                 document.getElementById('print_timelapse').checked = config.print_defaults.timelapse !== false;
                 document.getElementById('print_use_ams').checked = config.print_defaults.use_ams !== false;
                 document.getElementById('print_layer_inspect').checked = config.print_defaults.layer_inspect !== false;
-                // Dreistufig. Alte Einstellungen kennen nur das Haekchen —
-                // daraus ableiten, damit nichts verlorengeht.
+                // Three stages. Older settings only know the tick -- derive it
+                // from that so nothing is lost.
                 const stufe = (wert, haken, wennAn) =>
                     [0, 1, 2].includes(wert) ? wert : (haken ? wennAn : 0);
                 document.getElementById('print_bed_leveling_mode').value = String(
@@ -4461,7 +4753,7 @@
                 document.getElementById('ha_token').value = config.homeassistant.token || '';
             }
 
-            // Steckdosen-Wahl aufbauen: gespeicherte UUID zeigen, Geraete auf Knopfdruck holen.
+            // Build the socket picker: show the stored UUID, fetch the devices on a button press.
             function bereiteSteckdosenWahlVor(meross) {
                 var gruppe = document.getElementById('meross-plug-group');
                 var wahl = document.getElementById('meross_device_uuid');
@@ -4484,14 +4776,15 @@
                 knopf.addEventListener('click', function () {
                     var hinweis = document.getElementById('meross-plug-msg');
                     if (hinweis) hinweis.textContent = getText('set_loading_devices', 'Lade Geräte …');
-                    // Zugangsdaten mitschicken: der Bambu-Server ignoriert sie und
-                    // nutzt die laufende Verbindung, der Klipper-Direkt-Endpunkt
-                    // braucht sie. So passt EIN Aufruf auf beide Betriebsarten.
+                    // Send credentials along: the Bambu server ignores them
+                    // and uses the active connection, while the
+                    // Klipper-direct endpoint needs them. This way ONE call
+                    // works for both operating modes.
                     //
-                    // ueber apiCall, nicht ueber fetch: der Server verlangt bei
-                    // POST einen CSRF-Token, und den setzt nur apiCall. Im
-                    // Klipper-Direkt-Modus gibt es apiCall nicht — dort bleibt
-                    // fetch, dort gibt es auch keine CSRF-Pruefung.
+                    // Via apiCall, not fetch: the server requires a CSRF
+                    // token on POST, and only apiCall sets one. In
+                    // Klipper-direct mode there is no apiCall — fetch stays
+                    // there, and there's no CSRF check there either.
                     var anfrage = {
                         method: 'POST', credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/json' },
@@ -4528,19 +4821,20 @@
                 document.getElementById('meross_password').value = config.meross.password || '';
                 document.getElementById('meross_device').value = config.meross.device_name || '';
                 document.getElementById('meross_region').value = config.meross.region || 'eu';
-                // Nur-LAN: der Schalter steht immer da. Ihn zu verstecken,
-                // solange die Dose noch nicht im Netz gefunden wurde, hiess
-                // warten auf eine Suche, die erst beim naechsten Schalten
-                // laeuft — man haette die Einstellung nie zu Gesicht bekommen.
-                // Woran es gerade hakt, sagt die Zeile darunter.
+                // Local-only: the switch is always shown. Hiding it until
+                // the socket has been found on the network would mean
+                // waiting for a search that only runs on the next switch —
+                // the setting would never be seen at all.
+                // The line below explains what's currently blocking it.
                 merossBrueckenStand = config.meross.bridge || {};
                 document.getElementById('meross_lan_only').checked = !!config.meross.lan_only;
                 document.getElementById('meross_lan_ip').value = config.meross.lan_ip || '';
                 document.getElementById('meross_lan_only').onchange = updateMerossLanHint;
                 updateMerossLanHint();
-                // Steckdosen-Wahl: der Name aendert sich beim Umbenennen, die
-                // UUID nie. Ohne eindeutige Wahl griff die App bei mehreren
-                // Dosen am Konto zur erstbesten.
+                // Socket selection: the name changes on rename, the UUID
+                // never does. Without an unambiguous choice, the app would
+                // fall back to the first one when the account has multiple
+                // sockets.
                 bereiteSteckdosenWahlVor(config.meross);
             }
 
@@ -4553,7 +4847,7 @@
             if (config.ui) {
                 document.getElementById('default_camera_size').value = config.ui.default_camera_size || 2;
 
-                // Card Visibility (default: alle sichtbar)
+                // Card visibility (default: all visible)
                 const cardVis = config.ui.card_visibility || {};
                 document.getElementById('card_camera_visible').checked = cardVis.camera !== false;
                 document.getElementById('card_progress_visible').checked = cardVis.progress !== false;
@@ -4593,7 +4887,7 @@
                 }
             });
 
-            // Nach dem Laden: Initial State speichern für Change Detection
+            // After loading: store the initial state for the change detection
             setTimeout(() => {
                 captureInitialState();
                 initializeChangeTracking();
@@ -4602,22 +4896,22 @@
 
         // ===== UNSAVED CHANGES TRACKING =====
 
-        // Erfasse den initialen Zustand aller Form-Felder
+        // Capture the initial state of every form field
         function captureInitialState() {
             initialFormState = getCurrentFormState();
             console.log('📸 Initial form state captured');
         }
 
-        // Hole den aktuellen Zustand aller Form-Felder
+        // Fetch the current state of every form field
         function getCurrentFormState() {
             const state = {};
 
-            // Alle Input-Felder
+            // Every input field
             document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="number"]').forEach(input => {
                 if (input.id) state[input.id] = input.value;
             });
 
-            // Alle Checkboxen
+            // Every checkbox
             document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 if (checkbox.id) state[checkbox.id] = checkbox.checked;
             });
@@ -4635,13 +4929,13 @@
             return state;
         }
 
-        // Prüfe ob es Änderungen gibt
+        // Check whether anything changed
         function checkForChanges() {
             if (!initialFormState) return false;
 
             const currentState = getCurrentFormState();
 
-            // Vergleiche alle Felder
+            // Compare every field
             for (const key in currentState) {
                 if (currentState[key] !== initialFormState[key]) {
                     return true;
@@ -4651,7 +4945,7 @@
             return false;
         }
 
-        // Update UI basierend auf Änderungen
+        // Update the UI from the changes
         function updateUnsavedChangesUI() {
             const hasChanges = checkForChanges();
 
@@ -4662,7 +4956,7 @@
             }
         }
 
-        // Initialisiere Change Tracking für alle Form-Elemente
+        // Initialise the change tracking for every form element
         function initializeChangeTracking() {
             // Text/Number/Password Inputs
             document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], input[type="number"]').forEach(input => {
@@ -4690,9 +4984,9 @@
 
         // Save Settings to Server
         async function saveSettings() {
-            // Drucker-Typ + Klipper-Felder: nur befuellen wenn "klipper"
-            // aktiv ist, sonst klipper_printers als leere Liste senden
-            // (sodass eine Umstellung Bambu->Klipper->Bambu sauber leert).
+            // Printer type + Klipper fields: only fill in when "klipper"
+            // is active, otherwise send klipper_printers as an empty list
+            // (so switching Bambu->Klipper->Bambu cleanly clears it).
             const activeTypeEl = document.querySelector('input[name="active_printer_type"]:checked');
             const activeType = activeTypeEl ? activeTypeEl.value : 'bambu';
             const klipperList = [];
@@ -4755,8 +5049,8 @@
                     bed_leveling_mode: parseInt(document.getElementById('print_bed_leveling_mode').value, 10),
                     flow_cali_mode: parseInt(document.getElementById('print_flow_cali_mode').value, 10),
                     nozzle_offset_mode: parseInt(document.getElementById('print_nozzle_offset_mode').value, 10),
-                    // Die alten Haekchen bleiben im Gleichklang, damit aeltere
-                    // Clients (und der Zeitplaner) weiter damit rechnen koennen.
+                    // The old checkboxes are kept in sync so that older
+                    // clients (and the scheduler) can still rely on them.
                     bed_leveling: document.getElementById('print_bed_leveling_mode').value !== '0',
                     flow_cali: document.getElementById('print_flow_cali_mode').value !== '0',
                     vibration_cali: document.getElementById('print_vibration_cali').checked
@@ -4819,7 +5113,7 @@
                 if (response.ok) {
                     showSuccess(texts.settings_saved_msg || 'Settings saved successfully!');
 
-                    // Nach erfolgreichem Speichern: Initial State neu erfassen
+                    // After a successful save: capture the initial state again
                     captureInitialState();
                     hasUnsavedChanges = false;
 
@@ -4849,6 +5143,129 @@
         }
 
         // Restart Server
+        // ── Backup ──────────────────────────────────────────────────
+        //
+        // The password ALWAYS goes in the request body, never in the
+        // address: a URL ends up in the server log, in history, and in
+        // the referrer.
+
+        async function sicherungErstellen() {
+            const knopf = document.getElementById('btn-sicherung-erstellen');
+            const pw = document.getElementById('sicherung-passwort').value || '';
+            const alt = knopf.textContent;
+            knopf.disabled = true;
+            knopf.textContent = texts.settings_backup_running || 'Wird erstellt …';
+            try {
+                const antwort = await fetch('/api/sicherung/erstellen', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ passwort: pw })
+                });
+                if (!antwort.ok) {
+                    showError((await antwort.json().catch(() => ({}))).error
+                              || texts.set_error || 'Fehler');
+                    return;
+                }
+                const blob = await antwort.blob();
+                // The browser takes the name from Content-Disposition if
+                // we don't set it ourselves — the server knows the timestamp.
+                const zuordnung = antwort.headers.get('Content-Disposition') || '';
+                const treffer = zuordnung.match(/filename="?([^";]+)"?/);
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = treffer ? treffer[1] : 'dashboard-sicherung.zip';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+
+                const geheim = antwort.headers.get('X-Sicherung-Geheim') || '0';
+                const verschl = antwort.headers.get('X-Sicherung-Verschluesselt') === '1';
+                let text = texts.settings_backup_done || 'Sicherung erstellt';
+                if (geheim !== '0' && !verschl) {
+                    text += ' — ' + (texts.settings_backup_pw_hint || '');
+                }
+                showSuccess(text);
+                // The license is never included. That should be stated,
+                // not left unsaid.
+                window.skToast && window.skToast(
+                    texts.settings_backup_nolicense || '', 'info');
+            } catch (e) {
+                showError(String(e));
+            } finally {
+                knopf.disabled = false;
+                knopf.textContent = alt;
+            }
+        }
+
+        async function sicherungEinspielen() {
+            const feld = document.getElementById('sicherung-datei');
+            if (!feld.files || !feld.files.length) {
+                showError(texts.settings_backup_nofile || 'Bitte erst eine Datei wählen.');
+                return;
+            }
+            const knopf = document.getElementById('btn-sicherung-einspielen');
+            const alt = knopf.textContent;
+            knopf.disabled = true;
+            try {
+                const paket = new FormData();
+                paket.append('datei', feld.files[0]);
+                paket.append('passwort',
+                    document.getElementById('sicherung-passwort-ein').value || '');
+                const antwort = await fetch('/api/sicherung/einspielen', {
+                    method: 'POST', credentials: 'same-origin', body: paket
+                });
+                const e = await antwort.json();
+                if (!e.ok) {
+                    showError(e.fehler || texts.set_error || 'Fehler');
+                    return;
+                }
+                showSuccess(texts.settings_backup_staged || 'Sicherung liegt bereit');
+                if (e.hinweis) window.skToast && window.skToast(e.hinweis, 'info');
+                feld.value = '';
+                document.getElementById('sicherung-passwort-ein').value = '';
+                await sicherungStand();
+            } catch (err) {
+                showError(String(err));
+            } finally {
+                knopf.disabled = false;
+                knopf.textContent = alt;
+            }
+        }
+
+        async function sicherungStand() {
+            try {
+                const antwort = await fetch('/api/sicherung/stand',
+                                            { credentials: 'same-origin' });
+                if (!antwort.ok) return;
+                const { steht_aus } = await antwort.json();
+                const zeile = document.getElementById('sicherung-aussteht');
+                if (!zeile) return;
+                zeile.style.display = steht_aus ? '' : 'none';
+                if (steht_aus) {
+                    const d = document.getElementById('sicherung-aussteht-details');
+                    if (d) d.textContent = [steht_aus.aus_app && 'v' + steht_aus.aus_app,
+                                            steht_aus.aus_plattform,
+                                            steht_aus.bereit_seit]
+                                           .filter(Boolean).join(' · ');
+                }
+            } catch (_) { /* a missing status display isn't an error */ }
+        }
+
+        async function sicherungVerwerfen() {
+            try {
+                await fetch('/api/sicherung/stand',
+                            { method: 'DELETE', credentials: 'same-origin' });
+                await sicherungStand();
+            } catch (e) {
+                showError(String(e));
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', sicherungStand);
+
         async function restartServer() {
             if (!await window.skConfirm(texts.confirm_restart || 'Really restart the server?')) {
                 return;
@@ -4867,7 +5284,427 @@
             }
         }
 
-        // Load System Health Status
+        // ---- Aktualisierung ------------------------------------------------
+        //
+        // Two things can be behind, and they are not the same question. The
+        // SERVER decides for itself when to install — only while no print is
+        // running, because installing restarts it. This app is a viewer and
+        // can update whenever somebody says yes.
+        //
+        // Where the server sits inside the macOS app, it cannot replace its
+        // own files (the bundle is sealed file by file). There Sparkle does
+        // it, and the server only relays: the button leaves a note, the app
+        // picks it up and pushes back what it found.
+        //
+        // The key AND the German wording: getText returns its fallback when a
+        // language file has not arrived yet, and an empty fallback would show
+        // an empty badge instead of a state.
+        const UPDATE_TEXTE = {
+            unknown:             ['update_unknown', 'unbekannt'],
+            not_applicable:      ['update_not_applicable', 'nicht zutreffend'],
+            checking:            ['update_checking', 'wird geprüft …'],
+            downloading:         ['update_downloading', 'wird geladen …'],
+            extracting:          ['update_extracting', 'wird entpackt …'],
+            ready:               ['update_ready', 'bereit'],
+            installing:          ['update_installing', 'wird eingespielt …'],
+            current:             ['update_current', 'aktuell'],
+            available:           ['update_available', 'verfügbar'],
+            waiting_for_printer: ['update_waiting', 'wartet auf den Drucker'],
+            installed:           ['update_installed', 'eingespielt'],
+            failed:              ['update_failed', 'fehlgeschlagen'],
+        };
+
+        /** "Zuletzt geprüft 17:42" — the receipt for a press whose answer is
+         *  the same as before. Without it nothing visibly happens when the
+         *  answer is "up to date", which is the normal case. */
+        function geprueftUm(wann) {
+            if (!wann) return '';
+            const d = new Date(wann > 1e12 ? wann : wann * 1000);
+            if (isNaN(d.getTime())) return '';
+            return uText('update_last_checked', 'Zuletzt geprüft') + ' '
+                 + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        }
+
+        /** There is no global t() on this page — getText is the one. */
+        function uText(schluessel, ersatz) {
+            return (typeof getText === 'function')
+                ? (getText(schluessel, ersatz) || ersatz) : ersatz;
+        }
+
+        function updateZustandText(zustand) {
+            const paar = UPDATE_TEXTE[zustand] || UPDATE_TEXTE.unknown;
+            return uText(paar[0], paar[1]);
+        }
+
+        /**
+         * Fills in what an older client did not send.
+         *
+         * The card reads busy / can_check / can_install and draws exactly
+         * that. A bridge from before those existed answers with undefined,
+         * and `disabled = !undefined` switches every button off for good —
+         * the row looked dead until the app was rebuilt. So the same table
+         * the server keeps (UPDATE_LAGE in routes/system.py) stands in here
+         * once, as the fallback.
+         */
+        const UPDATE_LAGE = {
+            //  state                laeuft  pruefbar  einspielbar  abbrechbar
+            unknown:              [false,  true,     false,       false],
+            checking:             [true,   false,    false,       true],
+            available:            [false,  true,     true,        false],
+            downloading:          [true,   false,    false,       true],
+            extracting:           [true,   false,    false,       true],
+            ready:                [false,  false,    true,        false],
+            installing:           [true,   false,    false,       false],
+            current:              [false,  true,     false,       false],
+            failed:               [false,  true,     false,       false],
+            waiting_for_printer:  [false,  true,     false,       false],
+            not_applicable:       [false,  false,    false,       false],
+        };
+
+        function mitLage(stand) {
+            if (typeof stand.can_cancel === 'boolean') return stand;
+            const [busy, pruefbar, einspielbar, abbrechbar] =
+                UPDATE_LAGE[stand.state] || UPDATE_LAGE.unknown;
+            return { ...stand, busy, can_check: pruefbar,
+                     can_install: einspielbar, can_cancel: abbrechbar };
+        }
+
+        /** Colour the badge by what the state means, not by its name. */
+        function updateMarkenKlasse(zustand) {
+            return 'es-marke' + (zustand === 'available' ? ' es-marke--warn'
+                               : zustand === 'failed' ? ' es-marke--fehler' : '');
+        }
+
+        /**
+         * Draws the server row. Decides nothing.
+         *
+         * What a state means — is something running, may it be checked, may
+         * it be installed — is answered by the server (UPDATE_LAGE in
+         * routes/system.py). Four interfaces deciding that for themselves is
+         * what left a search button clickable in the middle of a download.
+         */
+        function zeigeUpdate(rohstand) {
+            const stand = mitLage(rohstand);
+            const marke = document.getElementById('update-marke');
+            const text = document.getElementById('update-text');
+            const einspielen = document.getElementById('update-einspielen');
+            const suchen = document.getElementById('update-suchen');
+            if (!marke) return;
+
+            marke.textContent = updateZustandText(stand.state);
+            marke.className = updateMarkenKlasse(stand.state);
+
+            if (stand.busy) {
+                const teile = [stand.version].filter(Boolean);
+                if (typeof stand.percent === 'number') teile.push(`${stand.percent} %`);
+                text.textContent = teile.join(' · ') || '—';
+            } else if (stand.state === 'available' || stand.state === 'ready') {
+                const teile = [stand.version];
+                if (stand.files) teile.push(`${stand.files} ${uText('update_files', 'Dateien')}`);
+                if (stand.bytes) teile.push(`${(stand.bytes / 1e6).toFixed(1)} MB`);
+                text.textContent = teile.filter(Boolean).join(' · ');
+            } else {
+                const fassung = stand.version_installed || stand.version;
+                const teile = [];
+                if (fassung) teile.push(`${uText('update_installed_version', 'Installiert:')} ${fassung}`);
+                const wann = geprueftUm(stand.checked);
+                if (wann) teile.push(wann);
+                text.textContent = teile.join(' · ') || '—';
+            }
+
+            // Jeder Knopf bekommt seinen Zustand HIER, aus der Antwort.
+            //
+            // Ein Druck schaltet ihn aus, damit er nicht zweimal ausgeloest
+            // wird -- eingeschaltet wird er nur von hier. Wer das dem
+            // Druck-Handler ueberlaesst, hat einen Knopf, der nach dem ersten
+            // Klick fuer immer tot ist (06sep26, der Installieren-Knopf).
+            einspielen.style.display = stand.can_install ? '' : 'none';
+            einspielen.disabled = false;
+            suchen.disabled = !stand.can_check;
+            suchen.style.opacity = stand.can_check ? '' : '0.4';
+            const abbrechen = document.getElementById('update-abbrechen');
+            if (abbrechen) {
+                abbrechen.style.display = stand.can_cancel ? '' : 'none';
+                abbrechen.disabled = false;
+            }
+
+            const karte = document.getElementById('update-karte');
+            if (karte && stand.applicable === false && !istEigenerClient())
+                karte.style.display = 'none';
+        }
+
+        /** Can the client we are running in update itself? */
+        function istEigenerClient() {
+            return !!(window.electronAPI && window.electronAPI.update);
+        }
+
+        /**
+         * The app's own row.
+         *
+         * Fetching and swapping in are two separate presses: the second one
+         * quits the app, and that must not happen a moment after somebody
+         * only asked whether there is anything new.
+         */
+        let clientStand = null;
+        /**
+         * Draws this app's row. Decides nothing — same contract as the
+         * server row (busy / can_check / can_install, see updater.js).
+         */
+        function zeigeClientUpdate(rohstand) {
+            const stand = mitLage(rohstand);
+            const zeile = document.getElementById('update-zeile-app');
+            const suchen = document.getElementById('update-app-suchen');
+            const marke = document.getElementById('update-app-marke');
+            const text = document.getElementById('update-app-text');
+            const knopf = document.getElementById('update-app-knopf');
+            const knopfText = document.getElementById('update-app-knopf-text');
+            if (!zeile || !marke) return;
+            clientStand = stand;
+            zeile.style.display = '';
+            marke.textContent = updateZustandText(stand.state);
+            marke.className = updateMarkenKlasse(stand.state);
+
+            if (stand.busy) {
+                const teile = [stand.version].filter(Boolean);
+                if (typeof stand.percent === 'number') teile.push(`${stand.percent} %`);
+                text.textContent = teile.join(' · ') || '—';
+            } else if (stand.state === 'available' || stand.state === 'ready') {
+                text.textContent = stand.version || '—';
+            } else {
+                const teile = [];
+                if (stand.installed)
+                    teile.push(`${uText('update_installed_version', 'Installiert:')} ${stand.installed}`);
+                const wann = geprueftUm(stand.geprueft);
+                if (wann) teile.push(wann);
+                text.textContent = teile.join(' · ') || '—';
+            }
+
+            if (suchen) {
+                suchen.style.display = istEigenerClient() ? '' : 'none';
+                suchen.disabled = !stand.can_check;
+                suchen.style.opacity = stand.can_check ? '' : '0.4';
+            }
+            if (knopf) {
+                if (stand.can_install) {
+                    knopfText.textContent = stand.state === 'ready'
+                        ? uText('update_install', 'Installieren')
+                        : uText('update_fetch', 'Herunterladen');
+                    knopf.style.display = '';
+                } else {
+                    knopf.style.display = 'none';
+                }
+                knopf.disabled = false;
+            }
+            const abbrechen = document.getElementById('update-app-abbrechen');
+            if (abbrechen) {
+                abbrechen.style.display = stand.can_cancel ? '' : 'none';
+                abbrechen.disabled = false;
+            }
+        }
+
+        /** Where this installation fetches from — one switch for all of it. */
+        async function setzeUpdateQuelle(wert) {
+            const feld = document.getElementById('update-quelle');
+            if (feld) feld.disabled = true;
+            try {
+                const r = await apiCall('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ update: { source: wert } })
+                });
+                if (!r.ok) throw new Error(r.status);
+                skToast(getText('update_source_saved',
+                                'Quelle gespeichert — die naechste Suche fragt dort nach'),
+                        'success');
+                // Same reason as with the channel: the other source may hold
+                // another version, and the row would keep showing the old
+                // answer.
+                sucheUpdate();
+            } catch (fehler) {
+                skToast(getText('toast_error', 'Fehler'), 'error');
+                console.error('update.source:', fehler);
+            } finally {
+                if (feld) feld.disabled = false;
+            }
+        }
+
+        /** Which channel this installation follows — one switch for all of it. */
+        async function setzeUpdateKanal(wert) {
+            const feld = document.getElementById('update-kanal');
+            if (feld) feld.disabled = true;
+            try {
+                const r = await apiCall('/api/config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ update: { channel: wert } })
+                });
+                if (!r.ok) throw new Error(r.status);
+                skToast(getText('update_channel_saved',
+                                'Kanal gespeichert — die naechste Suche fragt dort nach'),
+                        'success');
+                // Ask again right away: on the other channel a different
+                // version may be waiting, and the row would otherwise keep
+                // showing the answer from the old one.
+                sucheUpdate();
+            } catch (fehler) {
+                skToast(getText('toast_error', 'Fehler'), 'error');
+                console.error('update.channel:', fehler);
+            } finally {
+                if (feld) feld.disabled = false;
+            }
+        }
+
+        /** Stop what the server is doing. */
+        async function brichUpdateAb() {
+            const knopf = document.getElementById('update-abbrechen');
+            if (knopf) knopf.disabled = true;
+            try {
+                const r = await apiCall('/api/update/cancel', { method: 'POST' });
+                if (r.ok) zeigeUpdate(await r.json());
+            } catch (_) { /* the answer arrives over the socket anyway */ }
+        }
+
+        /** Stop what this app is doing. */
+        async function brichClientUpdateAb() {
+            if (!istEigenerClient() || !window.electronAPI.update.cancel) return;
+            const knopf = document.getElementById('update-app-abbrechen');
+            if (knopf) knopf.disabled = true;
+            try {
+                zeigeClientUpdate(await window.electronAPI.update.cancel());
+            } catch (_) { /* the bridge is older than this page */ }
+        }
+
+        /** Ask this app. Only this app. */
+        async function sucheClientUpdate() {
+            if (!istEigenerClient()) return;
+            const knopf = document.getElementById('update-app-suchen');
+            if (knopf) knopf.disabled = true;
+            try {
+                const stand = mitLage(await window.electronAPI.update.check());
+                zeigeClientUpdate(stand);
+                if (stand.busy) wartetAufClient();
+            } catch (_) { /* the bridge is older than this page */ }
+            // Not switched back on here — zeigeClientUpdate does it from the
+            // answer, exactly like the server row.
+        }
+
+        /** One button, two steps — which one depends on where we are. */
+        async function clientUpdateTat() {
+            if (!istEigenerClient() || !clientStand) return;
+            // Aus, damit der Druck nicht zweimal zaehlt. An geht er wieder
+            // durch zeigeClientUpdate, aus der Antwort.
+            const knopf = document.getElementById('update-app-knopf');
+            if (knopf) knopf.disabled = true;
+            try {
+                if (clientStand.state === 'ready') {
+                    // The app quits here. Nothing after this line runs.
+                    await window.electronAPI.update.install();
+                } else {
+                    zeigeClientUpdate(await window.electronAPI.update.fetch());
+                    wartetAufClient();
+                }
+            } catch (_) { /* the bridge is older than this page */ }
+        }
+
+        async function ladeClientStand() {
+            if (!istEigenerClient()) return;
+            try { zeigeClientUpdate(await window.electronAPI.update.status()); }
+            catch (_) { /* the bridge is older than this page */ }
+        }
+
+        /**
+         * The app answers "checking" and finishes a moment later.
+         *
+         * electron-updater works on events: the check returns at once and the
+         * answer arrives when the feed has replied. Without this the row sat
+         * on "wird geprüft" forever even though the fetch had long succeeded.
+         */
+        let clientWarten = null;
+        function wartetAufClient() {
+            clearInterval(clientWarten);
+            // A download takes as long as the line does, so this keeps
+            // looking much longer than a check would need — it shows the
+            // percentage on the way.
+            let versuche = 400;
+            clientWarten = setInterval(async () => {
+                if (--versuche < 0) { clearInterval(clientWarten); return; }
+                try {
+                    const stand = mitLage(await window.electronAPI.update.status());
+                    zeigeClientUpdate(stand);
+                    if (!stand.busy) clearInterval(clientWarten);
+                } catch (_) { clearInterval(clientWarten); }
+            }, 1500);
+        }
+
+        async function ladeUpdateStand() {
+            try {
+                // Via apiCall, not fetch: GET needs no CSRF token, but the
+                // 403 retry and the device-token header live in there too.
+                const r = await apiCall('/api/update/status');
+                if (r.ok) zeigeUpdate(await r.json());
+            } catch (_) { /* offline is not an error worth shouting about */ }
+            ladeClientStand();
+        }
+
+        /**
+         * Ask the SERVER. Only the server.
+         *
+         * Two rows, two buttons: the two are different machines with
+         * different rules, and one press that moves both says nothing about
+         * which of them just answered.
+         */
+        async function sucheUpdate(einspielen = false) {
+            // Not switched back on in a `finally` — the server's answer says
+            // whether it may be pressed, and during a download it may not.
+            const knopf = document.getElementById('update-suchen');
+            if (knopf) knopf.disabled = true;
+            try {
+                // apiCall and not fetch: POST needs the CSRF token, and only
+                // apiCall sets one. A plain fetch got a 403 here (06sep26).
+                const r = await apiCall('/api/update/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ install: einspielen }),
+                });
+                if (r.ok) {
+                    const stand = mitLage(await r.json());
+                    zeigeUpdate(stand);
+                    if (stand.busy) wartetAufApp();
+                }
+            } catch (e) {
+                zeigeUpdate({ state: 'failed', can_check: true, applicable: true });
+            }
+        }
+
+        /** The macOS app answers within a poll of its own. */
+        let updateWarten = null;
+        /**
+         * The fallback, not the way it normally arrives.
+         *
+         * The server pushes every change over the socket (see 'update_status'
+         * below). This is for the case where the socket is down — then the
+         * answer still turns up, just a beat later.
+         */
+        function wartetAufApp() {
+            clearInterval(updateWarten);
+            // Long enough for a whole download and swap, not just a check.
+            let versuche = 300;
+            updateWarten = setInterval(async () => {
+                if (--versuche < 0) { clearInterval(updateWarten); return; }
+                try {
+                    const r = await apiCall('/api/update/status', { noDedup: true });
+                    if (!r.ok) return;
+                    const stand = await r.json();
+                    zeigeUpdate(stand);
+                    // Keep looking while it is working — the server says
+                    // whether it is.
+                    if (!stand.busy) clearInterval(updateWarten);
+                } catch (_) { /* keep trying until the tries run out */ }
+            }, 2000);
+        }
+
+        function spieleUpdateEin() { sucheUpdate(true); }
+
         async function loadHealthStatus() {
             try {
                 const response = await apiCall('/api/health/detailed');
@@ -4877,8 +5714,8 @@
                 const statusEl = document.getElementById('health-overall-status');
                 const statusIcon = document.getElementById('health-status-icon');
 
-                // Marke statt Emoji-Text — dieselbe Bauform wie die uebrigen
-                // Zustandsmarken der Seite.
+                // Badge instead of emoji text — same pattern as the page's
+                // other status badges.
                 statusEl.className = 'es-marke';
                 statusEl.removeAttribute('style');
                 if (data.status === 'healthy') {
@@ -4998,9 +5835,9 @@
             }
         }
 
-        // Meldungen: derselbe Stapel oben rechts wie auf allen anderen
-        // Seiten (confirm-dialog.js). Die Seite hatte bis 21aug26 zwei
-        // eigene Kaesten unten links, die nichts vom Rest wussten.
+        // Toasts: the same stack top-right as on all other pages
+        // (confirm-dialog.js) — not separate boxes bottom-left that know
+        // nothing about the rest.
         window.showSuccess = (msg) => window.skToast(msg, 'success');
         window.showError = (msg) => window.skToast(msg, 'error');
         function showToast(id, message) {
@@ -5020,7 +5857,7 @@
                 const response = await apiCall('/api/test/simulate_hms_error', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: hmsCode })
+                    body: JSON.stringify({ hms_code: hmsCode })
                 });
 
                 const data = await response.json();
@@ -5142,7 +5979,7 @@
                         document.getElementById('license-activated-container').style.display = 'none';
                     }
 
-                    // Hardware ID — nur zeigen, wenn es eine gibt.
+                    // Hardware ID — only shown if there is one.
                     const hwid = data.hardware_id || '';
                     document.getElementById('license-hwid-value').value = hwid;
                     const hwidRow = document.getElementById('license-hwid-row');
@@ -5365,11 +6202,10 @@
 
         // ============ END HELPER FUNCTIONS ============
 
-        // Texte setzen. Vorher standen hier rund 550 Zeilen, die jede
-        // Beschriftung einzeln per id zuwiesen — und trotzdem war die Seite
-        // grossteils englisch, weil nur vier Elemente ueberhaupt einen
-        // Schluessel trugen. Jetzt traegt das Markup data-i18n und hier
-        // laeuft ein Durchgang darueber.
+        // Set the texts. Instead of ~550 lines individually assigning
+        // each label by id — which still left the page mostly English,
+        // since only four elements even carried a key — the markup now
+        // carries data-i18n and a single pass runs over it here.
         function updatePageTexts() {
             const pageTitle = document.getElementById('page-title');
             if (pageTitle) {
@@ -5386,28 +6222,213 @@
             });
         }
 
-        // Immer mit "System & Lizenz" aufmachen. Vorher wurde der zuletzt
-        // besuchte Abschnitt wiederhergestellt — man landete also irgendwo,
-        // je nachdem, was man beim letzten Mal getan hatte.
+        // Always open with "System & Lizenz", rather than restoring the
+        // last visited section — which meant landing somewhere
+        // unpredictable, depending on what was done last time.
         document.addEventListener('DOMContentLoaded', function () {
             switchSection('system');
         });
 
         // Android App Back Button Support
-        // Quit-Verhalten (nur Electron-Desktop, Tray/Menüleiste). Liest/schreibt
-        // den Electron-Store via electronAPI; im Browser/Web bleibt der Block aus.
+        // Quit behavior (Electron desktop only, tray/menu bar). Reads/writes
+        // the Electron store via electronAPI; stays inactive in browser/web.
         function saveQuitBehavior(value) {
             if (window.electronAPI && window.electronAPI.setQuitBehavior) {
                 window.electronAPI.setQuitBehavior(value);
             }
         }
         /**
-         * Die Meldungs-Schalter dieses Rechners.
+         * This computer's notification toggles.
          *
-         * Sie liegen in der Desktop-App, nicht am Server — was hier aus ist,
-         * bleibt am Telefon an. Gefiltert wird im Hauptprozess, weil ein Push
-         * auch bei geschlossenem Fenster ankommt.
+         * They live in the desktop app, not on the server — what's off
+         * here stays on on the phone. Filtering happens in the main
+         * process, because a push notification still arrives even with
+         * the window closed.
          */
+        /**
+         * Every registered push device with its switches.
+         *
+         * They decide on the SERVER: what is off is not sent, instead of
+         * arriving and being thrown away. That is also why they belong here
+         * and not only on the device -- whoever sits at the desktop can
+         * silence the phone.
+         *
+         * The eight names are the contract; the table that maps them to
+         * message types lives in services/notification_kinds.py. A device that has
+         * never reported its switches gets everything, so an empty set shows
+         * as all-on.
+         */
+        /**
+         * The eight switches with their label keys.
+         *
+         * NOT `'settings_' + key`: the HMS switch is called
+         * `settings_notify_printer_error`, not `..._hms_error`. Deriving the
+         * key put the raw name on screen (05sep26).
+         */
+        const GERAETE_SCHALTER = [
+            ['notify_printer_power',   'settings_notify_printer_power'],
+            ['notify_print_started',   'settings_notify_print_started'],
+            ['notify_milestones',      'settings_notify_milestones'],
+            ['notify_print_finished',  'settings_notify_print_finished'],
+            ['notify_print_failed',    'settings_notify_print_failed'],
+            ['notify_hms_error',       'settings_notify_printer_error'],
+            ['notify_filament_drying', 'settings_notify_filament_drying'],
+            ['notify_maintenance',     'settings_notify_maintenance']
+        ];
+
+        // The same line icons the users page uses for its device list, so a
+        // phone looks like a phone in both places (static/users.html).
+        const GERAETE_SYMBOLE = {
+            desktop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+            laptop:  '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
+            handy:   '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+            tablet:  '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M11 18h2"/>'
+        };
+
+        function geraeteSymbol(geraet) {
+            const text = ((geraet.device_name || '') + ' ' + (geraet.device_model || '')).toLowerCase();
+            const plattform = geraet.platform || '';
+            let art = 'desktop';
+            if (plattform === 'android' || plattform === 'ios') {
+                art = /tab|pad/.test(text) ? 'tablet' : 'handy';
+            } else if (/macbook|laptop|notebook/.test(text)) {
+                art = 'laptop';
+            }
+            return '<svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true">'
+                 + GERAETE_SYMBOLE[art] + '</svg>';
+        }
+
+        /**
+         * Every registered push device with its switches, folded shut.
+         *
+         * They decide on the SERVER: what is off is not sent, instead of
+         * arriving and being thrown away. That is why they belong where all
+         * devices are reachable -- whoever sits at the desktop can silence
+         * the phone. Eight switches times four devices is a wall, and you
+         * come here to change one thing, so every device starts closed.
+         */
+        async function ladeGeraeteMeldungen() {
+            const liste = document.getElementById('geraete-meldungen-liste');
+            if (!liste) return;
+            try {
+                const antwort = await apiCall('/api/tokens/list');
+                const daten = await antwort.json();
+                const geraete = (daten.fcm_tokens || []);
+                liste.innerHTML = '';
+                if (!geraete.length) {
+                    const leer = document.createElement('div');
+                    leer.className = 'es-zeile';
+                    leer.innerHTML = '<div class="es-zeile-name"></div>';
+                    leer.firstChild.textContent =
+                        getText('settings_geraete_keine', 'Noch kein Gerät angemeldet');
+                    liste.appendChild(leer);
+                    return;
+                }
+                geraete.forEach(g => liste.appendChild(geraeteZeile(g)));
+            } catch (e) {
+                liste.innerHTML = '';
+                const fehler = document.createElement('div');
+                fehler.className = 'es-zeile';
+                fehler.innerHTML = '<div class="es-zeile-name"></div>';
+                fehler.firstChild.textContent =
+                    getText('settings_geraete_fehler', 'Geräte konnten nicht geladen werden');
+                liste.appendChild(fehler);
+            }
+        }
+
+        function geraeteZeile(geraet) {
+            const schalter = geraet.notify_prefs || {};
+            const name = geraet.device_model || geraet.device_name || geraet.device_id || '?';
+            const artNamen = { web: 'Web', electron: 'Electron', ios: 'iOS',
+                               android: 'Android', desktop: 'Desktop' };
+            const plattform = geraet.platform || 'unknown';
+
+            const zeile = document.createElement('div');
+            zeile.className = 'es-zeile';
+            const auf = document.createElement('details');
+            auf.className = 'es-aufklapp';
+
+            const kopf = document.createElement('summary');
+            kopf.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'
+                + geraeteSymbol(geraet)
+                + '<span class="es-aufklapp-titel"></span>'
+                + '<span class="platform-badge platform-' + plattform + '" style="margin-left:auto"></span>';
+            kopf.querySelector('.es-aufklapp-titel').textContent = name;
+            kopf.querySelector('.platform-badge').textContent =
+                artNamen[plattform] || plattform.toUpperCase();
+            auf.appendChild(kopf);
+
+            const inhalt = document.createElement('div');
+            inhalt.className = 'es-aufklapp-inhalt';
+            GERAETE_SCHALTER.forEach(function (paar) {
+                const schluessel = paar[0], textkey = paar[1];
+                const z = document.createElement('div');
+                z.className = 'es-zeile';
+                const bez = document.createElement('div');
+                bez.className = 'es-zeile-name';
+                const b = document.createElement('b');
+                b.setAttribute('data-i18n', textkey);
+                b.textContent = getText(textkey, schluessel);
+                bez.appendChild(b);
+                const wert = document.createElement('div');
+                wert.className = 'es-zeile-wert';
+                const label = document.createElement('label');
+                label.className = 'es-schalter';
+                const kasten = document.createElement('input');
+                kasten.type = 'checkbox';
+                // Nothing reported = everything on, same rule as on the server.
+                kasten.checked = schalter[schluessel] !== false;
+                kasten.addEventListener('change', function () {
+                    speichereGeraeteSchalter(geraet, schluessel, kasten.checked, kasten);
+                });
+                label.appendChild(kasten);
+                label.appendChild(document.createElement('span'));
+                wert.appendChild(label);
+                z.appendChild(bez);
+                z.appendChild(wert);
+                inhalt.appendChild(z);
+            });
+            auf.appendChild(inhalt);
+            zeile.appendChild(auf);
+            return zeile;
+        }
+
+        async function speichereGeraeteSchalter(geraet, schluessel, an, kasten) {
+            const voll = geraet.full_token || geraet.token;
+            if (!voll) return;
+            const nutzlast = {};
+            nutzlast[schluessel] = an;
+            try {
+                const antwort = await apiCall(
+                    '/api/tokens/fcm/' + encodeURIComponent(voll) + '/prefs',
+                    { method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ notify_prefs: nutzlast }) });
+                const daten = await antwort.json();
+                if (!antwort.ok || !daten.success) throw new Error(daten.error || 'fehlgeschlagen');
+                geraet.notify_prefs = daten.notify_prefs || {};
+            } catch (e) {
+                // Put the switch back: what did not reach the server must not
+                // look as if it had.
+                kasten.checked = !an;
+                if (typeof window.skToast === 'function') {
+                    window.skToast(getText('settings_geraete_speichern_fehler',
+                        'Der Schalter konnte nicht gespeichert werden'), 'error');
+                }
+            }
+        }
+
+        /** Which of the two tabs in "Benachrichtigungen" is showing. */
+        function zeigeMeldungsReiter(welcher) {
+            ['verlauf', 'geraete'].forEach(function (name) {
+                const inhalt = document.getElementById('meldungen-inhalt-' + name);
+                const knopf = document.getElementById('meldungen-reiter-' + name);
+                if (inhalt) inhalt.style.display = (name === welcher) ? '' : 'none';
+                if (knopf) knopf.classList.toggle('es-knopf--haupt', name === welcher);
+            });
+            if (welcher === 'geraete') ladeGeraeteMeldungen();
+        }
+
         function initDeskNotifySettings() {
             const karte = document.getElementById('desk-notify-card');
             if (!karte || !window.electronAPI || !window.electronAPI.getNotifyPrefs) return;
@@ -5435,7 +6456,7 @@
             }).catch(function() {});
         }
 
-        // Rechtliches: Disclaimer + Open-Source-Liste + Lizenztexte rendern.
+        // Legal: render the disclaimer, the open-source list and the licence texts.
         function renderLegalSection() {
             const data = window.LEGAL_DATA;
             if (!data) return;
@@ -5447,9 +6468,10 @@
             const intro = document.getElementById('legal-oss-intro');
             if (intro) intro.textContent = getText('legal_oss_intro', 'Diese App nutzt folgende Open-Source-Komponenten:');
 
-            // Komponenten-Liste — aus der ERZEUGTEN Datei, nicht von Hand.
-            // Von Hand gepflegt standen hier neunzehn Eintraege, alle aus
-            // der Electron-Welt; tatsaechlich sind es 190 (31aug26).
+            // Component list — from the GENERATED file, not maintained by
+            // hand: a manual list undercounts badly, listing only
+            // nineteen entries (all from the Electron world) when the
+            // real count is 190.
             renderKomponenten();
             // Lizenztexte (collapsible <details>)
             const texts = document.getElementById('legal-license-texts');
@@ -5462,12 +6484,12 @@
         }
 
         /**
-         * Die fremden Bestandteile, nach Bereichen aufklappbar.
+         * Third-party components, expandable by area.
          *
-         * Quelle ist static/lizenzen.json aus
-         * `scripts/lizenzen_sammeln.py --schreibe`. Fehlt die Datei, sagt
-         * der Dialog das — eine veraltete Handliste waere schlechter als
-         * ein ehrlicher Hinweis.
+         * Source is static/lizenzen.json from
+         * `scripts/collect_licenses.py --schreibe`. If the file is
+         * missing, the dialog says so — a stale hand-written list would
+         * be worse than an honest notice.
          */
         function renderKomponenten() {
             const ziel = document.getElementById('legal-components');
@@ -5490,13 +6512,13 @@
                     if (!d || !d.anzahl) {
                         ziel.innerHTML = '<div style="font-size:12px;color:var(--text-secondary);">'
                             + esc(getText('legal_oss_missing',
-                                getText('set_licences_missing', 'Liste noch nicht erzeugt — scripts/lizenzen_sammeln.py --schreibe')))
+                                getText('set_licences_missing', 'Liste noch nicht erzeugt — scripts/collect_licenses.py --schreibe')))
                             + '</div>';
                         return;
                     }
                     const zeile = function (e) {
-                        // Was eine genauere Betrachtung verdient, bekommt eine
-                        // Marke — GPL, LGPL, MPL und Verwandte.
+                        // Whatever deserves closer scrutiny gets a marker —
+                        // GPL, LGPL, MPL, and related licenses.
                         const auf = /GPL|SSPL|MPL|CC-BY|RSAL/i.test(e.lizenz || '');
                         return '<div style="display:flex;gap:10px;align-items:baseline;'
                             + 'padding:5px 0;border-bottom:1px solid var(--border-color,rgba(0,0,0,0.06));">'
@@ -5512,8 +6534,9 @@
                         return (d[b[0]] || []).length;
                     }).map(function (b) {
                         const liste = d[b[0]];
-                        // Die Programme stehen offen: drei Zeilen, und dort
-                        // sitzen die Lizenzen, auf die es ankommt.
+                        // The bundled-programs section starts expanded:
+                        // it's only three lines, and that's where the
+                        // licenses that matter live.
                         const offen = b[0] === 'programme' ? ' open' : '';
                         return '<details' + offen + ' style="margin:4px 0;">'
                             + '<summary style="cursor:pointer;font-size:13px;font-weight:600;'
@@ -5529,7 +6552,7 @@
                 .catch(function () {
                     ziel.innerHTML = '<div style="font-size:12px;color:var(--text-secondary);">'
                         + esc(getText('legal_oss_missing',
-                            getText('set_licences_missing', 'Liste noch nicht erzeugt — scripts/lizenzen_sammeln.py --schreibe')))
+                            getText('set_licences_missing', 'Liste noch nicht erzeugt — scripts/collect_licenses.py --schreibe')))
                         + '</div>';
                 });
         }
@@ -5614,7 +6637,7 @@
         setTimeout(checkLicenseStatus, 5000);
         licenseCheckInterval = setInterval(checkLicenseStatus, 60000);
 
-        // WebSocket Verbindung für Notifications (z.B. HMS Test)
+        // A WebSocket connection for notifications (the HMS test, say)
         (function() {
             // Socket.IO Verbindung aufbauen
             const socket = io({
@@ -5626,7 +6649,7 @@
                 forceNew: true
             });
 
-            // Socket global verfügbar machen für cleanup
+            // Make the socket globally available for the cleanup
             window.settingsSocket = socket;
 
             socket.on('connect', function() {
@@ -5637,11 +6660,24 @@
                 console.log('❌ Settings: WebSocket getrennt');
             });
 
-            // Notification Listener für HMS Test etc.
+            // The update state, pushed.
+            //
+            // It changes for reasons that have nothing to do with who asked:
+            // the daily check, a download running, the macOS app answering a
+            // note. Polling only after one's OWN press meant every other open
+            // window kept showing yesterday's answer.
+            socket.on('update_status', function (roh) {
+                const stand = mitLage(roh);
+                zeigeUpdate(stand);
+                // The answer is here, so nothing has to be asked for any more.
+                if (!stand.busy) clearInterval(updateWarten);
+            });
+
+            // Notification listener for HMS test etc.
             socket.on('notification', function(data) {
                 console.log('📬 Settings: Notification empfangen:', data);
 
-                // Toast-Notification anzeigen
+                // Show a toast notification
                 const isError = data.type === 'hms_error' || data.type === 'error' || data.type === 'print_failed';
                 const toastMessage = `${data.title}\n${data.message}`;
 
@@ -5651,7 +6687,7 @@
                     showSuccess(toastMessage);
                 }
 
-                // Optional: Browser-Notification wenn Berechtigung vorhanden
+                // Optional: a browser notification when the permission is there
                 if ('Notification' in window && Notification.permission === 'granted') {
                     const options = {
                         body: data.message,
@@ -5659,7 +6695,7 @@
                         tag: data.type || 'general'
                     };
 
-                    // HMS Errors mit stärkerer Vibration
+                    // HMS errors with a stronger vibration
                     if (data.type === 'hms_error') {
                         options.requireInteraction = true;
                         options.vibrate = [500, 200, 500, 200, 500];
@@ -5672,10 +6708,10 @@
 
         // ============ TOKEN MANAGEMENT FUNCTIONS ============
 
-        // FCM-Queue-Reset Button nur in Electron anzeigen (Web/iOS haben
-        // keine push-receiver-Credentials). Der Button löscht lokale
-        // Credentials → Neustart → frische GCM-Identität → Google's
-        // FCM-Queue-Leichen landen ins Leere.
+        // Show the FCM queue reset button only in Electron (web and iOS have
+        // no push-receiver credentials). The button deletes the local
+        // credentials, restarts, and gets a fresh GCM identity, so Google's
+        // queued leftovers go nowhere.
         (function _initResetFcmBtn() {
             const btn = document.getElementById('btn-reset-fcm-queue');
             if (btn && window.electronAPI && window.electronAPI.resetFcmQueue) {
@@ -5692,7 +6728,7 @@
             try {
                 const res = await window.electronAPI.resetFcmQueue();
                 if (res && res.success) {
-                    // App wird gleich neu gestartet — kurze Info anzeigen
+                    // The app restarts in a moment -- show a short note
                     showSuccess(getText('set_fcm_reset', 'Warteschlange wird zurückgesetzt, die App startet neu …'));
                 } else {
                     showError('Reset fehlgeschlagen: ' + (res && res.error || 'unbekannt'));
@@ -5821,7 +6857,7 @@
                         const card = document.createElement('div');
                         card.className = 'token-card';
 
-                        // Status-spezifische Icons und Texte
+                        // Icons and texts per state
                         const statusConfig = {
                             'active': { icon: `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>`, text: getText('settings_status_active', 'Active') },
                             'idle': { icon: `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>`, text: getText('settings_status_idle', 'Idle') },
@@ -6002,7 +7038,7 @@
                     const card = document.createElement('div');
                     card.className = 'token-card';
 
-                    // Icon basierend auf Platform
+                    // The icon by platform
                     const icon = token.platform === 'ios' ? `<svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg>` : `<svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V5M9 3h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg>`;
 
                     card.innerHTML = `
@@ -6288,10 +7324,10 @@
         // ============ DASHBOARD RESET FUNCTION ============
         async function resetDashboardLayoutFromSettings() {
             if (await window.skConfirm('Möchtest du das Dashboard-Layout wirklich auf die Standardeinstellungen zurücksetzen?\n\nAlle deine Dashboard-Anpassungen (Kartenpositionen und -größen) gehen verloren.')) {
-                // Lösche Layout-Einstellungen aus localStorage (korrekter Key mit Bindestrich)
+                // Delete the layout settings from localStorage (the correct hyphenated key)
                 localStorage.removeItem('dashboard-layout');
 
-                // Zeige Erfolgs-Nachricht
+                // Show the success message
                 showSuccess(getText('set_layout_reset', 'Layout zurückgesetzt. Wirksam beim nächsten Besuch des Dashboards.'));
 
                 console.log('🔄 Dashboard layout reset from Settings');
@@ -6316,9 +7352,10 @@
                     const diagnosis = data.diagnosis;
 
                     // Status message with color (use translated messages ONLY)
-                    // Der Stream laeuft nur, solange jemand zusieht — der
-                    // Server startet ihn beim ersten Bildabruf. "Laeuft nicht"
-                    // in Rot sah nach Fehler aus, obwohl nichts kaputt ist.
+                    // The stream runs only while somebody is watching -- the
+                    // server starts it on the first frame request. "Not
+                    // running" in red looked like a fault, although nothing is
+                    // broken.
                     const statusEl = document.getElementById('bambu-status-message');
                     statusEl.className = 'es-marke';
                     let statusText = '';
@@ -6337,10 +7374,10 @@
                     statusEl.style.color = '';
                     statusEl.textContent = statusText;
 
-                    // Die Zaehler gehoeren zur MJPEG-Pipeline des Servers. Holen
-                    // sich die Apps den Stream direkt von go2rtc (WebRTC), zaehlt
-                    // hier nichts — dann standen vier Nullen da, als waere die
-                    // Kamera kaputt.
+                    // The counters belong to the server's MJPEG pipeline. When
+                    // the apps take the stream straight from go2rtc (WebRTC)
+                    // nothing counts here -- four zeros then stood there as if
+                    // the camera were broken.
                     const zaehlerAn = status.thread_alive || status.frame_count > 0;
                     document.getElementById('bambu-camera-status').style.display = zaehlerAn ? '' : 'none';
 
@@ -6382,7 +7419,7 @@
                         threadEl.textContent = getText('settings_camera_running', 'Läuft');
                         threadEl.style.color = 'var(--color-green, #4CAF50)';
                     } else {
-                        // Kein Fehler: der Stream startet erst, wenn ihn
+                        // Not a fault: the stream only starts once somebody
                         // jemand oeffnet.
                         threadEl.textContent = getText('settings_camera_idle_hint', 'Ruht — startet beim Zusehen');
                         threadEl.style.color = 'var(--text-secondary)';
@@ -6437,9 +7474,9 @@
         }
 
         // Auto-refresh camera status when on camera section
-        // Wie kommt das Bild zu den Apps? go2rtc reicht das H.264 des Druckers
-        // als WebRTC durch; die Einzelbild-Pipeline des Servers ist nur der
-        // Rueckfall.
+        // How does the picture reach the apps? go2rtc passes the printer's
+        // H.264 through as WebRTC; the server's single-frame pipeline is only
+        // the fallback.
         async function ladeKameraUebertragung() {
             const marke = document.getElementById('kamera-uebertragung');
             if (!marke) return;
@@ -6460,9 +7497,9 @@
             }
         }
 
-        // Was steckt am Drucker? Aus /api/status — dort fuehrt resolve() Profil
-        // und Live-Zustand zusammen. Meldet der Drucker nichts (aus), nimmt
-        // /api/config das Datenblatt als Erststand.
+        // What is fitted to the printer? From /api/status, where resolve()
+        // merges profile and live state. When the printer reports nothing
+        // (off), /api/config takes the data sheet as the first state.
         async function ladeAngeschlossen() {
             const setzeMarke = (id, text, klasse) => {
                 const el = document.getElementById(id);
@@ -6516,12 +7553,12 @@
                 setzeText('ang-ams-detail', '');
             }
 
-            // Werkzeugmodul: nur Geraete mit Aufsatz melden ext_tool. Leer
-            // heisst "nichts gemeldet" — dann bleibt die Zeile weg, statt bei
-            // einem Drucker ohne Aufsatz "kein Laser" zu behaupten.
-            // Zeile nur bei Geraeten, die ueberhaupt einen Aufsatz tragen
-            // koennen (Datenblatt) — sonst stuende bei einem P1S "kein Laser",
-            // obwohl es dort nie einen geben kann.
+            // Tool module: only machines with an attachment report ext_tool.
+            // Empty means "nothing reported" -- the row then stays away rather
+            // than claiming "no laser" on a printer without an attachment.
+            // The row only on machines that can carry an attachment at all
+            // (from the data sheet) -- otherwise a P1S would read "no laser",
+            // although there can never be one.
             const wz = caps.tool_module || '';
             const wzZeile = document.getElementById('ang-werkzeug-zeile');
             if (!caps.tool_mount) {
@@ -6592,7 +7629,7 @@
                 clearInterval(bambuStatusInterval);
             }
 
-            // WICHTIG: WebSocket sauber schließen
+            // IMPORTANT: close the WebSocket cleanly
             if (window.settingsSocket) {
                 console.log('🔌 Settings: Closing WebSocket');
                 window.settingsSocket.removeAllListeners();
@@ -6630,7 +7667,7 @@
         }
 
         function renderNotifications() {
-            window.nbListe.zeichne(document.getElementById('notif-list'), window.__notifAll, {
+            window.notificationList.zeichne(document.getElementById('notif-list'), window.__notifAll, {
                 filter: window.__notifFilter,
                 aufWeg: dismissNotif,
             });
@@ -6650,7 +7687,7 @@
             } catch (e) { console.error('Dismiss failed', e); }
         }
 
-        // Auto-Update wenn anderer Client markiert
+        // Auto update when another client marks it
         if (window.settingsSocket) {
             const onPeer = data => {
                 if (!data || !data.id) return;
@@ -6670,24 +7707,105 @@
         }
     </script>
     <script>
-        // Klipper-Direct: Bambu-Server-Sektionen ausblenden. Greift NUR im
-        // lokalen Adapter (cfg.direct_mode) — im Backend-Klipper-Modus sind
-        // Security/Tokens/Health echte Backend-Features und bleiben sichtbar.
+        // Klipper direct: hide the Bambu server sections. This applies ONLY
+        // in the local adapter (cfg.direct_mode) -- in the backend Klipper mode
+        // security, tokens and health are real backend features and stay.
         (function () {
-            // Abschnitte, die es im Klipper-Direct-Modus nicht gibt.
-            // Seit dem Umbau sind es Abschnitte der neuen Gliederung; was
-            // frueher eigene Menuepunkte waren (mqtt, license, health,
-            // debug, homeassistant), steckt heute als Karte in einem
-            // Abschnitt und wird weiter unten einzeln versteckt.
-            var HIDE = ['sicherheit', 'automatik', 'standards'];
+            // What the backend we are talking to can do, and what follows
+            // from it for this page.
+            //
+            // There used to be two hand-kept lists here: one of sections and
+            // one of cards that do not exist in Klipper direct mode. They had
+            // drifted -- a whole area stood in the directory and led to an
+            // empty page, because all five of its cards were on the card list
+            // while the area itself was on neither.
+            //
+            // Now each card says in the markup what it needs
+            // (data-requires="server"), the backend says in /api/config what
+            // it has (backend_capabilities), and an area disappears when
+            // nothing is left in it. Nobody keeps a list of areas any more.
+            //
+            //   server        our backend answers -- licence, health, backup,
+            //                 tools, update, tokens, cloud, Home Assistant,
+            //                 maintenance messages, automation, print
+            //                 defaults, the Bambu hardware list
+            //   config_store  GET and POST /api/config really store something
+            //   moonraker     Moonraker and the companion, spoken to directly
+            //
+            // The three interfaces differ here for a real reason: the web in
+            // direct mode is served by the Electron adapter, which DOES have
+            // config_store -- so costs and Spoolman stay. The phone apps in
+            // direct mode have no /api/config at all.
+            var KANN = null;
+
+            // An old backend sends no list. Then nothing is hidden -- exactly
+            // as before this existed.
+            function faehig(el) {
+                var braucht = el.getAttribute('data-requires');
+                if (!braucht || !KANN) return true;
+                return braucht.split(/\s+/).every(function (f) { return KANN[f] === true; });
+            }
+
+            // Only ever hides, never shows: cards like the health notes start
+            // out hidden and are brought back by their own code.
+            function wendeFaehigkeitenAn(cfg) {
+                var liste = cfg && cfg.backend_capabilities;
+                if (!Array.isArray(liste)) return;
+                KANN = {};
+                liste.forEach(function (f) { KANN[f] = true; });
+
+                document.querySelectorAll('[data-requires]').forEach(function (el) {
+                    if (!faehig(el)) el.style.display = 'none';
+                });
+
+                // An area stays as long as ONE card in it stays. That is what
+                // makes the area list unnecessary -- and it is the check that
+                // the old code did not have.
+                var offenerWeg = false;
+                document.querySelectorAll('.es-verz-eintrag[id^="nav-"]').forEach(function (eintrag) {
+                    var id = eintrag.id.slice(4);
+                    var bereich = document.getElementById('section-' + id);
+                    if (!bereich) return;
+                    var karten = bereich.querySelectorAll('.es-karte');
+                    if (!karten.length) return;
+                    var bleibt = 0;
+                    karten.forEach(function (k) { if (faehig(k)) bleibt++; });
+                    if (bleibt) return;
+                    eintrag.style.display = 'none';
+                    bereich.style.display = 'none';
+                    if (typeof currentSection !== 'undefined' && currentSection === id) offenerWeg = true;
+                });
+
+                // Empty group headings in the directory ("Security" when
+                // access and tokens are both gone).
+                document.querySelectorAll('.es-verz-gruppe').forEach(function (gruppe) {
+                    var n = gruppe.nextElementSibling, sichtbar = false;
+                    while (n && !n.classList.contains('es-verz-gruppe')) {
+                        if (n.classList.contains('es-verz-eintrag') && n.style.display !== 'none') { sichtbar = true; break; }
+                        n = n.nextElementSibling;
+                    }
+                    if (!sichtbar) gruppe.style.display = 'none';
+                });
+
+                // The page always opens on "System" -- and that is exactly one
+                // of the areas that can be gone. Without this the user would
+                // land on a blank page.
+                if (offenerWeg) {
+                    var erster = document.querySelector('.es-verz-eintrag[id^="nav-"]:not([style*="none"])');
+                    if (erster && typeof switchSection === 'function') {
+                        switchSection(erster.id.slice(4));
+                    }
+                }
+            }
             function hideClosest(id, sel) {
                 var el = document.getElementById(id);
                 if (el) { var p = el.closest(sel); if (p) p.style.display = 'none'; }
             }
 
-            // ---- Klipper-Direct Kamera-Verwaltung ----
-            // Port von SettingsScreen.kt (CameraCard, Direct-Zweig) + CameraEditDialog.kt:
-            // Liste der Moonraker-Kameras mit an/aus-Schalter + Bearbeiten-Dialog.
+            // ---- The Klipper-Direct camera management ----
+            // A port of SettingsScreen.kt (CameraCard, direct branch) plus
+            // CameraEditDialog.kt: the list of Moonraker cameras with an on/off
+            // switch and an edit dialog.
             var CAM_SERVICES = ['mjpegstreamer', 'mjpegstreamer-adaptive', 'uv4l-mjpeg', 'ipstream',
                 'hlsstream', 'jmuxer-stream', 'webrtc-camerastreamer', 'webrtc-go2rtc',
                 'webrtc-mediamtx', 'webrtc-creality'];
@@ -6696,7 +7814,7 @@
             var camEditing = null, camRotation = 0;
             function tx(k, fb) { return (window.texts && window.texts[k]) || fb; }
 
-            // Sprach-Dropdown (global, da inline onclick im Markup) — Port aus users.html.
+            // Language dropdown (global, because the markup has an inline onclick) -- ported from users.html.
             window.toggleLangDropdown = function () {
                 var dd = document.getElementById('langDropdown');
                 if (dd) dd.classList.toggle('open');
@@ -6869,37 +7987,17 @@
             }
 
             function apply(cfg) {
-                if (!cfg || cfg.direct_mode !== true) return;
-                // 1) Bambu-Server-Sektionen aus der Sidebar.
-                HIDE.forEach(function (id) {
-                    document.querySelectorAll('[onclick*="switchSection(\'' + id + '\')"]')
-                        .forEach(function (el) { el.style.display = 'none'; });
-                    var sec = document.getElementById('section-' + id);
-                    if (sec) sec.style.display = 'none';
-                });
-                // 1b) Leere Kategorie-Header ausblenden (z.B. "🔒 Sicherheit",
-                //     wenn security + tokens beide weg sind).
-                document.querySelectorAll('.es-verz-gruppe').forEach(function (cat) {
-                    var n = cat.nextElementSibling, visible = false;
-                    while (n && !n.classList.contains('es-verz-gruppe')) {
-                        if (n.classList.contains('es-verz-eintrag') && n.style.display !== 'none') { visible = true; break; }
-                        n = n.nextElementSibling;
-                    }
-                    if (!visible) cat.style.display = 'none';
-                });
-
-                // Karten, die im Direct-Modus nichts zu suchen haben. Sie
-                // stecken in Abschnitten, die es weiterhin gibt.
-                ['karte-bambu', 'karte-wartungsmeldungen', 'karte-homeassistant',
-                 'karte-lizenz', 'karte-werkzeuge', 'health-status-card'].forEach(function (id) {
-                    var k = document.getElementById(id);
-                    if (k) k.style.display = 'none';
-                });
-                // i18n-Helfer: window.texts mit Fallback. Die Drucker-/Kamera-/
-                // Meross-Direct-Texte stehen NICHT im Index-Nav-Loop, daher hier.
+                if (!cfg) return;
+                // Applies in EVERY mode -- what is hidden follows from what
+                // the backend can, not from which mode we are in.
+                wendeFaehigkeitenAn(cfg);
+                if (cfg.direct_mode !== true) return;
+                // i18n helper: window.texts with a fallback. The printer,
+                // camera and Meross direct texts are NOT in the index nav loop,
+                // hence here.
                 var t = function (k, fb) { return (window.texts && window.texts[k]) || fb; };
-                // 2) Kamera wie Android: Bambu-uStreamer-Karten raus, stattdessen
-                //    Moonraker-Kameraliste mit an/aus + Bearbeiten (CameraEditDialog).
+                // 2) Camera as on Android: out with the Bambu uStreamer cards,
+                //    in with the Moonraker camera list with on/off and edit.
                 hideClosest('camera_enabled', '.es-karte');
                 hideClosest('bambu-camera-status', '.es-karte');
                 var ct = document.getElementById('card-camera-title');
@@ -6971,20 +8069,20 @@
                         });
                     }
                 })();
-                // 3) Übersicht: Bambu-spezifische Felder/Karten raus.
+                // 3) Overview: out with the Bambu-specific fields and cards.
                 hideClosest('overview-printer-ip', '.es-zeile');     // Klipper: Host im Setup-Dialog
                  // Bambu-only
                 hideClosest('overview-ha-status', '.es-zeile');               // Home-Assistant-Karte
                      // Backend-CORS
                        // Backend-SSH
-                // 4) Drucker-Sektion (Moonraker/Companion) einblenden + Felder laden.
-                // Die Moonraker- und Companion-Karten stehen im Abschnitt
-                // "Verbindung" und sind sonst versteckt.
+                // 4) Show the printer section (Moonraker/companion) and load
+                // its fields. The Moonraker and companion cards sit in the
+                // "connection" section and are otherwise hidden.
                 var navP = document.getElementById('section-printer-direct');
                 if (navP) navP.style.display = '';
                 var navC = document.getElementById('section-companion');
                 if (navC) navC.style.display = '';
-                // i18n: Feldlabels der Drucker-Sektion (nicht im Index-Nav-Loop).
+                // i18n: field labels of the printer section (not in the index nav loop).
                 var setLabel = function (sel, txt) { var e = document.querySelector(sel); if (e) e.textContent = txt; };
                 setLabel('#section-printer-direct .section-title', t('settings_printer_section', 'Drucker'));
                 setLabel('label[for="pd_display_name"]', t('settings_field_display_name', 'Anzeigename'));
@@ -7039,11 +8137,12 @@
                 var mLoadBtnLbl = document.getElementById('meross_load_devices_btn');
                 if (mLoadBtnLbl) mLoadBtnLbl.textContent = t('settings_meross_load_devices', 'Geräte laden');
 
-                // 6) Sprache (wie Android im Direkt-Modus): Nav + Sektion einblenden,
-                //    aktuelle Sprache vorwählen, Labels setzen, Speichern → reload.
-                // Die Sprachwahl steht als Block im Abschnitt "Darstellung"
-                // und ist ausserhalb des Direct-Modus versteckt (dort waehlt
-                // man die Sprache auf der Benutzer-Seite).
+                // 6) Language (as on Android in direct mode): show the nav and
+                //    the section, preselect the current language, set the
+                //    labels, and reload on save.
+                // The language choice sits as a block in the "appearance"
+                // section and is hidden outside direct mode (there one chooses
+                // the language on the user page).
                 var navLang = document.getElementById('section-language');
                 if (navLang) navLang.style.display = '';
                 setLabel('#section-language .section-title', t('settings_language', 'Sprache'));
@@ -7112,7 +8211,7 @@
             } else { run(); }
         })();
         // ===================== Companion (Klipper-Direct) =====================
-        // Spiegelt die Companion-Status-Seite (:7126) + Dienst-Neustart + Geräte-Löschen.
+        // Mirrors the companion status page (:7126) plus service restart and device deletion.
         (function () {
             function cEsc(v) {
                 return String(v == null ? '' : v).replace(/[&<>"]/g, c =>
@@ -7175,7 +8274,7 @@
                     html += row(getText('companion_sent', 'Gesendet (OK / Fehler)'),
                         `<b>${d.sent_ok || 0}</b> / <b style="color:${(d.sent_fail ? '#FF3B30' : 'inherit')};">${d.sent_fail || 0}</b>`);
 
-                    // Geräte
+                    // Devices
                     html += `<div style="margin-top:12px;font-weight:600;font-size:13px;">${cEsc(getText('companion_devices', 'Registrierte Geräte'))} (${devs.length})</div>`;
                     if (!devs.length) {
                         html += `<div style="opacity:.6;font-size:12px;padding:4px 0;">${cEsc(getText('companion_no_devices', 'keine registriert'))}</div>`;
@@ -7211,7 +8310,7 @@
                         }
                         html += '</div>';
                     }
-                    // Letzte Fehler
+                    // The last errors
                     if (errs.length) {
                         html += `<div style="margin-top:12px;font-weight:600;font-size:13px;color:#FF3B30;">${cEsc(getText('companion_errors', 'Letzte Fehler'))}</div>`;
                         html += '<div style="margin-top:4px;">';
@@ -7283,5 +8382,6 @@
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

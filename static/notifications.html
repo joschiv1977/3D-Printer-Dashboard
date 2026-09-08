@@ -35,7 +35,8 @@
     <script src="/static/js/modules/i18n-manager.js"></script>
     <script src="/static/auth-handler.js"></script>
     <script src="/static/js/modules/tab-bar-manager.js"></script>
-    <script src="/static/js/modules/benachrichtigungen-liste.js"></script>
+    <script src="/static/js/modules/device-names.js"></script>
+    <script src="/static/js/modules/notification-list.js"></script>
 
     <div class="nb-huelle">
         <div class="nb-kopf">
@@ -98,10 +99,10 @@
 
         function render() {
             const list = document.getElementById('notif-list');
-            const ungelesen = allNotifications.filter(n => !window.nbListe.erledigt(n)).length;
+            const ungelesen = allNotifications.filter(n => !window.notificationList.erledigt(n)).length;
             document.getElementById('zahl-alle').textContent = allNotifications.length || '';
             document.getElementById('zahl-neu').textContent = ungelesen || '';
-            window.nbListe.zeichne(list, allNotifications, {
+            window.notificationList.zeichne(list, allNotifications, {
                 filter: currentFilter,
                 aufWeg: dismissOne,
             });
@@ -109,7 +110,7 @@
 
         async function dismissOne(id) {
             try {
-                // apiCall setzt automatisch X-CSRF-Token + Cookie-Refresh
+                // apiCall sets the X-CSRF token and the cookie refresh on its own
                 const call = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
                 await call(`/api/notifications/${encodeURIComponent(id)}/dismiss`, {
                     method: 'POST'
@@ -139,7 +140,7 @@
             return String(s).replace(/'/g, "\\'");
         }
 
-        // WebSocket-Echo: andere Clients haben etwas dismissed
+        // WebSocket echo: another client dismissed something
         try {
             const socket = io({ transports: ['websocket', 'polling'] });
             socket.on('notification_dismissed', data => {
@@ -170,5 +171,6 @@
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

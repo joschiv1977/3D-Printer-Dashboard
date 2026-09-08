@@ -24,13 +24,13 @@
         pause:    '<path d="M9 5v14M15 5v14"/>',
         stopp:    '<rect x="6" y="6" width="12" height="12" rx="1"/>',
         tropfen:  '<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/>',
-        // ACHTUNG: 'tropfen' oben ist in Wahrheit ein THERMOMETER (Kolben
-        // und Saeule) — der Name taeuscht. Das hier ist der echte Tropfen,
-        // fuer die Luftfeuchte im AMS.
+        // CAREFUL: 'tropfen' above is really a THERMOMETER (bulb and column)
+        // -- the name is misleading. This one is the real drop, for the
+        // humidity in the AMS.
         wasser:   '<path d="M12 3s6 6.4 6 10.4a6 6 0 0 1-12 0C6 9.4 12 3 12 3z"/>',
-        // Die beiden Plaketten am Geraet: Kammer und Heizbett. Sie lagen
-        // bisher nur als data-URI im Template (_progress.html) und fehlten
-        // damit Android und iOS. Aus dem 16er-Raster auf 24 gerechnet.
+        // The two badges on the machine: chamber and heated bed. They used to
+        // sit only as a data URI in the template (_progress.html) and were
+        // therefore missing on Android and iOS. Scaled from the 16 grid to 24.
         kammer:   '<rect x="2.25" y="2.25" width="18.258" height="19.687" rx="0.819"/><rect x="5.656" y="6.349" width="11.445" height="3.284" rx="0.819"/><rect x="5.656" y="14.552" width="7.357" height="3.284" rx="0.819"/>',
         heizbett: '<path d="M7.118 3C7.118 4.209 4.676 4.209 4.676 5.415C4.676 6.623 7.118 6.623 7.118 7.832C7.118 9.04 4.676 9.04 4.676 10.249C4.676 11.457 7.118 11.457 7.118 12.666C7.118 13.874 4.676 13.874 4.676 15.083"/><path d="M13.681 3C13.681 4.209 11.238 4.209 11.238 5.415C11.238 6.623 13.681 6.623 13.681 7.832C13.681 9.04 11.238 9.04 11.238 10.249C11.238 11.457 13.681 11.457 13.681 12.666C13.681 13.874 11.238 13.874 11.238 15.083"/><path d="M20.245 3C20.245 4.209 17.803 4.209 17.803 5.415C17.803 6.623 20.245 6.623 20.245 7.832C20.245 9.04 17.803 9.04 17.803 10.249C17.803 11.457 20.245 11.457 20.245 12.666C20.245 13.874 17.803 13.874 17.803 15.083"/><rect x="3.75" y="18.158" width="17.794" height="2.822" rx="1.411"/>',
         haus:     '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/>',
@@ -44,24 +44,24 @@
         schnee:   '<path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5"/>',
         hoch:     '<path d="M12 19V5M5 12l7-7 7 7"/>',
         runter:   '<path d="M12 5v14M19 12l-7 7-7-7"/>',
-        // Die drei kommen aus der Historie: Suchfeld leeren, Duplikate
-        // ausblenden, Filterblatt oeffnen. Standen dort inline im HTML —
-        // benannt braucht sie auch iOS und Android.
+        // These three come from the history: clear the search field, hide the
+        // duplicates, open the filter sheet. They stood there inline in the
+        // HTML -- named, iOS and Android need them too.
         kreuz:    '<path d="M18 6 6 18M6 6l12 12"/>',
         duplikate:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
         trichter: '<path d="M3 4h18l-7 8.5V20l-4-2v-5.5z"/>',
-        // Blaetterpfeile der Historie (.hv-blaettern) — spitze Winkel, kein
-        // Abspiel-Dreieck.
+        // The paging arrows of the history (.hv-blaettern) -- sharp chevrons,
+        // not a play triangle.
         chevronLinks:  '<path d="M15 18l-6-6 6-6"/>',
         chevronRechts: '<path d="M9 18l6-6-6-6"/>',
-        // Zeitraffer-Bedienung: Vollbild und Sichern.
+        // The timelapse controls: full screen and save.
         vollbild: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
         sichern:  '<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
         regler:   '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/>',
-        // Diese elf standen nur in SkIkonPfade.swift und fehlten in dieser
-        // Quelle — ein Lauf des Generators haette sie geloescht (und hat es
-        // am 25aug26 auch getan). Sie gehoeren hierher, damit Web, Android
-        // und iOS dieselben Symbole haben.
+        // These eleven stood only in SkIconPaths.swift and were missing from
+        // this source -- one run of the generator would have deleted them (and
+        // did). They belong here, so that web, Android and iOS have the same
+        // symbols.
         protokoll: '<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
         benutzer: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
         schild: '<path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"/>',
@@ -95,12 +95,12 @@
         waage:    '<path d="M12 4v16M7 20h10"/><path d="M5 9h14l-2 5H7z"/><circle cx="12" cy="4" r="1.5"/>',
         bett:     '<path d="M2 17h20M4 17V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8M4 17v3M20 17v3"/>',
         winkel:   '<path d="M4 4v16h16"/><path d="M4 12h8v8"/>',
-        // --- Nachgetragen 24aug26 ------------------------------------------
-        // Diese zehn standen bisher als Inline-SVG im Markup bzw. als IC_*-
-        // Konstanten in sd-card-manager.js, und Android hatte sie von Hand in
-        // SkIkon.kt kopiert. Damit gab es drei Wahrheiten. Jetzt stehen sie
-        // hier — icons.js ist die einzige Quelle, aus der Android und iOS
-        // erzeugt werden (tools/gen_skikon_swift.py).
+        // --- Added later ---------------------------------------------------
+        // These ten used to stand as inline SVG in the markup or as IC_*
+        // constants in sd-card-manager.js, and Android had copied them into
+        // SkIcon.kt by hand. That made three truths. Now they stand here --
+        // icons.js is the single source Android and iOS are generated from
+        // (tools/gen_skicon_swift.py).
         zeit:      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         gewicht:   '<path d="M12 3v10M7 21h10M6 13h12l-2 8H8z"/>',
         drucker:   '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
@@ -111,11 +111,11 @@
         druckbett: '<rect x="1" y="7" width="18" height="11" rx="2"/><path d="M3 12h18"/>',
         kalenderPlan: '<rect x="1" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
         sonneOptionen: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
-        // --- Kartenkoepfe der Statistik (25aug26) ---------------------------
-        // Eigene Zeichnungen, weil die gleichnamigen Symbole oben anders
-        // aussehen (ziel/balken/thermo/regler) oder fehlten. Standen bis
-        // heute nur inline in analytics-dashboard.js — iOS konnte sie damit
-        // nicht zeichnen und nahm SF-Symbole, die anders aussahen.
+        // --- The card heads of the statistics --------------------------------
+        // Drawings of their own, because the symbols of the same name above look
+        // different (ziel/balken/thermo/regler) or were missing. They stood only
+        // inline in analytics-dashboard.js -- iOS could not draw them and took
+        // SF Symbols, which looked different.
         statZiel:    '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
         statBalken:  '<path d="M4 20h16M7 16V8M12 16V4M17 16v-6"/>',
         statVerlauf: '<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
@@ -124,9 +124,9 @@
         statPokal:   '<path d="M8 3h8v5a4 4 0 0 1-8 0z"/><path d="M8 5H5v2a3 3 0 0 0 3 3M16 5h3v2a3 3 0 0 1-3 3M10 21h4M12 12v9"/>',
         statThermo:  '<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/>',
         statRegler:  '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
-        // --- Wartungen (25aug26) -------------------------------------------
-        // Standen nur inline in static/maintenance.html — iOS zeichnete
-        // dort leere Kacheln, weil es die Pfade nicht kannte.
+        // --- Maintenance -----------------------------------------------------
+        // These stood only inline in static/maintenance.html -- iOS drew empty
+        // tiles there, because it did not know the paths.
         wartung_duese: '<path d="M8 3h8v6l-2 3v9h-4v-9L8 9z"/>',
         wartung_platte: '<rect x="3" y="7" width="18" height="11" rx="2"/><path d="M3 12h18"/>',
         wartung_riemen: '<circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M7 9h10M7 15h10"/>',
@@ -144,10 +144,11 @@
         wartung_schrauber: '<path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/>',
     };
 
-    /** Nur die Pfad-Bruchstuecke — fuer Aufrufer mit eigener SVG-Huelle. */
+    /** The path fragments only -- for callers with an SVG shell of their own. */
     window.skIconPfad = function (name) { return PFADE[name] || ''; };
 
-    /** SVG-Text für ein Symbol. `zusatz` hängt weitere Klassen an (z.B. 'hd-ic--xs'). */
+    /** The SVG text for one symbol. `zusatz` appends further classes
+     *  (e.g. 'hd-ic--xs'). */
     window.skIcon = function (name, zusatz) {
         const p = PFADE[name];
         if (!p) return '';

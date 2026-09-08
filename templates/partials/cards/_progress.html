@@ -1,18 +1,18 @@
-          <!-- Print Progress Card — HelixScreen-Layout (Sovol 356C)
-               Linke Spalte: Thumbnail mit Bottom-Metadata-Overlay
-               Rechte Spalte: Temp-Card / Speed·Flow / Fan-Reihe / Buttons
-               Referenz: /home/biqu/helixscreen/ui_xml/print_status_panel.xml -->
+          <!--Print Progress Card -- HelixScreen layout (Sovol 356C)
+               Left column: thumbnail with bottom metadata overlay
+               Right column: temp card / speed*flow / fan row / buttons
+               Reference: /home/biqu/helixscreen/ui_xml/print_status_panel.xml -->
           <div class="grid-stack-item" gs-w="6" gs-h="13" gs-x="0" gs-y="14" gs-min-w="4" gs-min-h="8" gs-max-w="12" gs-max-h="30" id="progress-card-grid">
               <div class="grid-stack-item-content">
 {% if active_printer_type == 'bambu' %}
-                  <!-- ============================================================
-                       Bambu-Druckkarte im X2D-Display-Stil (Mockup hauptseite_b):
-                       oben Thumbnail | Maschinen-Render mit Plaketten | Werkzeugkopf,
-                       darunter Wert-Chips, Fortschrittsbalken ueber die volle
-                       Kartenbreite, Metadaten-Zeile, Dateiname.
-                       Gleiche Element-IDs wie die Klipper-Karte — das JS bedient
-                       beide Betriebsarten unveraendert.
-                       ============================================================ -->
+                  <!--============================================================
+                      Bambu print card in the X2D display style (mockup hauptseite_b):
+                      thumbnail on top | machine render with badges | tool head,
+                      below that value chips, a progress bar spanning the full
+                      card width, a metadata row, filename.
+                      Same element IDs as the Klipper card -- the JS serves
+                      both operating modes unchanged.
+                      ============================================================-->
                   <div class="card progress-card progress-card--bambu" id="progress-card">
 
                       <div class="progress-card__status-pill" id="print-status">
@@ -20,14 +20,14 @@
                           <span id="print-status-text">--</span>
                       </div>
 
-                      <!-- Druck-Aktionen oben rechts: Pause/Fortsetzen/Abbrechen -->
+                      <!--Print actions top right: pause/resume/cancel-->
                       <div class="pcb-actions" id="pcb-actions" style="display:none;">
                           <button class="pcb-act" id="pcb-pause" onclick="pausePrint()" title="Pause"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg></button>
                           <button class="pcb-act" id="pcb-resume" onclick="resumePrint()" style="display:none;" title="Fortsetzen"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg></button>
-                          <!-- Einzelne Teile fallen lassen statt den ganzen Druck
-                               abzubrechen. Steht hier und nicht in der
-                               Entwickler-Karte: waehrend eines Drucks schaut
-                               niemand dorthin. -->
+                          <!--Drop individual objects instead of aborting the whole print.
+                               Lives here and not in the developer
+                               card: nobody looks there during a
+                               print.-->
                           <button class="pcb-act" id="pcb-skip" onclick="teileUeberspringenOeffnen()" style="display:none;" title="Teile überspringen"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4l10 8-10 8z"/><path d="M19 4v16"/></svg></button>
                           <button class="pcb-act pcb-act--stop" id="pcb-stop" onclick="stopPrint()" title="Abbrechen"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg></button>
                       </div>
@@ -43,25 +43,25 @@
                                   <span class="pv-badge pv-badge--bed pv-badge--click" id="pv-bed" onclick="openTempControl('bed')" title="Betttemperatur"><img src="data:image/svg+xml;utf8,%3csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3cpath d='M4.74539 2C4.74539 2.80568 3.11719 2.80568 3.11719 3.60976C3.11719 4.41544 4.74539 4.41544 4.74539 5.22111C4.74539 6.02679 3.11719 6.02679 3.11719 6.83247C3.11719 7.63815 4.74539 7.63815 4.74539 8.44382C4.74539 9.2495 3.11719 9.2495 3.11719 10.0552' stroke='currentColor' stroke-miterlimit='10' stroke-linecap='round'/%3e %3cpath d='M9.12039 2C9.12039 2.80568 7.49219 2.80568 7.49219 3.60976C7.49219 4.41544 9.12039 4.41544 9.12039 5.22111C9.12039 6.02679 7.49219 6.02679 7.49219 6.83247C7.49219 7.63815 9.12039 7.63815 9.12039 8.44382C9.12039 9.2495 7.49219 9.2495 7.49219 10.0552' stroke='currentColor' stroke-miterlimit='10' stroke-linecap='round'/%3e %3cpath d='M13.4969 2C13.4969 2.80568 11.8687 2.80568 11.8687 3.60976C11.8687 4.41544 13.4969 4.41544 13.4969 5.22111C13.4969 6.02679 11.8687 6.02679 11.8687 6.83247C11.8687 7.63815 13.4969 7.63815 13.4969 8.44382C13.4969 9.2495 11.8687 9.2495 11.8687 10.0552' stroke='currentColor' stroke-miterlimit='10' stroke-linecap='round'/%3e %3crect x='2.5' y='12.1055' width='11.8627' height='1.8816' rx='0.9408' stroke='currentColor'/%3e %3c/svg%3e" class="pv-ic" alt="">--</span>
                               </div>
                           </div>
-                          <!-- Angebautes AMS. Wird nur eingeblendet, wenn der
-                               Drucker eine Einheit meldet — socket-manager
-                               _zeigeAmsAnbau() setzt Bild und Sichtbarkeit. -->
-                          <!-- Duese und AMS teilen sich die Spalte rechts neben
-                               dem Drucker: Duese oben, AMS unten. Die Spalte
-                               wird auf Zeilenhoehe gedehnt, damit die
-                               Prozent-Hoehen darin aufloesen. -->
+                          <!--Attached AMS. Only shown when the
+                               printer reports a unit -- socket-manager
+                               _zeigeAmsAnbau() sets the image and visibility.-->
+                          <!--Nozzle and AMS share the column to the right of
+                               the printer: nozzle on top, AMS below. The column
+                               is stretched to row height so the
+                               percentage heights inside it resolve.-->
                           <div class="pcb-side">
                               <div class="pcb-tool pv-toolhead pv-badge--click" id="pv-toolhead" onclick="openTempControl('nozzle')" title="Düsentemperatur">
-                                  <!-- Eigener Kasten fuer den Rahmen: die Spalte
-                                       muss gedehnt bleiben, der Rahmen soll aber
-                                       nur den Inhalt umschliessen. -->
+                                  <!--Separate box for the border: the column
+                                       has to stay stretched, but the border should
+                                       only wrap the content.-->
                                   <div class="pv-tool-box">
                                       <div class="pv-tool-one">
                                           <img src="/static/img/printers/nozzle_hs.png" class="pv-nozzle-img" alt="">
                                           <span class="pv-badge" id="pv-nozzle-l">L --</span>
                                       </div>
-                                      <!-- Zweite Duese: blendet socket-manager aus,
-                                           wenn der Drucker nur eine meldet. -->
+                                      <!--Second nozzle: hidden by socket-manager
+                                           when the printer only reports one.-->
                                       <div class="pv-tool-one" id="pv-nozzle-r-col">
                                           <img src="/static/img/printers/nozzle_hs.png" class="pv-nozzle-img" alt="">
                                           <span class="pv-badge" id="pv-nozzle-r">R --</span>
@@ -69,8 +69,8 @@
                                   </div>
                               </div>
                               <div class="pcb-ams pv-ams" id="pv-ams" hidden>
-                                  <!-- Bild und Anzeige im selben Rahmen, damit die
-                                       Anzeige am BILD klebt und nicht an der Spalte. -->
+                                  <!--Image and display in the same frame, so the
+                                       display sticks to the IMAGE and not to the column.-->
                                   <div class="pv-ams-wrap">
                                       <img src="" id="pv-ams-img" class="pv-ams-img" alt="">
                                       <span class="pv-badge" id="pv-ams-badge"></span>
@@ -133,8 +133,8 @@
                           <span id="display-message-value">--</span>
                       </div>
 
-                      <!-- Kompat: IDs, die das JS auch im Bambu-Betrieb beschreibt,
-                           in der neuen Karte aber keinen sichtbaren Platz haben -->
+                      <!--Compat: IDs the JS still writes to in Bambu mode,
+                           but that have no visible spot in the new card-->
                       <div style="display:none;" aria-hidden="true">
                           <span id="temp-nozzle-side"></span>
                           <span id="temp-nozzle-actual">--</span><span id="temp-nozzle-target">--</span><span id="nozzle-status-pill"></span>
@@ -148,7 +148,7 @@
                   <div class="card progress-card progress-card--helix" id="progress-card">
                       <div class="progress-card__cols">
 
-                          <!-- ============ LEFT: Thumbnail + Metadata-Overlay ============ -->
+                          <!--============ LEFT: Thumbnail + Metadata Overlay ============-->
                           <div class="progress-card__left" id="progress-thumb-section">
                               <!-- Thumbnail (Klipper: /api/sd_thumbnail/<file>, Bambu: /api/titelbild) -->
                               <div class="progress-card__thumb-wrap" id="titelbild-container">
@@ -162,7 +162,7 @@
                                       <div class="progress-card__bar-fill" id="progress-card-bar-fill" style="width:0%;"></div>
                                   </div>
 
-                                  <!-- Reihe 1: Layer · Objects · Filament-Used -->
+                                  <!--Row 1: Layer . Objects . Filament-Used-->
                                   <div class="progress-card__row">
                                       <span class="progress-card__cell" id="layer-info">
                                           <span id="layer-value">--/--</span>
@@ -175,10 +175,10 @@
                                       </span>
                                   </div>
 
-                                  <!-- Reihe 2: Filename (scrolling marquee bei Overflow) -->
+                                  <!--Row 2: Filename (scrolling marquee on overflow)-->
                                   <div class="progress-card__filename" id="file-info">--</div>
 
-                                  <!-- Reihe 3: elapsed · remaining · ETA · % -->
+                                  <!--Row 3: elapsed . remaining . ETA . %-->
                                   <div class="progress-card__row progress-card__row--time">
                                       <span class="progress-card__cell">
                                           <span id="elapsed-value">0m</span>
@@ -190,13 +190,13 @@
                                       <span class="progress-card__pct" id="progress-percentage">0%</span>
                                   </div>
 
-                                  <!-- Reihe 4: Klipper M117 / display_message (collapses when empty) -->
+                                  <!--Row 4: Klipper M117 / display_message (collapses when empty)-->
                                   <div class="progress-card__display-msg" id="display-message-info" style="display:none;">
                                       <span id="display-message-value">--</span>
                                   </div>
                               </div>
 
-                              <!-- Status-Pill oben rechts (Druckt/Pausiert/Fehler) -->
+                              <!--Status pill top right (Printing/Paused/Error)-->
                               <div class="progress-card__status-pill" id="print-status">
                                   <span class="status-dot status-idle" id="status-dot"></span>
                                   <span id="print-status-text">--</span>
@@ -206,7 +206,7 @@
                           <!-- ============ RIGHT: Temp + Speed + Fans + Buttons ============ -->
                           <div class="progress-card__right">
 
-                              <!-- Temperatur-Card (Düse + Bett + optional Chamber) -->
+                              <!--Temperature card (nozzle + bed + optional chamber)-->
                               <div class="helix-temp-card helix-temp-card--rows">
                                   <div class="helix-temp-row" id="temp-nozzle-row">
                                       <span class="helix-temp-label" data-i18n="nozzle">Düse<span id="temp-nozzle-side" style="display:none; opacity:0.75; font-size:0.85em;"></span></span>
@@ -240,7 +240,7 @@
                                   </div>
                               </div>
 
-                              <!-- Speed · Flow Inline-Reihe -->
+                              <!--Speed . Flow inline row-->
                               <div class="helix-inline-row" id="speed-flow-info">
                                   <span>Speed</span>
                                   <span class="helix-inline-value" id="speed-value">100%</span>
@@ -249,13 +249,13 @@
                                   <span class="helix-inline-value" id="flow-value">100%</span>
                               </div>
 
-                              <!-- Filament-Row (Spoolman-Vendor + Material) -->
+                              <!--Filament row (Spoolman vendor + material)-->
                               <div class="helix-inline-row" id="filament-info">
                                   <span class="helix-inline-icon"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg></span>
                                   <span class="helix-inline-value" id="filament-value">--</span>
                               </div>
 
-                              <!-- Fan-Reihe: Teile · Hotend · Aux -->
+                              <!--Fan row: part . hotend . aux-->
                               <div class="helix-inline-row helix-fan-row">
                                   <span class="helix-fan-cell" id="fan-part-info">
                                       <span class="helix-fan-icon"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5"/></svg></span>
@@ -282,7 +282,7 @@
                                   </span>
                               </div>
 
-                              <!-- Klipper-Extras (Z, Z-Offset) — falls vorhanden -->
+                              <!--Klipper extras (Z, Z-offset) -- if present-->
                               <div class="helix-inline-row helix-extras-row">
                                   <span class="helix-fan-cell" id="z-height-info" style="display:none;">
                                       <span><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"/><path d="M4 12h8v8"/></svg> Z</span>
@@ -295,10 +295,10 @@
                                   </span>
                               </div>
 
-                              <!-- Bed-Mesh-Heatmap (Klipper-only). 15x15 (oder NxM)
-                                   probed-Matrix als kompakte 2D-Heatmap. Wird vom
-                                   socket-manager bei jedem klipper_state-Tick
-                                   re-rendert wenn die Daten da sind. -->
+                              <!--Bed mesh heatmap (Klipper only). 15x15 (or NxM)
+                                   probed matrix as a compact 2D heatmap. Re-rendered by
+                                   socket-manager on every klipper_state tick
+                                   once the data is available.-->
                               <div class="helix-bed-mesh" id="bed-mesh-info" style="display:none;">
                                   <div class="helix-bed-mesh__header">
                                       <span class="helix-bed-mesh__title"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5z"/><path d="M9 4v13M15 6.5v13"/></svg> <span data-i18n="bed_mesh_title">Bed-Mesh</span></span>

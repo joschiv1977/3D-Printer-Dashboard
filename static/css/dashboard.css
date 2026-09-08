@@ -128,22 +128,20 @@
 }
 
 /* ============================================================
- * Filament-Trocknung — Karte im Stil der uebrigen Oberflaeche
- * (Mockup 26aug26). Vorher trug sie durchgehend Inline-Stile:
- * graue Info-Box, Ankreuzfeld, Knoepfe ueber die volle Breite.
+ * Filament drying — card in the style of the rest of the UI
  * ============================================================ */
 .tr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
 
-/* Die zwoelf Punkte oben gelten nur zwischen den KINDERN von .tr-koerper —
-   und davon gibt es genau zwei: den Block zum Starten und den fuer den
-   laufenden Lauf. Deren Zeilen lagen deshalb ohne jeden Abstand
-   aufeinander: Auswahl, Kaestchen und Schalter klebten aneinander
-   (27aug26 im Bild gesehen). Also dieselbe Regel eine Ebene tiefer. */
+/* The twelve points of gap above only apply between the CHILDREN of
+   .tr-koerper — and there are exactly two of those: the block for
+   starting and the one for the running run. Their rows therefore sat
+   with no spacing at all: selection, box and toggle stuck together.
+   So the same rule, one level deeper. */
 #material-selection,
 #drying-active { display: flex; flex-direction: column; gap: 12px; }
 
-/* Zeile: Beschriftung links, Bedienelement rechts — dieselbe Bauform
-   wie `.tray-edit-zeile` im Trocknungs-Dialog. */
+/* Row: label left, control right — the same construction
+   as `.tray-edit-zeile` in the drying dialog. */
 .tr-zeile { display: flex; align-items: center; gap: 14px; }
 .tr-lab { flex: 0 0 96px; font-size: 13px; font-weight: 600; color: var(--text-primary); }
 
@@ -158,12 +156,12 @@
     cursor: pointer;
 }
 
-/* Zahlen wie `.dry-feld`: getoente Flaeche, feiner Rand. Der Wert bringt
-   seine Einheit selbst mit (JS schreibt „90-100°C"). */
+/* Numbers like `.dry-feld`: tinted area, thin border. The value brings
+   its own unit along (JS writes "90-100°C"). */
 .tr-felder { display: flex; gap: 10px; }
 .tr-feld {
-    /* Nie umbrechen: ein Wert, eine Zeile. Bricht er doch, waechst das
-       Kaestchen und die ganze Reihe verrutscht (27aug26 gesehen). */
+    /* Never wrap: one value, one line. If it does wrap, the box
+       grows and the whole row shifts out of place. */
     white-space: nowrap;
     display: inline-flex; align-items: baseline;
     background: var(--bg-secondary, #f2f3f5);
@@ -175,8 +173,8 @@
 }
 .tr-feld--warm { color: var(--accent-orange, #e65100); }
 
-/* Zahlenfeld im Kaestchen — die Farbe kommt vom Kaestchen, das Feld selbst
-   bringt keinen eigenen Rahmen und keinen eigenen Grund mit. */
+/* Number field in the box — the color comes from the box, the field
+   itself brings no border and no background of its own. */
 .tr-feld input[type="number"] {
     width: 3.2em; border: 0; background: none; padding: 0;
     font: inherit; color: inherit; text-align: right;
@@ -189,8 +187,8 @@
 .tr-feld input[type="number"]:focus { outline: none; }
 .tr-einheit { margin-left: 3px; font-size: 12.5px; font-weight: 600; opacity: 0.75; }
 
-/* Schalter statt Ankreuzfeld — das Feld bleibt, es traegt den Zustand
-   fuer das JavaScript, ist aber nicht mehr zu sehen. */
+/* Toggle instead of a checkbox — the field stays, it carries the
+   state for the JavaScript, but is no longer visible. */
 .tr-schalter-zeile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
 .tr-schalter-txt { flex: 1; font-size: 13px; color: var(--text-primary); }
 .tr-schalter-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
@@ -207,7 +205,7 @@
 .tr-cb:checked + .tr-schalter { background: var(--accent-green, #16a34a); }
 .tr-cb:checked + .tr-schalter::after { left: 21px; }
 
-/* Fuss: kompakte Knoepfe rechts statt einer Leiste ueber die ganze Breite. */
+/* Footer: compact buttons on the right instead of a full-width bar. */
 .tr-fuss {
     display: flex; justify-content: flex-end; gap: 10px;
     border-top: 1px solid var(--border-color); padding-top: 10px;
@@ -223,7 +221,7 @@
 .tr-knopf--gruen { background: rgba(22, 163, 74, 0.12); color: var(--accent-green, #16a34a); }
 .tr-knopf--rot { background: rgba(220, 38, 38, 0.10); color: var(--accent-red, #dc2626); }
 
-/* Laufende Trocknung: Zeile, Balken, Prozent rechts — wie die Druckkarte. */
+/* Active drying: row, bar, percent on the right — like the print card. */
 .tr-lauf { display: flex; align-items: center; gap: 12px; }
 .tr-mat-punkt {
     width: 18px; height: 18px; border-radius: 50%; flex: none;
@@ -236,7 +234,7 @@
 .tr-balken { height: 7px; border-radius: 999px; background: var(--bg-secondary, #e5e7eb); overflow: hidden; }
 .tr-balken i { display: block; height: 100%; background: var(--accent-green, #16a34a); transition: width .3s; }
 
-/* Der Punkt im Kopf sagt, ob getrocknet wird. */
+/* The dot in the header says whether drying is active. */
 #drying-status-indicator {
     width: 8px; height: 8px; border-radius: 50%; display: inline-block;
     margin-left: 10px; background: var(--text-secondary); color: transparent;
@@ -244,14 +242,14 @@
 }
 
 /* ===================================================================
-   Hotend-Magazin (H2C) — Karte
-   Aufbau wie die Material-Zone: oben wohin gedruckt wird, darunter das
-   Lager. Entwurf: static/_mockup_magazin.html.
+   Hotend magazine (H2C) — card
+   Laid out like the material zone: what's printing on top, the
+   storage below. Mockup: static/_mockup_magazin.html.
    =================================================================== */
 .hr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
 .hr-zaehler { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
 
-/* Die zwei Druckstellen */
+/* The two print positions */
 .hr-duesen { display: flex; gap: 10px; }
 .hr-duese {
     flex: 1; min-width: 0; background: var(--bg-secondary, #f0f1f4);
@@ -269,7 +267,7 @@
     background: rgba(59, 130, 246, 0.08);
 }
 
-/* Laufender Wechsel */
+/* Active swap */
 .hr-wechsel {
     display: flex; align-items: center; gap: 10px;
     background: rgba(59, 130, 246, 0.09);
@@ -281,7 +279,7 @@
 .hr-wechsel-txt b { font-weight: 600; color: var(--text-primary); }
 .hr-wechsel-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
 
-/* Die Plaetze. Drei Spalten, am Telefon zwei. */
+/* The slots. Three columns, two on phones. */
 .hr-plaetze { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .hr-pl {
     position: relative; min-height: 78px;
@@ -296,13 +294,13 @@
 .hr-dm { display: block; font-size: 15px; font-weight: 800; margin-top: 3px; color: var(--text-primary); }
 .hr-dm span { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-left: 2px; }
 .hr-code { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
-/* Verschleiss als nackte Zahl, ohne Balken: der Drucker meldet einen Wert,
-   aber kein Maximum — ein Balken waere geraten. */
+/* Wear as a bare number, without a bar: the printer reports a value
+   but no maximum — a bar would be a guess. */
 .hr-vs { display: block; font-size: 10.5px; color: var(--text-secondary); margin-top: 6px; font-variant-numeric: tabular-nums; }
 .hr-leer { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); opacity: 0.55; margin-top: 6px; }
 
-/* Aktiv-Zustand: Fuellung + Rand + Haken — dasselbe Muster wie ueberall,
-   keine duenne Randlinie allein. */
+/* Active state: fill + border + checkmark — the same pattern as
+   everywhere else, never just a thin border line. */
 .hr-pl--auf { background: rgba(22, 163, 74, 0.10); border-color: rgba(22, 163, 74, 0.55); }
 .hr-pl--ziel { background: rgba(59, 130, 246, 0.10); border-color: rgba(59, 130, 246, 0.55); }
 .hr-marke {

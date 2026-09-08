@@ -21,10 +21,10 @@
     <!-- Chart.js (local) -->
     <script src="/static/chart.umd.js"></script>
 
-    <!-- Plotly (offline-Bundle, gl3d) - fuer den Bed-Mesh-Tab im Druck-Detail -->
+    <!--Plotly (offline bundle, gl3d) - for the bed mesh tab in the print detail view-->
     <script src="/static/vendor/plotly-gl3d.min.js"></script>
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -60,7 +60,7 @@
     <script src="/static/js/modules/tab-bar-manager.js"></script>
     <script src="/static/js/modules/confirm-dialog.js"></script>
     <script src="/static/js/modules/analytics.js"></script>
-    <script src="/static/js/modules/ams-feuchte.js?v=1"></script>
+    <script src="/static/js/modules/ams-humidity.js?v=1"></script>
     <script src="/static/js/modules/analytics-dashboard.js?v=2"></script>
 
     <div class="hist-container">
@@ -75,9 +75,8 @@
                     <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
                     <span data-i18n="refresh">Aktualisieren</span>
                 </button>
-                <!-- Die drei Werte lagen als aufklappbare Karte ueber der
-                     Liste und schoben beim Oeffnen alles nach unten. Als
-                     Menue am Knopf bleibt die Seite stehen. -->
+                <!--As a menu on the button, the page stays put -- an expandable card
+                     above the list would push everything down when opened.-->
                 <span class="hv-menue-huelle">
                     <button class="hist-btn" onclick="toggleHistorySettings(event)">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
@@ -116,14 +115,14 @@
             </div>
         </div>
 
-        <!-- Liste links, Detail rechts. Kein Overlay mehr: beim Durchblaettern
-             mehrerer Drucke bleibt die Liste stehen, nur rechts wechselt es. -->
+        <!--List on the left, detail on the right. No overlay: paging through
+             multiple prints keeps the list in place, only the right side changes.-->
         <div class="hv-rahmen" id="hv-rahmen">
 
-            <!-- Die Reiter stehen ueber beiden Spalten, nicht in der Liste:
-                 sonst verschwinden sie mit der Listenspalte, sobald die
-                 Statistik die volle Breite einnimmt — und man kommt aus der
-                 Statistik nicht mehr zurueck. -->
+            <!--The tabs sit above both columns, not inside the list:
+                 otherwise they would disappear with the list column, once the
+                 statistics take the full width -- and there would be no way
+                 back out of the statistics.-->
             <div class="hist-tabs hv-reiter">
                 <button id="tab-current" class="hist-tab-btn active" onclick="switchHistoryTab('current')">
                     <span id="history-tab-current-text" data-i18n="history_tab_current">Aktuelle</span>
@@ -151,9 +150,9 @@
                                 <option value="failed" data-i18n="history_filter_failed">Fehlgeschlagen</option>
                                 <option value="cancelled" data-i18n="history_filter_cancelled">Abgebrochen</option>
                                 <option value="running" data-i18n="history_filter_running">Laufend</option>
-                                <!-- Systemlaeufe sind kein Status: eine Kalibrierung kann
-                                     genauso gelingen oder scheitern. Der Eintrag filtert
-                                     deshalb auf das Kennzeichen, nicht auf p.status. -->
+                                <!--System runs are not a status: a calibration can
+                                     succeed or fail just the same. The entry therefore
+                                     filters on the flag, not on p.status.-->
                                 <option value="system" data-i18n="history_filter_system">System</option>
                             </select>
                             <select id="hist-material" class="hist-dropdown" onchange="applyHistoryFilters()">
@@ -190,7 +189,7 @@
             </div>
 
             <div class="hv-detail" id="hv-detail">
-                <!-- Solange nichts gewaehlt ist -->
+                <!--As long as nothing is selected-->
                 <div class="hv-nichts" id="hv-nichts">
                     <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h8"/></svg>
                     <div data-i18n="history_pick_print">Links einen Druck wählen</div>
@@ -210,7 +209,7 @@
                             <div id="detail-info" class="hv-d-unter"></div>
                         </div>
                         <span class="hv-marke" id="hv-marke"></span>
-                        <!-- Blaettern ohne Umweg ueber die Liste; Pfeiltasten tun dasselbe. -->
+                        <!--Paging without detouring through the list; arrow keys do the same.-->
                         <div class="hv-blaettern">
                             <button id="hv-vor" onclick="waehleNachbar(-1)" data-i18n-title="history_prev_print" title="Vorheriger Druck">
                                 <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
@@ -257,10 +256,6 @@
                                     data-i18n-title="detail_export_pdf" title="PDF">
                                 <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                             </button>
-                            <button onclick="reprintFile()" class="hv-akt-btn hv-akt-btn--haupt">
-                                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
-                                <span id="detail-reprint-text" data-i18n="detail_reprint">Erneut drucken</span>
-                            </button>
                         </span>
                     </div>
 
@@ -270,7 +265,7 @@
                             <div id="detail-stats"></div>
                         </div>
 
-                        <!-- Bed Mesh Tab - Snapshot des Cartographer-Scans dieses Drucks -->
+                        <!--Bed Mesh Tab - snapshot of this print's Cartographer scan-->
                         <div id="mesh-tab" class="detail-tab-content" style="display:none;">
                             <div id="detail-mesh-empty" class="bm-empty" style="display:none; text-align:center; padding:40px 16px; color:var(--text-secondary);"></div>
                             <div id="detail-mesh-wrap" style="display:none;">
@@ -318,7 +313,7 @@
                 </div>
             </div>
 
-            <!-- Statistik nimmt die ganze Breite; Liste und Detail treten beiseite. -->
+            <!--Statistics take the full width; list and detail step aside.-->
             <div class="hv-stat" id="history-list-statistics">
                 <div class="hist-empty">
                     <div class="loading"></div>
@@ -447,11 +442,6 @@
             pdf_page: 'Seite',
             pdf_of: 'von',
             pdf_generated_on: 'PDF erstellt am',
-            detail_reprint: 'Erneut drucken',
-            reprint_confirm_msg: 'erneut drucken?',
-            reprint_start: 'Drucken',
-            reprint_started: 'Druck gestartet',
-            reprint_error: 'Fehler beim Starten des Drucks',
             detail_duration: 'Dauer',
             detail_start: 'Start',
             detail_end: 'Ende',
@@ -505,16 +495,16 @@
         };
 
         // Initialize page
-        // Versionsmarker: sagt in der Konsole, welcher Stand wirklich laeuft.
+        // Version marker: shows in the console which build is actually running.
         console.log('history.html Stand 20aug26 — Kosten-Aufschluesselung Filament/Strom');
         document.addEventListener('DOMContentLoaded', function() {
             if (window.tabBarManager) {
                 window.tabBarManager.render();
             }
 
-            // Direktaufruf eines Eintrags: /static/history.html?print=<id>
-            // Die Vorschau auf der Startseite verlinkt so auf den laufenden
-            // Druck. Etwas verzoegert, damit die Liste vorher steht.
+            // Direct link to an entry: /static/history.html?print=<id>
+            // The homepage preview links here to the running print.
+            // Slightly delayed so the list is already in place.
             const gewuenscht = new URLSearchParams(location.search).get('print');
             if (gewuenscht) {
                 setTimeout(function() {
@@ -611,14 +601,14 @@
             const rahmen = document.getElementById('hv-rahmen');
             const istStat = (tab === 'statistics');
             rahmen.classList.toggle('hv-statistik', istStat);
-            // Beim Wechsel in die Statistik das offene Detail zuklappen, sonst
-            // steht es beim Zurueckwechseln auf einem Druck, der im anderen
-            // Reiter gar nicht in der Liste ist.
+            // Collapse the open detail view when switching to statistics,
+            // otherwise switching back would leave it showing a print that
+            // isn't even in the other tab's list.
             if (istStat) rahmen.classList.remove('hv-offen');
 
-            // Such-/Filterleiste gehoert zur Druckliste. Die Statistik bringt
-            // ihre eigenen Filter mit (Zeitraum, Material, Status) — beide
-            // uebereinander sind verwirrend, und die obere wirkt dort auf nichts.
+            // The search/filter bar belongs to the print list. Statistics
+            // brings its own filters (time range, material, status) — having
+            // both stacked is confusing, and the top one has no effect there.
             const controls = document.querySelector('.hist-controls');
             if (controls) controls.style.display = istStat ? 'none' : '';
 
@@ -629,11 +619,11 @@
 
         // Load history data
         async function loadHistory(fresh) {
-            // Immer ALLE Drucke laden — Status/Material/Suche/Sortierung laufen
-            // client-seitig in applyHistoryFilters() (kein Re-Fetch pro Filter).
+            // Always load ALL prints — status/material/search/sort run
+            // client-side in applyHistoryFilters() (no re-fetch per filter).
             let url = '/api/history';
-            // Cache-first: ohne fresh kommt sofort der Cache (instant Render); danach
-            // wird einmal mit fresh=1 live nachgeladen + neu gerendert.
+            // Cache-first: without fresh, the cache renders instantly; then
+            // it reloads once live with fresh=1 and re-renders.
             if (fresh) url += (url.includes('?') ? '&' : '?') + 'fresh=1';
 
             try {
@@ -642,13 +632,13 @@
 
                 if (data.prints && data.prints.length > 0) {
                     _allPrints = data.prints;
-                    // Statistik immer über ALLE Drucke (ungefiltert).
+                    // Statistics always run over ALL prints (unfiltered).
                     statsPrints = data.prints;
                     buildHistoryFilterOptions(_allPrints);
-                    applyHistoryFilters();   // filtert + splittet + rendert + Zähler
-                    // Statistik-Dashboard lazy: erst rendern (inkl. Deep-Detail-
-                    // Laden) wenn der Tab offen ist — sonst lädt es bei jedem
-                    // History-Aufruf ungefragt hunderte Detail-JSONs.
+                    applyHistoryFilters();   // filters + splits + renders + updates counters
+                    // Statistics dashboard is lazy: only render (including
+                    // deep-detail loading) once the tab is open — otherwise
+                    // it would fetch hundreds of detail JSONs on every history call.
                     if (currentTab === 'statistics') renderStatsTab(true);
                 } else {
                     _listeAktuell = [];
@@ -664,14 +654,14 @@
                 document.getElementById('hv-liste').innerHTML =
                     `<div class="hist-empty"><span style="color: var(--color-red);">${texts.console_history_error}</span></div>`;
             }
-            // Cache-first „dann auffrischen": nach dem Instant-Render einmal live nachladen.
+            // Cache-first "then refresh": reload once live after the instant render.
             if (!fresh) loadHistory(true);
         }
 
-        // Eine Zeile der Druckliste. Bewusst schmal: die Liste steht dauerhaft
-        // neben dem Detail, alles Ausfuehrliche steht rechts. Der Status-Punkt
-        // erscheint nur, wenn der Druck NICHT erfolgreich war — bei acht gruenen
-        // Haken hintereinander traegt das Symbol keine Information mehr.
+        // One row of the print list. Deliberately narrow: the list sits
+        // permanently next to the detail view, everything detailed goes on
+        // the right. The status dot only appears when the print did NOT
+        // succeed — eight green checkmarks in a row carry no information.
         function renderHistoryZeile(print) {
             const esc = s => String(s == null ? '' : s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -680,11 +670,10 @@
                 ? (print.duration_minutes < 60
                    ? `${Math.max(1, Math.round(print.duration_minutes))} min`
                    : `${Math.floor(print.duration_minutes / 60)}:${String(print.duration_minutes % 60).padStart(2, '0')} h`)
-                // Beim laufenden Druck steht rechts schon die Marke „Druckt" —
-                // hier stattdessen die bisher gelaufene Zeit, sonst stand
-                // zweimal dasselbe Wort in einer Zeile. Ein Fortschritt in
-                // Prozent geht nicht: /api/history liefert kein last_progress,
-                // der alte Balken stand deshalb immer auf 0 %.
+                // The running print already shows the "Printing" badge on the
+                // right, so here we show the elapsed time instead — otherwise
+                // the same word would appear twice in one line. A percentage
+                // isn't possible: /api/history doesn't return last_progress.
                 : (print.status === 'running'
                     ? _laufzeit(print.start_time)
                     : texts.unknown);
@@ -693,14 +682,14 @@
             const datum = isNaN(d) ? '' : d.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })
                 + ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-            // Ein Farbpunkt vorn — er gehoert zum Druck, nicht ans Zeilenende.
+            // A color dot up front — it belongs to the print, not at the end of the row.
             const farben = _zeilenFarben(print);
             const punkte = farben.slice(0, 3).map(c =>
                 `<span class="hv-punkt" style="background:${esc(c)};" title="${esc(texts.detail_filament)}"></span>`).join('');
 
-            // Erfolgreich ist der Normalfall und bekommt keine Marke. Acht gruene
-            // Haken untereinander waren keine Information; auffallen soll, was
-            // NICHT normal lief — als Wort, nicht als unbeschrifteter Punkt.
+            // Success is the normal case and gets no badge. Eight green
+            // checkmarks in a row carry no information; what should stand
+            // out is what did NOT run normally — as a word, not a bare dot.
             const markeText = {
                 running: texts.status_running, failed: texts.status_failed,
                 cancelled: texts.status_cancelled
@@ -708,9 +697,9 @@
             const marke = markeText
                 ? `<span class="hv-e-marke hv-e-marke--${esc(print.status)}">${esc(markeText)}</span>` : '';
 
-            // Kalibrierungen stehen mit in der Liste, sollen aber nicht wie
-            // ein Druck aussehen: eigene Marke, und der Name kommt lesbar
-            // statt als calibrate_motion_precision.gcode.
+            // Calibrations appear in the list too, but shouldn't look like a
+            // print: their own badge, and the name is shown readably instead
+            // of as calibrate_motion_precision.gcode.
             const system = !!print.is_system_run;
             const systemMarke = system
                 ? `<span class="hv-e-marke hv-e-marke--system">${esc(texts.history_system_run || 'System')}</span>` : '';
@@ -719,7 +708,7 @@
                     .replace(/\.(gcode\.3mf|gcode|3mf)$/, '').replace(/_/g, ' ')
                 : print.filename;
 
-            // Ohne Vorschaubild ein Symbol statt eines leeren grauen Kastens.
+            // Without a thumbnail, show an icon instead of an empty gray box.
             const bild = print.has_thumbnail
                 ? `<img src="/api/history/${print.id}/thumbnail" alt=""
                         onerror="this.remove(); this.parentNode.classList.add('kein-bild');">` : '';
@@ -748,7 +737,7 @@
                 </div>`;
         }
 
-        // Wie lange der laufende Druck schon dauert.
+        // How long the running print has been going.
         function _laufzeit(start) {
             const t = new Date(String(start).replace(' ', 'T'));
             if (isNaN(t)) return texts.status_running;
@@ -757,7 +746,7 @@
                 : `${Math.floor(min / 60)}:${String(min % 60).padStart(2, '0')} h`;
         }
 
-        // Farben eines Drucks fuer die Listenzeile (max. 3 Punkte).
+        // Colors of a print for the list row (max. 3 dots).
         function _zeilenFarben(print) {
             if (Array.isArray(print.filaments) && print.filaments.length) {
                 return print.filaments.map(f => _normColor(f.color) || '#9ca3af');
@@ -766,10 +755,9 @@
             return [];
         }
 
-        // Die Liste zeigt immer genau EINEN Datensatz: den des aktiven Reiters.
-        // Vorher gab es zwei DOM-Container nebeneinander, von denen einer per
-        // CSS versteckt war — beim Blaettern haette man dann durch unsichtbare
-        // Eintraege navigiert.
+        // The list always shows exactly one data set — the active tab's —
+        // as a single container, so paging never walks through entries
+        // hidden by CSS in an unused second container.
         function renderListe() {
             const el = document.getElementById('hv-liste');
             if (!el) return;
@@ -794,7 +782,7 @@
             });
         }
 
-        // Zaehler + Pfeilknoepfe im Detailkopf an die sichtbare Liste anpassen.
+        // Sync the counter and arrow buttons in the detail header to the visible list.
         function aktualisiereBlaettern() {
             const i = _sichtbar.findIndex(p => String(p.id) === String(_gewaehlt));
             const zaehler = document.getElementById('hv-zaehler');
@@ -814,13 +802,13 @@
             const ziel = _sichtbar[i + richtung];
             if (!ziel) return;
             showPrintDetails(ziel.id);
-            // Gewaehlte Zeile in den sichtbaren Bereich holen, sonst blaettert
-            // man rechts weiter waehrend links die Markierung aus dem Bild laeuft.
+            // Scroll the selected row into view, otherwise paging continues
+            // on the right while the highlight scrolls out of view on the left.
             const zeile = document.querySelector(`#hv-liste .hv-eintrag[data-id="${ziel.id}"]`);
             if (zeile) zeile.scrollIntoView({ block: 'nearest' });
         }
 
-        // Pfeiltasten blaettern, Escape schliesst (auf Mobil zurueck zur Liste).
+        // Arrow keys page through, Escape closes (back to the list on mobile).
         document.addEventListener('keydown', (e) => {
             const t = e.target;
             if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
@@ -830,24 +818,25 @@
             else if (e.key === 'Escape') closePrintDetails();
         });
 
-        // ---- Filterleiste (client-seitig auf den geladenen Drucken) ----
+        // ---- Filter bar (client-side, over the loaded prints) ----
         let _allPrints = [];
-        let _histColor = '';   // ausgewählte Filamentfarbe (Filter)
-        let _listeAktuell = [];  // Drucke im Reiter „Aktuelle"
-        let _listeArchiv = [];   // Drucke im Reiter „Archiv"
-        let _sichtbar = [];      // was gerade in der Liste steht (Basis fuers Blaettern)
-        let _gewaehlt = null;    // id des rechts angezeigten Drucks
+        let _histColor = '';   // selected filament color (filter)
+        let _listeAktuell = [];  // prints in the "Current" tab
+        let _listeArchiv = [];   // prints in the "Archive" tab
+        let _sichtbar = [];      // what's currently in the list (basis for paging)
+        let _gewaehlt = null;    // id of the print shown on the right
 
-        // Materialien aus dem filament_type ziehen (single = klarer String,
-        // multi = JSON-Array-String → parsen, sonst an , / ; trennen + säubern).
-        // Echtes Basismaterial aus filament_type/-name/filaments ziehen. Die DB hat in
-        // filament_type oft ganze Namen + Kombis ("Bambu PETG Basic + 5 weitere") statt
-        // des Materials → hier auf bekannte Materialien normalisieren (Set, da Kombis).
+        // Pull materials from filament_type (single = plain string, multi =
+        // JSON array string → parse it, otherwise split on , / ; and clean up).
+        // Pull the real base material from filament_type/-name/filaments. The
+        // DB often stores whole names + combos ("Bambu PETG Basic + 5 more")
+        // in filament_type instead of the material → normalize here to known
+        // materials (a Set, since combos exist).
         const _KNOWN_MATERIALS = ['PETG', 'TPU', 'ABS', 'ASA', 'PVA', 'HIPS', 'PLA'];
         function _historyMaterials(p) {
-            // filament_material ist das bereits normalisierte Basismaterial und
-            // damit die verlaessliche Quelle; die Namensfelder sind nur der
-            // Rueckfall fuer aeltere Datensaetze ohne diese Spalte.
+            // filament_material is the already-normalized base material and
+            // thus the reliable source; the name fields are only the fallback
+            // for older records without this column.
             const direkt = [];
             if (p.filament_material) String(p.filament_material).toUpperCase()
                 .split(/[,;+/]/).map(x => x.trim()).forEach(x => { if (x) direkt.push(x); });
@@ -869,15 +858,16 @@
             return found;
         }
 
-        // Farbwert vereinheitlichen: # ergänzen, Großschrift, Alpha kappen, #RGB→#RRGGBB,
-        // ungültiges verwerfen. Sammelt sonst dieselbe Farbe mehrfach (#fff/#FFFFFF/ffffff).
+        // Normalize the color value: add #, uppercase, strip alpha,
+        // #RGB→#RRGGBB, discard invalid. Otherwise the same color gets
+        // collected multiple times (#fff/#FFFFFF/ffffff).
         function _normColor(c) {
             if (!c) return '';
             let s = String(c).trim();
             if (!s) return '';
             if (s[0] !== '#') s = '#' + s;
             s = s.toUpperCase();
-            if (/^#[0-9A-F]{8}$/.test(s)) s = s.slice(0, 7);           // Alpha kappen
+            if (/^#[0-9A-F]{8}$/.test(s)) s = s.slice(0, 7);           // strip alpha
             if (/^#[0-9A-F]{3}$/.test(s)) s = '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3];
             return /^#[0-9A-F]{6}$/.test(s) ? s : '';
         }
@@ -888,16 +878,17 @@
             return set;
         }
 
-        // Fast-identische Farben zusammenfassen — ABSTANDSBASIERT (kein Raster):
-        // Farben innerhalb RGB-Distanz D landen im selben Cluster, Repräsentant =
-        // häufigste echte Farbe. So fallen z.B. #000000 und #16161A zusammen (eine
-        // Rasterung würde die an der Grenze trennen). _colorClusterMap wird in
-        // buildHistoryFilterOptions gefüllt.
-        let _colorClusterMap = {};   // echte Farbe (#RRGGBB) → Cluster-Repräsentant
+        // Merge near-identical colors — DISTANCE-BASED (no grid): colors
+        // within RGB distance D land in the same cluster, with the
+        // representative being the most frequent actual color. This way
+        // #000000 and #16161A end up together, for example (a grid would
+        // split them at the boundary). _colorClusterMap gets filled in
+        // buildHistoryFilterOptions.
+        let _colorClusterMap = {};   // actual color (#RRGGBB) → cluster representative
         function _rgb(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
         function _buildColorClusters(colorCounts) {
-            const D2 = 45 * 45;   // RGB-Distanz-Schwelle
-            const items = [...colorCounts.entries()].sort((a, b) => b[1] - a[1]);  // häufigste zuerst
+            const D2 = 45 * 45;   // RGB distance threshold
+            const items = [...colorCounts.entries()].sort((a, b) => b[1] - a[1]);  // most frequent first
             const clusters = [];
             _colorClusterMap = {};
             for (const [hex] of items) {
@@ -919,14 +910,14 @@
         }
 
         function buildHistoryFilterOptions(prints) {
-            // placeholder/title beherrscht der i18nManager nicht → hier setzen.
+            // The i18nManager doesn't handle placeholder/title → set them here.
             const searchEl = document.getElementById('hist-search');
             if (searchEl) searchEl.placeholder = texts.history_search_placeholder || 'Drucke durchsuchen...';
             const dedupEl = document.getElementById('hist-dedup');
             if (dedupEl) dedupEl.title = texts.history_hide_duplicates || 'Duplikate ausblenden';
 
             const mats = new Set(), printers = new Set();
-            const colorCounts = new Map();   // echte Farbe → Häufigkeit
+            const colorCounts = new Map();   // actual color → frequency
             prints.forEach(p => {
                 if (p.printer_type) printers.add(p.printer_type);
                 _printColors(p).forEach(c => colorCounts.set(c, (colorCounts.get(c) || 0) + 1));
@@ -1013,7 +1004,7 @@
         }
 
         // Calculate and render statistics
-        // Statistik-Dashboard (Port von Androids AnalyticsDashboard, analytics-dashboard.js).
+        // Statistics dashboard (ported from Android's AnalyticsDashboard, analytics-dashboard.js).
         function calculateStatistics(prints) {
             const container = document.getElementById('history-list-statistics');
             if (!container || !window.AnalyticsDashboard || !window.HistoryAnalytics) return;
@@ -1021,25 +1012,25 @@
                 filamentDefaultPerKg: (costSettings && costSettings.filament_per_kg) || 21,
                 powerPerKwh: (costSettings && costSettings.power_per_kwh) || 0.30,
                 fetchDetail: async (id) => { const r = await apiCall('/api/history/' + id); return r && r.ok ? await r.json() : null; },
-                // Fehler-Steckbrief: EINE Abfrage ueber alle Ereignisse statt
-                // je Druck — der Steckbrief soll nicht bei den juengsten
-                // Drucken aufhoeren, wie es die Detail-Abrufe tun (DEEP_CAP).
+                // Error profile: ONE query over all events instead of per
+                // print — the profile shouldn't stop at the most recent
+                // prints the way the detail fetches do (DEEP_CAP).
                 fetchHmsProfile: async (tage) => {
                     const r = await apiCall('/api/history/hms-profile'
                         + (tage ? '?days=' + tage : ''));
                     return r && r.ok ? await r.json() : null;
                 },
-                // Feuchte-Gedaechtnis: Verlauf je AMS-Einheit und Urteil je
-                // Fach. Kommt nicht aus den Druckdaten, sondern aus der
-                // eigenen Messreihe — deshalb ein eigener Abruf.
+                // Humidity memory: history per AMS unit and a verdict per
+                // slot. Doesn't come from the print data but from its own
+                // measurement series — hence a separate fetch.
                 fetchFeuchte: async (tage) => {
                     const r = await apiCall('/api/filament/feuchte?tage=' + (tage || 30));
                     return r && r.ok ? await r.json() : null;
                 },
-                // Aus der Statistik heraus einen Druck oeffnen: erst zurueck in
-                // den passenden Reiter wechseln. Im Statistik-Modus sind Liste
-                // und Detail ausgeblendet — showPrintDetails allein fuellte ein
-                // unsichtbares Panel, es passierte scheinbar nichts.
+                // Opening a print from within statistics: first switch back
+                // to the matching tab. In statistics mode the list and detail
+                // are hidden — calling showPrintDetails alone would fill an
+                // invisible panel and appear to do nothing.
                 onOpenPrint: (id) => {
                     if (id == null || typeof showPrintDetails !== 'function') return;
                     const imArchiv = _listeArchiv.some(p => String(p.id) === String(id));
@@ -1051,8 +1042,9 @@
             });
         }
 
-        // Lazy-Render des Statistik-Dashboards: einmal beim ersten Öffnen des Tabs
-        // (Deep-Cache bleibt im Render-Closure erhalten). force=true bei Daten-Refresh.
+        // Lazy render of the statistics dashboard: only once, on first
+        // opening the tab (the deep cache stays alive in the render
+        // closure). force=true on a data refresh.
         let statsBuilt = false;
         let statsPrints = [];
         function renderStatsTab(force) {
@@ -1084,8 +1076,9 @@
             return '#666';
         }
 
-        // Custom Confirm Dialog (gleicher Stil wie index.html)
-        function showConfirmDialog(message, title = 'Bestätigung', options = {}) {
+        // Custom confirm dialog (same style as index.html)
+        function showConfirmDialog(message, title, options = {}) {
+            title = title || texts.confirm_title || 'Bestätigung';
             const okText = options.okText || texts.confirm_ok || 'Löschen';
             const okClass = options.okClass || 'hist-btn--danger';
             const icon = options.icon || `<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg>`;
@@ -1126,9 +1119,8 @@
             });
         }
 
-        // Custom Toast (Name showWebToast um Konflikt mit Electron toast.js zu vermeiden)
-        // Die Historie hatte einen eigenen Toast unten am Bildschirm mit
-        // Emoji davor. Jetzt derselbe Stapel oben rechts wie ueberall sonst.
+        // Custom toast (named showWebToast to avoid a conflict with
+        // Electron's toast.js).
         function showWebToast(message, type = 'success') {
             if (typeof window.skToast === 'function') window.skToast(message, type);
             else console.log(message);
@@ -1143,8 +1135,8 @@
                 const response = await apiCall(`/api/history/${printId}`, { method: 'DELETE' });
                 if (response.ok) {
                     showWebToast(texts.toast_print_deleted, 'success');
-                    // Rechts stand sonst weiter der Druck, den man gerade
-                    // geloescht hat — inklusive „Erneut drucken"-Knopf.
+                    // Otherwise the print one had just deleted stayed on
+                    // the right, "print again" button included.
                     if (String(_gewaehlt) === String(printId)) closePrintDetails();
                     loadHistory();
                 } else {
@@ -1163,11 +1155,11 @@
             aktualisiereBlaettern();
             document.getElementById('hv-nichts').style.display = 'none';
             document.getElementById('hv-inhalt').style.display = '';
-            // Auf schmalen Schirmen schiebt sich das Detail ueber die Liste.
+            // On narrow screens the detail slides over the list.
             document.getElementById('hv-rahmen').classList.add('hv-offen');
 
-            // Ein Chart aus dem vorher gewaehlten Druck haelt sonst dessen Daten
-            // fest und zeichnet beim Reiterwechsel den falschen Verlauf.
+            // A chart from the previously chosen print otherwise holds its data
+            // and draws the wrong trace on a tab change.
             if (printProgressChart) { printProgressChart.destroy(); printProgressChart = null; }
 
             try {
@@ -1186,15 +1178,15 @@
                         .catch(err => console.error('Timelapse check failed:', err));
                 }
 
-                // Console-Tab nur einblenden wenn Lines vorhanden (Klipper).
+                // Show the console tab only when there are lines (Klipper).
                 const consoleBtn = document.getElementById('console-tab-btn');
                 if (consoleBtn) {
                     consoleBtn.style.display = (data.console_log && data.console_log.length > 0)
                         ? 'block' : 'none';
                 }
 
-                // Bed-Mesh-Tab nur wenn dieser Druck einen Snapshot hat (Companion
-                // speichert ihn beim Macro-Event bed_mesh_end - aeltere Drucke haben keinen).
+                // The bed mesh tab only when this print has a snapshot (the
+                // companion stores it on the bed_mesh_end macro event).
                 const meshBtn = document.getElementById('mesh-tab-btn');
                 if (meshBtn) {
                     meshBtn.style.display = (data.print && data.print.bed_mesh) ? 'block' : 'none';
@@ -1202,13 +1194,13 @@
 
                 const escHtml = s => String(s == null ? '' : s)
                     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                // Der Dateiname bekommt die volle Kopfzeile und wird per CSS
-                // abgeschnitten — kein Kuerzen auf 50 Zeichen mehr, das schnitt
-                // auch bei viel Platz ab.
+                // The file name gets the full header and is clipped by CSS --
+                // no more cutting at 50 characters, which clipped even with
+                // plenty of room.
                 document.getElementById('detail-title').textContent = data.print.filename;
 
-                // Unterzeile: wann gedruckt wurde und womit. Der Status steht
-                // rechts als Chip — im Fliesstext ging er unter.
+                // Subline: when it was printed and with what. The state stands
+                // on the right as a chip -- in running text it was lost.
                 const p = data.print;
                 const dt = new Date(p.start_time);
                 const teile = [];
@@ -1255,8 +1247,8 @@
             }
         }
 
-        // Linien-Icons der Detail-Abschnitte. Emoji sahen je nach System
-        // anders aus und passten nicht zu den Icons im Rest der Oberflaeche.
+        // Line icons of the detail sections. Emoji looked different on every
+        // system and did not match the icons in the rest of the interface.
         const HIST_ICO = {
             eckdaten:    '<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
             temperatur:  '<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/></svg>',
@@ -1281,8 +1273,8 @@
             const esc = v => String(v == null ? '' : v)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const zahl = (v, einheit) => `<span class="hv-wert-zahl">${esc(v)}${einheit ? ` <small>${esc(einheit)}</small>` : ''}</span>`;
-            // Fehlende Werte werden als solche benannt. Vorher stand dort eine
-            // Tilde neben „0,00 €" — das las sich wie ein gemessener Wert.
+            // Missing values are named as such. A tilde used to stand there
+            // beside "0.00 €" -- which read like a measured value.
             const fehlt = (was) => `<span class="hv-wert-zahl hv-wert-zahl--leer">— <small>${esc(was || T.detail_not_recorded)}</small></span>`;
             const wert = (name, inhalt) =>
                 `<div class="hv-wert"><span class="hv-wert-name">${esc(name)}</span>${inhalt}</div>`;
@@ -1292,10 +1284,10 @@
                 return `${Math.floor(min / 60)}:${String(Math.round(min % 60)).padStart(2, '0')} h`;
             };
 
-            // ---- Karte 1: geplant gegen gemessen -----------------------------
-            // Beides stand vorher gemischt in verschiedenen Kaesten — die Duese
-            // mit 275 °C unter „Temperaturen" und mit 280 °C unter
-            // „Druck-Einstellungen", ohne Hinweis welcher Wert welcher ist.
+            // ---- Card 1: planned against measured --------------------------
+            // Both used to stand mixed in different boxes -- the nozzle with
+            // 275 °C under "temperatures" and with 280 °C under "print
+            // settings", with no hint which value was which.
             const planMin = set.print_time_estimate ? set.print_time_estimate / 60 : null;
             const geplant = [
                 wert(T.detail_duration, planMin != null ? zahl(stunden(planMin)) : fehlt()),
@@ -1305,8 +1297,8 @@
                 wert(T.detail_bed, set.bed_temp ? zahl(set.bed_temp, '°C') : fehlt())
             ].join('');
 
-            // Erfolgreich = alle Schichten gedruckt; das letzte Sample der
-            // Companion liegt oft ein bis zwei Schichten darunter.
+            // Successful = every layer printed; the companion's last sample
+            // often lies one or two layers below that.
             const pr = d.progress || [];
             const letzteSchicht = pr.length ? pr[pr.length - 1].layer : null;
             const schichten = (print.status === 'success' && print.total_layers)
@@ -1323,8 +1315,8 @@
                     ? zahl(Math.round(stats.max_nozzle_temp), '°C') : fehlt()),
                 wert(T.detail_bed_max, stats.max_bed_temp != null
                     ? zahl(Math.round(stats.max_bed_temp), '°C') : fehlt()),
-                // Endstand nur, wenn er etwas aussagt — bei einem erfolgreichen
-                // Druck sind 100 % keine Information.
+                // The final state only when it says something -- on a
+                // successful print 100 % is no information.
                 print.status !== 'success' && endstand != null
                     ? wert(T.detail_final_progress, zahl(endstand, '%')) : '',
                 stats.avg_chamber_temp != null
@@ -1369,10 +1361,10 @@
                 </div>`;
 
             // ---- Karte 3: Filamente ------------------------------------------
-            // Die Tabelle print_filaments wird nur bei Mehrfarb-Drucken
-            // gefuellt. Bei einem einzelnen Filament blieb die Karte deshalb
-            // ganz weg, obwohl Name, Typ und Farbe im Druck-Datensatz stehen —
-            // sie standen dann nur noch klein in der Kopfzeile.
+            // The print_filaments table is only filled for multi-colour
+            // prints. With a single filament the card therefore stayed away
+            // entirely, although name, type and colour are in the print record
+            // -- they then stood only small in the header.
             let fils = Array.isArray(d.filaments) ? d.filaments : [];
             if (!fils.length && (print.filament_type || print.filament_material)) {
                 fils = [{
@@ -1402,11 +1394,11 @@
             }
 
             // ---- Karte 4: Slicer-Einstellungen -------------------------------
-            // Nur zeigen, wenn tatsaechlich etwas darin steht. Fuer Drucke
-            // ohne erreichbare 3MF (direkt aus Bambu Studio) liegt in der
-            // Datenbank ein Datensatz mit lauter NULL — bis auf zwei Nullen
-            // fuer die Schalter, die dann als "Stuetzen: aus" erschienen,
-            // obwohl wir es gar nicht wissen.
+            // Only show it when something is actually in there. For prints
+            // without a reachable 3MF (straight from Bambu Studio) the
+            // database holds a record of nothing but NULL -- except two zeros
+            // for the switches, which then appeared as "supports: off",
+            // although we do not know at all.
             const echteWerte = ['layer_height', 'infill_density', 'wall_loops', 'print_speed',
                                 'nozzle_temp', 'bed_temp', 'nozzle_diameter',
                                 'top_layers', 'bottom_layers', 'print_time_estimate'];
@@ -1423,9 +1415,9 @@
                         ? wert(T.detail_top_bottom, zahl(`${set.top_layers || '—'} / ${set.bottom_layers || '—'}`)) : '',
                     set.support_enabled != null ? wert(T.detail_support, anAus(set.support_enabled)) : '',
                     set.ironing_enabled != null ? wert(T.detail_ironing, anAus(set.ironing_enabled)) : '',
-                    // Dateigroesse stand vorher zweimal auf demselben Blatt, mit
-                    // unterschiedlichen Werten (1,5 MB oben, 1,4 MB unten) — weil
-                    // einmal durch 1e6 und einmal durch 1048576 geteilt wurde.
+                    // The file size used to stand twice on the same sheet with
+                    // different values (1.5 MB above, 1.4 MB below) -- because
+                    // one divided by 1e6 and the other by 1048576.
                     print.file_size ? wert(T.detail_file_size,
                         zahl((print.file_size / 1048576).toFixed(1), 'MB')) : ''
                 ].join('');
@@ -1436,8 +1428,8 @@
                 </div>`;
             }
 
-            // Ohne Vorschaubild einmal erklaeren, warum — sonst wirkt es
-            // wie ein Fehler unserer Seite.
+            // Without a preview, explain once why -- otherwise it looks like a
+            // fault on our side.
             if (!print.thumbnail_base64) {
                 html += `
                 <div class="hv-karte hv-karte--hinweis">
@@ -1474,8 +1466,8 @@
         }
 
         // Bed-Mesh-Tab: Snapshot-JSON {matrix, mesh_min, mesh_max, profile_name}
-        // aus der History (Companion) - gleicher Plotly-Renderer wie bedmesh.html
-        // (Live-Ansicht), nur mit statischen statt live gepollten Daten.
+        // from the history (companion) -- the same Plotly renderer as
+        // bedmesh.html (the live view), only with static instead of polled data.
         var PORTLAND_MESH = [
             [0.0, '#313695'], [0.1, '#4575b4'], [0.2, '#74add1'], [0.3, '#abd9e9'],
             [0.4, '#e0f3f8'], [0.5, '#ffffbf'], [0.6, '#fee090'], [0.7, '#fdae61'],
@@ -1560,8 +1552,8 @@
             }
             empty.style.display = 'none';
             wrap.style.display = 'block';
-            // Nur einmal pro Detail-Oeffnen zeichnen (WebGL-Aufbau ist teuer,
-            // Tab hat sich ja nicht geaendert waehrend das Modal offen ist).
+            // Draw only once per detail opening (the WebGL setup is expensive,
+            // and the tab has not changed while the modal is open).
             if (!_histMeshRendered) { renderHistoryMesh(bm); _histMeshRendered = true; }
             updateHistoryMeshInfo(bm);
         }
@@ -1571,7 +1563,7 @@
                 document.getElementById('detail-console').textContent = '';
                 return;
             }
-            // Escape HTML, prepend timestamp pro Zeile, monospace.
+            // Escape the HTML, prepend a timestamp per line, monospace.
             const escape = s => String(s)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             const lines = currentPrintData.console_log.map(l => {
@@ -1579,20 +1571,23 @@
                 return `<span style="color:var(--text-secondary, #888);">${t}</span>  ${escape(l.message)}`;
             });
             const el = document.getElementById('detail-console');
+            // Only follow along while the reader IS at the bottom. Whoever
+            // has scrolled up to an older line has said what they want to
+            // look at; the next refresh must not drag them away from it.
+            const warAmEnde = el.scrollHeight - el.scrollTop - el.clientHeight <= 40;
             el.innerHTML = lines.join('\n');
-            // Auto-scroll ans Ende — User sieht zuerst die neueste Stelle.
-            el.scrollTop = el.scrollHeight;
+            if (warAmEnde) el.scrollTop = el.scrollHeight;
         }
 
         // Show progress chart
-        // Verlauf: Chips oben statt Chart.js-Legende, Ereignisse als senkrechte
-        // Marken IM Diagramm, und eine Uebersichtsleiste zum Hineinzoomen.
+        // The trace: chips on top instead of a Chart.js legend, events as
+        // vertical marks IN the diagram, and an overview bar to zoom into.
         //
-        // Warum der Zoom: ein fuenfstuendiger Druck bringt rund 660 Messpunkte.
-        // Auf 1000 Pixel traegt damit jeder Pixel zwei Messungen — die
-        // Duesenkurve wird zu einem Zickzack-Band, in dem einzelne Ausschlaege
-        // nicht mehr von Rauschen zu unterscheiden sind. Im Ausschnitt liegen
-        // dieselben Punkte weit auseinander und die Kurve flacht ab.
+        // Why the zoom: a five-hour print produces about 660 samples. On 1000
+        // pixels every pixel then carries two measurements -- the nozzle curve
+        // becomes a zigzag band in which single excursions can no longer be
+        // told from noise. In a section the same points lie far apart and the
+        // curve flattens out.
         var _verlaufReihen = null;
         var _vPunkte = [];        // Messpunkte des aktuellen Drucks
         var _vZeit = [];          // deren Zeitstempel in ms
@@ -1601,9 +1596,9 @@
         var _vMarken = [];        // Ereignisse als {ms, typ}
         var _vMarkenAn = true;
 
-        // Eine Reihe liest normalerweise ein Feld des Messpunkts. Die
-        // Doppelduese braucht mehr: ihre Werte stecken im Unterobjekt
-        // nozzle_temps, deshalb darf eine Reihe auch rechnen.
+        // A series normally reads one field of the sample. The dual nozzle
+        // needs more: its values sit in the sub-object nozzle_temps, so a
+        // series may compute as well.
         function _vWert(p, r) { return r.wert ? r.wert(p) : p[r.key]; }
 
         function _vZeitpunkt(wert) {
@@ -1613,8 +1608,8 @@
             const d = new Date(ms);
             return isNaN(d) ? '' : d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
         }
-        // Indizes des sichtbaren Bereichs, je einer links und rechts darueber
-        // hinaus, damit die Linien am Rand nicht in der Luft enden.
+        // Indices of the visible range, one each beyond it on the left and
+        // right, so the lines do not end in mid-air at the edge.
         function _vBereich() {
             let a = _vZeit.findIndex(t => t >= _vVon);
             if (a < 0) a = 0;
@@ -1648,8 +1643,8 @@
                 return isNaN(t) ? null : { ms: t, typ: ev.type };
             }).filter(Boolean).filter(m => m.ms >= _vT0 && m.ms <= _vT1);
 
-            // …und jeder Wechsel der aktiven Duese als eigene Marke. Das ist
-            // das "wann": ohne sie sieht man nur, DASS zwei Kurven laufen.
+            // …and every change of the active nozzle as a mark of its own.
+            // That is the "when": without them one only sees THAT two curves run.
             let vorher = null;
             pr.forEach((p, k) => {
                 const jetzt = p.active_nozzle;
@@ -1662,11 +1657,11 @@
             const chamber = pr.some(p => p.chamber_temp != null);
             const leistung = pr.some(p => p.power_watts != null);
 
-            // Doppelduese: nozzle_temp traegt den Wert der GERADE AKTIVEN
-            // Duese (am X2D nachgemessen). Als eine Kurve gezeichnet sprang
-            // sie beim Werkzeugwechsel um 150-200 Grad, ohne dass erkennbar
-            // war, dass das ein Wechsel ist und kein Fehler. Liegen die
-            // Einzelwerte vor, wird daraus je Duese eine eigene Kurve.
+            // Dual nozzle: nozzle_temp carries the value of the CURRENTLY
+            // ACTIVE nozzle (measured on the X2D). Drawn as one curve it
+            // jumped by 150-200 degrees at a tool change without it being
+            // recognisable as a change rather than a fault. Where the
+            // individual values exist, each nozzle gets a curve of its own.
             const duesenIds = [...new Set(pr.flatMap(
                 p => p.nozzle_temps ? Object.keys(p.nozzle_temps) : []))].sort();
             const doppel = duesenIds.length > 1;
@@ -1692,10 +1687,10 @@
                 { key: 'bed_temp', name: texts.chart_label_bed, farbe: '#3b82f6', achse: 'y-temp', einheit: ' °C' });
             if (chamber) _verlaufReihen.push(
                 { key: 'chamber_temp', name: texts.detail_chamber, farbe: '#f59e0b', achse: 'y-temp', einheit: ' °C' });
-            // Die Leistung steht seit jeher in print_progress.power_watts und
-            // kam ueber die API mit — nur gezeichnet hat sie hier nie jemand.
-            // Gelb wie im Live-Verlauf (chart-manager.js 'power'), damit man
-            // dieselbe Kurve wiedererkennt.
+            // The power has always been in print_progress.power_watts and came
+            // along through the API -- only nobody ever drew it here.
+            // Yellow as in the live trace (chart-manager.js 'power'), so the
+            // same curve is recognisable again.
             if (leistung) _verlaufReihen.push(
                 { key: 'power_watts', name: texts.chart_label_power, farbe: '#ffce56', achse: 'y-watt', einheit: ' W' });
 
@@ -1739,9 +1734,9 @@
             const gitter = cs.getPropertyValue('--border-color').trim() || 'rgba(128,128,128,.3)';
             const beschriftung = cs.getPropertyValue('--text-secondary').trim() || '#999';
 
-            // Die Marken sitzen auf Positionen der Kategorie-Achse. Weil beim
-            // Zoomen die Daten selbst beschnitten werden, rechnet das Plugin
-            // sie jedes Mal neu aus dem Zeitstempel um.
+            // The marks sit on positions of the category axis. Because zooming
+            // clips the data itself, the plugin recomputes them from the
+            // timestamp every time.
             const markenPlugin = {
                 id: 'hvMarken',
                 beforeDatasetsDraw(chart) {
@@ -1788,9 +1783,9 @@
                             grid: { color: gitter }, ticks: { color: beschriftung, callback: v => v + ' %' } },
                         'y-temp': { type: 'linear', position: 'right', min: 0,
                             grid: { drawOnChartArea: false }, ticks: { color: beschriftung, callback: v => v + ' °' } },
-                        // display:'auto' — die Achse erscheint nur, solange die
-                        // Leistungskurve eingeschaltet ist. Sonst stuenden bei
-                        // jedem Druck drei Achsen nebeneinander.
+                        // display:'auto' -- the axis appears only while the
+                        // power curve is switched on. Otherwise three axes
+                        // would stand side by side on every print.
                         'y-watt': { type: 'linear', position: 'right', min: 0, display: 'auto',
                             grid: { drawOnChartArea: false }, ticks: { color: beschriftung, callback: v => v + ' W' } }
                     }
@@ -1799,7 +1794,7 @@
             });
         }
 
-        // Uebersichtsleiste: immer der ganze Druck, stark vereinfacht.
+        // The overview bar: always the whole print, heavily simplified.
         function _vBaueMini() {
             const c = document.getElementById('hv-mini');
             const spur = document.getElementById('hv-spur');
@@ -1811,9 +1806,9 @@
             g.setTransform(dpr, 0, 0, dpr, 0, 0);
             g.clearRect(0, 0, b.width, b.height);
 
-            // Je Achse ein eigener Hoechstwert: Watt und Grad in denselben
-            // Massstab zu zwingen wuerde die Temperaturkurven platt an den
-            // Boden druecken (1000 W gegen 250 °C).
+            // A maximum of its own per axis: forcing watts and degrees into
+            // the same scale would press the temperature curves flat against
+            // the floor (1000 W against 250 °C).
             const achsMax = { 'y-temp': 60, 'y-watt': 1 };
             _vPunkte.forEach(p => {
                 achsMax['y-temp'] = Math.max(achsMax['y-temp'],
@@ -1840,7 +1835,7 @@
             g.globalAlpha = 1;
         }
 
-        // Chips tragen Hoechst- und Tiefstwert des SICHTBAREN Bereichs.
+        // The chips carry the highest and lowest value of the VISIBLE range.
         function _vChips() {
             const { a, b } = _vBereich();
             const el = document.getElementById('hv-chips');
@@ -1923,9 +1918,9 @@
                 printProgressChart.data.datasets[i].data = teil.map(p => _vWert(p, r));
             });
 
-            // Die Temperaturachse folgt dem Ausschnitt. Ohne das klebt die
-            // Kurve beim Hineinzoomen flach am unteren Rand, weil die Achse
-            // weiter bis zum Hoechstwert des ganzen Drucks reicht.
+            // The temperature axis follows the section. Without that the curve
+            // sticks flat to the bottom edge while zooming in, because the axis
+            // still reaches to the maximum of the whole print.
             let tMax = 0;
             _verlaufReihen.forEach((r, i) => {
                 if (r.achse !== 'y-temp') return;
@@ -1955,7 +1950,7 @@
                 if (griff === 'l' || griff === 'r') zieh = { art: griff, b };
                 else if (x >= l && x <= r) zieh = { art: 'schieben', b, greifX: x, von: _vVon, bis: _vBis };
                 else {
-                    // Klick daneben setzt das Fenster gleicher Breite dorthin.
+                    // A click beside it puts the window of the same width there.
                     const breite = _vBis - _vVon;
                     const mitte = _vT0 + x / b.width * (_vT1 - _vT0);
                     _vVon = Math.max(_vT0, Math.min(_vT1 - breite, mitte - breite / 2));
@@ -2013,12 +2008,12 @@
 
         // History-Event-`details` → lesbarer Text. Pendant zu Androids
         // KlipperEventFormatter: Companion liefert rohes JSON {"key":"events.x","vars":{}}
-        // (oder einen rohen Key) → wir übersetzen client-seitig via texts.klipper_evt_*.
+        // (or a raw key) -> we translate client-side via texts.klipper_evt_*.
         function formatEventDetail(details) {
             if (!details) return '';
-            // WICHTIG: die lokale `texts` (via i18nManager.getAllTexts() befüllt),
-            // NICHT window.texts (das ist hier nicht gesetzt) — sonst fehlen die
-            // klipper_evt_*-Templates und es bleibt der nackte Key stehen.
+            // IMPORTANT: the local `texts` (filled via i18nManager.getAllTexts()),
+            // NOT window.texts (which is not set here) -- otherwise the
+            // klipper_evt_* templates are missing and the bare key stands.
             const t = (typeof texts !== 'undefined' && texts) ? texts : (window.texts || {});
             const resolveKey = (key, vars) => {
                 const name = 'klipper_evt_' + key.replace(/^events\./, '').replace(/^stages\./, '');
@@ -2045,39 +2040,39 @@
                     }
                 } catch (e) { /* kein gültiges JSON → Fall 3 */ }
             }
-            // Fall 3: bereits fertiger Text
+            // Case 3: an already finished text
             return details;
         }
 
         // Show events timeline
         /**
-         * Die Phasen dieses Drucks als Balken.
+         * The phases of this print as a bar.
          *
-         * Der Drucker meldet jeden Stufenwechsel (stage_change). Bis 27aug26
-         * standen die nur als Zeilen untereinander — dass zehn von zwoelf
-         * Minuten in die Vorkonditionierung gingen, musste man sich aus
-         * Zeitstempeln zusammenrechnen. Dauer einer Stufe = Zeit bis zum
-         * naechsten Wechsel, die letzte bis zum Ende des Drucks.
+         * The printer reports every stage change (stage_change). Those used
+         * to stand only as rows under each other -- that ten of twelve
+         * minutes went into the preconditioning had to be worked out from
+         * timestamps. The duration of a stage is the time until the next
+         * change, the last one until the end of the print.
          *
-         * Dieselbe Herleitung wie in analytics.js, dort ueber alle Drucke
-         * gemittelt — hier fuer diesen einen.
+         * The same derivation as in analytics.js, which averages it over
+         * every print -- here for this single one.
          */
         function phasenLeiste(events, ohneEmoji) {
-            // Nur die sechs groessten Phasen bekommen eine eigene Farbe, der
-            // Rest wird grau. Vorher hatte jede der bis zu 33 Phasen eine Farbe
-            // aus einer 8er-Palette — Cyan und Blau kamen doppelt vor, damit war
-            // die Legende nicht mehr auf den Balken abbildbar.
+            // Only the six largest phases get a colour of their own, the rest
+            // goes grey. Each of the up to 33 phases used to have a colour
+            // from a palette of eight -- cyan and blue came round twice, and
+            // the legend could no longer be mapped onto the bar.
             const FARBEN = ['#3b82f6', '#f59e0b', '#10b981',
                             '#a855f7', '#ef4444', '#06b6d4'];
             const GRAU = '#94a3b8';
             const ZEIGEN = 6;
             const zeit = t => new Date(String(t).replace(' ', 'T').slice(0, 19));
 
-            // Der Drucker schreibt die Stufe bereits uebersetzt in die Datenbank
-            // ("Druckt" / "Printing" / "Impression"), je nach Sprache zur Laufzeit.
-            // Gleich bleibt ueber alle Sprachen und beide Speicherformate hinweg
-            // nur das Emoji: 🖨️ steht fuer den echten Druck, alles andere ist
-            // Vorbereitung. Deshalb haengt die Aufteilung am Icon, nicht am Text.
+            // The printer writes the stage into the database already
+            // translated ("Druckt" / "Printing" / "Impression"), depending on
+            // the language at runtime. The only thing constant across every
+            // language and both storage formats is the emoji: 🖨️ stands for
+            // the real printing. So the split hangs off the icon, not the text.
             const istDruck = ev => {
                 const roh = String(ev.details == null ? '' : ev.details).trim();
                 if (roh.startsWith('🖨')) return true;
@@ -2108,9 +2103,9 @@
                 if (ms <= 0) continue;
                 const name = ohneEmoji(formatEventDetail(e.details));
                 if (!name) continue;
-                // Zweimal dieselbe Stufe hintereinander ist ein Wechsel, den
-                // der Drucker doppelt meldet — zusammenfassen statt zwei
-                // Abschnitte mit demselben Namen zu zeichnen.
+                // The same stage twice in a row is a change the printer
+                // reports twice -- fold them together instead of drawing two
+                // sections with the same name.
                 const letzte = teile[teile.length - 1];
                 if (letzte && letzte.name === name) letzte.ms += ms;
                 else teile.push({ name, ms, druck: istDruck(e) });
@@ -2129,9 +2124,9 @@
                 return p < 1 ? '&lt;1%' : Math.round(p) + '%';
             };
 
-            // Der Balken bleibt chronologisch, die Liste darunter beantwortet
-            // die eigentliche Frage: wo ist die Zeit geblieben. Dafuer wird pro
-            // Name summiert — eine Stufe, die dreimal vorkommt, ist eine Zeile.
+            // The bar stays chronological; the list underneath answers the
+            // actual question: where did the time go. For that it is summed
+            // per name -- a stage occurring three times is one row.
             const proName = new Map();
             teile.forEach(t => {
                 const e = proName.get(t.name) || { name: t.name, ms: 0 };
@@ -2170,8 +2165,8 @@
                 liste += schwanz.map(r => zeile(r, true)).join('');
             }
 
-            // Kernaussage: von 57:47 waren nur 27:09 wirklich Drucken. Ohne die
-            // Zeile muesste man sich das aus der Liste zusammenaddieren.
+            // The key statement: of 57:47 only 27:09 was really printing.
+            // Without the row one would have to add that up from the list.
             const druckMs = teile.reduce((a, t) => a + (t.druck ? t.ms : 0), 0);
             const split = (druckMs > 0 && druckMs < gesamt) ? `
                 <div class="hv-split">
@@ -2201,35 +2196,118 @@
                 return;
             }
 
-            // Punktfarbe traegt die Art des Ereignisses. Vorher stand vor jeder
-            // Zeile dasselbe 📌 — das unterschied nichts — und zusaetzlich noch
-            // ein Emoji aus dem uebersetzten Text davor.
+            // The dot colour carries the kind of event. The same 📌 used to
+            // stand before every row -- which distinguished nothing -- and an
+            // emoji from the translated text on top of it.
             const farbe = {
                 start:          'var(--color-blue)',
                 finish:         'var(--color-green)',
                 print_error:    'var(--color-red)',
                 server_restart: 'var(--color-orange)'
             };
-            // Fuehrende Emoji aus den Stage-Texten entfernen; die Information
-            // steckt schon im Punkt und die Zeichen sahen je nach System anders aus.
+            // Strip leading emoji from the stage texts; the information is
+            // already in the dot and the glyphs looked different per system.
             const ohneEmoji = t => String(t == null ? '' : t)
                 .replace(/^[\s\u2000-\u3300\uD83C-\uDBFF\uDC00-\uDFFF\uFE0F\u2B00-\u2BFF\u2600-\u27BF]+/u, '')
                 .trim();
 
-            let html = phasenLeiste(currentPrintData.events, ohneEmoji);
+            // How often does the same text stand there? A pending printer
+            // state used to write every minute -- 754 identical rows in one
+            // print. The cause is fixed, the stock remains; so the number
+            // stands on the row and can be cleared in one go.
+            const haeufigkeit = {};
+            currentPrintData.events.forEach(ev => {
+                const t = ohneEmoji(formatEventDetail(ev.details));
+                haeufigkeit[t] = (haeufigkeit[t] || 0) + 1;
+            });
+            const wiederholungen = Object.values(haeufigkeit)
+                .reduce((n, k) => n + (k > 1 ? k - 1 : 0), 0);
+
+            let html = '';
+            if (wiederholungen > 0) {
+                html += `<div class="hv-ev-werkzeuge">
+                    <span class="hv-ev-hinweis">${(texts.events_repeats || '{n} Wiederholungen')
+                        .replace('{n}', wiederholungen)}</span>
+                    <button class="hist-btn" onclick="ereignisseAufraeumen()"
+                            title="${texts.events_tidy_hint || ''}">${texts.events_tidy || 'Wiederholungen zusammenfassen'}</button>
+                </div>`;
+            }
+            html += phasenLeiste(currentPrintData.events, ohneEmoji);
             html += '<div class="hv-strahl">';
             currentPrintData.events.forEach(ev => {
                 const d = new Date(String(ev.time).replace(' ', 'T'));
                 const zeit = isNaN(d) ? '' : d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                 const c = farbe[ev.type] || 'var(--text-secondary)';
+                const text = ohneEmoji(formatEventDetail(ev.details));
+                const wie_oft = haeufigkeit[text] || 1;
+                // No id, no deleting -- old answers carried none.
+                const griff = (ev.id == null) ? '' : `
+                        <span class="hv-ev-aktion">
+                            <button class="hv-ev-weg" title="${texts.events_delete || 'Eintrag löschen'}"
+                                    onclick="ereignisLoeschen(${ev.id}, false, 1)">✕</button>${wie_oft > 1 ? `
+                            <button class="hv-ev-weg hv-ev-weg--alle"
+                                    title="${texts.events_delete_same || 'Alle gleichen löschen'}"
+                                    onclick="ereignisLoeschen(${ev.id}, true, ${wie_oft})">✕${wie_oft}</button>` : ''}
+                        </span>`;
                 html += `
                     <div class="hv-ereignis" style="--punkt:${c};">
                         <span class="hv-ev-zeit">${zeit}</span>
-                        <span class="hv-ev-text">${ohneEmoji(formatEventDetail(ev.details))}</span>
+                        <span class="hv-ev-text">${text}</span>${griff}
                     </div>`;
             });
             html += '</div>';
             ziel.innerHTML = html;
+        }
+
+        async function ereignisLoeschen(eventId, alleGleichen, anzahl) {
+            const frage = alleGleichen
+                ? (texts.events_delete_same_ask || 'Alle {n} gleichen Einträge löschen?')
+                      .replace('{n}', anzahl)
+                : (texts.events_delete_ask || 'Diesen Eintrag löschen?');
+            if (!await window.skConfirm(frage)) return;
+            const id = currentPrintData?.print?.id;
+            try {
+                const r = await apiCall(`/api/history/${id}/events/${eventId}`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ alle_gleichen: !!alleGleichen })
+                });
+                const j = await r.json();
+                if (!j.success) { window.skToast && window.skToast(j.error || '', 'fehler'); return; }
+                window.skToast && window.skToast(
+                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'erfolg');
+                await ereignisseNeuLaden();
+            } catch (e) {
+                window.skToast && window.skToast(String(e), 'fehler');
+            }
+        }
+
+        async function ereignisseAufraeumen() {
+            if (!await window.skConfirm(texts.events_tidy_ask
+                || 'Wiederholungen zusammenfassen?')) return;
+            const id = currentPrintData?.print?.id;
+            try {
+                const r = await apiCall(`/api/history/${id}/events/aufraeumen`, { method: 'POST' });
+                const j = await r.json();
+                if (!j.success) { window.skToast && window.skToast(j.error || '', 'fehler'); return; }
+                window.skToast && window.skToast(
+                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'erfolg');
+                await ereignisseNeuLaden();
+            } catch (e) {
+                window.skToast && window.skToast(String(e), 'fehler');
+            }
+        }
+
+        /** Fetch the print again, so the list is right instead of guessed. */
+        async function ereignisseNeuLaden() {
+            const id = currentPrintData?.print?.id;
+            if (!id) return;
+            const r = await apiCall(`/api/history/${id}`);
+            const frisch = await r.json();
+            if (frisch && frisch.events) {
+                currentPrintData.events = frisch.events;
+                showEventsTimeline();
+            }
         }
 
         // Show timelapse
@@ -2240,7 +2318,7 @@
             const printId = currentPrintData.print.id;
 
             const poster = `/api/history/${printId}/thumbnail`;
-            // Offline-Hinweis (Video nicht lokal + Drucker aus) — mit Thumbnail-Poster.
+            // Offline hint (video not local plus printer off) -- with a thumbnail poster.
             const offlineCard = `
                 <div class="hist-empty">
                     <img src="${poster}" onerror="this.style.display='none'" style="max-width:240px; width:60%; border-radius:8px; margin-bottom:12px; opacity:.75;">
@@ -2260,23 +2338,23 @@
                             </div>`;
                         return;
                     }
-                    // Lokal gecacht → offline abspielbar; sonst nur wenn Drucker online.
+                    // Cached locally -> playable offline; otherwise only when the printer is online.
                     const printerOnline = window.lastMqttStatus !== false;
                     if (!status.cached && !printerOnline) {
                         container.innerHTML = offlineCard;
                         return;
                     }
-                    // Abspielen (Cache oder Live). Schlägt das Laden fehl → Offline-Hinweis.
-                    // KEIN poster: dort hing das Slicer-Thumbnail des Drucks —
-                    // ein quadratisches Rendering, kein Bild aus dem Video. Der
-                    // Player uebernahm dessen Seitenverhaeltnis, wurde dadurch
-                    // viel zu hoch (Bedienleiste erst nach Scrollen erreichbar)
-                    // und sprang beim Start auf die echten Videomasse zurueck.
-                    // preload=metadata holt stattdessen die tatsaechlichen Masse.
-                    // Eigene Bedienleiste unter dem Video statt der
-                    // eingebauten: unter dem Bild ist ohnehin Platz, und so
-                    // traegt sie dieselbe Form wie der Rest der Oberflaeche —
-                    // mit Tempowahl (Zeitraffer sind schnell) und Herunterladen.
+                    // Play (from cache or live). If loading fails -> the offline hint.
+                    // NO poster: the slicer thumbnail of the print hung there --
+                    // a square rendering, not a frame from the video. The
+                    // player took over its aspect ratio, which made
+                    // the element far too tall (the controls only reachable
+                    // after scrolling) and it snapped back to the real video
+                    // size on start. preload=metadata fetches the real size.
+                    // A control bar of our own under the video instead of the
+                    // built-in one: there is room under the picture anyway, and
+                    // it then carries the same shape as the rest of the
+                    // interface -- with a speed choice and a download.
                     const dateiname = (currentPrintData.print.filename || 'timelapse')
                         .replace(/\.(gcode\.)?3mf$/i, '').replace(/[\\/:*?"<>|]/g, '_');
                     container.innerHTML = `
@@ -2321,9 +2399,9 @@
                 });
         }
 
-        // Bedienung des Zeitraffers. Bewusst eine eigene Leiste: die
-        // eingebauten Steuerelemente sehen in jedem Browser anders aus und
-        // koennen kein Tempo vorgeben.
+        // Controls for the timelapse. Deliberately a bar of our own: the
+        // built-in controls look different in every browser and cannot set a
+        // speed.
         function _tlBinde() {
             const v = document.getElementById('hv-tl');
             const play = document.getElementById('hv-tl-play');
@@ -2359,7 +2437,7 @@
             v.addEventListener('loadedmetadata', zeichne);
             v.addEventListener('ended', () => { v.currentTime = 0; });
 
-            // Klick in die Leiste springt an die Stelle.
+            // A click in the bar jumps to that place.
             if (bahn) bahn.onclick = (e) => {
                 if (!v.duration) return;
                 const b = bahn.getBoundingClientRect();
@@ -2386,8 +2464,8 @@
         }
 
         // Close modals
-        // Auf Mobil der Zurueck-Knopf, auf Desktop nur die Escape-Taste: die
-        // Liste bleibt sichtbar, es wird lediglich die Auswahl aufgehoben.
+        // On mobile the back button, on desktop only the escape key: the list
+        // stays visible, only the selection is lifted.
         function closePrintDetails() {
             document.getElementById('hv-rahmen').classList.remove('hv-offen');
             _gewaehlt = null;
@@ -2552,12 +2630,12 @@
 
         // Calculate cost
         function calculateCost(stats, print) {
-            // Gespeicherten Serverwert BEVORZUGEN: der Abschluss rechnet seit
-            // 20aug26 inkl. Strom und bei Multi-Filament je Spule mit ihrem
-            // Spoolman-Preis — die Client-Rechnung (EIN Preis x Gesamtgramm)
-            // kann das nicht und lief z.B. bei der Prototypen-Platte auf den
-            // 21-Euro-Fallback. Selbst rechnen nur noch, wenn nichts
-            // gespeichert ist (alte/abgebrochene Drucke).
+            // PREFER the stored server value: the finish computes including
+            // power and, for multi-filament, per spool with its Spoolman
+            // price -- the client calculation (ONE price times total grams)
+            // cannot do that and fell back to the 21-euro fallback on the
+            // prototype plate, say. Compute here only when nothing is stored
+            // (old or aborted prints).
             const gespeichert = parseFloat(stats.print_cost_eur);
             if (!isNaN(gespeichert) && gespeichert > 0) return gespeichert.toFixed(2);
             const spoolPrice = print && print.filament_price_per_kg > 0 ? print.filament_price_per_kg : null;
@@ -2584,11 +2662,11 @@
             a.click();
         }
 
-        // ── PDF-Export (Electron): alle Tabs in einer schönen Report-Ansicht ──
-        // Der Renderer baut fertiges, selbstständiges HTML (App-Styling inline,
-        // Chart als PNG, Thumbnail aus base64); main.js druckt es per printToPDF.
+        // ── PDF export (Electron): every tab in one proper report view ──
+        // The renderer builds finished, self-contained HTML (app styling
+        // inline, chart as PNG, thumbnail from base64); main.js prints it.
 
-        // Progress-/Temp-Chart in ein PNG rendern (offscreen, ohne Animation).
+        // Render the progress/temperature chart into a PNG (offscreen, no animation).
         function renderChartImage() {
             return new Promise(resolve => {
                 try {
@@ -2608,7 +2686,7 @@
                             { label: texts.chart_label_bed, data: p.map(x => x.bed_temp), borderColor: 'rgb(54,162,235)', yAxisID: 'y-temp', tension: 0.1, pointRadius: 0 },
                         ] },
                         options: { responsive: false, animation: false, devicePixelRatio: 2,
-                            // Farben für den HELLEN PDF-Hintergrund (dunkle Achsen, helle Grids).
+                            // Colours for the LIGHT PDF background (dark axes, light grids).
                             plugins: { legend: { labels: { color: '#334155', font: { size: 13 } } } },
                             scales: {
                                 x: { ticks: { color: '#475569', maxTicksLimit: 10 }, grid: { color: '#e5e7eb' } },
@@ -2689,7 +2767,7 @@
                 cell(texts.detail_costs || 'Kosten', cost, '€', '#2196f3'),
             ].join('')}</div>`;
 
-            // Einstellungen (Definition-Liste, nur vorhandene)
+            // Settings (a definition list, only what is present)
             const yn = b => b ? (texts.detail_support_active || 'Aktiv') : (texts.detail_support_off || 'Aus');
             const def = (k, v) => has(v) ? `<div class="def"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
             const setDefs = [
@@ -2811,64 +2889,17 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
             }
         }
 
-        // Reprint file
-        async function reprintFile() {
-            if (!currentPrintData) return;
-
-            const filename = currentPrintData.print.filename;
-            // Reprint hat KEINE Timelapse-Auswahl → globalen moonraker-timelapse-Schalter
-            // NICHT anfassen (null). Früher wurde hier `timelapse_enabled || false`
-            // geschickt → kippte den globalen Schalter ungewollt auf AUS.
-            const timelapse = null;
-
-            const confirmed = await showConfirmDialog(
-                `"${filename}" ${texts.reprint_confirm_msg || 'erneut drucken?'}`,
-                texts.detail_reprint || 'Nochmal drucken',
-                { okText: texts.reprint_start || 'Drucken', okClass: 'hist-btn--primary', icon: `<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>` }
-            );
-            if (!confirmed) return;
-
-            const sendReprint = async (extra) => {
-                const body = {
-                    command: 'print_sd',
-                    filename: filename,
-                    timelapse: timelapse,
-                    ...(extra || {})
-                };
-                const response = await apiCall('/api/mqtt/print', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(body)
-                });
-                const data = await response.json();
-
-                // Option C: Filament-Mismatch -> Inline-Dialog
-                if (response.status === 409 && data.filament_mismatch) {
-                    showHistoryFilamentMismatchDialog(data.filament_mismatch, async (picked) => {
-                        if (!picked) return;
-                        try {
-                            await apiCall(`/api/spoolman/spool/${picked}/activate`, { method: 'POST' });
-                        } catch (_) {}
-                        sendReprint({ filament_confirmed: true, spool_id: picked });
-                    });
-                    return;
-                }
-
-                if (data.success) {
-                    showWebToast(texts.reprint_started || 'Druck gestartet', 'success');
-                    closePrintDetails();
-                } else {
-                    showWebToast(data.error || texts.reprint_error || 'Fehler beim Starten', 'error');
-                }
-            };
-
-            try {
-                await sendReprint();
-            } catch (error) {
-                console.error('Reprint error:', error);
-                showWebToast(texts.reprint_error || 'Fehler beim Starten des Drucks', 'error');
-            }
-        }
+        // "Erneut drucken" ist hier raus (04sep26). Der Historien-Eintrag
+        // haelt nur den Namen -- keinen Speicherort und, je nach dem was der
+        // Drucker als subtask_name meldet, nicht einmal die Endung. Damit
+        // fand der Druckbefehl den Pfad nicht und der Drucker antwortete mit
+        // HMS 0500-4002. Archivierte Dateien liegen ausserdem gar nicht mehr
+        // auf dem Geraet, und Uploads tragen keinen Pfad.
+        //
+        // Das alles waere zu heilen gewesen -- aber der Weg ueber die
+        // SD-Karte kann es bereits, mit Ort, Pfad und Platte. Ein zweiter,
+        // schwaecherer Weg zum selben Ziel ist die Sorte Doppelbestand, die
+        // hier schon oefter Fehler getragen hat.
 
         function showHistoryFilamentMismatchDialog(mismatch, onPick) {
             const wanted = mismatch.wanted || {};
@@ -2903,7 +2934,7 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
             overlay.innerHTML = `
                 <div style="background:var(--bg-primary);border-radius:10px;padding:20px;max-width:460px;width:90%;max-height:80vh;overflow:auto;">
                     <h3 style="margin:0 0 12px 0;">Spule bestaetigen</h3>
-                    <p style="margin:0 0 6px 0;color:var(--text-secondary);">Die Datei braucht:</p>
+                    <p style="margin:0 0 6px 0;color:var(--text-secondary);">${getText('hist_file_needs', 'Die Datei braucht:')}</p>
                     <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-secondary);border-radius:6px;margin-bottom:14px;">
                         <div style="width:20px;height:20px;border-radius:50%;background:${wantedColor};border:1px solid var(--border-color);"></div>
                         <div><strong>${wanted.name || '—'}</strong>${wanted.material ? ' <span style="color:var(--text-secondary)">(' + wanted.material + ')</span>' : ''}</div>
@@ -2947,5 +2978,6 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

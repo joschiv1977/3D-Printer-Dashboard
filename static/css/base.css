@@ -59,7 +59,7 @@ body,
     margin: 0 auto;
     padding: var(--margin-h);
     padding-top: 8px;  /* Kompakter ohne Header — Cards rücken nach oben */
-    padding-bottom: 30px;
+    padding-bottom: var(--dock-freiraum, 94px);
     width: 100%;
     box-sizing: border-box;
 }

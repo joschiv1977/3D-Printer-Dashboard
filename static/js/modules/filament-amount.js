@@ -1,27 +1,26 @@
 /**
- * Filament-Mengen-Hinweis
+ * The filament amount hint
  *
- * Der Companion vergleicht waehrend eines laufenden Drucks das im Gcode
- * hinterlegte Gewicht (`filament_weight_total`) mit der Restmenge der aktiven
- * Spoolman-Rolle und legt das Ergebnis als `filament_amount` in seinen
- * Status-Snapshot.
+ * During a running print the companion compares the weight recorded in the
+ * gcode (`filament_weight_total`) with what is left on the active Spoolman
+ * spool and puts the result into its status snapshot as `filament_amount`.
  *
- * Der Hinweis existiert vor allem fuer Drucke, die direkt aus dem Slicer an den
- * Drucker gehen: dort laeuft kein Vorab-Check, die Datei wird erst sichtbar wenn
- * sie schon druckt. Die Vorbereitung dauert aber bis zu 20 Minuten — genug Zeit,
- * die Rolle zu tauschen und den Druck zu behalten.
+ * The hint exists above all for prints that go straight from the slicer to the
+ * printer: no pre-check runs there, and the file only becomes visible once it
+ * is already printing. The preparation takes up to 20 minutes, though -- enough
+ * time to swap the spool and keep the print.
  *
- * REIN INFORMATIV. Nichts hier greift in den Druck ein, es gibt keinen Abbruch.
- * Zu wenig Filament ist kein Fehler — der Druck darf trotzdem laufen.
+ * PURELY INFORMATIONAL. Nothing here interferes with the print, there is no
+ * abort. Too little filament is not an error -- the print may run anyway.
  *
- * Nur Klipper-Direct: beim Bambu-Backend gibt es keinen Companion, dort wird
- * gar nicht erst gefragt (siehe _isDirectMode).
+ * Klipper direct only: with the Bambu backend there is no companion, and
+ * nothing is asked there at all (see _isDirectMode).
  */
 class FilamentAmountManager {
     constructor() {
         this.POLL_MS = 30000;
-        // Pro Datei einmal weggeklickt bleibt es weg — der Wert aendert sich
-        // waehrend eines Drucks nicht mehr, ein Wiederauftauchen waere nur Laerm.
+        // Dismissed once per file, it stays dismissed -- the value no longer
+        // changes during a print, and coming back would be pure noise.
         this.dismissed = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -41,13 +40,13 @@ class FilamentAmountManager {
     }
 
     /**
-     * Laeuft die UI gegen den lokalen Direct-Adapter? Nur dort gibt es einen
-     * Companion. Beim Bambu-Backend existiert der Endpoint gar nicht — die
-     * Anfrage lief in einen 404, den Flask mit vollem Traceback protokolliert,
-     * und das alle 30 Sekunden. Also erst gar nicht fragen.
+     * Is the UI running against the local direct adapter? Only there is there a
+     * companion. With the Bambu backend the endpoint does not exist at all --
+     * the request ran into a 404 that Flask logs with a full traceback, every
+     * 30 seconds. So it does not ask in the first place.
      *
-     * Nutzt denselben dokumentweit gecachten /api/config-Abruf wie
-     * tab-bar-manager._applyDirectMode() — eine Abfrage fuer die ganze Seite.
+     * Uses the same document-wide cached /api/config call as
+     * tab-bar-manager._applyDirectMode() -- one query for the whole page.
      */
     _isDirectMode() {
         window.__directCfgPromise = window.__directCfgPromise ||
@@ -87,8 +86,8 @@ class FilamentAmountManager {
         const t = (key, fallback) =>
             (typeof getText === 'function' && getText(key)) || fallback;
 
-        // "knapp": reicht rechnerisch noch, aber nicht mehr mit Reserve. Spoolman
-        // rechnet die Restmenge selbst nur hoch, darum ist der Puffer kein Luxus.
+        // "tight": it is enough on paper, but no longer with a reserve. Spoolman
+        // only extrapolates what is left, so the buffer is not a luxury.
         const tight = !!fa.tight;
         if (title) {
             title.textContent = tight
@@ -125,8 +124,8 @@ class FilamentAmountManager {
 
     dismiss() {
         const el = document.getElementById('filament-amount-message');
-        // Datei aus dem zuletzt gezeigten Zustand merken, damit derselbe Druck
-        // nicht beim naechsten Poll wieder aufpoppt.
+        // Remember the file from the state last shown, so the same print does
+        // not pop up again on the next poll.
         this._call('/api/companion/status')
             .then(r => (r.ok ? r.json() : null))
             .then(snap => {

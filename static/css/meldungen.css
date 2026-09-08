@@ -1,11 +1,8 @@
 /* ==========================================================================
-   Drucker-Meldungen — der Stapel, auf JEDER Seite.
+   Printer messages — the stack, on EVERY page.
    --------------------------------------------------------------------------
-   Stand bis 29aug26 in components.css, und die laedt nur ein Teil der
-   Seiten. Wer von der Startseite auf die Konsole ging, verlor die Meldung
-   damit still — sie war nicht weggeklickt, sie hatte dort nur keine Form
-   und keinen Knoten. Eigene Datei, weil sie auf jeder Seite gebraucht wird
-   und sonst halb so viel CSS mitkommen muesste.
+   Its own file, because it's needed on every page and would otherwise
+   drag along about half of components.css.
    ========================================================================== */
 .mld-stapel {
     position: fixed;
@@ -19,7 +16,7 @@
 .mld {
     pointer-events: auto;
     position: relative;
-    display: none;                 /* .active blendet ein */
+    display: none;                 /* .active fades it in */
     gap: 11px; align-items: flex-start;
     padding: 11px 12px;
     border-radius: 11px;
@@ -41,7 +38,7 @@
 .mld--warnung { --mld-strich: var(--color-orange); }
 .mld--info    { --mld-strich: var(--color-blue); }
 .mld--laeuft  { --mld-strich: var(--color-green); }
-/* Wartung wird rot, sobald sie ueberfaellig ist (Klasse setzt app-init.js). */
+/* Maintenance turns red as soon as it's overdue (class set by app-init.js). */
 .mld.overdue  { --mld-strich: var(--color-red); }
 
 .mld-ic {
@@ -58,8 +55,8 @@
 .mld-t { flex: 1; min-width: 0; }
 .mld-titel { font-weight: 640; font-size: 13.5px; word-break: break-word; }
 .mld-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; word-break: break-word; }
-/* Der Fehlercode gehoert unter die Meldung, nicht in die Ueberschrift:
-   "HMS Fehler 0700-2000-0002-0001" als Titel war der Code, nicht das Problem. */
+/* The error code belongs under the message, not in the heading:
+   "HMS error 0700-2000-0002-0001" as the title was the code, not the problem. */
 .mld-code {
     font-size: 11px; color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
@@ -88,9 +85,10 @@
 }
 .mld-zu:hover { color: var(--text-primary); }
 
-/* Zustaende beschreiben, was der Drucker gerade TUT — Wegklicken waere
-   falsch, der Zustand liefe ja weiter. Statt eines Kreuzes ein Punkt, der
-   mitlaeuft; die Meldung geht von selbst, wenn der Zustand endet. */
+/* States describe what the printer is currently DOING — dismissing them
+   would be wrong, since the state keeps running regardless. Instead of a
+   cross, a dot that tracks along; the message goes away on its own once
+   the state ends. */
 .mld--zustand .mld-zu { display: none; }
 .mld-puls {
     width: 8px; height: 8px; border-radius: 50%;
@@ -100,21 +98,22 @@
 @keyframes mld-puls { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 @media (prefers-reduced-motion: reduce) { .mld-puls { animation: none; } }
 
-/* Der Griff zum Beiseiteschieben.
+/* The handle for pushing the stack aside.
    ---------------------------------------------------------------------------
-   Absolut gesetzt statt als Flex-Kind: auf dem Handy laeuft der Stapel
-   umgekehrt (column-reverse, siehe unten), ein Kind waere dort unten
-   gelandet. So sitzt er in beiden Faellen ueber der obersten Karte.
+   Positioned absolutely instead of as a flex child: on mobile the stack
+   runs reversed (column-reverse, see below), and a child would have
+   ended up at the bottom there. This way it sits above the topmost card
+   in both cases.
 
-   Der Stapel selbst hat pointer-events: none — der Griff muss sie sich
-   also zurueckholen, wie die Meldungen auch. */
+   The stack itself has pointer-events: none — so the handle has to
+   claim them back for itself, just like the messages do. */
 .mld-griff {
     position: absolute;
     top: -13px; left: 50%; transform: translateX(-50%);
     width: 46px; height: 16px;
     display: flex; align-items: center; justify-content: center;
     pointer-events: auto; cursor: grab;
-    touch-action: none;          /* sonst scrollt das Handy statt zu schieben */
+    touch-action: none;          /* otherwise the phone scrolls instead of pushing */
 }
 .mld-griff::before {
     content: ""; width: 34px; height: 4px; border-radius: 2px;
@@ -124,12 +123,12 @@
 .mld-stapel--zieht .mld-griff { cursor: grabbing; }
 .mld-stapel--zieht .mld-griff::before { opacity: 0.75; }
 
-/* Sammelzeile, wenn mehr als drei Meldungen anliegen. */
+/* Summary row for when more than three messages are pending. */
 .mld-sammel { cursor: pointer; }
 .mld-sammel .mld-titel { font-weight: 600; }
 .mld-mehr { font-size: 12px; color: var(--color-blue); font-weight: 600; margin-top: 3px; }
 
-/* Auf dem Handy volle Breite und unten — oben klebt der Systembalken. */
+/* Full width and bottom-anchored on phones — the system bar sits at the top. */
 @media (max-width: 600px) {
     .mld-stapel {
         top: auto; bottom: calc(env(safe-area-inset-bottom, 0px) + 92px);
@@ -138,3 +137,20 @@
     }
 }
 
+
+
+/* The button on a message that can be acted on. Sits under the text, does
+   not compete with the close cross. */
+.mld-aktion {
+    margin-top: 8px;
+    padding: 5px 12px;
+    border: 1px solid var(--rand, rgba(0,0,0,.15));
+    border-radius: 7px;
+    background: var(--flaeche-2, rgba(0,0,0,.04));
+    color: inherit;
+    font: inherit;
+    font-size: .85em;
+    font-weight: 600;
+    cursor: pointer;
+}
+.mld-aktion:hover { background: var(--flaeche-3, rgba(0,0,0,.08)); }

@@ -1,29 +1,29 @@
 /**
- * Spulenauswahl  (24aug26)
+ * Spool selection
  * ==========================================================================
- * Ein eigenes Fenster statt der Auswahlliste in der Material-Karte.
+ * A window of its own instead of the picker list in the material card.
  *
- * Die Liste konnte nur eine Zeile Text je Spule — Name, Material, Gramm,
- * Prozent, alles hintereinander. Beim Spulenwechsel sucht man aber nach
- * FARBE und Restmenge, und beides las man dort erst nach dem Aufklappen.
+ * The list could only manage one line of text per spool -- name, material,
+ * grams, per cent, all in a row. But on a spool change one looks for COLOUR
+ * and remaining amount, and both were only readable there after unfolding.
  *
- * Jede Spule ist hier ein Rad: der Aussenring traegt die Filamentfarbe und
- * ist so weit gefuellt, wie die Spule noch voll ist. Farbe und Rest in
- * einem Blick.
+ * Every spool is a ring here: the outer ring carries the filament colour and
+ * is filled as far as the spool is still full. Colour and remainder at a
+ * glance.
  *
- * Vier Zustaende erzaehlt die Karte selbst:
- *   passt   — blau, kommt aus /api/spoolman/match zur gewaehlten Datei
- *   aktiv   — gruen
- *   knapp   — orange, unter KNAPP_GRAMM
- *   leer    — abgeblendet, nicht waehlbar
+ * The card tells four states itself:
+ *   match   -- blue, from /api/spoolman/match for the chosen file
+ *   active  -- green
+ *   low     -- orange, under KNAPP_GRAMM
+ *   empty   -- dimmed, not selectable
  */
 (function () {
     'use strict';
 
-    /** Ab hier ist eine Spule „knapp" — dieselbe Schwelle wie im Server-Warner. */
+    /** From here a spool counts as "low" -- the same threshold as the server warner. */
     const KNAPP_GRAMM = 50;
 
-    /** Dichte in g/cm3 je Materialfamilie, fuer die Laengenschaetzung. */
+    /** Density in g/cm3 per material family, for the length estimate. */
     const DICHTE = {
         pla: 1.24, petg: 1.27, abs: 1.04, asa: 1.07,
         tpu: 1.21, pc: 1.20, nylon: 1.14, hips: 1.04, pva: 1.23,
@@ -46,7 +46,7 @@
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-    /** Materialfamilie — dieselbe Zusammenfassung wie am Server. */
+    /** Material family -- the same grouping as on the server. */
     function familie(material) {
         const m = String(material || '').toLowerCase().trim();
         for (const schluessel of Object.keys(DICHTE)) {
@@ -56,9 +56,9 @@
     }
 
     /**
-     * Gramm in laufende Meter. Geschaetzt: Dichte je Material, Durchmesser
-     * aus der Spule (Rueckfall 1,75 mm). Steht klein neben der Restmenge,
-     * damit man weiss, ob der Druck ueberhaupt draufpasst.
+     * Grams into running metres. Estimated: density per material, diameter
+     * from the spool (falling back to 1.75 mm). It stands small beside the
+     * remaining amount, so one knows whether the print fits at all.
      */
     function meter(spool) {
         const gramm = spool.remaining_weight || 0;
@@ -71,7 +71,7 @@
         return Math.round(laenge / 100);               // m
     }
 
-    /** „heute, 06:10" · „vor 3 Tagen" · „vor 2 Monaten" · „neu" */
+    /** "today, 06:10" · "3 days ago" · "2 months ago" · "new" */
     function zuletzt(iso) {
         if (!iso) return t('spool_never_used', 'neu');
         const d = new Date(iso);
@@ -158,27 +158,48 @@
         return window.skIcon ? window.skIcon(name, 'hd-ic--xs') : '';
     }
 
-    // Feuchte-Gedaechtnis je Spoolman-Nummer. Die Bruecke entsteht beim
-    // Druckstart (print_filaments haelt spool_id und ams_tray_id zusammen),
-    // deshalb hat nicht jede Rolle einen Eintrag — angezeigt wird nur, was
-    // wirklich gemessen wurde.
+    // Humidity memory per Spoolman number. The bridge comes into being at the
+    // print start (print_filaments holds spool_id and ams_tray_id together),
+    // so not every spool has an entry -- only what was really measured is shown.
     let feuchteJeSpule = new Map();
+    let feuchteStand = {};
     let feuchteSchwelle = 35;
 
     async function ladeFeuchte() {
-        if (!window.amsFeuchte) return;
+        if (!window.amsHumidity) return;
         try {
-            const daten = await window.amsFeuchte.hole(400);
+            const daten = await window.amsHumidity.hole(400);
             if (!daten) return;
             feuchteSchwelle = daten.schwelle;
-            feuchteJeSpule = new Map(
-                (daten.verlauf_spulen || [])
-                    .filter(e => e.spool_id != null)
-                    .map(e => [e.spool_id, e]));
+            feuchteStand = daten;
+            // Several rows can point at the same Spoolman number: one per
+            // spell in the tray, and a spool often lies in there more than
+            // once. `new Map([...])` takes the LAST on an equal key -- with no
+            // rule at all about which is the right one. A row that ended at
+            // 14:16 once won that way while the open one had measured until
+            // 15:43: the window showed the state from an hour and a half
+            // earlier.
+            //
+            // Now the row with the most recent measurement wins; on a tie the
+            // one still open.
+            const juengste = e => {
+                const v = e.verlauf || [];
+                return v.length ? String(v[v.length - 1].zeit || '') : '';
+            };
+            feuchteJeSpule = new Map();
+            for (const e of (daten.verlauf_spulen || [])) {
+                if (e.spool_id == null) continue;
+                const bisher = feuchteJeSpule.get(e.spool_id);
+                if (!bisher) { feuchteJeSpule.set(e.spool_id, e); continue; }
+                const a = juengste(e), b = juengste(bisher);
+                if (a > b || (a === b && e.bis == null && bisher.bis != null)) {
+                    feuchteJeSpule.set(e.spool_id, e);
+                }
+            }
         } catch (e) { /* ohne Feuchte bleibt es die einfache Auswahl */ }
     }
 
-    /** Die Plakette auf der Karte: Urteil und wie lange es zu feucht war. */
+    /** The badge on the card: the verdict and how long it was too damp. */
     function feuchteChip(spoolId) {
         const e = feuchteJeSpule.get(spoolId);
         if (!e) return '';
@@ -194,27 +215,27 @@
                 .replace('{n}', Math.max(1, Math.round(e.stunden_ueber)))
                 .replace('{s}', feuchteSchwelle);
         }
-        // Anklickbar statt nur beschriftet: die Vorgeschichte gehoert in ein
-        // eigenes Fenster. Unter der Karte angeklebt sah die Kurve auf elf
-        // Karten nach Tapete aus.
-        // KEIN <button>: die Karte selbst ist schon eines, und ein Knopf im
-        // Knopf ist ungueltiges HTML — der Browser bricht die Karte dort auf.
+        // Clickable rather than just labelled: the history belongs in a window
+        // of its own. Glued under the card, the curve looked like wallpaper
+        // across eleven cards.
+        // NOT a <button>: the card is one already, and a button inside a
+        // button is invalid HTML -- the browser breaks the card open there.
         const titel = t('feuchte_open', 'Feuchteverlauf zeigen');
         return `<span class="spw-feucht spw-feucht--${esc(e.urteil)}" role="button"`
              + ` tabindex="0" data-feuchte="${spoolId}" title="${esc(titel)}">`
              + ikon('wasser') + esc(text) + ikon('chevronRechts') + '</span>';
     }
 
-    /** Die Vorgeschichte einer Rolle als eigenes Fenster. */
+    /** The history of one spool as a window of its own. */
     function zeigeFeuchte(spoolId) {
         const e = feuchteJeSpule.get(spoolId);
-        if (!e || !window.amsFeuchte) return;
+        if (!e || !window.amsHumidity) return;
         const spule = zustand.spulen.find(x => x.id === spoolId) || {};
         const fil = spule.filament || {};
         const name = [((fil.vendor || {}).name || ''), fil.name || ''].filter(Boolean).join(' ')
             || (e.typ || '');
-        const zeit = window.amsFeuchte.spanne(e.verlauf);
-        const kurve = window.amsFeuchte.kurve(e.verlauf, feuchteSchwelle, 480, 96);
+        const zeit = window.amsHumidity.spanne(e.verlauf);
+        const kurve = window.amsHumidity.kurve(e.verlauf, feuchteSchwelle, 480, 96);
         const worte = {
             trocken: t('feuchte_urteil_trocken', 'trocken'),
             beobachten: t('feuchte_urteil_beobachten', 'im Blick behalten'),
@@ -259,7 +280,7 @@
                 </div>
             </div>`;
         document.body.appendChild(ov);
-        // Ueber der Spulenauswahl, die selbst schon vorn liegt.
+        // Above the spool picker, which already lies in front.
         if (window.skNachVorn) window.skNachVorn(ov, 10050);
         const zu = () => ov.remove();
         ov.querySelector('#spf-zu').addEventListener('click', zu);
@@ -290,8 +311,7 @@
             }
         });
 
-        // Passende Spulen nach oben — sie sind der Grund, warum das Fenster
-        // aufging.
+        // Matching spools to the top -- they are the reason the window opened.
         if (zustand.treffer.length) {
             liste.sort((x, y) =>
                 (zustand.treffer.includes(y.id) ? 1 : 0) - (zustand.treffer.includes(x.id) ? 1 : 0));
@@ -326,11 +346,37 @@
             ? liste.map(karteHtml).join('')
             : `<div class="spw-leer">${esc(t('spool_none_found', 'Keine Spule gefunden'))}</div>`;
 
+        // Say when a tray has no spool assigned.
+        //
+        // This used to stay silent: the card simply showed no badge, and
+        // nobody could know there was something to set. Nothing is guessed any
+        // more, so the hint has to be there.
+        const hinweis = document.getElementById('spw-hinweis');
+        if (hinweis) hinweis.innerHTML = ohneZuordnungHtml();
+
         const chips = document.getElementById('spw-chips');
         if (chips) chips.innerHTML = materialChips();
 
         const uebernehmen = document.getElementById('spw-uebernehmen');
         if (uebernehmen) uebernehmen.disabled = zustand.gewaehlt == null;
+    }
+
+    /** Trays in the AMS with no Spoolman spool assigned. */
+    function ohneZuordnungHtml() {
+        const offen = (feuchteStand.spulen || []).filter(s => s.spool_id == null);
+        if (!offen.length) return '';
+        return offen.map(s => {
+            const vorschlag = (s.vorschlaege || [])[0];
+            return '<div class="spw-hinweis-zeile">'
+                 + esc(t('feuchte_ohne_zuordnung',
+                         'Fach {n} im AMS ist keiner Spule zugeordnet.')
+                       .replace('{n}', (s.slot ?? 0) + 1))
+                 + (vorschlag
+                    ? ' <b>' + esc(t('feuchte_vorschlag', 'Vorschlag: {name}')
+                                   .replace('{name}', vorschlag.name || '')) + '</b>'
+                    : '')
+                 + '</div>';
+        }).join('');
     }
 
     function bandHtml() {
@@ -354,11 +400,11 @@
 
     /**
      * @param {object} opts
-     *   datei   — Dateiname; setzt das Empfehlungsband und die Treffer
-     *   plate   — Plattennummer (Standard 1)
-     *   gewaehlt— vorgewaehlte Spulen-ID
-     *   onWahl  — Rueckruf mit der gewaehlten Spule; ohne ihn wird direkt
-     *             aktiviert (Material-Karte)
+     *   datei   -- file name; it sets the recommendation band and the matches
+     *   plate   -- plate number (default 1)
+     *   gewaehlt-- preselected spool id
+     *   onWahl  -- callback with the chosen spool; without it the spool is
+     *              activated directly (the material card)
      */
     async function oeffne(opts = {}) {
         const sm = window.spoolmanManager;
@@ -380,16 +426,16 @@
 
         const fenster = document.getElementById('spoolPickerModal');
         if (!fenster) return;
-        // Der Fach-Dialog liegt auf z-index 10050. Ohne das oeffnete sich die
-        // Auswahl DAHINTER — sichtbar war nur die Abdunklung.
+        // The tray dialog sits at z-index 10050. Without this the picker
+        // opened BEHIND it -- only the dimming was visible.
         if (window.skNachVorn) window.skNachVorn(fenster, 1006);
         fenster.style.display = 'block';
         document.getElementById('spw-band').innerHTML = '';
         zeichne();
         ladeFeuchte().then(() => { if (feuchteJeSpule.size) zeichne(); });
 
-        // Passende Spulen nachladen — der Abgleich liegt am Server, damit
-        // Liste, Planen und Sofortdruck dieselbe Meinung haben.
+        // Load the matching spools -- the matching lives on the server, so the
+        // list, scheduling and an immediate print share one opinion.
         if (opts.datei) {
             try {
                 const antwort = await window.apiCall(
@@ -400,7 +446,7 @@
                 document.getElementById('spw-band').innerHTML = bandHtml();
                 zeichne();
             } catch (e) {
-                /* ohne Treffer bleibt es die einfache Auswahl */
+                /* without matches it stays the plain picker */
             }
         }
     }
@@ -429,7 +475,7 @@
     document.addEventListener('click', (e) => {
         const feucht = e.target.closest && e.target.closest('[data-feuchte]');
         if (feucht) {
-            // Nicht die Karte auswaehlen — der Klick galt der Plakette.
+            // Do not select the card -- the click was meant for the badge.
             e.preventDefault();
             e.stopPropagation();
             zeigeFeuchte(parseInt(feucht.dataset.feuchte, 10));

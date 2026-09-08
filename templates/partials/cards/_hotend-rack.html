@@ -1,15 +1,15 @@
-          <!-- Hotend-Magazin (H2C). Bleibt versteckt, bis der Drucker
-               wirklich Magazinplaetze meldet — nie am Modellnamen
-               festgemacht (services/printer_capabilities.py:
-               has_hotend_rack kommt vom Geraet, hotend_rack_slots aus dem
-               Datenblatt).
+          <!--Hotend rack (H2C). Stays hidden until the printer
+               really reports rack slots -- never keyed off the model name
+               (services/printer_capabilities.py:
+               has_hotend_rack comes from the device, hotend_rack_slots from the
+               datasheet).
 
-               Bewusst OHNE "links fest / rechts Magazin": Bambu Studio sagt
-               nur, dass Extruder 2 die Wechsel-Hotends nimmt
-               (extruder_max_nozzle_count ['1','6']). Welcher Duesen-Index
-               des MQTT-Blocks das ist (0 = rechts, 1 = links), steht in
-               keiner Quelle, die wir haben — die Seite wuerde also geraten.
-               Was belegt ist: welcher Platz aufgesetzt ist (tar_id). -->
+               Deliberately WITHOUT "left fixed / right rack": Bambu Studio only
+               says that extruder 2 takes the swappable hotends
+               (extruder_max_nozzle_count ['1','6']). Which nozzle index
+               of the MQTT block that corresponds to (0 = right, 1 = left), is not
+               stated in any source we have -- so the page would just be
+               guessing. What is confirmed: which slot is mounted (tar_id). -->
           <div class="grid-stack-item" gs-w="4" gs-h="21" gs-x="8" gs-y="40" gs-min-w="3" gs-min-h="15" gs-max-w="8" gs-max-h="24" id="hotend-rack-card-grid" style="display: none;">
               <div class="grid-stack-item-content">
                   <div class="card" id="hotend-rack-card">
@@ -22,16 +22,16 @@
                       </div>
 
                       <div class="hr-koerper">
-                          <!-- Was gerade auf dem Druckkopf sitzt. -->
+                          <!--What is currently mounted on the print head.-->
                           <div class="hr-duese" id="hr-aufgesetzt">
                               <span class="hr-wo" id="hr-auf-wo"></span>
                               <span class="hr-was" id="hr-auf-was">–</span>
                               <span class="hr-zu" id="hr-auf-zu"></span>
                           </div>
 
-                          <!-- Laufender Wechsel. Ohne Fortschrittsbalken: der
-                               Drucker meldet Zustand und Ziel, keinen
-                               Prozentwert. -->
+                          <!--Change in progress. No progress bar: the
+                               printer reports state and target, not a
+                               percentage.-->
                           <div class="hr-wechsel" id="hr-wechsel" style="display:none;">
                               <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h13m-4-5 5 5-5 5"/></svg>
                               <span class="hr-wechsel-txt">
@@ -40,8 +40,8 @@
                               </span>
                           </div>
 
-                          <!-- Die sechs Plaetze. Leere bleiben stehen, damit
-                               das Raster lesbar bleibt. -->
+                          <!--The six slots. Empty ones stay in place so
+                               the grid stays readable.-->
                           <div class="hr-plaetze" id="hr-plaetze"></div>
                       </div>
                   </div>

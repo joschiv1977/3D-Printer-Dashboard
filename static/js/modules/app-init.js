@@ -36,19 +36,19 @@ class AppInitManager {
     // ========================================
 
     initGridStack() {
-        // Auf Mobile: GridStack GAR NICHT initialisieren!
-        // CSS Flexbox uebernimmt das Layout
+        // On mobile: DON'T initialize GridStack at all!
+        // CSS flexbox handles the layout
         if (window.innerWidth <= 768) {
             console.log('📱 Mobile detected - GridStack DISABLED, using CSS flex layout');
             const resetBtn = document.getElementById('dashboard-reset-btn');
             const sidebarResetBtn = document.getElementById('sidebar-reset-btn');
             if (resetBtn) resetBtn.style.display = 'none';
             if (sidebarResetBtn) sidebarResetBtn.style.display = 'none';
-            this.adjustGridHeightForMobile(); // Grid-Hoehe fuer Flexbox setzen
-            return; // STOP! Kein GridStack auf Mobile!
+            this.adjustGridHeightForMobile(); // Set the grid height for flexbox
+            return; // STOP! No GridStack on mobile!
         }
 
-        // NUR auf Desktop: GridStack initialisieren
+        // ONLY on desktop: initialize GridStack
         console.log('🖥️ Desktop - GridStack init');
         const resetBtn = document.getElementById('dashboard-reset-btn');
         const sidebarResetBtn = document.getElementById('sidebar-reset-btn');
@@ -63,25 +63,25 @@ class AppInitManager {
             minRow: 1,
             resizable: {
                 handles: 'se, sw',
-                // Automatisches Constraint: Resize nur innerhalb des Grids
+                // Automatic constraint: resize only within the grid
                 autoPosition: true
             },
             draggable: {
                 handle: '.card-header'
             },
             animate: false,
-            // Disable drag/resize auf Mobile
+            // Disable drag/resize on mobile
             disableDrag: window.innerWidth <= 768,
             disableResize: window.innerWidth <= 768
         });
 
         // Default layout if no saved layout exists
         const bambu = document.body.dataset.activePrinter !== 'klipper';
-        // Bambu: Zonen-Layout (Variante B). Klipper: klassisches Layout.
+        // Bambu: zone layout (variant B). Klipper: classic layout.
         const defaultLayout = bambu ? [
-            // Vom Benutzer eingerichtet und abgenommen (26aug26): Kamera und
-            // Fortschritt oben nebeneinander, darunter die Drucker-Zone in
-            // voller Breite links, rechts daneben Material und Trocknung.
+            // Set up and approved by the user: camera and progress side by
+            // side up top, the printer zone in full width below on the
+            // left, material and drying next to it on the right.
             { "id": "camera-card-grid", "x": 0, "y": 0, "w": 6, "h": 21 },
             { "id": "progress-card-grid", "x": 6, "y": 0, "w": 6, "h": 21 },
             { "id": "printer-zone-card-grid", "x": 0, "y": 22, "w": 6, "h": 18 },
@@ -101,11 +101,11 @@ class AppInitManager {
         let layoutToApply = savedLayout ? JSON.parse(savedLayout) : defaultLayout;
         let hasCustomLayout = false;
 
-        // Grid-Version pruefen: alte Layouts verwerfen bei Aenderung
-        // v10 = Standard-Layout nach dem Umbau neu eingerichtet. Die Erhoehung
-        // verwirft gespeicherte Layouts einmalig — sonst bekaeme niemand den
-        // neuen Standard zu sehen, der schon eine eigene Anordnung hat.
-        const GRID_VERSION = 10; // v9 = Spoolman in der Material-Zone aufgegangen // v1=12cols/40px, v2=broken, v3=12cols/20px, v4=12cols/20px(fixed), v5=compact layout, v6=adjusted heights
+        // Check the grid version: discard old layouts on a change
+        // v10 = the default layout was rebuilt after the redesign. Bumping
+        // it discards saved layouts once — otherwise nobody would see the
+        // new default, since they already have their own arrangement saved.
+        const GRID_VERSION = 10; // v1=12cols/40px, v2=broken, v3=12cols/20px, v4=12cols/20px(fixed), v5=compact layout, v6=adjusted heights
         const savedGridVersion = parseInt(localStorage.getItem('dashboard-grid-version') || '0');
 
         if (savedLayout && savedGridVersion >= GRID_VERSION) {
@@ -118,7 +118,7 @@ class AppInitManager {
                 layoutToApply = defaultLayout;
             }
         } else {
-            // Altes Layout verwerfen und Default verwenden
+            // Discard the old layout and use the default
             if (savedLayout) {
                 console.log('🔄 Old grid layout (v' + savedGridVersion + ') discarded, using default layout');
                 localStorage.removeItem('dashboard-layout');
@@ -128,10 +128,10 @@ class AppInitManager {
             layoutToApply = defaultLayout;
         }
 
-        // Grid-Version speichern
+        // Store the grid version
         localStorage.setItem('dashboard-grid-version', String(GRID_VERSION));
 
-        // Nur Desktop-Code hier - Mobile returned schon oben!
+        // Desktop-only code from here - mobile already returned above!
         let foundItems = 0;
         let updatedItems = 0;
 
@@ -152,17 +152,17 @@ class AppInitManager {
 
         const grid = this.dashboardGrid;
 
-        // Karten des jeweils anderen Modus sind per CSS unsichtbar, belegen
-        // im Raster aber weiter Platz — beim Verschieben rasten sichtbare
-        // Karten dann an unsichtbaren Bloecken ein. Deshalb ganz raus aus
-        // dem Raster (DOM bleibt, die Status-Logik braucht die Knopf-IDs).
+        // Cards for the other mode are hidden via CSS but still occupy
+        // space in the grid — when dragging, visible cards then snap to
+        // invisible blocks. So take them out of the grid entirely
+        // (they stay in the DOM, the status logic needs the button IDs).
         const fremd = (document.body.dataset.activePrinter !== 'klipper')
             ? ['control-card-desktop', 'dev-control-card-desktop']
             : ['printer-zone-card-grid', 'material-zone-card-grid'];
         fremd.forEach(id => {
             const el = document.getElementById(id);
             if (el && el.gridstackNode) {
-                try { grid.removeWidget(el, false); } catch (e) { /* egal */ }
+                try { grid.removeWidget(el, false); } catch (e) { /* doesn't matter */ }
             }
         });
 
@@ -188,9 +188,9 @@ class AppInitManager {
             console.log('✅ Grid height adjusted after layout load');
         }, 100);
 
-        // Save layout on change - NUR auf Desktop!
+        // Save layout on change - DESKTOP ONLY!
         grid.on('change', (event, items) => {
-            // Auf Mobile keine Layout-Aenderungen speichern
+            // Don't save layout changes on mobile
             if (window.innerWidth < 768) {
                 console.log('📱 Mobile - skip saving layout');
                 return;
@@ -203,8 +203,8 @@ class AppInitManager {
             gridItems.forEach(el => {
                 const node = el.gridstackNode;
                 if (node && el.id) {
-                    // Filter: Speichere nur Desktop-relevante Cards
-                    // Mobile Cards (control-card-mobile, dev-control-card-mobile) ueberspringen
+                    // Filter: only save desktop-relevant cards
+                    // Skip mobile cards (control-card-mobile, dev-control-card-mobile)
                     const isMobileOnly = el.classList.contains('control-card-mobile');
 
                     if (!isMobileOnly) {
@@ -222,16 +222,16 @@ class AppInitManager {
             localStorage.setItem('dashboard-layout', JSON.stringify(layout));
             console.log('💾 Dashboard layout saved:', layout);
 
-            // Hoehe nach Aenderung anpassen
+            // Adjust the height after a change
             this.adjustGridHeight();
         });
 
-        // Window Resize Handler - nur fuer Grid-Hoehe + Reset Button
+        // Window resize handler - just for grid height + reset button
         window.addEventListener('resize', () => {
             clearTimeout(this._resizeTimeout);
             this._resizeTimeout = setTimeout(() => {
-                // columnOpts macht responsive automatisch!
-                // Wir muessen nur Grid-Hoehe anpassen und Reset Button zeigen/verstecken
+                // columnOpts handles responsive automatically!
+                // We just need to adjust grid height and show/hide the reset button
                 const resetBtn = document.getElementById('dashboard-reset-btn');
                 const sidebarResetBtn = document.getElementById('sidebar-reset-btn');
                 if (resetBtn) {
@@ -244,23 +244,23 @@ class AppInitManager {
             }, 250);  // 250ms debounce
         });
 
-        // Patch: GridStack's _updateContainerHeight zaehlt ALLE nodes (auch display:none).
-        // Das verursacht zu viel Leerraum unten. Wir ueberschreiben die Methode,
-        // damit nur SICHTBARE Items die Container-Hoehe bestimmen.
+        // Patch: GridStack's _updateContainerHeight counts ALL nodes (including display:none).
+        // That leaves too much empty space at the bottom. We override the method
+        // so only VISIBLE items determine the container height.
         grid._updateContainerHeight = function() {
             if (!this.engine || this.engine.batchMode) return this;
 
-            // Nur sichtbare Items zaehlen (Original zaehlt alle)
+            // Only count visible items (the original counts all)
             let maxRow = 0;
             this.engine.nodes.forEach(n => {
                 if (!n.el) return;
-                // Inline-Style oder CSS-MediaQuery (z.B. .control-card-mobile auf Desktop)
+                // Inline style or CSS media query (e.g. .control-card-mobile on desktop)
                 if (n.el.style.display === 'none' ||
                     window.getComputedStyle(n.el).display === 'none') return;
                 const bottom = (n.y || 0) + (n.h || 0);
                 if (bottom > maxRow) maxRow = bottom;
             });
-            // Extra Rows waehrend Drag-Operationen + minRow
+            // Extra rows during drag operations + minRow
             maxRow += (this._extraDragRow || 0);
             maxRow = Math.max(maxRow, this.opts.minRow || 0);
 
@@ -292,14 +292,14 @@ class AppInitManager {
 
         const gridContainer = document.querySelector('.grid-stack');
         if (gridContainer) {
-            // Container: Hoehe auf auto, entferne alle GridStack-Styles
+            // Container: set height to auto, remove all GridStack styles
             gridContainer.style.height = 'auto';
             gridContainer.style.position = '';
 
-            // WICHTIG: Alle grid-stack-item Elemente von inline-Styles befreien
+            // IMPORTANT: strip all grid-stack-item elements of inline styles
             const gridItems = gridContainer.querySelectorAll('.grid-stack-item');
             gridItems.forEach(item => {
-                // Entferne ALLE GridStack inline-Styles
+                // Remove ALL GridStack inline styles
                 item.style.transform = '';
                 item.style.position = '';
                 item.style.top = '';
@@ -316,7 +316,8 @@ class AppInitManager {
 
     // Reset Dashboard Layout
     resetDashboardLayout() {
-        showConfirmDialog('Dashboard-Layout auf Standard zurücksetzen?', function() {
+        showConfirmDialog({ text: (window.texts || {}).confirm_reset_layout,
+            knopf: (window.texts || {}).confirm_reset }, function() {
             localStorage.removeItem('dashboard-layout');
             location.reload();
         });
@@ -333,7 +334,7 @@ class AppInitManager {
         const controlsTitle = document.getElementById('controls-title-desktop');
         if (controlsTitle) controlsTitle.textContent = texts.controls;
 
-        // Switch-Button Text wird durch updateStatusDisplay gesetzt (Einschalten/Ausschalten)
+        // Switch button text is set by updateStatusDisplay (turn on/turn off)
 
         const lightText = document.getElementById('light-text-desktop');
         if (lightText) lightText.textContent = texts.light;
@@ -347,7 +348,7 @@ class AppInitManager {
         const scheduledTextDesktop = document.getElementById('scheduled-text-desktop');
         if (scheduledTextDesktop) scheduledTextDesktop.textContent = texts.scheduled_prints;
 
-        // Switch-Button Text wird durch updateStatusDisplay gesetzt (Einschalten/Ausschalten)
+        // Switch button text is set by updateStatusDisplay (turn on/turn off)
 
         const lightTextMobile = document.getElementById('light-text-mobile');
         if (lightTextMobile) lightTextMobile.textContent = texts.light;
@@ -371,8 +372,8 @@ class AppInitManager {
         const scheduledPrintsTitle = document.getElementById('scheduled-prints-title');
         if (scheduledPrintsTitle) scheduledPrintsTitle.textContent = texts.scheduled_prints;
 
-        // Developer Controls — bei Klipper "Erweiterte Steuerung" (kein Bambu-
-        // "Developer"-Konzept). Bambu-Modus behält dev_controls.
+        // Developer controls — for Klipper "Advanced control" (there's no Bambu
+        // "Developer" concept). Bambu mode keeps dev_controls.
         const _ctrlTitle = (window.isKlipperMode && window.isKlipperMode())
             ? (texts.advanced_controls || texts.dev_controls)
             : texts.dev_controls;
@@ -439,15 +440,15 @@ class AppInitManager {
         const stopDryingText = document.getElementById('stop-drying-text');
         if (stopDryingText) stopDryingText.textContent = texts.stop_drying;
 
-        // Filament Drying Banner (oben im Main Content)
+        // Filament drying banner (top of the main content)
         const filamentDryingTitle = document.getElementById('filament-drying-title');
         if (filamentDryingTitle) filamentDryingTitle.textContent = texts.filament_drying_banner_title;
 
         const filamentDryingDetails = document.getElementById('filament-drying-details');
         if (filamentDryingDetails) filamentDryingDetails.textContent = texts.filament_drying_banner_fallback;
 
-        // Der Schliessknopf der Drucker-Meldung ist ein Kreuz; die
-        // Beschriftung gehoert in den Tooltip, nicht in den Knopf.
+        // The close button on the printer notification is an X; the
+        // label belongs in the tooltip, not on the button.
         const hmsDismissBtn = document.querySelector('.hms-dismiss-btn');
         if (hmsDismissBtn) hmsDismissBtn.title = texts.hms_dismiss;
 
@@ -514,7 +515,7 @@ class AppInitManager {
         const controlTabFilament = document.getElementById('control-tab-filament');
         if (controlTabFilament) controlTabFilament.textContent = texts.filament_tab;
 
-        // DEPRECATED: Homing Warning Uebersetzungen entfernt - X/Y Homing passiert automatisch im Backend
+        // DEPRECATED: homing warning translations removed - X/Y homing happens automatically in the backend
 
         // Movement Tab
         const controlXyMovement = document.getElementById('control-xy-movement');
@@ -522,6 +523,26 @@ class AppInitManager {
 
         const controlZMovement = document.getElementById('control-z-movement');
         if (controlZMovement) controlZMovement.textContent = texts.z_movement;
+
+        // Map view: the two panels carry the same titles as the button view,
+        // because they do the same job by other means.
+        const controlXyMovementMap = document.getElementById('control-xy-movement-map');
+        if (controlXyMovementMap) controlXyMovementMap.textContent = texts.xy_movement;
+
+        const controlZMovementMap = document.getElementById('control-z-movement-map');
+        if (controlZMovementMap) controlZMovementMap.textContent = texts.z_movement;
+
+        const moveViewButtons = document.getElementById('move-view-buttons');
+        if (moveViewButtons) moveViewButtons.textContent = texts.move_view_buttons;
+
+        const moveViewMap = document.getElementById('move-view-map');
+        if (moveViewMap) moveViewMap.textContent = texts.move_view_map;
+
+        const moveBedClear = document.getElementById('move-bed-clear');
+        if (moveBedClear) moveBedClear.textContent = texts.move_bed_clear;
+
+        const moveHeightLabel = document.getElementById('move-height-label');
+        if (moveHeightLabel) moveHeightLabel.textContent = texts.move_height;
 
         const controlZUp = document.getElementById('control-z-up');
         if (controlZUp) controlZUp.textContent = texts.z_up;
@@ -576,7 +597,7 @@ class AppInitManager {
         const controlFilamentManagement = document.getElementById('control-filament-management');
         if (controlFilamentManagement) controlFilamentManagement.textContent = texts.filament_management;
 
-        // Geraet-Tab (X2D/H2D & Co.) — Beschriftungen
+        // Device tab (X2D/H2D & co.) — labels
         const setTxt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
         setTxt('control-tab-device', texts.control_tab_device || 'Gerät');
         setTxt('dev-nozzles-title', texts.dev_nozzles || 'Düsen');
@@ -597,7 +618,7 @@ class AppInitManager {
         setTxt('dev-door-label', (texts.door_label || 'Tür') + ':');
         setTxt('dev-tool-label', (texts.tool_label || 'Werkzeug') + ':');
 
-        // Duesenwahl (nur bei Doppelduese sichtbar)
+        // Nozzle selection (only visible with a dual nozzle)
         const ctrlNozzleLabel = document.getElementById('ctrl-nozzle-label');
         if (ctrlNozzleLabel) ctrlNozzleLabel.textContent = (texts.nozzle_select || 'Düse') + ':';
         const ctrlNozzle = document.getElementById('ctrl-nozzle');
@@ -612,7 +633,7 @@ class AppInitManager {
         const controlUnload = document.getElementById('control-unload');
         if (controlUnload) controlUnload.textContent = texts.unload;
 
-        // Rueckfrage des Druckers nach dem Laden
+        // The printer's follow-up prompt after loading
         const amsResume = document.getElementById('control-ams-resume');
         if (amsResume) amsResume.textContent = texts.ams_resume;
 
@@ -666,6 +687,12 @@ class AppInitManager {
         const sdRefreshText = document.getElementById('sd-refresh-text');
         if (sdRefreshText) sdRefreshText.textContent = texts.refresh;
 
+        // Archive toggle: the label depends on the state, so it goes through
+        // its own function instead of being set here.
+        if (typeof window.sdArchivKnopfSetzen === 'function') {
+            window.sdArchivKnopfSetzen();
+        }
+
         const sdLoadingText = document.getElementById('sd-loading-text');
         if (sdLoadingText) sdLoadingText.textContent = texts.loading_files;
 
@@ -676,18 +703,15 @@ class AppInitManager {
         const schedulePrintTitle = document.getElementById('schedule-print-title');
         if (schedulePrintTitle) schedulePrintTitle.textContent = texts.schedule_print;
 
-        // Kopfzeile der Zeitplan-Karte. Frueher stand hier "Startzeit:" mit
-        // Doppelpunkt ueber zwei Eingabefeldern; jetzt ist es eine
-        // Abschnitts-Ueberschrift wie in den anderen Karten.
         const scheduleStartTime = document.getElementById('schedule-start-time');
         if (scheduleStartTime) scheduleStartTime.textContent = texts.schedule_section_time || 'Zeitplan';
 
         const scheduleAutoPowerLabel = document.getElementById('schedule-auto-power-label');
         if (scheduleAutoPowerLabel) scheduleAutoPowerLabel.textContent = texts.auto_power_on;
 
-        // Kopfzeile der Material-Karte. select_filament traegt einen
-        // Doppelpunkt (und steht in jeder Sprachdatei doppelt) — als
-        // Abschnitts-Ueberschrift taugt es darum nicht.
+        // Header for the material card. select_filament carries a
+        // colon (and appears twice in every language file) — so it
+        // doesn't work as a section heading.
         const scheduleSelectFilament = document.getElementById('schedule-select-filament');
         if (scheduleSelectFilament) scheduleSelectFilament.textContent = texts.schedule_section_material || 'Material';
 
@@ -697,7 +721,7 @@ class AppInitManager {
         const schedulePrintOptions = document.getElementById('schedule-print-options');
         if (schedulePrintOptions) schedulePrintOptions.textContent = texts.schedule_section_options || 'Druckoptionen';
 
-        // Beschriftungen der neuen Karten im Planen-Dialog.
+        // Labels for the new cards in the schedule dialog.
         const setzeText = (id, wert) => {
             const el = document.getElementById(id);
             if (el) el.textContent = wert;
@@ -706,16 +730,13 @@ class AppInitManager {
         setzeText('schedule-spool-label', texts.schedule_spool_label || 'Spule');
         setzeText('schedule-plate-label', texts.print_prepare_plate || 'Platte');
 
-        // Die Optionen und die Plattenauswahl im Planen-Dialog beschriftet
-        // jetzt die Druckvorbereitung selbst (print-prepare.js) — hier standen
-        // vorher dieselben Texte ein zweites Mal.
+        // The options and plate selection in the schedule dialog are now
+        // labeled by print preparation itself (print-prepare.js).
 
         // Schedule Modal Buttons
         const scheduleCancelBtn = document.getElementById('schedule-cancel-btn');
         if (scheduleCancelBtn) scheduleCancelBtn.textContent = texts.cancel;
 
-        // Das Emoji klebte ohne Abstand am Text und war das einzige in einer
-        // Dialog-Fusszeile — das Symbol steht jetzt als Strichzeichnung davor.
         const scheduleConfirmBtn = document.getElementById('schedule-confirm-btn');
         if (scheduleConfirmBtn) scheduleConfirmBtn.textContent = texts.schedule_print_button;
     }
@@ -725,12 +746,12 @@ class AppInitManager {
     // ========================================
 
     setupTheme() {
-        // Cache-Reset: Koerperklassen cleanen fuer frischen Start
+        // Cache reset: clean up body classes for a fresh start
         document.body.classList.remove('dark-mode');
 
         const savedTheme = localStorage.getItem('theme');
 
-        // Browser-Logik
+        // Browser logic
         if (savedTheme === 'auto' || !savedTheme) {
             this.applySystemTheme();
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
@@ -782,7 +803,7 @@ class AppInitManager {
     // ========================================
 
     applyCardVisibility(cardVisibility) {
-        // Default: alle Cards sichtbar
+        // Default: all cards visible
         const visibility = cardVisibility || {};
         this.cardVisibilitySettings = visibility;
         window.cardVisibilitySettings = visibility;
@@ -798,11 +819,11 @@ class AppInitManager {
         Object.entries(cardMappings).forEach(([key, elementId]) => {
             const card = document.getElementById(elementId);
             if (card) {
-                // Default ist true (sichtbar), nur wenn explizit false dann verstecken
+                // Default is true (visible), only hide when explicitly false
                 const isVisible = visibility[key] !== false;
                 card.style.display = isVisible ? '' : 'none';
 
-                // Fuer Filament Drying: auch die interne Variable setzen
+                // For filament drying: also set the internal variable
                 if (key === 'drying' && !isVisible) {
                     window.cardDryingHiddenBySettings = true;
                 } else if (key === 'drying') {
@@ -813,27 +834,27 @@ class AppInitManager {
 
         console.log('📊 Card visibility applied:', visibility);
 
-        // Nach dem Setzen der Settings: Drucker-Status-basierte Visibility anwenden
+        // After applying the settings: apply printer-status-based visibility
         this.updatePrinterDependentCards();
 
-        // Grid-Hoehe nach Visibility-Aenderung anpassen
+        // Adjust grid height after a visibility change
         setTimeout(() => this.adjustGridHeight(), 50);
     }
 
-    // Cards die nur bei eingeschaltetem Drucker sichtbar sein sollen
+    // Cards that should only be visible while the printer is on
     updatePrinterDependentCards() {
         const switchOn = window.lastKnownSwitchState === 'on';
         const mqttConnected = window.lastMqttStatus === true;
-        // Siehe status-manager.js: ohne eingerichtete Steckdose entscheidet
-        // die Verbindung, nicht ein Schalter, den es nicht gibt.
+        // See status-manager.js: without a configured outlet, the
+        // connection decides, not a switch that doesn't exist.
         const printerOnline = (typeof window.druckerDa === 'boolean')
             ? window.druckerDa
             : (switchOn && mqttConnected);
 
-        // Developer Card - Sichtbarkeit ueber checkDeveloperMode() steuern
-        // (zeigt Card + Buttons zusammen an, ohne Verzoegerung)
-        // Klipper: immer anzeigen (kein "printer online via Power-Switch"-
-        // Konzept noetig, Klipper ist da wenn Moonraker antwortet).
+        // Developer card - control visibility via checkDeveloperMode()
+        // (shows the card + buttons together, without delay)
+        // Klipper: always show (no "printer online via power switch"
+        // concept needed, Klipper is there once Moonraker responds).
         if (printerOnline || (window.isKlipperMode && window.isKlipperMode())) {
             checkDeveloperMode();
         } else {
@@ -843,24 +864,24 @@ class AppInitManager {
             if (devCardDesktop) devCardDesktop.style.display = 'none';
         }
 
-        // Filament Drying Card - nur bei Drucker online UND wenn nicht in Settings versteckt
+        // Filament drying card - only when the printer is online AND not hidden in settings
         const dryingCard = document.getElementById('filament-drying-card-grid');
         if (dryingCard) {
             const hiddenBySettings = this.cardVisibilitySettings.drying === false;
             if (hiddenBySettings || !printerOnline) {
                 dryingCard.style.display = 'none';
             } else {
-                // Sichtbarkeit wird von updateFilamentCardVisibility() gesteuert
-                // (prueft zusaetzlich ob Feature aktiviert ist)
+                // Visibility is controlled by updateFilamentCardVisibility()
+                // (also checks whether the feature is enabled)
             }
         }
 
-        // Mainsail-Dock-Tab bei offline ausgrauen (Mainsail ist dann unerreichbar).
+        // Gray out the Mainsail dock tab when offline (Mainsail is unreachable then).
         if (window.tabBarManager && window.tabBarManager.updateMainsailState) {
             window.tabBarManager.updateMainsailState();
         }
 
-        // Grid-Hoehe nach Visibility-Aenderung anpassen
+        // Adjust grid height after a visibility change
         setTimeout(() => this.adjustGridHeight(), 50);
     }
 
@@ -876,9 +897,9 @@ class AppInitManager {
         }
     }
 
-    // Fuehrt Non-Critical-Code nach dem initialen Paint aus, damit das HTML-
-    // Rendering / erste UI-Anzeige nicht durch Side-Effects blockiert wird.
-    // Nutzt requestIdleCallback wenn verfuegbar, sonst setTimeout als Fallback.
+    // Runs non-critical code after the initial paint, so HTML
+    // rendering / the first UI display isn't blocked by side effects.
+    // Uses requestIdleCallback when available, otherwise setTimeout as a fallback.
     deferNonCritical(fn, fallbackMs = 150) {
         if (typeof window.requestIdleCallback === 'function') {
             window.requestIdleCallback(fn, { timeout: 1500 });
@@ -906,11 +927,11 @@ class AppInitManager {
     }
 
     loadTitelbild() {
-        // Kein HA-Titelbild mehr — nur 3MF-Thumbnails beim Druckstart.
+        // No more HA title image — only 3MF thumbnails at print start.
         //
-        // Der PLATZ bleibt aber stehen: wurde der Container ausgeblendet,
-        // rutschte der Drucker nach links, sobald kein Thumbnail da war
-        // (z.B. direkt nach einem Neustart). Nur das Bild wird geleert.
+        // But the SPACE stays reserved: when the container was hidden,
+        // the printer shifted left as soon as there was no thumbnail
+        // (e.g. right after a restart). Only the image gets cleared.
         const bild = document.getElementById('titelbild');
         if (bild) { bild.removeAttribute('src'); bild.style.visibility = 'hidden'; }
     }
@@ -928,7 +949,7 @@ class AppInitManager {
                 const container = document.getElementById('spool-button-list');
                 if (!container) return;
 
-                // Hole die aktuelle aktive Spule
+                // Get the currently active spool
                 const currentActiveId = window.activeSpoolId;
 
                 let html = `
@@ -949,8 +970,8 @@ class AppInitManager {
                     const color = spool.filament?.color_hex || '888888';
                     const isActive = spool.id == currentActiveId;
 
-                    // Fuellstand als farbiger Punkt statt Emoji-Kreis — dieselbe
-                    // Sprache wie die uebrigen Statuspunkte auf der Seite.
+                    // Fill level as a colored dot instead of an emoji circle — the same
+                    // visual language as the other status dots on the page.
                     const fuellFarbe = remaining <= 50 ? '#ef4444'
                                      : remaining <= 150 ? '#f59e0b' : '#22c55e';
                     const statusIcon = `<span style="display:inline-block;width:8px;height:8px;`
@@ -1000,9 +1021,9 @@ class AppInitManager {
 
     async cancelPowerOffTimer() {
         const texts = window.texts || {};
-        // Zuerst ausblenden, dann melden. Andersherum stand der Banner noch,
-        // bis die Antwort da war — und wer nichts passieren sieht, drueckt
-        // ein zweites Mal. Geht der Aufruf schief, kommt er zurueck.
+        // Hide first, then report. The other way around, the banner would
+        // still show until the response came back — and if nothing visibly
+        // happens, people click again. If the call fails, it comes back.
         const banner = document.getElementById('power-off-banner');
         const warSichtbar = !!(banner && banner.classList.contains('active'));
         if (banner) banner.classList.remove('active');
@@ -1040,18 +1061,14 @@ class AppInitManager {
     }
 
     // ========================================
-    // Themenwechsel melden
+    // Report a theme change
     // ========================================
 
     /**
-     * Kurze Meldung nach dem Umschalten von Hell/Dunkel/Automatisch.
+     * Brief message after switching light/dark/auto.
      *
-     * Frueher hiess das showThemeToast und war die zweite Meldungsart
-     * neben skToast: graue Pille unten in der Mitte, ohne Typ und ohne
-     * Symbol, waehrend skToast oben rechts farbig meldete — welche man
-     * bekam, hing davon ab, welche Funktion die Stelle zufaellig aufrief.
-     * Seit 21aug26 laeuft alles ueber skToast; hier bleibt nur noch die
-     * Uebersetzung des Themen-Schluessels und die kuerzere Standzeit.
+     * All theme feedback goes through skToast; this only translates the
+     * theme key and uses a shorter display duration.
      */
     themenMeldung(schluessel) {
         const texts = window.texts || {};
@@ -1066,15 +1083,15 @@ class AppInitManager {
     }
 
     filamentChangeAction(action) {
-        // Filament-Change Workflow (Multi-color External Spool):
+        // Filament change workflow (multi-color external spool):
         // action: "load" | "done" | "retry"
         //
         // Routing:
         //   Bambu: POST /api/mqtt/filament_change {action}
-        //          (Backend sendet M620 P255/P254 + ams_control)
-        //   Klipper: POST /api/printer/<endpoint> (unified-dispatcher)
-        //          load  -> filament_change_start ODER filament_change_inserted
-        //                   (phase-abhaengig, gleiches Schema wie iOS-Pfad)
+        //          (backend sends M620 P255/P254 + ams_control)
+        //   Klipper: POST /api/printer/<endpoint> (unified dispatcher)
+        //          load  -> filament_change_start OR filament_change_inserted
+        //                   (phase-dependent, same scheme as the iOS path)
         //          done  -> filament_change_inserted
         //          retry -> filament_change_start
         const csrfToken = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
@@ -1112,13 +1129,14 @@ class AppInitManager {
                 console.log(`🎨 Filament change ${action}:`, data);
             } else {
                 console.error(`❌ Filament change ${action} failed:`, data.error);
-                window.skToast('Fehler: ' + (data.error || 'Unbekannt'));
+                window.skToast(((window.texts||{}).set_error_colon || 'Fehler:') + ' '
+                    + (data.error || (window.texts||{}).unknown || 'Unbekannt'));
             }
             return data;
         })
         .catch(e => {
             console.error('❌ Filament change error:', e);
-            window.skToast('Netzwerk-Fehler: ' + e.message);
+            window.skToast(((window.texts||{}).network_error || 'Netzwerkfehler') + ': ' + e.message);
             throw e;
         });
     }
@@ -1147,40 +1165,39 @@ class AppInitManager {
         .then(r => r.json())
         .then(data => {
             if (!data.success) {
-                window.skToast('Fehler: ' + (data.error || 'Unbekannt'));
+                window.skToast(((window.texts||{}).set_error_colon || 'Fehler:') + ' '
+                    + (data.error || (window.texts||{}).unknown || 'Unbekannt'));
             }
             return data;
         })
         .catch(e => {
-            window.skToast('Netzwerk-Fehler: ' + e.message);
+            window.skToast(((window.texts||{}).network_error || 'Netzwerkfehler') + ': ' + e.message);
             throw e;
         });
     }
 
     dismissHMSError() {
-        // Das Wegklicken wohnt in hms-banner.js — dieselbe Fassung, die auch
-        // die uebrigen Seiten benutzen. Hier stand sie zuletzt mit einem
-        // `banner`, das es in dieser Funktion gar nicht gab: das Ausblenden
-        // lief seit dem Umbau auf "alle auf einmal" in einen ReferenceError,
-        // und das Banner blieb nach dem Klick stehen.
+        // Dismissal lives in hms-banner.js — the same implementation the
+        // other pages use.
         window.HmsBanner.wegklicken();
     }
 
-    // Pruefe ob HMS Error dismissed wurde (nutzt Server-Liste)
+    // Check whether an HMS error was dismissed (uses the server list)
     isHMSErrorDismissed(errorCode) {
-        // Gross/klein zaehlt nicht: bis 28aug26 schrieben wir die Codes
-        // klein, seither gross wie Studio. Ein Vergleich Zeichen fuer
-        // Zeichen haette alles Weggeklickte einmal wieder auftauchen lassen.
+        // Case doesn't matter: codes have been written in different cases
+        // over time (lowercase vs. uppercase like Studio). A character-for-
+        // character comparison would make everything previously dismissed
+        // reappear once.
         return this.serverDismissedHMSErrors.some(
             c => window.HmsBanner.gleich(c, errorCode));
     }
 
-    // Clear dismissed HMS Errors - wird automatisch vom Server gemacht wenn keine Fehler mehr
+    // Clear dismissed HMS errors - handled automatically by the server once there are no more errors
     clearDismissedHMSErrors() {
-        // Nichts zu tun - Server handhabt das
+        // Nothing to do - the server handles that
     }
 
-    // HMS Status vom Server laden (beim Start) - MUSS vor progress_update fertig sein
+    // Load HMS status from the server (at startup) - MUST finish before progress_update
     async loadHMSStatus() {
         try {
             const response = await fetch('/api/hms/status');
@@ -1197,11 +1214,11 @@ class AppInitManager {
             this.hmsStatusLoaded = true;
             // Keep bare-global in sync
             hmsStatusLoaded = true;
-            // Und den Zustand, der waehrenddessen kam, jetzt zeichnen. Dieser
-            // Aufruf laeuft auf Idle, der erste /api/status ist da laengst
-            // durch — die Meldung wurde dabei zurueckgehalten, weil die
-            // Quittungsliste noch fehlte. Der Socket schickt erst wieder bei
-            // einer Aenderung, also kaeme sie sonst nie.
+            // And draw the state that arrived meanwhile now. This call runs
+            // on idle, the first /api/status has long since gone through —
+            // the notification was held back because the dismissal list
+            // wasn't there yet. The socket only sends again on a change, so
+            // it would otherwise never arrive.
             if (window.HmsBanner) {
                 window.HmsBanner.nachziehen({
                     geladen: true,
@@ -1229,13 +1246,13 @@ class AppInitManager {
             if (data.active) {
                 window.powerOffTimerActive = true;
 
-                // Banner anzeigen
+                // Show the banner
                 if (banner) {
                     banner.classList.add('active');
                     if (bannerReason) bannerReason.textContent = data.reason;
                 }
 
-                // Countdown starten
+                // Start the countdown
                 const updateCountdown = () => {
                     const remaining = Math.max(0, data.end_time - (Date.now() / 1000));
                     const minutes = Math.floor(remaining / 60);
@@ -1249,14 +1266,14 @@ class AppInitManager {
                     if (remaining > 0 && window.powerOffTimerActive) {
                         requestAnimationFrame(updateCountdown);
                     } else if (remaining <= 0) {
-                        // Timer abgelaufen - Banner ausblenden
+                        // Timer expired - hide the banner
                         if (banner) banner.classList.remove('active');
                     }
                 };
 
                 updateCountdown();
             } else {
-                // Timer nicht aktiv - Banner ausblenden
+                // Timer not active - hide the banner
                 if (banner) banner.classList.remove('active');
                 window.powerOffTimerActive = false;
             }
@@ -1272,17 +1289,17 @@ class AppInitManager {
     dismissMaintenanceBanner() {
         const banner = document.getElementById('maintenance-banner');
 
-        // Banner ausblenden
+        // Hide the banner
         banner.classList.remove('active');
 
-        // Dismissed-Status in localStorage (24h)
-        const dismissedUntil = Date.now() + (24 * 60 * 60 * 1000); // 24 Stunden
+        // Dismissed status in localStorage (24h)
+        const dismissedUntil = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
         localStorage.setItem('maintenance_banner_dismissed', dismissedUntil);
         console.log('✅ Maintenance banner dismissed for 24h');
     }
 
     showMaintenanceBanner(task) {
-        // Pruefe ob Banner fuer 24h dismissed wurde
+        // Check whether the banner was dismissed for 24h
         const dismissedUntil = localStorage.getItem('maintenance_banner_dismissed');
         if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
             console.log('⏭️ Maintenance banner dismissed until', new Date(parseInt(dismissedUntil)));
@@ -1296,45 +1313,45 @@ class AppInitManager {
         const taskName = task.name;
         const daysUntilDue = task.days_until_due;
 
-        // Title basierend auf Status
+        // Title based on status
         if (daysUntilDue < 0) {
-            // Ueberfaellig
+            // Overdue
             const daysOverdue = Math.abs(daysUntilDue);
             banner.classList.add('overdue');
             title.textContent = getText('maintenance_banner_overdue');
             message.textContent = getText('maintenance_banner_overdue_days').replace('{task}', taskName).replace('{days}', daysOverdue);
         } else if (daysUntilDue === 0) {
-            // Heute faellig
+            // Due today
             banner.classList.remove('overdue');
             title.textContent = getText('maintenance_banner_due_today');
             message.textContent = getText('maintenance_banner_today').replace('{task}', taskName);
         } else if (daysUntilDue === 1) {
-            // Morgen faellig
+            // Due tomorrow
             banner.classList.remove('overdue');
             title.textContent = getText('maintenance_banner_due_soon');
             message.textContent = getText('maintenance_banner_tomorrow').replace('{task}', taskName);
         } else {
-            // Bald faellig (2-3 Tage)
+            // Due soon (2-3 days)
             banner.classList.remove('overdue');
             title.textContent = getText('maintenance_banner_due_soon');
             message.textContent = getText('maintenance_banner_due_days').replace('{task}', taskName).replace('{days}', daysUntilDue);
         }
 
-        // Banner anzeigen
+        // Show the banner
         banner.classList.add('active');
         console.log('🔧 Maintenance banner shown:', taskName);
     }
 
     async checkMaintenanceStatus() {
         try {
-            // Hole faellige Wartungen
+            // Fetch due maintenance tasks
             const response = await apiCall('/api/maintenance/tasks/due');
             if (response.ok) {
                 const tasks = await response.json();
 
                 if (tasks && tasks.length > 0) {
-                    // Zeige Banner fuer die dringendste Wartung
-                    const mostUrgent = tasks[0]; // Bereits nach Prioritaet sortiert
+                    // Show the banner for the most urgent maintenance
+                    const mostUrgent = tasks[0]; // Already sorted by priority
                     this.showMaintenanceBanner(mostUrgent);
                 }
             }
@@ -1361,15 +1378,15 @@ class AppInitManager {
         window.cardVisibilitySettings = this.cardVisibilitySettings;
 
         // Camera error handler
-        // Kamera-Fehler behandelt ausschliesslich der camera-manager.
+        // Camera errors are handled exclusively by the camera-manager.
 
-        // KRITISCH: SOFORT ausfuehren VOR DOM Ready — Anti-Flicker
+        // CRITICAL: run IMMEDIATELY before DOM ready — anti-flicker
         (function() {
-            // NUR fuer Anti-Flacker: Schnelle Dark Mode Pruefung
+            // ONLY for anti-flicker: quick dark mode check
             const savedTheme = localStorage.getItem('theme');
             const systemIsDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-            // Nur die allereinfachste Logik fuer schnelles Theme
+            // Just the simplest possible logic for a fast theme
             if (savedTheme === 'dark' || (!savedTheme && systemIsDark)) {
                 document.body.classList.add('dark-mode');
                 console.log('Anti-Flicker: Dark Mode aktiviert (savedTheme=' + savedTheme + ', systemIsDark=' + systemIsDark + ')');
@@ -1423,30 +1440,30 @@ class AppInitManager {
             if (window.innerWidth <= 768 && this.dashboardGrid) {
                 this.dashboardGrid.destroy(false);
                 this.dashboardGrid = null;
-                this.adjustGridHeightForMobile(); // Grid-Hoehe fuer Flexbox setzen
+                this.adjustGridHeightForMobile(); // Set the grid height for flexbox
                 console.log('📱 GridStack disabled (Mobile)');
             } else if (window.innerWidth > 768 && !this.dashboardGrid) {
                 this.initGridStack();
             }
         });
 
-        // WebSocket Listener fuer HMS Updates (Synchronisation)
+        // WebSocket listener for HMS updates (synchronization)
         if (typeof socket !== 'undefined') {
             socket.on('hms_update', (data) => {
                 console.log('📡 HMS Update received:', data);
                 this.serverDismissedHMSErrors = data.dismissed_errors || [];
                 serverDismissedHMSErrors = this.serverDismissedHMSErrors;
 
-                // Banner-Anzeige aktualisieren
+                // Update the banner display
                 const banner = document.getElementById('hms-error-banner');
                 if (!banner) return;
 
                 const currentErrorCode = banner.dataset.errorCode;
                 const activeErrors = data.active_errors || [];
 
-                // Banner ausblenden wenn:
-                // 1. Keine aktiven Fehler mehr ODER
-                // 2. Der aktuell angezeigte Fehler dismissed wurde
+                // Hide the banner when:
+                // 1. There are no more active errors OR
+                // 2. The currently shown error was dismissed
                 if (activeErrors.length === 0) {
                     banner.classList.remove('active');
                     console.log('🧹 HMS Banner hidden - no active errors');
@@ -1460,64 +1477,59 @@ class AppInitManager {
         // Check maintenance status on page load
         setTimeout(() => {
             this.checkMaintenanceStatus();
-        }, 2000); // 2 Sekunden nach Seitenladung
+        }, 2000); // 2 seconds after the page loads
 
         // domReady callback with loadEverything, spoolman init, camera setup, event handlers
         this.domReady(async function() {
             console.log(texts.console_app_loaded);
 
-            // WICHTIG: Status ZUERST holen (Brücke bis der Socket verbunden ist),
-            // damit Buttons sofort richtig angezeigt werden.
+            // IMPORTANT: fetch status FIRST (a bridge until the socket connects),
+            // so buttons show the right state immediately.
             await self.loadEverything();
-            // Danach ist der Socket die alleinige Live-Quelle. /api/status nur noch
-            // als Fallback pollen, wenn der Socket NICHT verbunden ist.
+            // After that, the socket is the sole live source. Only poll
+            // /api/status as a fallback when the socket is NOT connected.
             window.statusUpdateInterval = setInterval(() => {
-                // Voll-online (Socket verbunden UND Drucker/mqtt da) → Socket liefert
-                // alles, kein Poll. Sonst (Socket weg ODER Drucker aus) /api/status holen,
-                // damit Power-Button/Online-Status nachkommen (Adapter pusht ohne
-                // Moonraker keinen printer_state).
-                // Der Socket traegt seit 20aug26 denselben Stand wie
-                // /api/status — beide bauen aus StatusBuilderService.vollstatus().
-                // Vorher fehlten dem Push 55 Schluessel (AMS, device_report,
-                // Temperaturblock), deshalb pollte Bambu hier IMMER mit. Genau
-                // das machte die Zonen-Karten bis zu 8 Sekunden alt: die
-                // Duesentemperatur stand auf einem Schnappschuss mitten aus der
-                // Aufheizrampe, waehrend das Drucker-Display laengst weiter war.
+                // Fully online (socket connected AND printer/mqtt present) -> the socket
+                // delivers everything, no poll. Otherwise (socket down OR printer off)
+                // fetch /api/status, so the power button/online status catches up
+                // (the adapter pushes no printer_state without Moonraker).
+                // The socket carries the same data as /api/status — both are
+                // built from StatusBuilderService.vollstatus().
                 //
-                // Jetzt nur noch als Rueckfall: Socket weg oder Drucker offline.
+                // Now only used as a fallback: socket down or printer offline.
                 const online = window.socket && window.socket.connected && window.lastMqttStatus === true;
                 if (!online) self.loadEverything();
             }, 8000);
 
-            // Kamera gehoert komplett dem camera-manager (_initCamera):
-            // der verhandelt WebRTC/MJPEG/off. Der alte Auto-Start setzte
-            // hier VOR der Verhandlung img.src=/api/camera und hielt damit
-            // die ffmpeg-Pipeline dauerhaft am Leben.
+            // The camera belongs entirely to the camera-manager (_initCamera):
+            // it negotiates WebRTC/MJPEG/off. Setting img.src=/api/camera
+            // here before that negotiation would keep the ffmpeg pipeline
+            // alive permanently — don't add it back.
 
-            // Spoolman Config pruefen und Card Visibility laden.
-            // Card Visibility ist layout-kritisch (sofort anwenden),
-            // Spoolman-Fetches (status + spools + spool/N) sind Non-Critical -> deferren.
+            // Check the Spoolman config and load card visibility.
+            // Card visibility is layout-critical (apply immediately),
+            // Spoolman fetches (status + spools + spool/N) are non-critical -> defer them.
             apiCall('/api/config')
                 .then(response => response.json())
                 .then(data => {
                     window.spoolmanEnabled = data.spoolman && data.spoolman.enabled;
                     // Card Visibility SOFORT anwenden (Layout)
                     self.applyCardVisibility(data.ui?.card_visibility);
-                    // Spoolman-Init danach auf Idle verschieben
+                    // Move the Spoolman init to idle afterwards
                     self.deferNonCritical(() => {
                         console.log(texts.console_call_init_spoolman);
                         initSpoolman();
                     });
                 });
 
-            // checkDeveloperMode() fetcht status+config erneut (via TTL-Cache gepoolt)
-            // und versteckt gewisse Buttons. Non-Critical fuer den initialen Paint.
+            // checkDeveloperMode() refetches status+config (pooled via TTL cache)
+            // and hides certain buttons. Non-critical for the initial paint.
             self.deferNonCritical(() => checkDeveloperMode());
 
-            // HQ Status asynchron initialisieren
+            // Initialize HQ status asynchronously
             setTimeout(() => initHQStatus(), 100);
 
-            // Camera Source Button Status initialisieren (direkt, keine API noetig)
+            // Initialize the camera source button status (direct, no API needed)
             initCameraSourceButton();
 
             // Power-Off Timer Click Handler
@@ -1532,12 +1544,12 @@ class AppInitManager {
 
             setupSafariStreamFix();
 
-            // Kamera Stream Error-Handler
+            // Camera stream error handler
             const cameraStreamImg = document.getElementById('camera-stream');
             if (cameraStreamImg) {
             }
 
-            // Mausrad-Zoom mit Mausposition
+            // Mouse-wheel zoom with mouse position
             const cameraStream = document.getElementById('camera-stream');
             if (cameraStream) {
                 cameraStream.addEventListener('wheel', function(e) {

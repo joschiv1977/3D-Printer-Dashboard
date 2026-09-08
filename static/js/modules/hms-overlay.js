@@ -1,13 +1,12 @@
-// hms-overlay.js — die Drucker-Meldung auf den uebrigen Seiten.
+// hms-overlay.js -- the printer message on the remaining pages.
 //
-// Die Hauptseite bekommt ihren Zustand ueber den Socket. Konsole, Historie,
-// Einstellungen und die anderen haben keinen — dort fragt dieses Modul im
-// gleichen Takt nach wie das Telefon (5 s). Gezeichnet wird mit derselben
-// Routine (hms-banner.js), damit die Meldung ueberall gleich aussieht und
-// gleich reagiert.
+// The main page gets its state over the socket. The console, the history, the
+// settings and the others have none -- there this module asks at the same
+// cadence as the phone (5 s). It draws with the same routine (hms-banner.js),
+// so the message looks and behaves the same everywhere.
 //
-// Es startet NICHT auf der Hauptseite: die traegt den Stapel schon in der
-// Seite, und dort waere der Poll neben dem Socket nur doppelt.
+// It does NOT start on the main page: that one already carries the stack in the
+// page, and there the poll beside the socket would only be a duplicate.
 (function () {
     'use strict';
 
@@ -32,21 +31,21 @@
             const a = await fetch('/api/status');
             if (!a.ok) return;
             const d = await a.json();
-            // Die Quittungsliste kommt im Zustand mit — sie kann sich auf
-            // einem anderen Geraet geaendert haben.
+            // The acknowledgement list comes along in the state -- it may have
+            // changed on another device.
             if (Array.isArray(d.hms_dismissed)) weggeklickt = d.hms_dismissed;
             window.HmsBanner.zeichne(d, {
                 geladen,
                 weggeklickt: c => weggeklickt.some(x => window.HmsBanner.gleich(x, c)),
             });
         } catch (f) {
-            // Server weg oder Sitzung abgelaufen: still bleiben, der
-            // naechste Takt versucht es wieder.
+            // The server is gone or the session has expired: stay quiet, the
+            // next tick tries again.
         }
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        if (document.getElementById('meldungs-stapel')) return;   // Hauptseite
+        if (document.getElementById('notification-stack')) return;   // Hauptseite
         if (!window.HmsBanner) return;
         await quittungen();
         nachsehen();

@@ -1,16 +1,16 @@
 /**
- * Power-Loss-Recovery
+ * Power loss recovery
  *
- * Der Companion schreibt waehrend jedes Drucks den byte-genauen Stand mit
- * (`virtual_sdcard.file_position` + Position, Temperaturen, Offsets, Profile).
- * Faellt der Strom aus oder stuerzt Klipper ab, bleibt dieser Stand liegen —
- * und sobald Klipper wieder steht und nichts druckt, bietet dieser Banner das
- * Fortsetzen an. Beim Fortsetzen werden X und Y gehomet (die real erreichte
- * Position ist nach einem Absturz nicht rekonstruierbar, die Move-Queue laeuft
- * bis zu 2s voraus), Z kommt per SET_KINEMATIC_POSITION aus dem Snapshot.
+ * During every print the companion records the byte-exact state
+ * (`virtual_sdcard.file_position` plus the position, temperatures, offsets and
+ * profiles). If the power fails or Klipper crashes, that state stays behind --
+ * and as soon as Klipper is back up and nothing is printing, this banner offers
+ * to resume. On resuming, X and Y are homed (the position really reached cannot
+ * be reconstructed after a crash, the move queue runs up to 2s ahead) and Z
+ * comes from the snapshot through SET_KINEMATIC_POSITION.
  *
- * Nur Klipper-Direct — beim Bambu-Backend gibt es keinen Companion, der den
- * Stand mitschreiben koennte. Dort wird gar nicht erst gefragt (siehe
+ * Klipper direct only -- with the Bambu backend there is no companion that
+ * could record the state. Nothing is asked there in the first place (see
  * _isDirectMode).
  */
 class PrintRecoveryManager {
@@ -36,13 +36,13 @@ class PrintRecoveryManager {
     }
 
     /**
-     * Laeuft die UI gegen den lokalen Direct-Adapter? Nur dort gibt es einen
-     * Companion. Beim Bambu-Backend existiert der Endpoint gar nicht — die
-     * Anfrage lief in einen 404, den Flask mit vollem Traceback protokolliert,
-     * und das alle 20 Sekunden. Also erst gar nicht fragen.
+     * Is the UI running against the local direct adapter? Only there is there a
+     * companion. With the Bambu backend the endpoint does not exist at all --
+     * the request ran into a 404 that Flask logs with a full traceback, every
+     * 20 seconds. So it does not ask in the first place.
      *
-     * Nutzt denselben dokumentweit gecachten /api/config-Abruf wie
-     * tab-bar-manager._applyDirectMode() — eine Abfrage fuer die ganze Seite.
+     * Uses the same document-wide cached /api/config call as
+     * tab-bar-manager._applyDirectMode() -- one query for the whole page.
      */
     _isDirectMode() {
         window.__directCfgPromise = window.__directCfgPromise ||
@@ -58,8 +58,8 @@ class PrintRecoveryManager {
     }
 
     async refresh() {
-        // Waehrend einer laufenden Wiederaufnahme nicht dazwischenfunken: der
-        // Companion antwortet erst nach Homing und Aufheizen, das dauert Minuten.
+        // Do not interfere while a resume is running: the companion only
+        // answers after homing and heating, which takes minutes.
         if (this.busy) return;
         try {
             const res = await this._call('/api/recovery');

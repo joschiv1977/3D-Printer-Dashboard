@@ -1,25 +1,25 @@
 /**
- * Zentrale Rechts-/Lizenz-Daten (Web/Electron). Single Source of Truth für den
- * „Rechtliches"-Bereich: Marken-Disclaimer, Liste der gebündelten Drittanbieter-
- * Komponenten + Lizenztexte. Android nutzt das Google-OSS-Plugin (auto-generiert),
- * iOS spiegelt diese Liste — Inhalte hier pflegen, dort nachziehen.
+ * The central legal and licence data (web and Electron). The single source of
+ * truth for the "legal" section: the trademark disclaimer, the list of bundled
+ * third-party components and their licence texts. Android uses the Google OSS
+ * plugin (auto-generated), iOS mirrors this list -- maintain the content here
+ * and follow up there.
  */
 window.LEGAL_DATA = {
-  // Genannte Marken (descriptive use) — werden im Disclaimer aufgezählt.
+  // The trademarks mentioned (descriptive use) -- listed in the disclaimer.
   trademarks: ['Bambu Lab', 'Klipper', 'Mainsail', 'Moonraker', 'Spoolman', 'Meross', 'Sovol'],
 
-  // Die Liste der Komponenten steht NICHT mehr hier.
+  // The list of components no longer stands here.
   //
-  // Von Hand gepflegt umfasste sie neunzehn Eintraege, alle aus der
-  // Electron-Welt — der Python-Server mit 115 Paketen, Android mit 60,
-  // iOS und die drei mitgelieferten Programme fehlten vollstaendig
-  // (nachgezaehlt 31aug26). Eine Liste, die jemand pflegen muss, laeuft
-  // der Wirklichkeit hinterher.
+  // Maintained by hand it held nineteen entries, all from the Electron world --
+  // the Python server with 115 packages, Android with 60, iOS and the three
+  // bundled programs were missing entirely. A list somebody has to maintain
+  // runs behind reality.
   //
-  // Sie wird jetzt erzeugt: `scripts/lizenzen_sammeln.py --schreibe`
-  // liest die installierten Pakete, die build.gradle, die pbxproj, die
-  // package.json und die Programme selbst und schreibt
-  // static/lizenzen.json. Der Dialog laedt diese Datei.
+  // It is generated now: `scripts/collect_licenses.py --schreibe` reads the
+  // installed packages, the build.gradle, the pbxproj, the package.json and the
+  // programs themselves, and writes static/lizenzen.json. The dialog loads that
+  // file.
 
   // Standard-Lizenztexte (einmal, da viele Komponenten dieselbe nutzen).
   licenseTexts: {

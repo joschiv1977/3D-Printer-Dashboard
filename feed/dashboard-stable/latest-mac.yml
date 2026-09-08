@@ -1,0 +1,11 @@
+version: 2.2.20
+files:
+  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-2.2.20-arm64-mac.zip
+    sha512: LquTDSl0o/kyfgJAs0ITS5El1yftJqguSJyi7urxLfLqgB7LTp6VcM6mv0/xSYHA3kiYYlJT2L6OGkODxyjfSA==
+    size: 118190979
+  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-2.2.20-arm64.dmg
+    sha512: pY/dNMsXEjtY2FCUDZuB4YxKYZ8VmNPA24uEcdzIeLQoXzHq8ZXemRClzHNplQoYIGAdlAe4FNDwvmU8nGLtbA==
+    size: 123367942
+path: Dashboard-2.2.20-arm64-mac.zip
+sha512: LquTDSl0o/kyfgJAs0ITS5El1yftJqguSJyi7urxLfLqgB7LTp6VcM6mv0/xSYHA3kiYYlJT2L6OGkODxyjfSA==
+releaseDate: '2026-09-08T14:58:46.820Z'

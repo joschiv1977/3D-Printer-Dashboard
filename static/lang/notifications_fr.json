@@ -159,11 +159,23 @@
     "calibration_cancelled": {
       "title": "🔧 Calibration annulée",
       "body": "{name} a été annulée."
+    },
+    "scheduled_print_started": {
+      "title": "⏰ Impression programmée démarrée",
+      "body": "'{filename}' est en cours."
+    },
+    "scheduled_print_failed": {
+      "title": "❌ Impression programmée échouée",
+      "body": "'{filename}' — {reason}"
+    },
+    "update_available": {
+      "title": "⬆️ Nouvelle version {version}",
+      "body": "{version} est prête pour {produkt}. À installer dans les réglages."
     }
   },
   "status": {
     "ready": "Prêt",
-    "printing": "Impression:",
+    "printing": "Impression",
     "preparing": "Préparation...",
     "starting_print": "Démarrage impression...",
     "print_completed": "Impression terminée",
@@ -280,7 +292,16 @@
     "printing_failed": "❌ Impression échouée ({duration_minutes} min, couche {layers_done}/{total_layers})",
     "dry_started": "🌡️ Séchage filament démarré ({material} {temp}°C, {hours}h)",
     "dry_stopped": "⏹️ Séchage filament arrêté ({material})",
-    "dry_complete": "✅ Séchage filament terminé ({material})"
+    "dry_complete": "✅ Séchage filament terminé ({material})",
+    "hms_error": "⚠️ HMS {code} : {text}",
+    "hms_info": "ℹ️ {text}",
+    "hms_more_errors": "📌 {errors} nouvelles erreurs",
+    "hms_more_infos": "ℹ️ {infos} nouveaux avis",
+    "hms_more_mixed": "📌 {errors} nouvelles erreurs, {infos} nouveaux avis",
+    "speed_change": "⚡ Vitesse : {level}",
+    "ams_tray_change": "🔄 {from} → {to} à la couche {layer}",
+    "spool_changed": "🧵 Bobine changée — {grams} g imputés à l’ancienne",
+    "spoolman_tracked": "🧵 {grams} g de filament imputés (arrêt manuel)"
   },
   "stages": {
     "0": "Impression",
@@ -371,6 +392,10 @@
       "no_filament_left": "Filament [{filament_index}] ({spool_name}) : Vide ! Nécessite {required_weight}g",
       "insufficient_filament": "Filament [{filament_index}] ({spool_name}) : {available_weight}g disponible, {required_weight}g nécessaire (manquent {shortage}g)",
       "critical_error_scheduling": "Impossible de programmer l'impression - erreurs critiques de filament présentes"
+    },
+    "mismatch": {
+      "title": "Le filament ne correspond pas",
+      "body": "{file} demande {wanted} — le bac contient {loaded}."
     }
   },
   "maintenance": {
@@ -395,5 +420,15 @@
       "title": "📅 Maintenance planifiée",
       "body": "{task_name} - dans {days} jour(s)"
     }
+  },
+  "speed_levels": {
+    "1": "Silencieux",
+    "2": "Standard",
+    "3": "Sport",
+    "4": "Fou"
+  },
+  "scheduled": {
+    "reason_klipper_boot": "Contrôleur Klipper injoignable après le démarrage",
+    "reason_mqtt": "Pas de connexion MQTT après {cycles} cycles électriques"
   }
 }

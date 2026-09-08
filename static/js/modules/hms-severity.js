@@ -1,31 +1,29 @@
 /**
- * HMS-Hinweis oder echter Fehler?
+ * An HMS notice or a real error?
  *
- * Der Drucker kodiert den Schweregrad in den Code selbst — deshalb braucht
- * es dafuer keine gepflegte Liste. Vorher hatte jede Oberflaeche (Web,
- * Android, iOS, Server) ihre eigene Aufzaehlung mit zwei Codes im kurzen
- * Format "0300-8013", die auf die 16-stelligen Codes aus hms_list nie
- * passte: eine offene Vordertuer kam damit als roter "⚠️ Druckerfehler"
- * mit Vibration durch.
+ * The printer encodes the severity in the code itself -- so no maintained list
+ * is needed for it. Every front end (web, Android, iOS, the server) used to
+ * have its own enumeration with two codes in the short format "0300-8013",
+ * which never matched the 16-digit codes from hms_list: an open front door came
+ * through as a red "printer error" with a vibration.
  *
- * Spiegelt mixins/progress/constants.py (hms_stufe_aus_code /
- * hms_ist_hinweis). Aendert sich die Regel dort, gehoert sie hier mit
- * angepasst.
+ * Mirrors mixins/progress/constants.py (hms_stufe_aus_code / hms_ist_hinweis).
+ * If the rule changes there, it wants changing here too.
  */
 (function (global) {
     'use strict';
 
-    // Kurze print_error-Codes ohne Schweregrad-Feld — nur die brauchen
-    // noch eine gepflegte Aufzaehlung.
+    // The short print_error codes without a severity field -- only those still
+    // need a maintained enumeration.
     const INFO_HMS_CODES = ['0300-8013', '0300-8004'];
 
     /**
-     * Schweregrad-Ziffer aus dem Code (0 = nicht ermittelbar).
+     * The severity digit out of the code (0 = cannot be determined).
      *
      *     0300940000030001
-     *     ^^^^^^^^          attr (Modul + Bauteil)
-     *             ^^^^      1 fatal, 2 ernst, 3 normal, 4 Hinweis
-     *                 ^^^^  laufende Nummer
+     *     ^^^^^^^^          attr (module and part)
+     *             ^^^^      1 fatal, 2 serious, 3 normal, 4 notice
+     *                 ^^^^  the running number
      */
     function hmsStufeAusCode(code) {
         const text = String(code || '').replace(/[-_]/g, '').trim();
@@ -35,18 +33,18 @@
     }
 
     /**
-     * Hinweis (blaues Fenster am Drucker) statt Fehler?
+     * A notice (the blue window on the printer) rather than an error?
      *
-     * Stufe 3 ("normal") und 4 ("Hinweis") sind Meldungen, die den Druck
-     * nicht gefaehrden: offene Tuer, langsam kuehlende Kammer, Bett ueber
-     * Solltemperatur.
+     * Levels 3 ("normal") and 4 ("notice") are messages that do not endanger
+     * the print: an open door, a chamber cooling slowly, the bed above its
+     * target temperature.
      *
-     * @param {Object|string} fehler Fehlerobjekt vom Server (mit is_info)
-     *                               oder blosser Code.
+     * @param {Object|string} fehler the error object from the server (carrying
+     *                               is_info), or a bare code.
      */
     function hmsIstHinweis(fehler) {
         if (fehler && typeof fehler === 'object') {
-            // Der Server schickt die Einstufung mit — die gewinnt.
+            // The server sends its classification along -- that wins.
             if (typeof fehler.is_info === 'boolean') return fehler.is_info;
             return hmsIstHinweis(fehler.code);
         }

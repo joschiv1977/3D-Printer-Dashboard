@@ -3,7 +3,7 @@
           <button class="modal-close-btn" onclick="closeSpeedModal()">×</button>
             <h2 style="margin-bottom:20px; color:var(--text-primary);"><svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 15A8.1 8.1 0 1 1 19 15"/><path d="M12 13 16 8"/><circle cx="12" cy="14" r="1.4"/></svg> <span id="speed-modal-title">Geschwindigkeit</span></h2>
 {% if active_printer_type == 'bambu' %}
-            <!-- Display-Stil: vier Stufen-Karten, Klick setzt sofort -->
+            <!--Display style: four level cards, click applies immediately-->
             <div class="ds-grid" id="ds-grid">
                 <button class="dsp-card ds-card" id="ds-card-1" onclick="dsPick(1)">
                     <span class="ds-check">✓</span>
@@ -37,7 +37,7 @@
                     <input type="range" id="speed-slider" min="1" max="4" value="2" step="1"
                            style="width:100%; cursor:pointer;"
                            oninput="updateSpeedDisplay(this.value)">
-                    <!-- Labels unter dem Slider (Bambu-Stufen; Klipper blendet sie aus) -->
+                    <!--Labels below the slider (Bambu levels; Klipper hides them)-->
                     <div id="speed-level-labels" style="display:flex; justify-content:space-between; margin-top:10px;">
                         <span id="speed-label-silent" style="font-size:12px; color:var(--text-secondary);">Leise</span>
                         <span id="speed-label-standard" style="font-size:12px; color:var(--text-secondary);">Standard</span>
@@ -45,13 +45,13 @@
                         <span id="speed-label-ludicrous" style="font-size:12px; color:var(--text-secondary);">Verrückt</span>
                     </div>
                 </div>
-                <!-- Aktuelle Auswahl -->
+                <!--Current selection-->
                 <div style="text-align:center; margin-top:20px;">
                     <div id="speed-display" style="font-size:24px; font-weight:bold; color:var(--accent-blue);">Standard</div>
                     <div id="speed-description" style="font-size:14px; color:var(--text-secondary); margin-top:5px;">Ausgewogene Geschwindigkeit</div>
                 </div>
             </div>
-            <!-- Buttons (Klipper: Anwenden-Modell) -->
+            <!--Buttons (Klipper: apply model)-->
             <div style="display:flex; gap:10px; justify-content:flex-end;">
               <button class="modal-btn modal-btn-cancel" onclick="closeSpeedModal()">
                   <span id="speed-cancel-btn">Abbrechen</span>

@@ -5,15 +5,15 @@
  * progress chart, events timeline, and timelapse fullscreen.
  */
 /**
- * Die Druckoptionen an EINER Stelle einsammeln.
+ * Collect the print options in ONE place.
  *
- * Standen vorher fuenfmal wortgleich im Modul — jede neue Option musste an
- * allen fuenf gepflegt werden, und genau daran waeren die dreistufigen
- * Kalibrierungen haengengeblieben.
+ * Used to be spelled out identically five times in the module — every new
+ * option had to be maintained in all five spots, and that is exactly where
+ * the three-stage calibrations would have gotten stuck.
  *
- * Dreistufig heisst: 0 aus, 1 ein, 2 automatisch. So kennt der Drucker sie
- * (am 18aug26 gegen echte Bambu-Studio-Befehle gemessen), und so zeigt er
- * sie auch auf seinem Display.
+ * Three-stage means: 0 off, 1 on, 2 automatic. That's how the printer knows
+ * them (measured against real Bambu Studio commands on 18aug26), and that's
+ * how it shows them on its display too.
  */
 function collectPrintOptions(filename) {
     const haken = (cls) => {
@@ -36,33 +36,33 @@ function collectPrintOptions(filename) {
         bed_leveling_mode: stufe('print-opt-bed-leveling', 2),
         flow_cali_mode: stufe('print-opt-flow-cali', 2),
         nozzle_offset_mode: stufe('print-opt-nozzle-offset', 0),
-        // Trocknung parallel zum Druck. Material und Werte holt der Server
-        // selbst aus der 3MF — hier reicht der Schalter.
+        // Drying in parallel with the print. The server pulls material and
+        // values from the 3MF itself — the switch here is enough.
         dry_during_print: haken('print-opt-dry-during'),
     };
 }
 
 // ========================================
-// Teile ueberspringen
+// Skip parts
 // ========================================
-// Der Drucker kann einzelne Teile eines laufenden Drucks fallen lassen
-// (skip_objects, fun-Bit 49). Loest sich eines vom Bett, rettet das den
-// Rest des Auftrags — bisher blieb nur der Abbruch.
+// The printer can drop individual parts of a running print
+// (skip_objects, fun bit 49). If one comes loose from the bed, this saves
+// the rest of the job — until now the only option was to abort.
 //
-// Nicht umkehrbar: was uebersprungen ist, kommt in diesem Auftrag nicht
-// wieder. Darum die Liste zum Ankreuzen und eine ausdrueckliche Rueckfrage.
-// Sichtbarkeit des Knopfes. EINE Funktion, von beiden Wegen gerufen: das
-// Web laeuft ueber den Socket, der Poll ist nur der Rueckfall. Genau daran
-// ist der Knopf beim ersten Versuch nicht aufgetaucht — die Logik hing im
-// Poll-Pfad, der beim laufenden Socket gar nicht drankommt. Denselben Fehler
-// nennt der Kommentar in socket-manager schon fuer die Geraete-Anzeige.
+// Not reversible: whatever is skipped does not come back in this job.
+// That's why there's a checklist and an explicit confirmation prompt.
+// Visibility of the button. ONE function, called from both paths: the
+// web runs over the socket, the poll is only the fallback. That is exactly
+// why the button did not show up on the first attempt — the logic was
+// stuck in the poll path, which never runs while the socket is active. The
+// comment in socket-manager already names the same bug for the device display.
 window.skTeileKnopfZeigen = function (data) {
     if (!data) return;
     const laeuft = ['RUNNING', 'PAUSE'].includes(
         String(data.gcode_state || '').toUpperCase()) || data.paused === true;
     const sichtbar = laeuft && data.kann_teile_ueberspringen === true;
-    // Drei Stellen: die Druckkarte (dort schaut man waehrend eines Drucks
-    // hin) und die beiden Knopfreihen der Entwickler-Karte.
+    // Three places: the print card (that's where you look during a print)
+    // and the two button rows on the developer card.
     ['pcb-skip', 'skip-btn-mobile', 'skip-btn-desktop'].forEach(id => {
         const btn = document.getElementById(id);
         if (btn) btn.style.display = sichtbar ? '' : 'none';
@@ -152,7 +152,7 @@ async function zeigePlatte(ov, teile) {
     try {
         punkte = tk.getImageData(0, 0, K, K).data;
     } catch (e) {
-        return aufgeben();            // fremde Quelle — dann eben ohne Bild
+        return aufgeben();            // cross-origin source — then just go without the image
     }
 
     const bekannt = new Set(teile.map(o => o.id));
@@ -192,17 +192,17 @@ async function zeigePlatte(ov, teile) {
         const y = Math.floor((e.clientY - r.top) / r.height * K);
         if (x < 0 || y < 0 || x >= K || y >= K) return;
         const pos = (y * K + x) * 4;
-        if (!punkte[pos + 3]) return;          // daneben
-        // Die Nummer steckt in ZWEI Kanaelen: Rot ist das untere Byte, Gruen
-        // das obere. Am 31aug26 an einem Teil mit der Nummer 752 gemessen —
-        // die Trefferkarte trug dort RGB(240, 2, 0), und 240 + 2*256 = 752.
+        if (!punkte[pos + 3]) return;          // missed
+        // The number lives in TWO channels: red is the low byte, green
+        // is the high byte. Measured on 31aug26 on a part numbered 752 —
+        // the pick map carried RGB(240, 2, 0) there, and 240 + 2*256 = 752.
         //
-        // Die alte Messung an sechs Wuerfeln (Nummern 56 bis 204) stimmte
-        // trotzdem: unter 256 ist Gruen immer 0. Wer nur Rot liest, bekommt
-        // bei groesseren Nummern 240 statt 752 und findet kein Teil — das
-        // Antippen tat dann gar nichts.
+        // The old measurement on six cubes (numbers 56 to 204) still held
+        // true: below 256, green is always 0. Reading only red gets you
+        // 240 instead of 752 for larger numbers and finds no part — the
+        // tap then did nothing at all.
         const nummer = punkte[pos] + punkte[pos + 1] * 256;
-        if (!bekannt.has(nummer)) return;      // schon uebersprungen
+        if (!bekannt.has(nummer)) return;      // already skipped
         const k = kaestchen().find(i => parseInt(i.value, 10) === nummer);
         if (k) { k.checked = !k.checked; male(); }
     });
@@ -230,12 +230,12 @@ window.teileUeberspringenOeffnen = async function () {
         return;
     }
 
-    // Der Name allein reicht nicht: drei Kopien desselben Teils heissen
-    // alle gleich (am 29aug26 an "Cube + Cube + Cube" gesehen). Darum
-    // immer die Nummer dazu — sie ist ohnehin das, was geschickt wird —
-    // und die Lage auf der Platte, damit man sie am Geraet wiederfindet.
-    // Die Lage wird RELATIV zu den anderen Teilen bestimmt; die Bettgroesse
-    // spielt dabei keine Rolle.
+    // The name alone is not enough: three copies of the same part all have
+    // the same name (seen on 29aug26 with "Cube + Cube + Cube"). So the
+    // number is always added — it's what gets sent anyway —
+    // along with the position on the plate, so you can find it on the device.
+    // The position is determined RELATIVE to the other parts; the bed size
+    // plays no role.
     const mitte = o => (Array.isArray(o.bbox) && o.bbox.length === 4)
         ? [(o.bbox[0] + o.bbox[2]) / 2, (o.bbox[1] + o.bbox[3]) / 2] : null;
     const punkte = teile.map(mitte).filter(Boolean);
@@ -300,9 +300,9 @@ window.teileUeberspringenOeffnen = async function () {
                 body: JSON.stringify({ obj_list: ids }),
             });
             const erg = await antwort.json();
-            // Den Grund des Druckers zeigen, nicht unseren Fehlercode. Er
-            // sagt genau, was los ist ("no matched obj_list"), und das ist
-            // mehr wert als ein allgemeines "fehlgeschlagen".
+            // Show the printer's own reason, not our error code. It
+            // says exactly what's going on ("no matched obj_list"), and that is
+            // worth more than a generic "failed".
             let text, art;
             if (erg.success) {
                 art = 'success';
@@ -333,7 +333,7 @@ class PrintActionsManager {
     // pausePrint
     // ========================================
     pausePrint() {
-        // Unified — Backend dispatcht je nach Controller (Bambu MQTT, Klipper REST).
+        // Unified — backend dispatches depending on the controller (Bambu MQTT, Klipper REST).
         window.printerAdapter.pause().then(() => {
             document.getElementById('pause-btn-mobile').style.display = 'none';
             document.getElementById('pause-btn-desktop').style.display = 'none';
@@ -347,11 +347,11 @@ class PrintActionsManager {
     // resumePrint
     // ========================================
     resumePrint() {
-        // Bei aktiver Filament-Change-Pause (Phase 1/2) ist der Resume-Button
-        // ein Action-Button — siehe socket-manager.js der Icon/Label aendert.
-        // Phase 1: "Filament laden" -> filamentChangeAction('load')
-        // Phase 2: "Fertig"          -> filamentChangeAction('done')
-        // Phase 0: normaler resume
+        // During an active filament-change pause (phase 1/2) the resume button
+        // is an action button — see socket-manager.js, which changes the icon/label.
+        // Phase 1: "Load filament" -> filamentChangeAction('load')
+        // Phase 2: "Done"            -> filamentChangeAction('done')
+        // Phase 0: normal resume
         const fcPhase = (window.lastPrintData &&
                          window.lastPrintData.filament_change_phase) || 0;
         if (fcPhase === 1 || fcPhase === 2) {
@@ -359,11 +359,11 @@ class PrintActionsManager {
             window.filamentChangeAction(action).then(() => {
                 document.getElementById('resume-btn-mobile').style.display = 'none';
                 document.getElementById('resume-btn-desktop').style.display = 'none';
-            }).catch(() => { /* error toast schon im filamentChangeAction */ });
+            }).catch(() => { /* error toast already shown in filamentChangeAction */ });
             return;
         }
 
-        // Unified — normaler resume.
+        // Unified — normal resume.
         window.printerAdapter.resume().then(() => {
             document.getElementById('resume-btn-mobile').style.display = 'none';
             document.getElementById('resume-btn-desktop').style.display = 'none';
@@ -377,7 +377,7 @@ class PrintActionsManager {
     // ========================================
     stopPrint() {
         const texts = window.texts || {};
-        showConfirmDialog(texts.confirm_stop_print, function() {
+        showConfirmDialog({ text: texts.confirm_stop_print, knopf: texts.confirm_stop, gefaehrlich: true }, function() {
             window.printerAdapter.stop();
         });
     }
@@ -387,11 +387,11 @@ class PrintActionsManager {
     // ========================================
     startHoming() {
         const texts = window.texts || {};
-        // Beschriftung des Homing-Knopfes — Symbol aus icons.js statt Emoji.
+        // Label for the homing button — icon from icons.js instead of an emoji.
         const homingInhalt = (text) =>
             ((typeof window.skIcon === 'function') ? window.skIcon('haus') : '') + '<span>' + text + '</span>';
         showConfirmDialog(texts.confirm_start_homing, function() {
-        // Button deaktivieren während Homing
+        // Disable button during homing
         const homingBtnMobile = document.getElementById('homing-btn-mobile');
         const homingBtnDesktop = document.getElementById('homing-btn-desktop');
 
@@ -417,8 +417,8 @@ class PrintActionsManager {
             skToast(texts.connection_error, 'error');
         })
         .finally(() => {
-            // Buttons nach 25 Sekunden wieder aktivieren (Fallback)
-            // Wird normalerweise früher durch home_flag Update zurückgesetzt
+            // Re-enable buttons after 25 seconds (fallback)
+            // Normally reset earlier by a home_flag update
             setTimeout(() => {
                 if (homingBtnMobile) {
                     homingBtnMobile.disabled = false;
@@ -440,22 +440,22 @@ class PrintActionsManager {
     // startPrintFromSD
     // ========================================
     /**
-     * Einstieg beim Klick auf "Drucken".
+     * Entry point for clicking "Print".
      *
-     * Bambu: erst die Druckvorbereitung zeigen — Vorschau, Platte, Filament
-     * und alle Optionen auf einem Blatt, so wie es der Drucker auf seinem
-     * Display auch macht. Vorher lagen die Optionen im Zahnrad der Dateiliste
-     * und waren beim Drucken nicht mehr zu sehen.
+     * Bambu: show the print preparation first — preview, plate, filament
+     * and all options on one sheet, just like the printer does on its
+     * own display. Before, the options lived in the file list's gear menu
+     * and were no longer visible while printing.
      *
-     * Der eigentliche Ablauf dahinter (Spulenpruefung, Mehrfarben-Dialog,
-     * Plattenwahl, Start) bleibt unveraendert und steckt in beginPrintFlow.
+     * The actual flow behind it (spool check, multi-color dialog,
+     * plate selection, start) stays unchanged and lives in beginPrintFlow.
      */
     startPrintFromSD(filename, location, buttonElement) {
         const istKlipper = window.isKlipperMode && window.isKlipperMode();
         if (!istKlipper && window.printPrepare) {
             window.printPrepare.oeffne(filename, location).then(gezeigt => {
-                // Vorbereitung nicht ladbar (z.B. Datei nicht im Zwischen-
-                // speicher)? Dann direkt den alten Weg gehen statt gar nichts.
+                // Preparation not loadable (e.g. file not in the
+                // cache)? Then go straight to the old path instead of doing nothing.
                 if (!gezeigt) this.beginPrintFlow(filename, location, buttonElement);
             });
             return;
@@ -466,14 +466,14 @@ class PrintActionsManager {
     beginPrintFlow(filename, location, buttonElement) {
         const texts = window.texts || {};
 
-        // Klipper: simpler Druck-Start ohne AMS/Plate/Spool-Wizard.
-        // Backend dispatcht ueber controller.start_print(filename).
-        // Einzige unterstuetzte Option: Timelapse (moonraker-timelapse-Plugin).
+        // Klipper: simple print start without the AMS/plate/spool wizard.
+        // Backend dispatches via controller.start_print(filename).
+        // Only supported option: timelapse (moonraker-timelapse plugin).
         if (window.isKlipperMode && window.isKlipperMode()) {
             const msg = (texts.confirm_start_print || 'Druck starten') + ': ' + filename + '?';
-            // Eigenes gestyltes Modal statt nativem confirm() (wie im Bambu-Pfad).
+            // Custom styled modal instead of native confirm() (like in the Bambu path).
             if (window.showConfirmDialog) {
-                window.showConfirmDialog(msg, () => this._klipperStartWithSpoolCheck(filename));
+                window.showConfirmDialog({ text: msg, knopf: texts.confirm_start }, () => this._klipperStartWithSpoolCheck(filename));
             } else if (window.skConfirm) {
                 window.skConfirm(msg).then(ja => {
                     if (ja) this._klipperStartWithSpoolCheck(filename);
@@ -482,27 +482,28 @@ class PrintActionsManager {
             return;
         }
 
-        // PRIORITÄT 1: Multi-Filament Check
+        // PRIORITY 1: multi-filament check
         const fileData = window.sdDateiFinden ? window.sdDateiFinden(filename)
             : window.lastSDFiles?.find(f => f.name === filename);
 
         if (fileData && fileData.is_multifilament && fileData.all_filaments) {
-            // Multi-Filament detected!
-            if (!(window.spoolmanManager && window.spoolmanManager.connected)) {
-                window.skToast(texts.spoolman_required, 'warning');
+            // Assigning a spool per colour needs Spoolman. Printing does not:
+            // the server picks the tray for each filament by type and colour
+            // straight from the AMS — mqtt_payload_builder never asks
+            // Spoolman anything. So without it, carry on to the plate check
+            // instead of refusing the file.
+            if (window.spoolmanManager && window.spoolmanManager.connected) {
+                showMultiFilamentSpoolModal(fileData, location, 'print');
                 return;
             }
-
-            showMultiFilamentSpoolModal(fileData, location, 'print');
-            return;
         }
 
-        // PRIORITÄT 2: Spoolman Single-Filament Check
+        // PRIORITY 2: Spoolman single-filament check
         let selectedSpoolId = window.activeSpoolId;
 
         if (buttonElement) {
-            // .sd-zeile ist die Dateizeile seit dem Umbau 21aug26;
-            // .sd-file-card und .file-card bleiben fuer andere Listen drin.
+            // .sd-zeile has been the file row since the 21aug26 rework;
+            // .sd-file-card and .file-card stay in for other lists.
             const fileCard = buttonElement.closest('.sd-zeile')
                 || buttonElement.closest('.sd-file-card')
                 || buttonElement.closest('.file-card');
@@ -526,14 +527,150 @@ class PrintActionsManager {
             return;
         }
 
-        // PRIORITÄT 3: Weiter mit Platten-Check
+        // PRIORITY 3: continue with the plate check
         this.proceedWithPlateCheck(filename, location);
     }
 
-    // Klipper-Druckstart mit Spulen-Gewichts-Check (wie Bambu-Server vor dem Print):
-    // benötigtes Filament (Moonraker-Metadaten) vs. Restgewicht der aktiven
-    // Spoolman-Spule. Leer → blockieren; zu wenig → Rückfrage; kein Spool/Spoolman
-    // aus → einfach drucken.
+    _findHumidityAssignmentCandidate(feuchteStand, spoolId) {
+        if (!feuchteStand || spoolId == null) return null;
+        const id = parseInt(spoolId, 10);
+        if (!Number.isFinite(id)) return null;
+
+        const offene = (feuchteStand.spulen || []).filter(s => s && s.spool_id == null);
+        if (!offene.length) return null;
+
+        const jeSlot = new Map();
+        (feuchteStand.verlauf_spulen || []).forEach(e => {
+            if (!e) return;
+            jeSlot.set(`${e.ams_id}:${e.slot}`, e);
+        });
+
+        const treffer = [];
+        offene.forEach(s => {
+            const slot = Number.isFinite(parseInt(s.slot, 10)) ? parseInt(s.slot, 10) : 0;
+            const amsId = Number.isFinite(parseInt(s.ams_id, 10)) ? parseInt(s.ams_id, 10) : null;
+            if (amsId == null) return;
+            const verlauf = jeSlot.get(`${amsId}:${slot}`) || null;
+            const vorschlaege = Array.isArray((verlauf || {}).vorschlaege)
+                ? verlauf.vorschlaege
+                : (Array.isArray(s.vorschlaege) ? s.vorschlaege : []);
+            const passend = vorschlaege.find(v => {
+                const vid = parseInt((v && (v.spool_id != null ? v.spool_id : v.id)), 10);
+                return Number.isFinite(vid) && vid === id;
+            });
+            if (!passend) return;
+            treffer.push({
+                ams_id: amsId,
+                slot: slot,
+                typ: s.typ || (verlauf && verlauf.typ) || '',
+                farbe: s.farbe || (verlauf && verlauf.farbe) || '',
+                name: s.name || (verlauf && verlauf.name) || '',
+            });
+        });
+
+        return treffer.length === 1 ? treffer[0] : null;
+    }
+
+    async _confirmHumidityAssignmentBeforePrint(spoolId, spoolMapping) {
+        if (!window.amsHumidity) return;
+
+        // A multi-colour print carries one spool per filament index instead of
+        // a single spool id. Until 04sep26 the presence of that mapping made
+        // this method return on the spot -- so the one case where the user has
+        // just named every spool by hand was the one case nothing was
+        // remembered, and the material card kept the slot marked orange
+        // ("not assigned to any spool") until it was assigned a second time
+        // through the tray editor.
+        //
+        // Every entry is resolved the same way a single spool is, and a slot
+        // is only claimed when exactly one candidate fits it -- guessing stays
+        // out of this.
+        const rohIds = spoolMapping
+            ? Object.values(spoolMapping)
+            : (spoolId != null ? [spoolId] : []);
+        const ids = [...new Set(rohIds.map(v => parseInt(v, 10)).filter(Number.isFinite))];
+        if (!ids.length) return;
+
+        let stand = null;
+        try {
+            stand = await window.amsHumidity.hole(14);
+        } catch (_) {
+            return;
+        }
+
+        const texts = window.texts || {};
+        const namen = (nummer) => {
+            const spool = (window.spoolmanSpools || []).find(s => s.id === nummer);
+            const filament = (spool && spool.filament) || {};
+            return [
+                filament.vendor && filament.vendor.name ? filament.vendor.name : '',
+                filament.name || ''
+            ].filter(Boolean).join(' ') || `#${nummer}`;
+        };
+
+        const offen = [];
+        const belegteFaecher = new Set();
+        ids.forEach(nummer => {
+            const kandidat = this._findHumidityAssignmentCandidate(stand, nummer);
+            if (!kandidat) return;
+            const fach = kandidat.ams_id + ':' + kandidat.slot;
+            // Two spools pointing at the same slot means the suggestion is not
+            // unambiguous after all -- then neither of them gets it.
+            if (belegteFaecher.has(fach)) {
+                const i = offen.findIndex(e => e.fach === fach);
+                if (i >= 0) offen.splice(i, 1);
+                return;
+            }
+            belegteFaecher.add(fach);
+            offen.push({ fach, spoolNum: nummer, kandidat });
+        });
+        if (!offen.length) return;
+
+        const message = offen.map(e => (texts.feuchte_assign_before_print
+            || 'AMS slot {slot} has no spool assignment for humidity history. Assign {spool} now?')
+            .replace('{slot}', String((e.kandidat.slot || 0) + 1))
+            .replace('{spool}', namen(e.spoolNum))).join('\n\n');
+
+        const bestaetigt = await new Promise(resolve => {
+            if (window.showConfirmDialog) {
+                window.showConfirmDialog(message, () => resolve(true), () => resolve(false));
+                return;
+            }
+            if (window.skConfirm) {
+                window.skConfirm(message).then(resolve).catch(() => resolve(false));
+                return;
+            }
+            resolve(false);
+        });
+        if (!bestaetigt) return;
+
+        try {
+            for (const e of offen) {
+                await window.apiCall('/api/filament/feuchte/zuordnung', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ams_id: e.kandidat.ams_id,
+                        slot: e.kandidat.slot,
+                        spool_id: e.spoolNum,
+                        typ: e.kandidat.typ || '',
+                        farbe: e.kandidat.farbe || '',
+                        name: e.kandidat.name || '',
+                    }),
+                });
+            }
+            if (window.amsHumidity) window.amsHumidity.vergiss();
+            if (window.skToast) window.skToast(texts.feuchte_assignment_saved, 'success');
+        } catch (e) {
+            if (window.skToast) window.skToast(texts.feuchte_assignment_save_failed, 'warning');
+            console.warn('Failed to persist AMS humidity mapping before print:', e);
+        }
+    }
+
+    // Klipper print start with a spool weight check (like the Bambu server does before printing):
+    // required filament (Moonraker metadata) vs. the remaining weight of the active
+    // Spoolman spool. Empty → block; not enough → ask for confirmation; no spool/Spoolman
+    // off → just print.
     async _klipperStartWithSpoolCheck(filename) {
         const texts = window.texts || {};
         try {
@@ -550,19 +687,19 @@ class PrintActionsManager {
                 const vendor = fil.vendor && fil.vendor.name ? fil.vendor.name + ' ' : '';
                 const name = vendor + (fil.name || ('#' + spoolId));
 
-                // 1) Material-Mismatch (Companion-Logik vorgezogen — sie würde
-                //    den Druck sonst erst mitten im Heat-Soak stoppen): erster
-                //    Profil-Typ vs. Spulen-Material, Basis-Material normalisiert.
+                // 1) Material mismatch (Companion logic pulled forward — otherwise it would
+                //    only stop the print mid heat-soak): first
+                //    profile type vs. spool material, base material normalized.
                 const baseMat = (s) => {
                     let t = String(s || '').toUpperCase().trim();
                     for (const sep of ['+', '-', ' ', '/', '_']) t = t.split(sep)[0];
                     return t.trim();
                 };
-                // filament_type kann Array, JSON-Array-String (["PLA","PLA","TPU"])
-                // oder "PLA;PLA;TPU" sein — Mehr-Platten-Dateien listen ALLE Platten.
-                // Wir kennen die gewählte Platte hier nicht → die Spule muss zu
-                // IRGENDEINEM der Typen passen, sonst false-positive (z.B. TPU-Platte
-                // einer Datei, deren Platte 1 PLA ist).
+                // filament_type can be an array, a JSON-array string (["PLA","PLA","TPU"])
+                // or "PLA;PLA;TPU" — multi-plate files list ALL plates.
+                // We don't know the chosen plate here → the spool has to match
+                // ANY of the types, otherwise false positive (e.g. a TPU plate
+                // in a file whose plate 1 is PLA).
                 let typeList = (fileData && fileData.filament_type);
                 if (!Array.isArray(typeList)) {
                     let s = String(typeList || '').trim();
@@ -572,8 +709,8 @@ class PrintActionsManager {
                 const profileBases = [...new Set(typeList.map(baseMat).filter(Boolean))];
                 const spoolBase = baseMat(fil.material);
                 if (profileBases.length && spoolBase && !profileBases.includes(spoolBase)) {
-                    // BLOCKIEREN (kein Override): die Companion würde den Druck
-                    // im Heat-Soak ohnehin abbrechen — Spule/Profil erst fixen.
+                    // BLOCK (no override): the Companion would abort the print
+                    // during heat-soak anyway — fix the spool/profile first.
                     const msg = (texts.spool_check_mismatch || 'Falsches Filament: Profil braucht {profile}, gewählte Spule {name} ist {material} – bitte Spule oder Profil prüfen.')
                         .replace('{profile}', profileBases.join('/'))
                         .replace('{name}', name)
@@ -596,17 +733,17 @@ class PrintActionsManager {
                             .replace('{required}', Math.round(required))
                             .replace('{shortage}', shortage);
                         const okShort = window.showConfirmDialog
-                            ? await new Promise(res => window.showConfirmDialog(msg, () => res(true), () => res(false)))
+                            ? await new Promise(res => window.showConfirmDialog({ text: msg, knopf: texts.confirm_print_anyway }, () => res(true), () => res(false)))
                             : (window.skConfirm ? await window.skConfirm(msg) : true);
                         if (!okShort) return;
                     }
                 }
             }
-        } catch (_) { /* Check ist best-effort — bei Fehler trotzdem drucken */ }
+        } catch (_) { /* check is best-effort — print anyway on error */ }
 
-        // Checkbox nicht gefunden → timelapse NICHT mitsenden (null): der
-        // Adapter lässt das globale Setting dann unangetastet, statt es
-        // ungewollt auf false zu kippen.
+        // Checkbox not found → do NOT send timelapse (null): the
+        // adapter then leaves the global setting untouched, instead of
+        // unintentionally flipping it to false.
         const timelapseCb = document.querySelector(`.print-opt-timelapse[data-file="${filename}"]`);
         const timelapse = timelapseCb ? timelapseCb.checked : null;
         const r = await window.printerAdapter.startPrint(filename, { timelapse });
@@ -651,11 +788,16 @@ class PrintActionsManager {
             requestBody.spool_id = this.currentPlateSelection.spoolId;
         }
 
-        // Extra-Felder (z.B. filament_confirmed: true vom Mismatch-Dialog-Retry,
-        // oder explizite spool_id-Ueberschreibung).
+        // Extra fields (e.g. filament_confirmed: true from the mismatch-dialog retry,
+        // or an explicit spool_id override).
         if (extraBody && typeof extraBody === 'object') {
             Object.assign(requestBody, extraBody);
         }
+
+        await this._confirmHumidityAssignmentBeforePrint(
+            requestBody.spool_id,
+            requestBody.spool_mapping
+        );
 
         try {
             const response = await apiCall('/api/mqtt/print', {
@@ -669,8 +811,8 @@ class PrintActionsManager {
             // Debug: Log response details
             console.log('Print response:', {status: response.status, data: data});
 
-            // Single-Filament Mismatch (HTTP 409 mit filament_mismatch):
-            // Backend konnte nicht eindeutig automatchen -> User-Dialog.
+            // Single-filament mismatch (HTTP 409 with filament_mismatch):
+            // backend could not auto-match unambiguously -> user dialog.
             if (response.status === 409 && data.filament_mismatch) {
                 console.log('Showing filament-mismatch dialog (HTTP 409)');
                 this.showFilamentMismatchDialog(filename, location, plate, printOptions, data.filament_mismatch);
@@ -692,14 +834,26 @@ class PrintActionsManager {
             }
 
             if (data.success) {
-                closeMultiFilamentSpoolModal();
+                // The multi-filament dialog closes itself before it starts the
+                // print (print-scheduler.js, `modal.remove()` right before
+                // proceedWithPlateCheck). A `closeMultiFilamentSpoolModal()`
+                // stood here and was never defined anywhere -- it threw a
+                // ReferenceError on every multi-colour start, and everything
+                // below it was skipped: the two dialogs stayed open and the
+                // "print started" toast never appeared, while the print itself
+                // was already running.
                 document.getElementById('plateSelectModal').style.display = 'none';
                 closeSDModal();
+                // Only now — the job has been accepted.
+                if (texts.toast_starting_print_plate) {
+                    skToast(texts.toast_starting_print_plate
+                        .replace('{plate}', plate != null ? plate : 1), 'info');
+                }
 
                 // SpoolmanCard update is handled by backend via SocketIO 'spoolman_active_spool' event
 
-                // Zweite Zeile nennt die Datei, die Handlung fuehrt zur Karte —
-                // vorher stand nur "Druck gestartet" da und man scrollte selbst.
+                // Second line names the file, the action leads to the card —
+                // before, it just said "print started" and you had to scroll yourself.
                 const zeigeKarte = () => {
                     const karte = document.getElementById('print-status-container');
                     if (karte) karte.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -714,8 +868,8 @@ class PrintActionsManager {
                 setTimeout(zeigeKarte, 500);
             } else {
                 if (data.error && data.error.indexOf('guard_') === 0) {
-                    // Server-Guard (z.B. Filament-Wechsel laeuft noch) —
-                    // Schluessel uebersetzen statt roh anzeigen.
+                    // Server guard (e.g. a filament change still running) —
+                    // translate the key instead of showing it raw.
                     window.skToast((window.texts || {})[data.error] || data.error, 'warning');
                 } else if (data.error && (data.error.includes('Spoolman') || data.error.includes('Spule'))) {
                     window.skToast(data.error, 'warning');
@@ -755,6 +909,149 @@ class PrintActionsManager {
     // ========================================
     // showFilamentMismatchDialog (Option C: Single-Filament Spool-Confirm)
     // ========================================
+    /** The conflict dialog for a print we did NOT send.
+     *
+     *  showFilamentMismatchDialog below belongs to our own print command: it
+     *  asks BEFORE the start and its answer is "take this spool and go". A
+     *  job from the slicer is already running when we notice, so the answer
+     *  is a different one -- say which spool is really in the tray, or stop
+     *  the print. Everything else it shows is the same, so it looks the same.
+     */
+    zeigeFilamentKonflikt(konflikt, dateiname) {
+        const texts = window.texts || {};
+        const e = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        const farbe = (c, s) => (c && /^#?[0-9a-fA-F]{6}$/.test(c))
+            ? (c[0] === '#' ? c : '#' + c) : s;
+
+        const will = konflikt.wanted || {};
+        const fach = konflikt.tray || {};
+        const kandidaten = Array.isArray(konflikt.candidates) ? konflikt.candidates : [];
+        const aktiv = konflikt.current_active;
+        const optionen = [];
+        const gesehen = new Set();
+        kandidaten.forEach(sp => { if (!gesehen.has(sp.id)) { optionen.push(sp); gesehen.add(sp.id); } });
+        if (aktiv && !gesehen.has(aktiv.id)) optionen.push(aktiv);
+
+        // Stopping is offered while the printer is still preparing. The
+        // check runs at the start, so the message is there in time -- but it
+        // waits in the stack, and opening it three hours later must not put
+        // a red button next to a print at 80 %. Then the answer is the
+        // assignment; whoever really wants to stop has the button on the
+        // card, where the whole context is.
+        const stand = window.lastPrintData || {};
+        const zustand = String(stand.gcode_state || '').toUpperCase();
+        const nochVorbereitung = zustand === 'PREPARE'
+            || (zustand === 'RUNNING' && Number(stand.progress || 0) <= 0);
+
+        const zeile = (sp, i) => {
+            const fil = sp.filament || {};
+            const hersteller = (fil.vendor || {}).name || '';
+            return `
+                <label class="ui-zeile ui-zeile--klick fm-option" data-spool-id="${sp.id}">
+                    <input type="radio" name="fk-spule" value="${sp.id}" class="fm-radio"${i === 0 ? ' checked' : ''}>
+                    <span class="mf-punkt" style="background:${farbe(fil.color_hex, '#888')};"></span>
+                    <span class="ui-zeile-name">
+                        <span class="mf-name">${e(hersteller ? hersteller + ' ' : '')}${e(fil.name || '')}</span>
+                        <span class="mf-typ">${e(fil.material || '')}</span>
+                    </span>
+                </label>`;
+        };
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;'
+            + 'background:rgba(0,0,0,0.6); z-index:10000; display:flex;'
+            + 'align-items:center; justify-content:center;';
+        const content = document.createElement('div');
+        content.className = 'modal-panel';
+        content.style.cssText = 'position:relative; width:92%; max-width:560px;'
+            + 'max-height:85vh; overflow-y:auto; border-radius:12px; padding:0;';
+
+        content.innerHTML = `
+            <div class="sd-modal-header">
+                <h2 class="sd-modal-title">
+                    <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg>
+                    <span>${e(texts.fk_title || 'Filament passt nicht')}</span>
+                </h2>
+            </div>
+            <div class="ui-koerper" style="padding:16px 20px 20px;">
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_file_wants || 'Die Datei braucht')}</span></div>
+                    <div class="ui-zeile">
+                        <span class="mf-punkt" style="background:${farbe(will.color, '#888')};"></span>
+                        <span class="ui-zeile-name">
+                            <span class="mf-name">${e(will.name || '—')}</span>
+                            <span class="mf-typ">${e(will.material || '')}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_tray_holds || 'Im Fach liegt')}</span></div>
+                    <div class="ui-zeile">
+                        <span class="mf-punkt" style="background:${farbe(fach.color, '#888')};"></span>
+                        <span class="ui-zeile-name">
+                            <span class="mf-name">${e(fach.name || '—')}</span>
+                            <span class="mf-typ">${e(fach.type || '')}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_pick || 'Welche Spule liegt wirklich im Fach?')}</span></div>
+                    ${optionen.length ? `<div id="fk-options">${optionen.map(zeile).join('')}</div>`
+                        : `<div class="fm-hinweis">${e(texts.no_matching_spool || 'Keine passende Spule im Spoolman gefunden.')}</div>`}
+                </div>
+            </div>
+            <div class="ui-fuss">
+                <button class="modal-btn modal-btn-cancel" id="fk-zu">${e(texts.close || 'Schliessen')}</button>
+                ${nochVorbereitung ? `<button class="modal-btn modal-btn-danger" id="fk-stop">${e(texts.fk_abort_print || 'Druck abbrechen')}</button>` : ''}
+                <button class="modal-btn modal-btn-primary" id="fk-ok"${optionen.length ? '' : ' disabled'}>${e(texts.fk_assign || 'Zuordnen')}</button>
+            </div>`;
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        const zu = () => modal.remove();
+        content.querySelector('#fk-zu').addEventListener('click', zu);
+        modal.addEventListener('click', ev => { if (ev.target === modal) zu(); });
+
+        const stopKnopf = content.querySelector('#fk-stop');
+        if (stopKnopf) stopKnopf.addEventListener('click', () => {
+            // The same path and the same confirmation as the stop button on
+            // the card. Nothing here talks to the printer on its own.
+            zu();
+            showConfirmDialog({ text: texts.confirm_stop_print, knopf: texts.confirm_stop,
+                                gefaehrlich: true }, () => window.printerAdapter.stop());
+        });
+
+        content.querySelector('#fk-ok').addEventListener('click', async () => {
+            const gewaehlt = content.querySelector('input[name="fk-spule"]:checked');
+            if (!gewaehlt) return;
+            const id = parseInt(gewaehlt.value, 10);
+            const sp = optionen.find(o => o.id === id) || {};
+            const fil = sp.filament || {};
+            const ruf = window.apiCall || ((u, o) => fetch(u, Object.assign({ credentials: 'include' }, o)));
+            try {
+                // 1. Bind the spool to the tray -- that is the lasting answer.
+                await ruf('/api/filament/feuchte/zuordnung', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ams_id: fach.ams_id, slot: fach.slot, spool_id: id,
+                        typ: fil.material || '', farbe: (fil.color_hex || ''),
+                        name: ((fil.vendor || {}).name ? (fil.vendor.name + ' ') : '') + (fil.name || '')
+                    })
+                });
+                // 2. Make it the active spool. The running print's history
+                //    follows along on the server (_historie_auf_spule).
+                await ruf(`/api/spoolman/spool/${id}/activate`, { method: 'POST' });
+                zu();
+                if (window.skToast) skToast(texts.fk_assigned || 'Zugeordnet', 'success');
+            } catch (err) {
+                if (window.skToast) skToast(texts.fk_assign_error || 'Zuordnen fehlgeschlagen', 'error');
+            }
+        });
+    }
+
     showFilamentMismatchDialog(filename, location, plate, printOptions, mismatch) {
         const self = this;
         const texts = window.texts || {};
@@ -765,8 +1062,8 @@ class PrintActionsManager {
         const wanted = mismatch.wanted || {};
         const candidates = Array.isArray(mismatch.candidates) ? mismatch.candidates : [];
         const current = mismatch.current_active;
-        // Ohne echte Treffer schickt der Server ALLE Spulen mit, damit der
-        // Nutzer aus der vollen Liste waehlen kann statt falscher Vorschlaege.
+        // Without real matches the server sends ALL spools, so the
+        // user can choose from the full list instead of getting false suggestions.
         const allSpools = Array.isArray(mismatch.all_spools) ? mismatch.all_spools : [];
 
         const farbe = (v, fallback) => {
@@ -774,8 +1071,8 @@ class PrintActionsManager {
             return c ? `#${c}` : fallback;
         };
 
-        // Reihenfolge: echte Treffer zuerst, sonst alle Spulen mit der
-        // aktiven oben.
+        // Order: real matches first, otherwise all spools with the
+        // active one on top.
         const optionen = [];
         let ohneTreffer = false;
         if (candidates.length > 0) {
@@ -880,7 +1177,7 @@ class PrintActionsManager {
         content.querySelectorAll('.fm-option').forEach(el => {
             el.addEventListener('change', () => setzeAuswahl(parseInt(el.dataset.spoolId, 10)));
         });
-        // Bei genau einer Moeglichkeit gleich vorwaehlen.
+        // Pre-select right away when there is exactly one option.
         const einzige = content.querySelectorAll('.fm-option');
         if (einzige.length === 1) {
             einzige[0].querySelector('input').checked = true;
@@ -891,13 +1188,13 @@ class PrintActionsManager {
         knopf.onclick = async () => {
             if (!gewaehlt) return;
             try {
-                // Erst aktivieren, damit der zweite Anlauf die richtige sieht.
+                // Activate first, so the second attempt sees the right one.
                 await apiCall(`/api/spoolman/spool/${gewaehlt}/activate`, { method: 'POST' });
             } catch (err) {
                 console.warn('Spool activate failed, retry anyway:', err);
             }
             modal.remove();
-            // filament_confirmed=true — der Server ueberspringt den Abgleich.
+            // filament_confirmed=true — the server skips the matching step.
             self.sendPrintCommand(filename, location, plate, null, false,
                                   { filament_confirmed: true, spool_id: gewaehlt });
         };
@@ -910,7 +1207,7 @@ class PrintActionsManager {
         const texts = window.texts || {};
         console.log('showFilamentWarningDialog called with warnings:', warnings);
 
-        // Erstelle lesbare Warnungsliste
+        // Build a readable warning list
         const warningLines = warnings.map(w => {
             console.log('Warning item:', w);
             return '• ' + w.message;
@@ -921,7 +1218,7 @@ class PrintActionsManager {
         console.log('Showing confirm dialog with message:', message);
 
         const self = this;
-        showConfirmDialog(message, function() {
+        showConfirmDialog({ text: message, knopf: texts.confirm_print_anyway }, function() {
             console.log('User confirmed, retrying with force=true');
             self.sendPrintCommand(filename, location, plate, spoolMapping, true);
         });
@@ -945,11 +1242,11 @@ class PrintActionsManager {
     // ========================================
     proceedWithPlateCheck(filename, location) {
         const texts = window.texts || {};
-        // NEU: Debug
+        // NEW: debug
         console.log('🔍 proceedWithPlateCheck aufgerufen');
         console.log('🔍 window.pendingSpoolMapping:', window.pendingSpoolMapping);
 
-        // Speichere für später
+        // Save for later
         this.currentPlateSelection = {
             filename: filename,
             location: location,
@@ -964,7 +1261,7 @@ class PrintActionsManager {
             delete window.pendingSpoolMapping;
         }
 
-        // Zeige Modal mit Ladeindikator
+        // Show modal with loading indicator
         const modal = document.getElementById('plateSelectModal');
         const loading = document.getElementById('plate-loading');
         const list = document.getElementById('plate-list');
@@ -981,10 +1278,10 @@ class PrintActionsManager {
 
         const self = this;
 
-        // Wenn der Multi-Filament-Modal die Plate bereits gewaehlt hat
-        // (pendingPlateOverride), Plate-Picker ueberspringen und direkt
-        // drucken — der User hat oben schon die Platte selektiert, wir
-        // muessen ihn nicht nochmal fragen.
+        // If the multi-filament modal already picked the plate
+        // (pendingPlateOverride), skip the plate picker and print
+        // directly — the user already selected the plate above, we
+        // don't need to ask again.
         if (typeof window.pendingPlateOverride === 'number') {
             const overridePlate = window.pendingPlateOverride;
             delete window.pendingPlateOverride;
@@ -993,17 +1290,17 @@ class PrintActionsManager {
             return;
         }
 
-        // Prüfe Platten
+        // Check plates
         apiCall(`/api/check_plates/${filename}`)
             .then(response => response.json())
             .then(plateData => {
                 loading.style.display = 'none';
 
                 if (plateData.multi && plateData.plates.length > 1) {
-                    // Multi-Plate: Zeige Auswahl
+                    // Multi-plate: show selection
                     self.showPlateButtons(plateData);
                 } else {
-                    // Single-Plate: Schließe Modal und starte direkt
+                    // Single-plate: close modal and start directly
                     modal.style.display = 'none';
                     const plate = plateData.plates ? plateData.plates[0] : 1;
 
@@ -1016,7 +1313,7 @@ class PrintActionsManager {
                         ...collectPrintOptions(filename)
                     };
 
-                    // Starte direkt ohne Bestätigung
+                    // Start directly without confirmation
                     self.continuePrintWithPlate(plate);
                 }
             })
@@ -1024,7 +1321,7 @@ class PrintActionsManager {
                 console.error(texts.console_plate_check_error + ':', error);
                 modal.style.display = 'none';
 
-                // Fallback: Frage trotzdem
+                // Fallback: ask anyway
                 const getPrintOption = (className) => {
                     const checkbox = document.querySelector(`.${className}[data-file="${filename}"]`);
                     return checkbox ? checkbox.checked : false;
@@ -1034,7 +1331,7 @@ class PrintActionsManager {
                     ...collectPrintOptions(filename)
                 };
 
-                // Fallback: Starte mit Platte 1
+                // Fallback: start with plate 1
                 self.continuePrintWithPlate(1);
             });
     }
@@ -1045,11 +1342,11 @@ class PrintActionsManager {
     showPlateButtons(plateData) {
         const list = document.getElementById('plate-list');
 
-        // Zeige Liste
+        // Show list
         list.style.display = 'grid';
         list.innerHTML = '';
 
-        // Nutze plate_details wenn vorhanden
+        // Use plate_details when present
         const plateDetails = plateData.plate_details || plateData.plates.map(p => ({index: p}));
 
         const self = this;
@@ -1074,7 +1371,7 @@ class PrintActionsManager {
                 overflow: hidden;
             `;
 
-            // Mit Thumbnail oder Icon
+            // With thumbnail or icon
             if (plate.thumbnail) {
                 btn.innerHTML = `
                     <img src="${imageDataUrl(plate.thumbnail)}" class="plate-thumb"
@@ -1115,13 +1412,13 @@ class PrintActionsManager {
     // ========================================
     selectPlate(plateNumber) {
         const texts = window.texts || {};
-        // Schließe Platten-Modal
+        // Close plate modal
         document.getElementById('plateSelectModal').style.display = 'none';
 
-        // Visuelles Feedback
+        // Visual feedback
         skToast(texts.toast_preparing_print, 'info');
 
-        // Starte direkt ohne weitere Bestätigung
+        // Start directly without further confirmation
         this.continuePrintWithPlate(plateNumber);
     }
 
@@ -1136,21 +1433,25 @@ class PrintActionsManager {
     // ========================================
     // continuePrintWithPlate
     // ========================================
-    continuePrintWithPlate(plateNumber) {
+    async continuePrintWithPlate(plateNumber) {
         const texts = window.texts || {};
         if (!this.currentPlateSelection) return;
 
         const { filename, location, spoolId, spoolMapping } = this.currentPlateSelection;
 
-        // Schließe SD-Modal sofort
+        // Close SD modal immediately
         closeSDModal();
 
-        // Warte kurz, dann zeige Toast
-        setTimeout(() => {
-            skToast(texts.toast_starting_print_plate.replace('{plate}', plateNumber), 'info');
-        }, 100);
+        // No "Starting print..." at this point. The toast used to appear
+        // here unconditionally, 100 ms after the button was pressed — so
+        // BEFORE any request had even gone out. If the server then
+        // responds with 409 because the file's filament doesn't match the
+        // loaded spool, the spool dialog opens, with
+        // "Starting print from plate 1..." shown above it for a print that isn't
+        // running at all (reported 02sep26). It is now only reported once the
+        // server has accepted the job — in sendPrintCommand.
 
-        // Hole ALLE Print-Optionen
+        // Get ALL print options
         const getPrintOption = (className) => {
             const checkbox = document.querySelector(`.${className}[data-file="${filename}"]`);
             return checkbox ? checkbox.checked : false;
@@ -1160,10 +1461,10 @@ class PrintActionsManager {
             ...collectPrintOptions(filename)
         };
 
-        // Gewichtsprüfung vor dem Druck (nur bei Single-Filament)
+        // Weight check before printing (single-filament only)
         if (window._skipSpoolCheck) { delete window._skipSpoolCheck; }
         else if (window.spoolmanEnabled && spoolId && !spoolMapping) {
-            // Finde die Datei-Daten
+            // Find the file data
             const fileData = window.sdDateiFinden ? window.sdDateiFinden(filename)
             : window.lastSDFiles?.find(f => f.name === filename);
 
@@ -1181,13 +1482,13 @@ class PrintActionsManager {
                             .replace('{shortage}', shortage.toFixed(0));
 
                         const self = this;
-                        showConfirmDialog(message, function() {
-                            // User bestätigt — Druck trotzdem starten (skip check)
+                        showConfirmDialog({ text: message, knopf: texts.confirm_print_anyway }, function() {
+                            // User confirmed — start the print anyway (skip check)
                             window._skipSpoolCheck = true;
-                            // Direkt weiter im Ablauf: der User hat die
-                            // Vorbereitung schon ausgefuellt und gerade erst
-                            // bestaetigt — die Ansicht nochmal zu zeigen waere
-                            // nur im Weg.
+                            // Continue straight on: the user already filled
+                            // out the preparation and just confirmed it —
+                            // showing the view again would only get in
+                            // the way.
                             self.beginPrintFlow(filename, location);
                         }, function() {
                             self.currentPlateSelection = null;
@@ -1198,16 +1499,16 @@ class PrintActionsManager {
             }
         }
 
-        // Baue Request Body VOR dem apiCall
+        // Build the request body BEFORE the apiCall
         const requestBody = {
             command: 'print_sd',
             filename: filename,
             location: location || 'cache',
             plate: plateNumber,
-            ...printOptions  // Alle Optionen hinzufügen
+            ...printOptions  // add all options
         };
 
-        // Multi-Filament: Nutze Spool-Mapping
+        // Multi-filament: use spool mapping
         if (spoolMapping) {
             console.log('🔍 spoolMapping vorhanden:', spoolMapping);
             console.log('🔍 spoolMapping type:', typeof spoolMapping);
@@ -1215,29 +1516,34 @@ class PrintActionsManager {
             requestBody.spool_mapping = spoolMapping;
         } else if (spoolId) {
             console.log('🔍 Only spool_id:', spoolId);
-            // Single-Filament: Nutze einzelne Spool ID
+            // Single-filament: use a single spool ID
             requestBody.spool_id = spoolId;
         }
+
+        await this._confirmHumidityAssignmentBeforePrint(
+            requestBody.spool_id,
+            requestBody.spool_mapping
+        );
 
         console.log('🔍 FINALER requestBody:', JSON.stringify(requestBody, null, 2));
 
         const self = this;
 
-        // Sende Druck OHNE weitere Bestätigung
+        // Send print WITHOUT further confirmation
         apiCall('/api/mqtt/print', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(requestBody)
         })
         .then(response => {
-            // Parse JSON und behalte response für Status-Check
+            // Parse JSON and keep response for the status check
             return response.json().then(data => ({response, data}));
         })
         .then(({response, data}) => {
             console.log('continuePrintWithPlate response:', {status: response.status, data: data});
 
-            // Single-Filament Mismatch (Option C): Backend konnte nicht
-            // eindeutig auto-matchen -> User-Dialog mit Kandidaten.
+            // Single-filament mismatch (option C): backend could not
+            // auto-match unambiguously -> user dialog with candidates.
             if (response.status === 409 && data.filament_mismatch) {
                 console.log('Showing filament-mismatch dialog from continuePrintWithPlate');
                 self.showFilamentMismatchDialog(filename, location, plateNumber, null, data.filament_mismatch);
@@ -1262,12 +1568,12 @@ class PrintActionsManager {
             }
 
             if (data.success) {
-                // Erfolgs-Feedback mit Verzögerung
+                // Success feedback with a delay
                 setTimeout(() => {
                     skToast(texts.toast_plate_printing.replace('{plate}', plateNumber), 'success');
                 }, 200);
 
-                // Nach kurzer Verzögerung zur Progress-Card scrollen
+                // Scroll to the progress card after a short delay
                 setTimeout(() => {
                     const progressCard = document.querySelector('.progress-card');
                     if (progressCard) {
@@ -1275,7 +1581,7 @@ class PrintActionsManager {
                     }
                 }, 500);
             } else {
-                // Zeige Fehler
+                // Show error
                 if (data.error && (data.error.includes('Spoolman') || data.error.includes('Spule'))) {
                     window.skToast(data.error, 'warning');
 
@@ -1325,7 +1631,8 @@ class PrintActionsManager {
             texts.confirm_print_without_timelapse.replace('{filename}', filename);
 
         const self = this;
-        showConfirmDialog(message, function() {
+        showConfirmDialog({ text: message, knopf: texts.confirm_start }, async function() {
+            await self._confirmHumidityAssignmentBeforePrint(window.activeSpoolId, null);
             apiCall('/api/mqtt/print', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -1365,13 +1672,13 @@ class PrintActionsManager {
         });
     }
 
-    /* Hier lag bis 21aug26 der Druck-Detail-Dialog der Startseite
+    /* Until 21aug26 this is where the homepage's print-detail dialog lived
        (initDetailModalTranslations, showOverviewTab, switchDetailTab,
        showProgressChart, showEventsTimeline, toggleTimelapseFullscreen)
-       samt Partial _print-detail.html — rund 550 Zeilen, die nie jemand
-       zu Gesicht bekam: geoeffnet wurde der Dialog nirgends, und die
-       Druck-Historie bringt seit ihrem Umbau eigene, gepflegte Fassungen
-       derselben Funktionen mit. */
+       together with the _print-detail.html partial — around 550 lines that no
+       one ever laid eyes on: the dialog was never opened anywhere, and the
+       print history has carried its own, maintained versions of the same
+       functions since its rework. */
 }
 
 // ========================================

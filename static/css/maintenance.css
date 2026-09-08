@@ -364,17 +364,15 @@ body.dark-mode .maint-checklist li {
 }
 
 /* ==========================================================================
-   Wartung: Zeilen statt Kacheln  (21aug26)
+   Maintenance: rows instead of tiles
    --------------------------------------------------------------------------
-   Zwoelf Wartungen lagen als grosse Karten in zwei Spalten — vier passten auf
-   den Bildschirm, der Rest brauchte drei Bildschirme Scrollen. Jede Karte trug
-   acht Angaben, von denen sechs selten interessieren. Jetzt eine Zeile je
-   Wartung, gruppiert nach Dringlichkeit; alles Weitere im Aufklapper.
+   One row per maintenance item, grouped by urgency; everything else in
+   the expander.
    ========================================================================== */
 .container { --linie: rgba(0, 0, 0, 0.08); }
 [data-theme="dark"] .container { --linie: rgba(255, 255, 255, 0.10); }
 
-/* ---- Kopf: eine Zeile ---- */
+/* ---- Header: one row ---- */
 .maint-kopf {
     display: flex; align-items: center; gap: 9px;
     margin-bottom: 12px; flex-wrap: wrap;
@@ -386,7 +384,7 @@ body.dark-mode .maint-checklist li {
 .maint-kopf-luft { flex: 1; }
 .maint-kopf .maint-printer-select { max-width: 220px; margin: 0; }
 
-/* ---- Menue hinter „Verwalten" ---- */
+/* ---- Menu behind "Manage" ---- */
 .maint-menue-huelle { position: relative; display: inline-flex; }
 .maint-menue {
     position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
@@ -414,7 +412,7 @@ body.dark-mode .maint-checklist li {
     color: var(--text-secondary); padding: 7px 10px 3px;
 }
 
-/* ---- Lage: ein Satz statt drei Zaehlkarten ---- */
+/* ---- Status: one sentence instead of three count cards ---- */
 .maint-lage {
     display: flex; align-items: center; gap: 11px;
     padding: 11px 14px; margin-bottom: 14px;
@@ -433,7 +431,7 @@ body.dark-mode .maint-checklist li {
 .maint-lage-t b { display: block; font-size: 13.5px; font-weight: 640; }
 .maint-lage-t span { font-size: 12px; color: var(--text-secondary); }
 
-/* ---- Gruppen ---- */
+/* ---- Groups ---- */
 .maint-gruppe { margin-bottom: 18px; }
 .maint-gruppe-kopf {
     display: flex; align-items: center; gap: 8px; margin-bottom: 7px;
@@ -449,7 +447,7 @@ body.dark-mode .maint-checklist li {
     border-radius: var(--radius-lg, 12px); box-shadow: var(--shadow-card); overflow: hidden;
 }
 
-/* ---- Eine Wartung = eine Zeile ---- */
+/* ---- One maintenance item = one row ---- */
 .maint-zeile {
     display: flex; align-items: center; gap: 11px;
     padding: 10px 13px; cursor: pointer; border-left: 3px solid transparent;
@@ -485,8 +483,8 @@ body.dark-mode .maint-checklist li {
 .maint-z-bahn i { display: block; height: 100%; border-radius: 999px; background: var(--color-green); }
 .maint-z-bahn i.bald  { background: var(--color-orange); }
 .maint-z-bahn i.ueber { background: var(--color-red); }
-/* Ohne eine einzige Durchfuehrung gibt es keinen Fortschritt zu zeigen — der
-   alte Balken mass ab dem Anlegen der Aufgabe und sah aus wie ein Verlauf. */
+/* With not a single run yet, there's no progress to show — the old bar
+   measured from when the task was created and looked like a history. */
 .maint-z-nie { font-size: 11px; color: var(--text-secondary); font-style: italic; }
 
 .maint-z-akt { flex: none; display: flex; gap: 5px; align-items: center; }
@@ -503,14 +501,14 @@ body.dark-mode .maint-checklist li {
     width: 28px; height: 28px; cursor: pointer; display: grid; place-items: center;
 }
 .maint-z-mehr:hover { color: var(--text-primary); }
-/* Nur „hoch" bekommt eine Marke — zwoelf bunte Chips ordnen nichts. */
+/* Only "high" gets a badge — twelve colorful chips organize nothing. */
 .maint-hoch {
     font-size: 10.5px; font-weight: 640; padding: 1px 7px; border-radius: 999px;
     background: rgba(229, 83, 75, 0.13); color: #c62828; flex: none;
 }
 [data-theme="dark"] .maint-hoch { color: #ef9a9a; }
 
-/* ---- Aufgeklappte Zeile ---- */
+/* ---- Expanded row ---- */
 .maint-detail {
     display: none; padding: 0 13px 13px 56px;
     border-top: 1px solid var(--linie); background: var(--bg-card-variant);
@@ -539,7 +537,7 @@ body.dark-mode .maint-checklist li {
     .maint-detail { padding-left: 13px; }
 }
 
-/* Verschieben: Chips statt bildschirmbreiter Knoepfe mit Erklaertext. */
+/* Postpone: chips instead of screen-wide buttons with explanatory text. */
 .maint-chips { display: flex; gap: 7px; flex-wrap: wrap; }
 .maint-chips button {
     border: 1px solid var(--border-color); background: var(--bg-card-variant);
@@ -549,8 +547,8 @@ body.dark-mode .maint-checklist li {
 .maint-chips button:hover { border-color: var(--color-blue); }
 .sd-modal-title { display: flex; align-items: center; gap: 9px; }
 
-/* Prüfliste als eine Karte mit Trennlinien statt vier einzelner Kästen —
-   sie gehören zusammen, es ist eine Liste und keine Sammlung von Knöpfen. */
+/* Checklist as one card with divider lines instead of four separate
+   boxes — they belong together, it's a list, not a collection of buttons. */
 .maint-checklist {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg, 12px);
@@ -566,9 +564,27 @@ body.dark-mode .maint-checklist li + li { border-top: 1px solid rgba(255, 255, 2
 .maint-checklist input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--color-green); }
 .maint-checklist label { cursor: pointer; flex: 1; }
 
-/* Der Abschluss-Knopf ist die Hauptaktion des Dialogs. */
+/* The completion button is the dialog's primary action. */
 .maint-modal-footer .maint-btn--success {
     background: var(--color-green); border-color: var(--color-green);
     color: #fff; font-weight: 600;
 }
 .maint-modal-footer .maint-btn--success:hover { filter: brightness(1.06); }
+
+
+/* The overdue names in the situation banner are buttons: from the warning
+   straight into the completion dialog. They must not look like a form
+   control -- they are part of the sentence. */
+.maint-lage-name {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+.maint-lage-name:hover { color: var(--color-red); }
+.maint-lage--klickbar { cursor: pointer; }
+.maint-lage-haken { display: flex; align-items: center; color: var(--color-green); }

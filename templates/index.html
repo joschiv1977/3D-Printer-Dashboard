@@ -1,20 +1,20 @@
 {% include 'partials/_head.html' %}
 <body class="page-loading" data-active-printer="{{ active_printer_type | default('bambu') }}">
 <script>
-  // Multi-Printer Phase 3: Server-Side gerenderter Default — bevor irgendein
-  // JS-Modul laed. Ohne das wuerden alle bambu-only-Elemente initial sichtbar
-  // bleiben (CSS-Selektor matcht nicht ohne data-attr) und z.B. der
-  // CameraManager wuerde den falschen Init-Pfad nehmen.
+  // A server-side rendered default, before any JS module loads. Without it
+  // every bambu-only element would be visible at first (the CSS selector does
+  // not match without the data attribute) and the CameraManager, for one,
+  // would take the wrong init path.
   window.activePrinter = window.activePrinter || {
     type: '{{ active_printer_type | default("bambu") }}',
     capabilities: [],
     klipperId: null,
   };
-  // Robuste Type-Check-Helper: lesen aus body.dataset — IMMER verfuegbar,
-  // auch bevor printer-adapter.js geladen ist. Frueher haben wir auf
-  // window.printerAdapter.isKlipper gecheckt — der ist beim CameraManager-
-  // Constructor noch undefined, also fiel der Code in den Bambu-Pfad und
-  // startete Snapshot-Polling, was BambuCameraClient-Errors erzeugte.
+  // Robust type-check helpers: they read from body.dataset, which is ALWAYS
+  // available, even before printer-adapter.js has loaded. Checking
+  // window.printerAdapter.isKlipper instead is undefined at the CameraManager
+  // constructor, so the code fell into the Bambu path and started snapshot
+  // polling, which produced BambuCameraClient errors.
   window.isKlipperMode = function () {
     return (document.body && document.body.dataset.activePrinter) === 'klipper';
   };
@@ -42,18 +42,17 @@
     </script>
 
     <!-- Shared Modules - Load BEFORE body content so tab bar renders -->
-    <!-- Ein Buendel statt 27 Einzeldateien: ueber HTTP/1.1 laufen nur
-         ~6 Verbindungen parallel (je ~200 ms TLS), der Rest stand bis zu
-         2 s in der Warteschlange (gemessen 20aug26). Inhalt + Reihenfolge
-         kommen aus dieser Datei selbst (services/asset_bundle.py), ein
-         Build-Schritt entfaellt. -->
+    <!--One bundle instead of 27 separate files: over HTTP/1.1 only
+         ~6 connections run in parallel (each ~200ms TLS), the rest sat
+         queued for up to 2s. Content and order come from this file
+         itself (services/asset_bundle.py); no separate build step needed.-->
     <script defer src="/static/js/app-bundle.js"></script>
 
-    <!-- Die Drucker-Meldung liegt bewusst NEBEN dem Buendel: sie gehoert auf
-         jede Seite, und die uebrigen Seiten haben kein Buendel. Eine Quelle
-         fuer alle neun statt zwei Fassungen, die auseinanderlaufen.
-         hms-overlay.js merkt selbst, dass es hier den Stapel schon gibt, und
-         faengt hier gar nicht erst an zu fragen — hier fuellt der Socket. -->
+    <!--The printer message deliberately sits OUTSIDE the bundle: it belongs on
+         every page, and the other pages do not have a bundle. One source
+         for all nine instead of two versions drifting apart.
+         hms-overlay.js notices on its own that the stack already exists here, and
+         does not bother asking -- the socket fills it in here.-->
     <script defer src="/static/js/modules/hms-banner.js"></script>
     <script defer src="/static/js/modules/hms-overlay.js"></script>
 
@@ -122,13 +121,13 @@
         };
         // ===== END AUTH FETCH HELPER =====
 
-        // Wenn URL lang Parameter vorhanden, speichere in localStorage
+        // When the URL carries a lang parameter, store it in localStorage
         if (urlLang && urlLang !== localStorage.getItem('language')) {
             console.log(`🔄 URL lang parameter: ${urlLang}, updating localStorage`);
             localStorage.setItem('language', urlLang);
         }
 
-        // Synchronisiere Backend-Sprache mit Frontend beim Laden
+        // Sync the backend language with the frontend on load
         (async function syncLanguageOnLoad() {
             try {
                 const response = await authFetch('/api/auth/language', {
@@ -164,7 +163,7 @@
         window.texts = texts;
         window.currentLang = currentLang;
 
-        // Helper: Sicherer Zugriff auf Uebersetzungen
+        // Helper: safe access to the translations
         function getText(key, fallback = '') {
             return texts && texts[key] ? texts[key] : fallback;
         }
@@ -184,13 +183,13 @@
     </script>
 
     <!-- Extracted JS Modules -->
-    <!-- Multi-Printer-Adapter: setzt body[data-active-printer], mappt
-         klipper_state → print_progress, routet pause/resume/stop -->
+    <!--Multi-printer adapter: sets body[data-active-printer], maps
+         klipper_state -> print_progress, routes pause/resume/stop-->
     <style>
-      /* Multi-Printer-CSS-Schalter: Elemente, die nur fuer Bambu Sinn
-         machen (AMS-Slot-Widget, HMS-Banner, Bambu-Cloud-Spezifika),
-         im Klipper-Mode komplett ausblenden. Markierung am Element:
-         class="bambu-only" oder data-bambu-only. */
+      /* Multi-printer CSS switch: elements that only make sense for Bambu
+         (the AMS slot widget, the HMS banner, Bambu cloud specifics) are
+         hidden entirely in Klipper mode. Marked on the element with
+         class="bambu-only" or data-bambu-only. */
       body[data-active-printer="klipper"] .bambu-only,
       body[data-active-printer="klipper"] [data-bambu-only] {
         display: none !important;

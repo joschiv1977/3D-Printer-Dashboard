@@ -1,10 +1,10 @@
 /**
- * Shared Styles - Gemeinsame CSS-Variablen und Komponenten
- * Wird von allen Seiten genutzt
+ * Shared Styles - Common CSS variables and components
+ * Used by all pages
  * Note: design-tokens.css overrides these variables on pages that import it
  */
 
-/* CSS Variablen für Themes (legacy - kept for sub-page compatibility) */
+/* CSS variables for themes (legacy - kept for sub-page compatibility) */
 :root {
     --safe-area-inset-top: env(safe-area-inset-top, 0px);
     --safe-area-inset-right: env(safe-area-inset-right, 0px);
@@ -58,7 +58,7 @@ body.dark-mode {
     z-index: 999999;
 }
 
-/* Mobile Anpassungen */
+/* Mobile adjustments */
 @media (max-width: 768px) {
     .web-toast {
         bottom: 90px; /* Above floating tab bar */

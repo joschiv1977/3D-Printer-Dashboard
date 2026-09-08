@@ -1,6 +1,6 @@
-/* Vergroesserte Thumbnail-Vorschau beim Ueberfahren mit der Maus.
-   Liegt ueber allem und faengt selbst keine Mausereignisse ab, sonst wuerde
-   sie unter dem Zeiger sofort ihr eigenes mouseleave ausloesen. */
+/* Enlarged thumbnail preview on mouse hover.
+   Sits above everything and doesn't capture mouse events itself, otherwise
+   it would trigger its own mouseleave immediately under the cursor. */
 .thumb-preview {
     position: fixed;
     z-index: 10000;
@@ -33,12 +33,12 @@ body:not(.dark-mode) .thumb-preview {
     max-width: 100%;
     max-height: 100%;
     border-radius: 8px;
-    /* Freigestellte Vorschauen sind transparent — ein Schachbrett waere
-       unruhig, ein neutraler Grund zeigt helle wie dunkle Modelle. */
+    /* Cutout previews are transparent — a checkerboard pattern would be
+       distracting, a neutral background shows light and dark models alike. */
     background: rgba(127, 127, 127, 0.10);
 }
 
-/* Zeigt an, dass es etwas zu vergroessern gibt. */
+/* Indicates there's something to enlarge. */
 .thumb-preview-source {
     cursor: zoom-in;
 }

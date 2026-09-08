@@ -1,12 +1,12 @@
 
 /* ---- shared-styles.css ---- */
 /**
- * Shared Styles - Gemeinsame CSS-Variablen und Komponenten
- * Wird von allen Seiten genutzt
+ * Shared Styles - Common CSS variables and components
+ * Used by all pages
  * Note: design-tokens.css overrides these variables on pages that import it
  */
 
-/* CSS Variablen für Themes (legacy - kept for sub-page compatibility) */
+/* CSS variables for themes (legacy - kept for sub-page compatibility) */
 :root {
     --safe-area-inset-top: env(safe-area-inset-top, 0px);
     --safe-area-inset-right: env(safe-area-inset-right, 0px);
@@ -44,45 +44,8 @@ body.dark-mode {
     --input-border: #3a4151;
 }
 
-/* ========== LEGACY SIDEBAR (hidden - replaced by tab bar) ========== */
-.menu-toggle {
-    display: none !important;
-}
-
 .sidebar {
     display: none !important;
-}
-
-.sidebar-overlay {
-    display: none !important;
-}
-
-/* ========== WEB TOAST SYSTEM ========== */
-/* Einfaches, leichtgewichtiges Toast-System für Web-Browser */
-.web-toast {
-    position: fixed;
-    bottom: 90px; /* Above tab bar */
-    left: 50%;
-    transform: translateX(-50%) scale(0.95);
-    background: var(--bg-secondary, var(--bg-card));
-    color: var(--text-primary);
-    padding: 12px 24px;
-    border-radius: var(--radius-lg, 12px);
-    box-shadow: 0 4px 16px var(--shadow, rgba(0,0,0,0.1)), 0 0 0 1px var(--border-color);
-    z-index: 999999;
-    font-size: 14px;
-    font-weight: 500;
-    opacity: 0;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    pointer-events: auto;
-    max-width: 90%;
-    text-align: center;
-    white-space: nowrap;
-}
-
-.web-toast.show {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
 }
 
 .web-toast.hide {
@@ -97,7 +60,7 @@ body.dark-mode {
     z-index: 999999;
 }
 
-/* Mobile Anpassungen */
+/* Mobile adjustments */
 @media (max-width: 768px) {
     .web-toast {
         bottom: 90px; /* Above floating tab bar */
@@ -115,6 +78,13 @@ body.dark-mode {
  * ============================================ */
 
 :root {
+    /* === The select field arrow ===
+       One source for all UIs. A `select` with the house border and the
+       operating system's own glyph inside it is unfinished, and repeating
+       the data URI at every call site would be a patchwork.
+       Usage: `appearance: none` and `background-image: var(--pfeil)`. */
+    --pfeil: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+
     /* === Safe Area === */
     --safe-area-inset-top: env(safe-area-inset-top, 0px);
     --safe-area-inset-right: env(safe-area-inset-right, 0px);
@@ -139,7 +109,7 @@ body.dark-mode {
     --input-border: #ddd;
     --shadow: rgba(0, 0, 0, 0.1);
 
-    /* === Semantische Farben (gleich in Light+Dark) === */
+    /* === Semantic colors (same in light+dark) === */
     --color-blue: #2196F3;
     --color-green: #4CAF50;
     --color-orange: #FF9800;
@@ -181,6 +151,16 @@ body.dark-mode {
     --margin-h: 20px;
     --margin-v: 20px;
 
+    /* Room the floating dock needs at the bottom of every page.
+       .floating-tab-bar is position:fixed, 66px tall, sitting 16px off the
+       bottom edge -- content that runs into those 82px disappears under it.
+       Measured 01sep26: on a 13" MacBook the dashboard's bottom row of cards
+       ended 100px inside the dock, because .container reserved only 30px.
+       Two other pages carried their own 90px, so the number stood in three
+       places and drifted. It stands here now.
+       82px plus a gap, so the cards do not touch the dock. */
+    --dock-freiraum: 94px;
+
     /* === Corner Radius (iPhone) === */
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -198,6 +178,14 @@ body.dark-mode {
     --btn-height-medium: 44px;
     --btn-radius: var(--radius-lg);
 
+    /* === Button dimensions — one source for all buttons === */
+    --knopf-hoehe: 31px;
+    --knopf-polster: 6px 12px;
+    --knopf-schrift: 12.5px;
+    --knopf-radius: 10px;
+    --knopf-polster-klein: 5px 10px;
+    --knopf-schrift-klein: 12px;
+
     /* === Transitions === */
     --transition-fast: 0.15s ease;
     --transition-normal: 0.3s ease;
@@ -206,6 +194,7 @@ body.dark-mode {
 
 /* === Dark Mode === */
 body.dark-mode {
+    --pfeil: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     --bg-primary: #0F1419;
     --bg-secondary: #1A1F2E;
     --bg-card: #1A1F2E;
@@ -237,6 +226,10 @@ body.dark-mode {
         --font-size-caption: 15px;
     }
 }
+
+/* The house's second dark-mode switch — pages set either
+   `body.dark-mode` or `data-theme`. */
+[data-theme="dark"] { --pfeil: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); }
 
 
 /* ---- base.css ---- */
@@ -287,7 +280,6 @@ body {
 
 /* Smooth transitions for theme switching */
 body,
-.app-header,
 .card,
 .action-btn,
 .control-btn,
@@ -302,7 +294,7 @@ body,
     margin: 0 auto;
     padding: var(--margin-h);
     padding-top: 8px;  /* Kompakter ohne Header — Cards rücken nach oben */
-    padding-bottom: 30px;
+    padding-bottom: var(--dock-freiraum, 94px);
     width: 100%;
     box-sizing: border-box;
 }
@@ -313,95 +305,6 @@ body,
         padding-top: 8px;
         padding-bottom: calc(70px + var(--safe-area-inset-bottom));
     }
-}
-
-/* App Header */
-/* App-Header ausgeblendet — alle Funktionen sind über den Tab-Bar erreichbar
-   (Logs, Historie, Benutzer, Settings). Theme-Toggle: Settings. Power-Off-Timer:
-   eigenes Banner. Drucker-Name: Browser-Tab-Titel. */
-.app-header {
-    display: none;
-}
-
-body.dark-mode .app-header {
-    background: rgba(26, 31, 46, 0.97);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.app-title {
-    font-size: var(--font-size-headline);
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-@media (max-width: 768px) {
-    .app-title {
-        font-size: 16px;
-    }
-    .app-header {
-        padding: var(--space-md) 15px;
-        padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    }
-}
-
-.status-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--color-green);
-}
-
-/* Header Actions - hidden (replaced by tab bar) */
-.header-actions {
-    display: none !important;
-}
-
-/* Icon Buttons */
-.icon-btn {
-    background: none;
-    border: none;
-    color: var(--text-primary);
-    font-size: 20px;
-    cursor: pointer;
-    padding: var(--space-sm);
-    border-radius: var(--radius-md);
-    transition: background var(--transition-fast);
-}
-
-.icon-btn:hover {
-    background: var(--bg-hover);
-}
-
-body.dark-mode .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-/* Menu Toggle (kept for backwards compatibility, will be hidden) */
-.menu-toggle {
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    color: var(--text-primary);
-    font-size: 24px;
-    padding: 8px 12px;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}
-
-body.dark-mode .menu-toggle {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.menu-toggle:hover {
-    background: rgba(0, 0, 0, 0.08);
-}
-
-body.dark-mode .menu-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
 }
 
 /* Loading Animation */
@@ -466,32 +369,11 @@ body.dark-mode .menu-toggle:hover {
     animation: blink-hourglass 1.5s ease-in-out infinite;
 }
 
-/* Time display */
-.time-display {
-    font-size: var(--font-size-caption);
-    opacity: 0.8;
-}
-
 /* Icons */
 .icon {
     display: inline-block;
     width: 20px;
     text-align: center;
-}
-
-/* Utility Classes */
-.mobile-hide {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .mobile-hide {
-        display: none !important;
-    }
-
-    .mobile-date {
-        font-size: 12px !important;
-    }
 }
 
 /* High-DPI Optimizations */
@@ -583,19 +465,6 @@ body.dark-mode * {
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
-/* Modal specific scrollbars */
-#day-statistics-content::-webkit-scrollbar-thumb,
-#printDetailModal ::-webkit-scrollbar-thumb,
-.history-list-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-#day-statistics-content::-webkit-scrollbar-thumb:hover,
-#printDetailModal ::-webkit-scrollbar-thumb:hover,
-.history-list-container::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
-}
-
 /* ========== SLIDE ANIMATIONS ========== */
 @keyframes slideInUp {
     from { transform: translateX(-50%) translateY(100%); opacity: 0; }
@@ -605,24 +474,6 @@ body.dark-mode * {
 @keyframes slideOutDown {
     from { transform: translateX(-50%) translateY(0); opacity: 1; }
     to { transform: translateX(-50%) translateY(100%); opacity: 0; }
-}
-
-/* ========== MISC ========== */
-.nav-hover-btn:hover {
-    transform: translateY(-1px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Made in Germany Logo - only large desktops */
-.made-in-germany-logo {
-    display: none;
-}
-
-@media (min-width: 1025px) {
-    .made-in-germany-logo {
-        display: inline-block !important;
-    }
 }
 
 /* HQ Button */
@@ -807,9 +658,9 @@ body.dark-mode .control-btn {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* iOS Press Animation - subtiles Scale damit der Cursor beim Klick
-   nicht außerhalb des geschrumpften Buttons landet (sonst kommt kein
-   click-Event mehr bei nicht-mittigen Klicks, z.B. Licht-Button). */
+/* iOS Press Animation - a subtle scale so the cursor doesn't end up
+   outside the shrunk button on click (otherwise no click event fires
+   for off-center clicks, e.g. the light button). */
 .control-btn:active {
     transform: scale(0.96) translateZ(0) !important;
     opacity: 0.7;
@@ -837,6 +688,26 @@ body.dark-mode .control-btn:hover {
 
 body.dark-mode .control-btn.disabled {
     background: #1a1f2e;
+}
+
+/* A command has been sent but the printer has not carried it out yet
+   (job_state 6/7/11). The button stays where it is -- moving or hiding it
+   under the finger is worse than dimming it -- but it does not take a
+   second press. */
+.control-btn--laeuft {
+    opacity: 0.55;
+    cursor: progress;
+    pointer-events: none;
+    animation: sk-puls 1.4s ease-in-out infinite;
+}
+
+@keyframes sk-puls {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .control-btn--laeuft { animation: none; }
 }
 
 /* === Colored Button Variants (Dark Mode) === */
@@ -1011,421 +882,6 @@ body.dark-mode .status-card:hover {
     }
 }
 
-/* ========== SENSOR GRID ========== */
-.sensor-grid {
-    display: grid;
-    gap: 10px;
-}
-
-.sensor-item {
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: var(--radius-md);
-    padding: 10px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all var(--transition-fast);
-}
-
-body.dark-mode .sensor-item {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.06);
-}
-
-.sensor-item:hover {
-    background: rgba(0, 0, 0, 0.06);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode .sensor-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.12);
-}
-
-.sensor-name {
-    font-size: var(--font-size-caption);
-    color: var(--text-secondary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.sensor-value {
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-    color: var(--color-blue);
-}
-
-/* ========== BANNERS ========== */
-.filament-drying-banner {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff9800 100%);
-    color: white;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 99;
-}
-
-.filament-drying-banner.active {
-    display: flex;
-}
-
-.filament-drying-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-}
-
-.filament-drying-icon {
-    font-size: 24px;
-    animation: rotate 3s linear infinite;
-}
-
-.filament-drying-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.filament-drying-text p {
-    margin: 2px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.9;
-}
-
-/* HMS Error Banner */
-.hms-error-banner {
-    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-    color: white;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 98;
-}
-
-.hms-error-banner.info {
-    background: linear-gradient(135deg, #4488ff 0%, #0066cc 100%);
-    box-shadow: 0 2px 8px rgba(68, 136, 255, 0.3);
-}
-
-.hms-error-banner.active {
-    display: flex;
-}
-
-.hms-error-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-}
-
-.hms-error-icon {
-    font-size: 24px;
-}
-
-.hms-error-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.hms-error-text p {
-    margin: 4px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.9;
-}
-
-.hms-dismiss-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-}
-
-.hms-dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* Power-Off Timer Banner */
-.power-off-banner {
-    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-    color: #000;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 97;
-}
-
-.power-off-banner.active {
-    display: flex;
-}
-
-.power-off-banner-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-}
-
-.power-off-banner-icon {
-    font-size: 24px;
-}
-
-.power-off-banner-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.power-off-banner-text p {
-    margin: 4px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.8;
-}
-
-.power-off-cancel-btn {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    color: #000;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-}
-
-.power-off-cancel-btn:hover {
-    background: rgba(0, 0, 0, 0.3);
-}
-
-/* Power-Loss-Recovery Banner */
-.recovery-banner {
-    background: linear-gradient(135deg, #7e57c2 0%, #4527a0 100%);
-    color: white;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(69, 39, 160, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 98;
-}
-
-.recovery-banner.active {
-    display: flex;
-}
-
-.recovery-banner-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-}
-
-.recovery-banner-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.recovery-banner-text p {
-    margin: 4px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.9;
-}
-
-.recovery-banner-actions {
-    display: flex;
-    gap: var(--space-sm);
-}
-
-.recovery-resume-btn,
-.recovery-dismiss-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-}
-
-.recovery-resume-btn {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.recovery-resume-btn:hover,
-.recovery-dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-.recovery-resume-btn:disabled {
-    opacity: 0.6;
-    cursor: default;
-}
-
-@media (max-width: 768px) {
-    .recovery-banner {
-        padding: 10px 15px;
-        flex-wrap: wrap;
-        gap: var(--space-sm);
-    }
-
-    .recovery-banner-info {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .recovery-banner-text h4 {
-        font-size: 13px;
-    }
-
-    .recovery-banner-text p {
-        font-size: 11px;
-    }
-
-    .recovery-banner-actions {
-        gap: 6px;
-        flex-shrink: 0;
-    }
-
-    .recovery-resume-btn,
-    .recovery-dismiss-btn {
-        padding: 5px 10px;
-        font-size: 11px;
-    }
-}
-
-/* Maintenance Banner */
-.maintenance-banner {
-    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-    color: white;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 97;
-}
-
-.maintenance-banner.overdue {
-    background: linear-gradient(135deg, #ff5722 0%, #d32f2f 100%);
-    box-shadow: 0 2px 8px rgba(255, 87, 34, 0.3);
-}
-
-.maintenance-banner.active {
-    display: flex;
-}
-
-.maintenance-banner-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-}
-
-.maintenance-banner-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.maintenance-banner-text p {
-    margin: 4px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.9;
-}
-
-.maintenance-banner-actions {
-    display: flex;
-    gap: var(--space-sm);
-}
-
-.maintenance-dismiss-btn,
-.maintenance-view-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-    text-decoration: none;
-}
-
-.maintenance-view-btn {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.maintenance-dismiss-btn:hover,
-.maintenance-view-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-@media (max-width: 768px) {
-    .maintenance-banner {
-        padding: 10px 15px;
-        flex-wrap: wrap;
-        gap: var(--space-sm);
-    }
-
-    .maintenance-banner-info {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .maintenance-banner-text h4 {
-        font-size: 13px;
-    }
-
-    .maintenance-banner-text p {
-        font-size: 11px;
-    }
-
-    .maintenance-banner-actions {
-        gap: 6px;
-        flex-shrink: 0;
-    }
-
-    .maintenance-dismiss-btn,
-    .maintenance-view-btn {
-        padding: 5px 10px;
-        font-size: 11px;
-        white-space: nowrap;
-    }
-}
-
 /* ========== SPOOLMAN CARD ========== */
 .spoolman-status.connected {
     background-color: var(--color-green);
@@ -1501,81 +957,11 @@ body.dark-mode .spool-color-indicator {
     margin-top: 3px;
 }
 
-/* ========== CUSTOM DROPDOWN ========== */
-.custom-dropdown {
-    width: 100%;
-    padding: 12px 40px 12px 15px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-caption);
-    font-weight: 500;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    font-family: var(--font-family);
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23808080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 20px;
-    box-shadow: var(--shadow-card);
-    transition: all var(--transition-fast);
-}
-
-body.dark-mode .custom-dropdown {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    border-color: transparent;
-}
-
-.custom-dropdown:hover {
-    transform: translateY(-1px);
-    border-color: var(--color-blue);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-}
-
-body.dark-mode .custom-dropdown:hover {
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-.custom-dropdown:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-}
-
-.custom-dropdown option {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    padding: 10px;
-}
-
-.custom-dropdown.compact {
-    min-width: 180px;
-    width: auto;
-}
-
 /* ========== DEVELOPER CONTROLS ========== */
 #dev-control-card {
     border: 1px solid rgba(255, 152, 0, 0.25);
     background: rgba(255, 152, 0, 0.05);
     transition: max-height var(--transition-normal), opacity var(--transition-normal), margin var(--transition-normal);
-}
-
-/* ========== SD FILES ========== */
-.sd-files-section {
-    background: var(--bg-primary);
-    border-radius: var(--radius-md);
-    padding: 10px;
-    margin-top: 10px;
-}
-
-#sd-files-list .sensor-item:hover {
-    background: var(--accent-blue);
-    color: white;
-    transform: translateX(2px);
 }
 
 /* ========== POWER-OFF HEADER ========== */
@@ -1638,71 +1024,9 @@ body.dark-mode #spool-selector {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
-/* Filament-Mengen-Hinweis — rein informativ, kein Eingriff in den Druck.
-   Warnfarbe statt Fehlerrot: der Druck laeuft weiter, das ist Absicht. */
-.filament-amount-banner {
-    background: linear-gradient(135deg, #f0a020 0%, #b36b00 100%);
-    color: white;
-    padding: var(--space-md) var(--margin-h);
-    padding-top: calc(var(--space-md) + var(--safe-area-inset-top));
-    display: none;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(179, 107, 0, 0.3);
-    position: sticky;
-    top: 0;
-    z-index: 98;
-}
-
-.filament-amount-banner.active {
-    display: flex;
-}
-
-.filament-amount-info {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-}
-
-.filament-amount-text h4 {
-    margin: 0;
-    font-size: var(--font-size-caption);
-    font-weight: 600;
-}
-
-.filament-amount-text p {
-    margin: 4px 0 0 0;
-    font-size: var(--font-size-small);
-    opacity: 0.9;
-}
-
-.filament-amount-dismiss-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: white;
-    padding: 6px 12px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-size: var(--font-size-small);
-    font-weight: 600;
-    transition: all var(--transition-fast);
-}
-
-.filament-amount-dismiss-btn:hover {
-    background: rgba(255, 255, 255, 0.4);
-}
-
-@media (max-width: 768px) {
-    .filament-amount-banner {
-        padding: 10px 15px;
-        flex-wrap: wrap;
-        gap: var(--space-sm);
-    }
-}
-
-/* Duesenwahl im Filament-Tab — nur bei Doppelduesen-Geraeten sichtbar
-   (X2D, H2D, H2D Pro, H2C). Waehlt die externe Spule der jeweiligen Duese. */
+/* Nozzle selector in the filament tab — visible only on dual-nozzle
+   devices (X2D, H2D, H2D Pro, H2C). Selects the external spool for the
+   respective nozzle. */
 .ctrl-nozzle-select {
     display: flex;
     align-items: center;
@@ -1724,7 +1048,7 @@ body.dark-mode #spool-selector {
     font-size: 13px;
 }
 
-/* --- Geraet-Tab (Doppelduese, Kammer, Luefter, Luftfuehrung) ------------- */
+/* --- Device tab (dual nozzle, chamber, fan, airflow) ------------- */
 .dev-nozzle-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1743,8 +1067,8 @@ body.dark-mode #spool-selector {
     margin-bottom: 4px;
 }
 .dev-nozzle-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-/* Punkt markiert die gerade aktive Duese; per visibility geschaltet, damit
-   die Zeile nicht springt. */
+/* Dot marks the currently active nozzle; toggled via visibility so
+   the row doesn't jump. */
 .dev-nozzle-active { color: #51cf66; font-size: 12px; visibility: hidden; }
 .dev-nozzle-temp { font-size: 20px; font-weight: 700; color: var(--text-primary); }
 .dev-nozzle-target { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
@@ -1779,7 +1103,22 @@ body.dark-mode #spool-selector {
 }
 .dev-row strong { color: var(--text-primary); }
 
-/* --- AMS im Geraet-Tab --------------------------------------------------- */
+/* Right-hand end of a monitoring row: sensitivity picker plus switch. */
+.dev-row__end {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.dev-sel {
+    padding: 3px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 12px;
+}
+
+/* --- AMS in the device tab --------------------------------------------------- */
 .ams-card {
     padding: 10px;
     margin-bottom: 10px;
@@ -1802,7 +1141,7 @@ body.dark-mode #spool-selector {
     gap: 8px;
     font-size: 12px;
 }
-/* Farbpunkt des Fachs; gestrichelt = leer/keine Farbe gemeldet */
+/* Tray's color dot; dashed = empty/no color reported */
 .ams-tray-dot {
     width: 14px; height: 14px;
     border-radius: 50%;
@@ -1842,7 +1181,7 @@ body.dark-mode #spool-selector {
     font-size: 12px;
 }
 
-/* Filament-Editor eines AMS-Fachs (fuer Rollen ohne Bambu-RFID) */
+/* Filament editor for an AMS tray (for spools without Bambu RFID) */
 .ams-edit {
     display: flex;
     gap: 6px;
@@ -1872,6 +1211,168 @@ body.dark-mode #spool-selector {
     background: var(--input-bg);
     color: var(--text-primary);
     cursor: pointer;
+}
+
+/* ======================================================================
+   Schedule dialog
+   Four identically built cards instead of four different constructions.
+   Everything here carries the sp- prefix, so it doesn't clash with the
+   old sched-form-* rules (which still serve other dialogs).
+   ====================================================================== */
+.ui-koerper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ui-karte {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: 14px 15px;
+}
+
+.ui-karte-kopf {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    font-weight: 640;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.ui-karte-kopf .hd-ic { opacity: 0.75; }
+
+/* One row = one control. A divider line instead of a box per row. */
+.ui-zeile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 40px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+}
+
+.ui-zeile + .ui-zeile { border-top: 1px solid var(--border-color); }
+.ui-zeile--klick { cursor: pointer; margin: 0; }
+
+.ui-zeile-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.ui-zeile-name .hd-ic { color: var(--text-secondary); }
+.ui-breit { flex: 1; min-width: 0; }
+
+/* Toggle — same construction as in print prep (.prep-switch),
+   just without its row border here. */
+.ui-schalter { position: relative; flex: none; display: inline-flex; }
+.ui-schalter input { position: absolute; opacity: 0; pointer-events: none; }
+
+.ui-schalter > span {
+    width: 42px;
+    height: 24px;
+    border-radius: 999px;
+    background: var(--border-color);
+    transition: background 0.15s;
+    display: block;
+    position: relative;
+}
+
+.ui-schalter > span::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s;
+}
+
+.ui-schalter input:checked + span { background: var(--color-green); }
+.ui-schalter input:checked + span::after { transform: translateX(18px); }
+
+/* ======================================================================
+   Line icons instead of emoji
+   All dialogs now carry these icons in their headers, and without this
+   base rule they render as large black shapes (fill instead of stroke).
+   That's why it belongs here.
+   ====================================================================== */
+.hd-ic {
+    width: 17px;
+    height: 17px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -3px;
+    flex: 0 0 auto;
+}
+.hd-ic--xs { width: 13px; height: 13px; vertical-align: -2px; }
+/* Empty states: the icon carries the area, not the text beside it. */
+.hd-ic--xl { width: 40px; height: 40px; stroke-width: 1.4; vertical-align: 0; opacity: 0.55; }
+
+/* The printer messages (.mld*) live in meldungen.css — they're needed
+   on every page, not just wherever components.css is loaded. */
+/* ==========================================================================
+   Placeholder for when there is no preview image
+   --------------------------------------------------------------------------
+   Prints started directly from Bambu Studio store their 3MF in the
+   printer's internal storage. The FTPS service on port 990 exposes only
+   external storage (stick/SD) on every Bambu model — nobody can reach the
+   file, and thus the preview image, not even the Home Assistant
+   integration or Bambuddy.
+
+   Instead of an empty gray box, there's now an icon there. The reason
+   is in the title attribute and, where there's room, as text beside it.
+   ========================================================================== */
+.kein-bild {
+    display: grid !important;
+    place-items: center;
+    grid-template: 1fr / 1fr;
+    background: var(--bg-card-variant);
+    color: var(--text-secondary);
+    position: relative;
+}
+/* An image hidden via visibility still occupies a grid row and
+   pushes the icon down. In this view the placeholder itself holds
+   the space, so the image can be removed entirely. */
+.kein-bild > img { display: none !important; }
+.kein-bild::after {
+    content: "";
+    grid-area: 1 / 1;
+    /* The width MUST come from the height: `width: 58%` in a
+       `place-items: center` grid refers to the column width, which in
+       turn is sized by the content — the result is 0px. */
+    height: 58%; aspect-ratio: 1; width: auto;
+    max-height: 46px;
+    opacity: 0.42;
+    background-color: currentColor;
+    -webkit-mask: var(--kein-bild-form) center / contain no-repeat;
+    mask: var(--kein-bild-form) center / contain no-repeat;
+}
+:root {
+    /* Cube outline with a dashed top face: "a model we have no picture
+       of" — not the usual crossed-out photo icon, since no file is
+       missing here, just the view inside it. */
+    --kein-bild-form: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' \
+stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'>\
+<path d='M3 7.5l9-5 9 5v9l-9 5-9-5z'/>\
+<path d='M3 7.5l9 5 9-5' stroke-dasharray='2.5 2'/>\
+<path d='M12 12.5v9' stroke-dasharray='2.5 2'/>\
+</svg>");
 }
 
 
@@ -1927,7 +1428,7 @@ body.dark-mode .tab-item:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-/* Deaktivierter Tab (z.B. Mainsail bei offline): ausgegraut + nicht klickbar */
+/* Disabled tab (e.g. Mainsail when offline): grayed out + not clickable */
 .tab-item.tab-disabled {
     opacity: 0.4;
     pointer-events: none;
@@ -2009,24 +1510,6 @@ body.fullscreen-camera .floating-tab-bar {
     display: none !important;
 }
 
-.sidebar-overlay {
-    display: none !important;
-}
-
-/* Hide sidebar pinned styles */
-body.sidebar-pinned {
-    padding-left: 0 !important;
-}
-
-body.sidebar-pinned .menu-toggle {
-    display: block;
-}
-
-/* Hide menu toggle when tab bar is present */
-.menu-toggle {
-    display: none !important;
-}
-
 
 /* ---- modals.css ---- */
 /* ============================================
@@ -2057,10 +1540,15 @@ body.dark-mode .modal-panel {
 /* ========== MODAL BUTTONS ========== */
 .modal-btn {
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    border-radius: var(--radius-lg) !important;
-    padding: 10px 20px !important;
+    border-radius: var(--knopf-radius) !important;
+    padding: var(--knopf-polster) !important;
+    min-height: var(--knopf-hoehe) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
     cursor: pointer !important;
-    font-size: var(--font-size-caption) !important;
+    font-size: var(--knopf-schrift) !important;
     font-weight: 500 !important;
     transition: all var(--transition-fast) !important;
     box-shadow: none !important;
@@ -2147,27 +1635,6 @@ body.dark-mode .modal-btn-success:hover {
     border-color: rgba(76, 175, 80, 0.5) !important;
 }
 
-/* Danger Button */
-.modal-btn-danger {
-    background: rgba(244, 67, 54, 0.15) !important;
-    color: #c62828 !important;
-    border-color: rgba(244, 67, 54, 0.3) !important;
-}
-
-body.dark-mode .modal-btn-danger {
-    background: rgba(244, 67, 54, 0.3) !important;
-    color: #ef9a9a !important;
-}
-
-.modal-btn-danger:hover {
-    background: rgba(244, 67, 54, 0.25) !important;
-}
-
-body.dark-mode .modal-btn-danger:hover {
-    background: rgba(244, 67, 54, 0.45) !important;
-    border-color: rgba(244, 67, 54, 0.5) !important;
-}
-
 /* ========== MODAL CLOSE BUTTON ========== */
 .modal-close-btn {
     background: rgba(0, 0, 0, 0.04) !important;
@@ -2208,18 +1675,6 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
     background: rgba(26, 31, 46, 0.95);
 }
 
-/* ========== MODAL SECTIONS ========== */
-.modal-section {
-    background: rgba(0, 0, 0, 0.03) !important;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    border-radius: var(--radius-lg);
-}
-
-body.dark-mode .modal-section {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border-color: rgba(255, 255, 255, 0.06);
-}
-
 /* SD CARD MODAL: Mobile styles moved to sd-card.css */
 
 /* ========== DETAIL MODAL MOBILE ========== */
@@ -2236,11 +1691,6 @@ body.dark-mode .modal-section {
     #detail-timelapse {
         width: 100% !important;
         padding: 10px !important;
-    }
-
-    .detail-tab {
-        flex: 1 !important;
-        padding: 10px 5px !important;
     }
 }
 
@@ -2276,12 +1726,6 @@ body.dark-mode .modal-section {
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
-    }
-
-    .detail-tab {
-        font-size: 12px !important;
-        padding: 8px 12px !important;
-        white-space: nowrap !important;
     }
 
     #printDetailModal > div > div:last-child {
@@ -2359,6 +1803,183 @@ body.dark-mode .modal-section {
     #schedule-files-list button[style*="background:var(--accent-blue)"] > span:first-child {
         display: none !important;
     }
+}
+
+/* ======================================================================
+   History (sensor charts) — dashboard look
+   ======================================================================
+   One card per group, like on the dashboard, the legend as a chip row
+   with the CURRENT VALUE — click to hide a curve. */
+
+.vl-zeitwahl {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 3px;
+    width: max-content;
+    margin: 0 0 14px auto;
+}
+
+.vl-zeitwahl button {
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 5px 13px;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+.vl-zeitwahl button.an {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-weight: 600;
+    box-shadow: var(--shadow-card);
+}
+
+.vl-karte {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 15px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow-card);
+}
+
+.vl-karte-kopf h4 {
+    margin: 0 0 10px;
+    font-size: 14.5px;
+    font-weight: 620;
+    color: var(--text-primary);
+}
+
+.vl-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 12px;
+}
+
+/* Idle draw below the power curve: what the printer draws outside of
+   printing, averaged over weeks. Calmer than the chips above it — it's
+   not a measurement from right now, but a running total. */
+.vl-ruhe {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-top: 10px; padding-top: 9px;
+    border-top: 1px solid var(--border-color, rgba(128, 128, 128, .22));
+    font-size: 12px; color: var(--text-secondary);
+}
+.vl-ruhe-teil b { font-weight: 600; color: var(--text-primary); margin-right: 5px; }
+
+.vl-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font-size: 12.5px;
+    color: var(--text-primary);
+    font-family: inherit;
+    transition: opacity 0.15s;
+}
+
+.vl-chip .vl-punkt {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+}
+
+/* Tabular figures: otherwise the chip width jitters with every measurement. */
+.vl-chip .vl-wert { font-weight: 660; font-variant-numeric: tabular-nums; }
+
+.vl-chip.aus { opacity: 0.38; }
+.vl-chip.aus .vl-wert { text-decoration: line-through; }
+
+.vl-leinwand { height: 190px; position: relative; }
+.vl-leinwand--klein { height: 160px; }
+
+/* Skip parts.
+   Colors via the UI's tokens (design-tokens.css), so the window follows
+   light and dark mode. */
+.sk-teile-ov {
+    position: fixed; inset: 0; z-index: 2147483640;
+    background: rgba(0, 0, 0, .45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px;
+}
+.sk-teile-box {
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #1a1f2e);
+    border: 1px solid var(--border-color, #d3d3d3);
+    border-radius: 16px; padding: 16px 18px 18px;
+    width: min(420px, 100%); max-height: 80vh;
+    display: flex; flex-direction: column; gap: 10px;
+    box-shadow: 0 18px 50px var(--shadow-color, rgba(0, 0, 0, .2));
+}
+.sk-teile-box h3 { margin: 0; font-size: 16px; font-weight: 800; }
+.sk-teile-hinweis {
+    margin: 0; font-size: 13px; color: var(--text-secondary, #5a6270);
+}
+/* The plate from above. Two canvases stacked: the top-down view from
+   the 3MF at the bottom, the coloring of the selected parts on top.
+   The hit map itself is never shown, only read. */
+.sk-teile-platte {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    aspect-ratio: 1;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(128, 128, 128, .10);
+    border: 1px solid rgba(128, 128, 128, .16);
+}
+.sk-teile-platte canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.sk-teile-wahl { cursor: pointer; }
+
+.sk-teile-liste {
+    overflow-y: auto; display: flex; flex-direction: column; gap: 2px;
+    margin: 2px -6px;
+}
+/* Without this the list still shows despite `hidden`: its own
+   `display: flex` outranks the browser's `display: none`. */
+.sk-teile-liste[hidden] { display: none; }
+.sk-teil {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 6px; border-radius: 10px; cursor: pointer;
+}
+.sk-teil:hover { background: var(--bg-hover, rgba(127, 127, 127, .1)); }
+.sk-teil input { width: 18px; height: 18px; flex: none; accent-color: #2196f3; }
+.sk-teil-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sk-teil-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sk-teil-kennung {
+    font-size: 12px; color: var(--text-secondary, #5a6270);
+    font-variant-numeric: tabular-nums;
+}
+.sk-teile-knoepfe { display: flex; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+.sk-teile-knoepfe button {
+    padding: 9px 16px; border-radius: 9px; font-weight: 700;
+    font-size: 14px; cursor: pointer;
+}
+.sk-teile-knoepfe [data-ab] {
+    background: transparent;
+    color: var(--text-secondary, #5a6270);
+    border: 1px solid var(--border-color, #d3d3d3);
+}
+.sk-teile-knoepfe [data-ok] {
+    background: #2196f3; color: #fff; border: 1px solid transparent;
 }
 
 
@@ -2439,6 +2060,50 @@ body.dark-mode .modal-section {
     object-fit: cover;
 }
 
+/* ========== LIGHT IN THE CAMERA IMAGE ==========
+   Top left, separate from the stream group on the right: that group
+   controls the view, while the light controls real hardware on the printer.
+   The button carries .control-btn, because updateBothButtons('light-btn', …)
+   resets that class on toggle — this way it gets the same look
+   as the overlay buttons, without touching the logic. */
+.camera-light {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 4;
+}
+
+/* `body` in front, so the rule `body.dark-mode .control-btn.warning` from
+   components.css doesn't win — otherwise it colors the button orange as
+   soon as the light is on, and it no longer matches its neighbors.
+   No backdrop-filter: the overlay buttons deliberately skip it. */
+body .camera-light .control-btn,
+body .camera-light .control-btn.warning {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+body .camera-light .control-btn:hover,
+body .camera-light .control-btn.warning:hover {
+    background: rgba(0, 0, 0, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Light on: just a warm border, so the state stays recognizable without
+   tinting the area differently than its neighbors. */
+body .camera-light .control-btn.warning {
+    border-color: rgba(250, 204, 21, 0.85);
+}
+
 
 /* ---- progress-card.css ---- */
 /* ============================================
@@ -2463,36 +2128,8 @@ body:not(.dark-mode) .progress-card {
     border-color: rgba(0, 0, 0, 0.06);
 }
 
-/* ========== PRINT INFO CONTAINER ========== */
-.print-info {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 10px;
-}
-
-/* ========== HEADER (Filename + Status) ========== */
-.print-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-}
-
-.print-file {
-    font-size: var(--font-size-caption);  /* 15px Desktop, 14px Mobile — wie andere Card-Titel */
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-}
-
 .print-status {
-    font-size: var(--font-size-small);  /* 12px — wie andere Card-Subtitles */
+    font-size: var(--font-size-small);  /* 12px — like other card subtitles */
     display: flex;
     align-items: center;
     gap: 5px;
@@ -2515,125 +2152,6 @@ body:not(.dark-mode) .progress-card {
 .print-status-text {
     color: var(--text-secondary);
     font-weight: 500;
-}
-
-/* ========== PROGRESS CENTER (Ring + Thumbnail) ========== */
-.progress-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    flex-shrink: 0;
-}
-
-/* SVG Progress Ring */
-.progress-ring {
-    width: 100px;
-    height: 100px;
-    flex-shrink: 0;
-}
-
-.progress-ring__track {
-    fill: none;
-    stroke: rgba(255, 255, 255, 0.08);
-    stroke-width: 6;
-}
-
-body:not(.dark-mode) .progress-ring__track {
-    stroke: rgba(0, 0, 0, 0.06);
-}
-
-.progress-ring__fill {
-    fill: none;
-    stroke: var(--accent-green);
-    stroke-width: 6;
-    stroke-linecap: round;
-    transition: stroke-dashoffset 0.6s ease;
-}
-
-.progress-ring__text {
-    font-size: 22px;
-    font-weight: 700;
-    fill: var(--text-primary);
-    text-anchor: middle;
-    dominant-baseline: central;
-}
-
-/* Thumbnail */
-.progress-thumbnail {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    flex-shrink: 0;
-    cursor: zoom-in;
-    transition: transform 0.15s ease;
-}
-
-.progress-thumbnail:hover {
-    transform: scale(1.05);
-}
-
-body:not(.dark-mode) .progress-thumbnail {
-    border-color: rgba(0, 0, 0, 0.08);
-}
-
-/* ========== DETAIL CHIPS GRID ========== */
-.print-details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    align-content: start;
-}
-
-.detail-chip {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
-    padding: 7px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-body:not(.dark-mode) .detail-chip {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.05);
-}
-
-.detail-chip__icon {
-    font-size: var(--font-size-small);  /* 12px — konsistent mit Rest */
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.detail-chip__label {
-    font-size: var(--font-size-small);  /* 12px statt 10px — lesbar wie andere Cards */
-    color: var(--text-secondary);
-    font-weight: 500;
-    opacity: 0.7;
-}
-
-.detail-chip__value {
-    font-size: var(--font-size-caption);  /* 15px Desktop, 14px Mobile — wie andere Card-Werte */
-    font-weight: 600;
-    color: var(--text-primary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* ========== PROGRESS STATUS CONTAINER ========== */
-.progress-status-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
 }
 
 .progress-status-container .status-grid {
@@ -2675,9 +2193,6 @@ body:not(.dark-mode) .detail-chip {
 }
 
 @media (max-width: 968px) {
-    .progress-status-container {
-        flex-direction: column;
-    }
 
     .progress-status-container .status-grid {
         width: 100%;
@@ -2699,73 +2214,18 @@ body:not(.dark-mode) .detail-chip {
         width: 90px;
         height: 90px;
     }
-
-    .progress-ring__text {
-        font-size: 20px;
-    }
-
-    .progress-thumbnail {
-        width: 70px;
-        height: 70px;
-    }
-
-    .print-details {
-        gap: 5px;
-    }
-
-    .detail-chip {
-        padding: 6px 8px;
-    }
-
-    .detail-chip__value {
-        font-size: 11px;
-    }
-
-    .detail-chip__label {
-        font-size: 9px;
-    }
 }
 
 @media (min-width: 1024px) {
-    .progress-ring {
-        width: 90px;
-        height: 90px;
-    }
 
-    .progress-ring__text {
-        font-size: 20px;
-    }
-
-    .progress-ring__track,
-    .progress-ring__fill {
-        stroke-width: 5;
-    }
-
-    .progress-thumbnail {
-        width: 75px;
-        height: 75px;
-    }
-
-    .progress-center {
-        gap: 15px;
-    }
-
-    .print-details {
-        gap: 6px;
-    }
-
-    .detail-chip {
-        padding: 7px 10px;
-    }
-
-    /* Schriftgrößen kommen jetzt aus den CSS-Variablen (base) — keine
-       Desktop-Überschreibung nötig, die Variablen skalieren selbst. */
+    /* Font sizes now come from the CSS variables (base) — no
+       desktop override needed, the variables scale themselves. */
 }
 
 /* ============================================
  * HelixScreen-inspired Layout (Sovol 356C)
- * Linke Spalte: Thumbnail + Metadata-Overlay
- * Rechte Spalte: Temp/Speed/Fans/Buttons
+ * Left column: Thumbnail + Metadata-Overlay
+ * Right column: Temp/Speed/Fans/Buttons
  * ============================================ */
 
 .progress-card--helix {
@@ -2880,8 +2340,8 @@ body:not(.dark-mode) .progress-card__overlay {
     color: rgba(255, 255, 255, 0.55);
 }
 
-/* Bambu-Karte: Metazeile liegt auf hellem Kartengrund, nicht auf dem
- * dunklen Thumbnail-Overlay — weisser Text war im hellen Modus unsichtbar. */
+/* Bambu card: the meta row sits on the light card background, not on the
+ * dark thumbnail overlay — white text was invisible in light mode. */
 .progress-card--bambu .progress-card__muted {
     color: var(--text-secondary);
     opacity: 0.75;
@@ -3063,7 +2523,7 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
 
 /* ============================================
  * Bed-Mesh-Heatmap (Klipper-only)
- * Kompakte 2D-Top-Down-Heatmap unter Z-Extras
+ * Compact 2D top-down heatmap under Z-Extras
  * ============================================ */
 .helix-bed-mesh {
     margin: 4px 12px 0;
@@ -3094,7 +2554,7 @@ body.dark-mode .helix-bed-mesh {
 }
 .helix-bed-mesh__grid {
     width: 100%;
-    aspect-ratio: 200 / 140;  /* matches viewBox des SVGs */
+    aspect-ratio: 200 / 140;  /* matches the SVG's viewBox */
     max-height: 200px;
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.20);
@@ -3103,28 +2563,6 @@ body.dark-mode .helix-bed-mesh {
 body.dark-mode .helix-bed-mesh__grid {
     background: rgba(0, 0, 0, 0.40);
 }
-
-/* ============================================================
- * Drucker-Ansicht (X2D-Display-Stil): Geraetegrafik mit
- * Temperatur-Plaketten. Nur Bambu — Klipper behaelt die Zeilen.
- * ============================================================ */
-.pv-wrap {
-    display: flex;
-    gap: 10px;
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 10px;
-    padding: 10px 12px 6px;
-    cursor: pointer;
-    user-select: none;
-}
-
-body.dark-mode .pv-wrap {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
-.pv-wrap:hover { border-color: rgba(59, 130, 246, 0.45); }
 
 .pv-machine {
     position: relative;
@@ -3148,38 +2586,6 @@ body.dark-mode .pv-wrap {
     background: rgba(128, 128, 128, 0.22);
     margin: 6px 0;
 }
-
-.pv-svg { width: 100%; height: auto; display: block; }
-
-.pv-face {
-    fill: rgba(140, 160, 190, 0.10);
-    stroke: rgba(140, 160, 190, 0.55);
-    stroke-width: 1.4;
-    stroke-linejoin: round;
-}
-.pv-face--top  { fill: rgba(140, 160, 190, 0.18); }
-.pv-face--side { fill: rgba(140, 160, 190, 0.06); }
-
-.pv-screen { fill: rgba(59, 130, 246, 0.55); stroke: none; }
-
-.pv-window {
-    fill: rgba(120, 170, 255, 0.07);
-    stroke: rgba(140, 160, 190, 0.40);
-    stroke-width: 1.2;
-}
-
-.pv-gantry { stroke: rgba(140, 160, 190, 0.45); stroke-width: 2.5; }
-
-.pv-headbox {
-    fill: rgba(150, 165, 185, 0.30);
-    stroke: rgba(150, 165, 185, 0.65);
-    stroke-width: 1.2;
-}
-
-.pv-fanring { fill: none; stroke: rgba(150, 165, 185, 0.6); stroke-width: 2; }
-.pv-fanhub  { fill: rgba(150, 165, 185, 0.6); }
-
-.pv-noztip { fill: rgba(150, 165, 185, 0.75); transition: fill 0.4s; }
 .pv-noztip.pv-hot { fill: #f0703a; }
 
 .pv-bed {
@@ -3188,8 +2594,6 @@ body.dark-mode .pv-wrap {
     stroke-width: 1;
     transition: fill 0.4s;
 }
-
-.pv-bedglow { fill: rgba(240, 112, 58, 0); transition: fill 0.6s; }
 .pv-bedglow.pv-hot { fill: rgba(240, 112, 58, 0.30); }
 .pv-bed.pv-hot { fill: rgba(240, 130, 70, 0.55); }
 
@@ -3210,18 +2614,22 @@ body.dark-mode .pv-wrap {
     pointer-events: none;
 }
 
-.pv-badge--chamber { left: 24%; top: 44%; }
-.pv-badge--bed     { left: 34%; top: 70%; }
+/* Percentages are based on the CROPPED render: the x2d.png had a
+   transparent border all around, which visually read as extra spacing to
+   the AMS and pushed the baseline up. After cropping, printer and AMS sit
+   flush, so the badges move along with the image. */
+.pv-badge--chamber { left: 10.7%; top: 41%; }
+.pv-badge--bed     { left: 25.8%; top: 79.2%; }
 
-/* Duesen-Plaketten im Werkzeugkopf-Feld: unter der Grafik gestapelt */
+/* Nozzle badges in the tool-head field: stacked below the graphic */
 .pv-toolhead .pv-badge { position: static; }
 .pv-badge.pv-active { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
 
-/* Bambu zeigt die Grafik, die alten Textzeilen entfallen dort */
+/* Bambu shows the graphic; the old text lines are dropped there */
 body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
 
 /* ============================================================
- * Steuerungs-Uebersicht (X2D-Display-Stil) im Control-Modal
+ * Control overview (X2D display style) in the control modal
  * ============================================================ */
 .ov-layout {
     display: flex;
@@ -3308,17 +2716,17 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     .ov-machine { min-width: 0; }
 }
 
-/* Plaketten in der Grafik sind einzeln klickbar (Zonen-Dialog) */
+/* Badges in the graphic are individually clickable (zone dialog) */
 .pv-badge--click { pointer-events: auto; cursor: pointer; }
 .pv-badge--click:hover { border-color: rgba(59, 130, 246, 0.7); }
-.pv-wrap { cursor: default; }
 
-
-/* Echte Renderings statt gezeichneter Grafik */
+/* Real renderings instead of a drawn graphic */
 .pv-img { width: 100%; height: auto; display: block; }
 
 .pv-nozzle-img {
-    height: 64px;
+    /* Share of the row height instead of a fixed 64px — otherwise the nozzle
+       visually grows along whenever the card is dragged smaller. */
+    height: 58%;
     width: auto;
     display: block;
     margin: 2px auto 4px;
@@ -3335,13 +2743,13 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
 
 .pv-badge .pv-ic { filter: invert(1) brightness(1.6); width: 13px; height: 13px; }
 
-/* Plaketten-Positionen fuer das echte X2D-Render (354x354, 3/4-Ansicht):
-   Kammer mittig im Glas, Bett auf Hoehe der Druckplatte. */
+/* Badge positions for the real X2D render (354x354, 3/4 view):
+   chamber centered in the glass, bed at print-plate height. */
 .pv-badge--chamber { left: 26%; top: 46%; }
 .pv-badge--bed     { left: 32%; top: 66%; }
 
 /* ============================================================
- * Hauptseiten-Zonen (Variante B): Drucker links, Material rechts
+ * Main page zones (variant B): printer left, material right
  * ============================================================ */
 .ov-cards--zone { padding: 4px 2px; }
 
@@ -3376,7 +2784,6 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
 #mz-sys-power.mz-pwr-on .hd-ic { color: #f87171; }
 #mz-sys-light.mz-on { border-color: rgba(250, 204, 21, 0.55); }
 #mz-sys-light.mz-on .hd-ic { color: #facc15; }
-.mz-spacer { flex: 1; }
 
 .mz-badge {
     position: absolute;
@@ -3412,23 +2819,86 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     margin-bottom: 8px;
 }
 
-.mz-unit-head {
+/* Text column left, button right — centered across both lines. */
+.mz-unit-top {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
-    color: var(--text-secondary);
+    gap: 10px;
     margin-bottom: 6px;
 }
 
+.mz-unit-links {
+    flex: 1;
+    min-width: 0;
+}
+
+.mz-unit-head {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+/* Drying row under the head. Its own row, because otherwise two
+   degree values end up side by side — the tray's humidity and the
+   program's target temperature — and become indistinguishable once they
+   wrap. */
+.mz-unit-dry {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+}
+
+/* Measurement columns like on the AMS display: icon and abbreviation on
+   top, value below. Two side by side, RH and temp. */
+.mz-mess {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    margin-right: 18px;
+}
+
+.mz-mess-kopf {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+.mz-mess-wert {
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Remaining time as its own row under program and target. This leaves
+   room to the right of the drying row for the stop button. */
+.mz-unit-rest {
+    margin-top: -2px;
+}
+
 .mz-dry-btn {
-    margin-left: auto;
+    /* Taller than the old pill: the button needs to stand next to
+       two text lines, not get lost in them. */
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: none;
     background: rgba(59, 130, 246, 0.14);
     color: var(--accent-blue, #3b82f6);
     border: none;
-    border-radius: 8px;
-    padding: 3px 12px;
-    font-size: 12px;
+    border-radius: 10px;
+    padding: 9px 15px;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1;
     cursor: pointer;
     font-family: inherit;
 }
@@ -3449,16 +2919,16 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     margin-top: 4px;
 }
 
-/* Speist gerade eine Duese: Fuellung + kraeftiger Rand — die duenne
-   Randlinie allein war kaum sichtbar. */
+/* Currently feeding a nozzle: fill + bold border — a thin
+   border line alone was barely visible. */
 .mz-slot.mz-active-slot {
     border: 2px solid #4ade80;
     background: rgba(74, 222, 128, 0.14);
     padding: 6px 9px;
 }
 
-/* Zielwahl im Filament-Tab: deutlich gefuellt + Haekchen-Badge — die
-   duenne Randlinie allein war kaum sichtbar. */
+/* Target selection in the filament tab: solid fill + checkmark badge — a
+   thin border line alone was barely visible. */
 .mz-slot.mz-ziel-slot {
     background: rgba(74, 222, 128, 0.16);
     border: 2px solid #4ade80;
@@ -3486,8 +2956,24 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     flex: 0 0 auto;
 }
 
+/* Tray with no filament. The printer reports it through tray_exist_bits;
+   type and colour stay put and are no help as a clue. Restrained rather than
+   hidden: the tray does exist, there is just nothing in it. */
+.mz-slot--leer { opacity: .55; }
+.mz-slot--leer .mz-slot-col {
+    background: transparent !important;
+    border-style: dashed;
+}
+
 .mz-slot-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mz-slot-pct { margin-left: auto; color: var(--text-secondary); font-size: 11.5px; flex: 0 0 auto; }
+/* K value (Pressure Advance) on the active tray — the printer reports it
+   per filament, not per device. Subtle, it's a side note to the name. */
+.mz-slot-k {
+    flex: 0 0 auto; margin-left: 8px; font-size: 10.5px; font-weight: 600;
+    color: var(--text-secondary); border: 1px solid var(--border-color);
+    border-radius: 999px; padding: 1px 6px; white-space: nowrap;
+}
 
 .mz-spool-row { display: flex; gap: 8px; }
 
@@ -3499,7 +2985,7 @@ body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
     border-top: 1px solid rgba(128, 128, 128, 0.14);
 }
 
-/* Bambu: alte Knopf-Karten weichen den Zonen. Klipper unveraendert. */
+/* Bambu: the old button cards give way to the zones. Klipper unchanged. */
 body[data-active-printer="bambu"] #control-card-mobile,
 body[data-active-printer="bambu"] #control-card-desktop,
 body[data-active-printer="bambu"] #dev-control-card-mobile,
@@ -3511,7 +2997,7 @@ body[data-active-printer="klipper"] #material-zone-card-grid {
     display: none !important;
 }
 
-/* Druckkarte: Tempo-/Fluss- und Luefter-Zeilen im Chip-Stil */
+/* Print card: speed/flow and fan rows in chip style */
 body[data-active-printer="bambu"] .helix-inline-row,
 body[data-active-printer="bambu"] .helix-fan-row {
     background: rgba(128, 128, 128, 0.08);
@@ -3523,15 +3009,15 @@ body[data-active-printer="bambu"] .helix-fan-row {
 }
 
 /* ============================================================
- * Bambu-Druckkarte: Proportionen wie im Mockup — Geraet im
- * Zentrum, Thumbnail schmaler, Chips in einer Reihe
+ * Bambu print card: proportions as in the mockup — device in
+ * the center, thumbnail narrower, chips in one row
  * ============================================================ */
 body[data-active-printer="bambu"] .progress-card__cols {
     grid-template-columns: 2fr 3fr;
 }
 
 /* ============================================================
- * Bambu-Druckkarte im Display-Stil (progress-card--bambu)
+ * Bambu print card in display style (progress-card--bambu)
  * ============================================================ */
 .progress-card--bambu {
     display: flex;
@@ -3541,10 +3027,10 @@ body[data-active-printer="bambu"] .progress-card__cols {
     overflow: hidden;
 }
 
-/* Status-Pille sitzt oben LINKS ueber dem Thumbnail */
+/* Status pill sits top LEFT above the thumbnail */
 .progress-card--bambu .progress-card__status-pill { left: 10px; right: auto; }
 
-/* Druck-Aktionen oben rechts (Pause/Fortsetzen/Abbrechen) */
+/* Print actions top right (pause/resume/cancel) */
 .pcb-actions {
     position: absolute;
     top: 8px;
@@ -3576,16 +3062,34 @@ body[data-active-printer="bambu"] .progress-card__cols {
 .pcb-top {
     display: flex;
     gap: 10px;
+    /* MUST stay stretch: only then do the columns have a defined
+       height, and only then do the device images' percentage heights
+       resolve inside them. Set to flex-end, the nozzle and AMS lost their
+       sizing and sat fixed in pixels while the printer kept scaling along.
+       The shared baseline is set INSIDE the columns. */
     align-items: stretch;
+    /* ONE control for the size of all three devices. The ratios
+       between them (printer 100, AMS 60, nozzle 30) are the real
+       size relationships and stay fixed; only the shared zoom changes here.
+       Otherwise you'd have to adjust three numbers individually — and
+       that's exactly where they'd drift apart. */
+    --geraet: 0.78;
     flex: 1;
     min-height: 0;
 }
 
 .pcb-thumb {
-    flex: 1;
+    /* How the devices hang off the row height, so the preview scales along
+       when the card is resized instead of flooding the free space.
+       Square, because the model images come in every aspect ratio. */
+    flex: 0 0 auto;
+    align-self: flex-end;
+    height: calc(88% * var(--geraet, 1));
+    aspect-ratio: 1 / 1;
     min-width: 0;
-    border-radius: 10px;
-    background: rgba(128, 128, 128, 0.08);
+    /* No background of its own and no rounded corners: they stood out
+       against the card background, making the preview look like a
+       pasted-on image. The model now sits directly on the card. */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3595,50 +3099,94 @@ body[data-active-printer="bambu"] .progress-card__cols {
 .pcb-thumb-img {
     max-width: 100%;
     max-height: 100%;
+    height: auto;
+    width: auto;
     object-fit: contain;
     display: block;
 }
 
 .pcb-mach {
-    flex: 1.15;
+    /* Do NOT shrink. The printer is the scale reference: the AMS beside it
+       is sized as a share of the row height, and that's only correct as
+       long as the printer actually fills the row height. Letting the width
+       squeeze it made it smaller than the row — and the AMS relatively far
+       too large compared to it. The preview makes room instead
+       (see .pcb-thumb). */
+    flex: 0 0 auto;
     min-width: 0;
     min-height: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 }
 
-/* Render ist quadratisch (354x354): Wrapper an die Spaltenhoehe binden,
-   damit die Maschine nie ueber Chips/Balken hinauswaechst. Die Plaketten
-   sitzen in % vom Wrapper — bei 1:1-Ratio deckungsgleich mit dem Bild. */
+/* Render is square (354x354): bind the wrapper to the column height,
+   so the machine never grows past the chips/bars. The badges
+   sit in % of the wrapper — at a 1:1 ratio, exactly aligned with the image. */
 .pcb-mach .pv-machine {
     flex: none;
     height: 100%;
     max-height: 100%;
     max-width: 100%;
-    aspect-ratio: 1 / 1;
+    /* Aspect ratio of the CROPPED render (234x241). It must match the image
+       exactly — the badges are positioned in percent of this box, and a
+       mismatched ratio makes `object-fit: contain` reintroduce the
+       transparent border that cropping removed. */
+    aspect-ratio: 234 / 241;
     width: auto;
 }
 
 .pcb-mach .pv-img { width: 100%; height: 100%; object-fit: contain; }
 
+/* Printer: the scale reference for the other two. */
+.pcb-mach .pv-machine { height: calc(100% * var(--geraet, 1)); }
+
 .pcb-tool {
     flex: 0 0 auto;
-    align-self: center;
-    min-width: 96px;
-    background: rgba(128, 128, 128, 0.06);
-    border: 1px solid rgba(128, 128, 128, 0.10);
-    border-radius: 10px;
-    padding: 8px 8px;
+    /* Full row height, so the image's percentage height resolves inside it.
+       Content sits at the bottom — shared baseline with printer and AMS. */
+    align-self: stretch;
+    justify-content: flex-end;
+    /* Keep it narrow: every pixel here is missing on the right for the AMS. */
+    min-width: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* The border sits on .pv-tool-box, not here — otherwise it would stretch
+       across the full row height. */
+    cursor: pointer;
+}
+
+.pcb-tool:hover .pv-tool-box { border-color: rgba(59, 130, 246, 0.45); }
+
+/* One nozzle: image on top, its temperature below. */
+.pv-tool-one {
+    height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    cursor: pointer;
 }
 
-.pcb-tool:hover { border-color: rgba(59, 130, 246, 0.45); }
+/* The visible border. Its own, defined height — so the nozzle image's
+   percentage height resolves inside it, without the border taking up the
+   whole row. */
+.pv-tool-box {
+    height: calc(96% * var(--geraet, 1));
+    /* Two nozzles side by side — the X2D really has two. */
+    flex-direction: row !important;
+    gap: 8px;
+    background: rgba(128, 128, 128, 0.06);
+    border: 1px solid rgba(128, 128, 128, 0.10);
+    border-radius: 10px;
+    padding: 8px 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
 
 .pcb-chips {
     display: flex;
@@ -3711,27 +3259,15 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     flex: 0 0 auto;
 }
 
-/* Material-Zone: Spoolman kompakt — eine Infozeile statt Klotz */
+/* Material zone: Spoolman compact — one info row instead of a block */
 #spoolman-content #active-spool-info { padding: 6px 10px !important; margin-top: 7px !important; }
 #spoolman-content #spool-selector { padding: 7px 10px !important; font-size: 12.5px !important; }
 
-/* Linien-Icons statt Emoji in Kartentiteln und Systemleiste */
-.hd-ic {
-    width: 17px;
-    height: 17px;
-    stroke: currentColor;
-    fill: none;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    vertical-align: -3px;
-    flex: 0 0 auto;
-}
 .mz-chip .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; }
 .card-title .hd-ic { opacity: 0.85; }
 
-/* Drucker-Zone: Titelzeile weg — nur ein schmaler Greifstreifen bleibt
-   (die Kopfzeile ist der Drag-Griff des Rasters). */
+/* Printer zone: title row gone — only a narrow grip strip remains
+   (the header is the grid's drag handle). */
 #printer-zone-card-grid .card-header {
     padding: 0 0 6px;
     min-height: 12px;
@@ -3739,8 +3275,8 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
 }
 #printer-zone-card-grid .card-title { display: none; }
 
-/* Systemleiste: drei Gruppen — Geraet | Steuerung | Ansichten.
-   Gruppen brechen als Einheit um, kein einsamer Chip in Zeile 2. */
+/* System bar: three groups — device | control | views.
+   Groups wrap as a unit, no lone chip on line 2. */
 .mz-sys { justify-content: flex-start; }
 .mz-sys-grp { display: flex; gap: 6px; flex-wrap: nowrap; }
 .mz-sys-div {
@@ -3748,6 +3284,130 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     align-self: stretch;
     background: rgba(128, 128, 128, 0.25);
     margin: 3px 2px;
+}
+
+/* ---------------------------------------------------------------------
+   AMS unit attached beside the printer
+   ---------------------------------------------------------------------
+   Only visible when the printer reports a unit (the `hidden` attribute
+   is set by socket-manager).
+
+   Everything hangs off the ROW HEIGHT, nothing off the width. The user can
+   drag the card's height; CSS resolves `margin` percentages against the
+   WIDTH, not the height — so percentage margins would drift apart from the
+   image size at every other card height.
+
+   The renders are cropped to their content (no more transparent border),
+   so no negative margins are needed to close the gap either. */
+.pcb-ams {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: flex-end;      /* Baseline with the printer */
+    justify-content: center;
+    /* Push to the bottom, regardless of whether the nozzle box sits beside it.
+       It gets hidden as soon as the printer reports only ONE nozzle
+       temperature (socket-manager: dual). Then the AMS was the column's
+       only child, and space-between puts a single child at the START — the
+       AMS visibly jumped up during a print, away from the printer's
+       baseline. */
+    margin-top: auto;
+}
+
+.pcb-ams[hidden] { display: none; }
+
+/* Shared frame for image and display. The height determines the size,
+   the width follows the image's aspect ratio. */
+.pv-ams-wrap {
+    position: relative;
+    /* The printer now fills the row completely (no more square border),
+       so the share here is directly the devices' size ratio:
+       the AMS HT is really about 60% as tall as the X2D. */
+    height: calc(92% * var(--geraet, 1));
+    max-width: 100%;
+    display: flex;
+}
+
+.pv-ams-img {
+    height: 100%;
+    width: auto;
+    display: block;
+    /* Same look as the nozzle beside it. */
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* Humidity and temperature on the front panel — right where the device
+   shows them in real life too. Percentages refer to the frame and thus
+   exactly to the image. The image is mirrored (so it faces the printer),
+   so the panel sits at the bottom left. */
+.pcb-ams .pv-badge {
+    position: absolute;
+    left: 22%;
+    top: 57%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    font-size: 10px;
+    padding: 1px 6px;
+}
+
+/* Order in the printer card: nozzle, printer, AMS.
+   Via `order` instead of restructuring the markup — the markup also serves
+   Klipper and devices without an AMS, and maintaining a second variant
+   isn't worth it. The preview stays on the far left; without an active
+   print it's hidden, so the nozzle ends up on the outside. */
+.pcb-top > .pcb-thumb { order: 0; }
+.pcb-top > .pcb-mach  { order: 1; }
+.pcb-top > .pcb-side  { order: 2; }
+
+/* Column to the right of the printer: nozzle on top, AMS below.
+   Stretched to the row height — only that way do the percentage heights
+   of the two boxes inside it resolve. */
+.pcb-side {
+    flex: 0 0 auto;
+    min-width: 0;
+    /* Room for the pause/stop buttons, which sit absolutely positioned top
+       right in the card (34px tall, 8px from the edge). Without this
+       spacing they overlapped the nozzles during a print. */
+    padding-top: 46px;
+    /* To the right, but not all the way to the edge: all columns have a fixed
+       width, so the free space would otherwise all collect to the right of
+       the AMS. margin-left: auto pushes it over, margin-right leaves
+       breathing room. */
+    margin-left: auto;
+    margin-right: 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Fixed shares of the column height, so the children inside again have a
+   defined reference size. */
+.pcb-side > .pcb-tool { height: 46%; justify-content: flex-start; }
+.pcb-side > .pcb-ams  { height: 54%; align-items: flex-end; }
+
+/* With an AMS beside it, the printer sits on the baseline instead of
+   floating centered in its column — otherwise the AMS would visibly sit
+   lower. Without an AMS it stays centered, since there's no reference
+   point there. */
+.pcb-top:has(#pv-ams:not([hidden])) > .pcb-mach {
+    align-items: flex-end;
+}
+
+
+/* Tray without a Spoolman assignment.
+   Without an assignment, there is no humidity history for the tray. The
+   server no longer guesses assignments, so this needs to be visible right
+   here, where you're already looking. Restrained: a line on the side, no
+   exclamation mark. */
+.mz-slot--offen {
+    border-left: 3px solid var(--accent-orange, #f59e0b);
+    padding-left: 5px;
+}
+.mz-slot--offen .mz-slot-name::after {
+    content: "?";
+    margin-left: 6px;
+    font-weight: 700;
+    color: var(--accent-orange, #f59e0b);
 }
 
 
@@ -3881,6 +3541,194 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     }
 }
 
+/* ============================================================
+ * Filament drying — card in the style of the rest of the UI
+ * ============================================================ */
+.tr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
+
+/* The twelve points of gap above only apply between the CHILDREN of
+   .tr-koerper — and there are exactly two of those: the block for
+   starting and the one for the running run. Their rows therefore sat
+   with no spacing at all: selection, box and toggle stuck together.
+   So the same rule, one level deeper. */
+#material-selection,
+#drying-active { display: flex; flex-direction: column; gap: 12px; }
+
+/* Row: label left, control right — the same construction
+   as `.tray-edit-zeile` in the drying dialog. */
+.tr-zeile { display: flex; align-items: center; gap: 14px; }
+.tr-lab { flex: 0 0 96px; font-size: 13px; font-weight: 600; color: var(--text-primary); }
+
+.tr-wahl {
+    flex: 1; min-width: 0;
+    font-size: 13.5px; font-family: inherit;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    background: var(--bg-secondary, #f2f3f5);
+    color: var(--text-primary);
+    padding: 9px 10px;
+    cursor: pointer;
+}
+
+/* Numbers like `.dry-feld`: tinted area, thin border. The value brings
+   its own unit along (JS writes "90-100°C"). */
+.tr-felder { display: flex; gap: 10px; }
+.tr-feld {
+    /* Never wrap: one value, one line. If it does wrap, the box
+       grows and the whole row shifts out of place. */
+    white-space: nowrap;
+    display: inline-flex; align-items: baseline;
+    background: var(--bg-secondary, #f2f3f5);
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    padding: 7px 11px;
+    font-size: 14px; font-weight: 700;
+    color: var(--text-primary);
+}
+.tr-feld--warm { color: var(--accent-orange, #e65100); }
+
+/* Number field in the box — the color comes from the box, the field
+   itself brings no border and no background of its own. */
+.tr-feld input[type="number"] {
+    width: 3.2em; border: 0; background: none; padding: 0;
+    font: inherit; color: inherit; text-align: right;
+    -moz-appearance: textfield;
+}
+.tr-feld input[type="number"]::-webkit-outer-spin-button,
+.tr-feld input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+}
+.tr-feld input[type="number"]:focus { outline: none; }
+.tr-einheit { margin-left: 3px; font-size: 12.5px; font-weight: 600; opacity: 0.75; }
+
+/* Toggle instead of a checkbox — the field stays, it carries the
+   state for the JavaScript, but is no longer visible. */
+.tr-schalter-zeile { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.tr-schalter-txt { flex: 1; font-size: 13px; color: var(--text-primary); }
+.tr-schalter-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+.tr-cb { position: absolute; opacity: 0; width: 0; height: 0; }
+.tr-schalter {
+    flex: none; width: 42px; height: 24px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.35); position: relative; transition: background .15s;
+}
+.tr-schalter::after {
+    content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+    border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+    transition: left .15s;
+}
+.tr-cb:checked + .tr-schalter { background: var(--accent-green, #16a34a); }
+.tr-cb:checked + .tr-schalter::after { left: 21px; }
+
+/* Footer: compact buttons on the right instead of a full-width bar. */
+.tr-fuss {
+    display: flex; justify-content: flex-end; gap: 10px;
+    border-top: 1px solid var(--border-color); padding-top: 10px;
+}
+.tr-knopf {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none; border-radius: 999px; padding: 8px 16px;
+    font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;
+    transition: filter .15s;
+}
+.tr-knopf:hover:not(:disabled) { filter: brightness(0.96); }
+.tr-knopf:disabled { opacity: 0.45; cursor: default; }
+.tr-knopf--gruen { background: rgba(22, 163, 74, 0.12); color: var(--accent-green, #16a34a); }
+.tr-knopf--rot { background: rgba(220, 38, 38, 0.10); color: var(--accent-red, #dc2626); }
+
+/* Active drying: row, bar, percent on the right — like the print card. */
+.tr-lauf { display: flex; align-items: center; gap: 12px; }
+.tr-mat-punkt {
+    width: 18px; height: 18px; border-radius: 50%; flex: none;
+    background: var(--text-secondary); border: 1px solid var(--border-color);
+}
+.tr-lauf-txt { flex: 1; min-width: 0; }
+.tr-lauf-txt b { font-size: 15px; }
+.tr-lauf-txt small { display: block; font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+.tr-proz { font-size: 20px; font-weight: 800; color: var(--accent-green, #16a34a); }
+.tr-balken { height: 7px; border-radius: 999px; background: var(--bg-secondary, #e5e7eb); overflow: hidden; }
+.tr-balken i { display: block; height: 100%; background: var(--accent-green, #16a34a); transition: width .3s; }
+
+/* The dot in the header says whether drying is active. */
+#drying-status-indicator {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+    margin-left: 10px; background: var(--text-secondary); color: transparent;
+    overflow: hidden;
+}
+
+/* ===================================================================
+   Hotend magazine (H2C) — card
+   Laid out like the material zone: what's printing on top, the
+   storage below. Mockup: static/_mockup_magazin.html.
+   =================================================================== */
+.hr-koerper { padding: 14px 15px 15px; display: flex; flex-direction: column; gap: 12px; }
+.hr-zaehler { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+/* The two print positions */
+.hr-duesen { display: flex; gap: 10px; }
+.hr-duese {
+    flex: 1; min-width: 0; background: var(--bg-secondary, #f0f1f4);
+    border: 1px solid var(--border-color, rgba(120, 120, 130, 0.22));
+    border-radius: 12px; padding: 9px 11px;
+}
+.hr-wo {
+    display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--text-secondary); text-transform: uppercase;
+}
+.hr-was { display: block; font-size: 13.5px; font-weight: 700; margin-top: 2px; color: var(--text-primary); }
+.hr-zu { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+.hr-duese--wechsel {
+    border-color: rgba(59, 130, 246, 0.45);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+/* Active swap */
+.hr-wechsel {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(59, 130, 246, 0.09);
+    border: 1px solid rgba(59, 130, 246, 0.30);
+    border-radius: 12px; padding: 9px 11px;
+}
+.hr-wechsel > svg { flex: none; color: var(--accent-blue, #3b82f6); }
+.hr-wechsel-txt { flex: 1; min-width: 0; font-size: 13px; }
+.hr-wechsel-txt b { font-weight: 600; color: var(--text-primary); }
+.hr-wechsel-txt small { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+
+/* The slots. Three columns, two on phones. */
+.hr-plaetze { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.hr-pl {
+    position: relative; min-height: 78px;
+    background: var(--bg-secondary, #f0f1f4);
+    border: 1px solid var(--border-color, rgba(120, 120, 130, 0.22));
+    border-radius: 12px; padding: 9px 10px;
+}
+.hr-nr {
+    display: block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--text-secondary); text-transform: uppercase;
+}
+.hr-dm { display: block; font-size: 15px; font-weight: 800; margin-top: 3px; color: var(--text-primary); }
+.hr-dm span { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-left: 2px; }
+.hr-code { display: block; font-size: 11.5px; color: var(--text-secondary); margin-top: 1px; }
+/* Wear as a bare number, without a bar: the printer reports a value
+   but no maximum — a bar would be a guess. */
+.hr-vs { display: block; font-size: 10.5px; color: var(--text-secondary); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.hr-leer { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); opacity: 0.55; margin-top: 6px; }
+
+/* Active state: fill + border + checkmark — the same pattern as
+   everywhere else, never just a thin border line. */
+.hr-pl--auf { background: rgba(22, 163, 74, 0.10); border-color: rgba(22, 163, 74, 0.55); }
+.hr-pl--ziel { background: rgba(59, 130, 246, 0.10); border-color: rgba(59, 130, 246, 0.55); }
+.hr-marke {
+    position: absolute; top: 7px; right: 8px; width: 17px; height: 17px;
+    border-radius: 50%; display: grid; place-items: center;
+}
+.hr-pl--auf .hr-marke { background: var(--accent-green, #16a34a); }
+.hr-pl--ziel .hr-marke { background: var(--accent-blue, #3b82f6); }
+.hr-marke svg { width: 11px; height: 11px; fill: none; stroke: #fff; stroke-width: 3; }
+
+@media (max-width: 768px) {
+    .hr-plaetze { grid-template-columns: repeat(2, 1fr); }
+}
+
 
 /* ---- sd-card.css ---- */
 /* ============================================
@@ -3945,69 +3793,31 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
     align-items: center;
 }
 
+/* Header buttons stay neutral: color belongs to the real action
+   in the list below (printing), not to two equally-ranked tools up here.
+   The hover-lift effect is gone: headers don't jump. */
 .sd-header-btn {
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-size: 13px;
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    border-radius: var(--knopf-radius);
+    font-size: var(--knopf-schrift);
     font-weight: 500;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    border: 1px solid transparent;
-    transition: all 0.2s;
+    gap: 7px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    transition: border-color 0.15s, background 0.15s;
 }
 
 .sd-header-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: var(--bg-card);
+    border-color: var(--text-secondary);
 }
 
-.sd-header-btn--upload {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.25);
-    color: #2e7d32;
-}
-
-.sd-header-btn--upload:hover {
-    background: rgba(76, 175, 80, 0.22);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-body.dark-mode .sd-header-btn--upload {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: rgba(76, 175, 80, 0.3);
-    color: #a5d6a7;
-}
-
-body.dark-mode .sd-header-btn--upload:hover {
-    background: rgba(76, 175, 80, 0.3);
-    border-color: rgba(76, 175, 80, 0.5);
-}
-
-.sd-header-btn--refresh {
-    background: rgba(33, 150, 243, 0.12);
-    border-color: rgba(33, 150, 243, 0.25);
-    color: #1565c0;
-}
-
-.sd-header-btn--refresh:hover {
-    background: rgba(33, 150, 243, 0.22);
-    border-color: rgba(33, 150, 243, 0.4);
-}
-
-body.dark-mode .sd-header-btn--refresh {
-    background: rgba(33, 150, 243, 0.2);
-    border-color: rgba(33, 150, 243, 0.3);
-    color: #90caf9;
-}
-
-body.dark-mode .sd-header-btn--refresh:hover {
-    background: rgba(33, 150, 243, 0.3);
-    border-color: rgba(33, 150, 243, 0.5);
-}
-
-/* Close Button (inline in header flow) */
 .sd-close-btn {
     width: 36px;
     height: 36px;
@@ -4026,6 +3836,34 @@ body.dark-mode .sd-header-btn--refresh:hover {
 }
 
 body.dark-mode .sd-close-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Action in a window's header, left of the close cross. Same height,
+   same border, same corner radius as the cross — just wide enough for
+   one word. */
+.sd-kopf-knopf {
+    height: 36px;
+    padding: 0 13px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+.sd-kopf-knopf:hover { border-color: var(--color-blue, #2196F3); }
+body.dark-mode .sd-kopf-knopf,
+[data-theme="dark"] .sd-kopf-knopf {
     background: rgba(255, 255, 255, 0.06);
     border-color: rgba(255, 255, 255, 0.08);
 }
@@ -4068,7 +3906,21 @@ body.dark-mode .sd-close-btn:hover {
     gap: 10px;
     padding: 10px 0;
     margin-bottom: 12px;
-    flex-wrap: wrap;
+    /* ONE row for as long as there is space. It used to be allowed to wrap,
+       and then the spool display jumped into a second row depending on the
+       content: with the archive button and "39 files" it no longer fitted in
+       the live view, while "1 file" in the archive did. What shrinks here is
+       the search box — that goes unnoticed, a jumping box does not. */
+    flex-wrap: nowrap;
+}
+
+/* Everything except the search field keeps its width. */
+.sd-toolbar > * { flex: 0 0 auto; }
+
+/* Below this width one row can no longer be held — better to wrap cleanly
+   than to squeeze everything together. */
+@media (max-width: 700px) {
+    .sd-toolbar { flex-wrap: wrap; }
 }
 
 .sd-toolbar-label {
@@ -4118,8 +3970,11 @@ body.dark-mode .sd-sort-select {
 /* Search Input */
 .sd-search-wrap {
     position: relative;
-    flex: 1;
-    min-width: 120px;
+    /* The search box gives way so the rest of the bar stays put.
+       `min-width: 0` is the decisive part: without it a flex child refuses to
+       shrink, and the bar wraps after all. */
+    flex: 1 1 auto;
+    min-width: 0;
     max-width: 280px;
 }
 
@@ -4247,126 +4102,8 @@ body.dark-mode .sd-search-clear:hover {
     border-color: rgba(33, 150, 243, 0.15);
 }
 
-/* ============================================
- * NEW Badge
- * ============================================ */
-
-.sd-new-badge {
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    background: var(--accent-green);
-    color: white;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    z-index: 2;
-    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.4);
-}
-
-/* ============================================
- * Thumbnail + Hover Zoom
- * ============================================ */
-
-.sd-file-thumb {
-    width: 56px;
-    height: 56px;
-    border-radius: 8px;
-    flex-shrink: 0;
-    overflow: hidden;
-    background: var(--bg-card);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: flex-start;
-}
-
 .sd-file-thumb--has-img {
     cursor: zoom-in;
-}
-
-.sd-file-thumb > img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.sd-file-thumb-icon {
-    font-size: 24px;
-    opacity: 0.6;
-}
-
-/* Global zoom overlay — appended to <body>, outside scroll containers */
-#sd-thumb-zoom-overlay {
-    position: fixed;
-    width: 200px;
-    height: 200px;
-    border-radius: 12px;
-    overflow: hidden;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0;
-    transform: scale(0.3);
-    transform-origin: top left;
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    background: var(--bg-card);
-}
-
-#sd-thumb-zoom-overlay.active {
-    opacity: 1;
-    transform: scale(1);
-}
-
-#sd-thumb-zoom-overlay img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-body:not(.dark-mode) #sd-thumb-zoom-overlay {
-    border-color: rgba(0, 0, 0, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-}
-
-/* ============================================
- * Info Column (middle)
- * ============================================ */
-
-.sd-file-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.sd-file-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-}
-
-.sd-file-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-    min-width: 0;
-    cursor: default;
-}
-
-.sd-file-name:hover {
-    cursor: text;
 }
 
 /* ============================================
@@ -4454,70 +4191,6 @@ body:not(.dark-mode) .sd-rename-ext {
     50% { opacity: 1; }
 }
 
-.sd-file-status {
-    font-size: 11px;
-    color: var(--accent-orange);
-    white-space: nowrap;
-    flex-shrink: 0;
-    font-weight: 500;
-}
-
-/* ============================================
- * Metadata Mini-Grid (2 columns)
- * ============================================ */
-
-.sd-file-meta {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px 12px;
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-/* Planungs-Gruppe (Termin + Druckoptionen) getrennt von den Slicer-Daten —
-   vorher floss beides in EIN Grid und Optionen standen zufaellig neben
-   Dateigroesse oder Duesendurchmesser. */
-.sd-file-meta--plan {
-    margin-bottom: 6px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
-}
-
-/* Geplante Drucke sind volle Breite — das Zwei-Spalten-Raster der schmalen
-   SD-Karten laesst dort die rechte Haelfte leer und tuermt in die Hoehe.
-   Beide Gruppen fliessen stattdessen als Zeile ueber die volle Breite. */
-.sd-file-card--scheduled .sd-file-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 3px 16px;
-}
-
-.sd-file-card--scheduled .sd-file-meta--plan .sd-meta-item:first-child {
-    flex-basis: 100%;   /* Termin als eigene Zeile ueber den Optionen */
-}
-
-.sd-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.6;
-}
-
-.sd-meta-icon {
-    flex-shrink: 0;
-    width: 14px;
-    text-align: center;
-    font-size: 11px;
-}
-
-.sd-meta-value {
-    font-weight: 500;
-    color: var(--text-primary);
-}
-
 /* Filament Color Dot */
 .sd-filament-dot {
     width: 10px;
@@ -4544,14 +4217,6 @@ body.dark-mode .sd-filament-dot {
     font-size: 11px;
 }
 
-/* ============================================
- * Spoolman Compact Selector
- * ============================================ */
-
-.sd-spool-row {
-    margin-top: 2px;
-}
-
 .sd-spool-select {
     width: auto;
     max-width: 100%;
@@ -4567,20 +4232,6 @@ body.dark-mode .sd-filament-dot {
     background-repeat: no-repeat;
     background-position: right 6px center;
     background-size: 14px;
-}
-
-/* ============================================
- * Action Buttons Column (right side)
- * Labeled buttons with icon + text
- * ============================================ */
-
-.sd-file-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex-shrink: 0;
-    align-items: stretch;
-    position: relative;
 }
 
 .sd-action-btn {
@@ -4619,40 +4270,6 @@ body.dark-mode .sd-filament-dot {
 .sd-action-btn:active {
     transform: scale(0.95);
     opacity: 0.7;
-}
-
-/* Print button - green */
-.sd-action-btn--print {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.2);
-    color: #2e7d32;
-}
-
-.sd-action-btn--print:hover {
-    background: rgba(76, 175, 80, 0.25);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-.sd-action-btn--print:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    filter: grayscale(0.35);
-}
-
-.sd-action-btn--print:disabled:hover {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.2);
-    filter: grayscale(0.35);
-}
-
-body.dark-mode .sd-action-btn--print {
-    background: rgba(76, 175, 80, 0.2);
-    color: #a5d6a7;
-}
-
-body.dark-mode .sd-action-btn--print:hover {
-    background: rgba(76, 175, 80, 0.3);
-    border-color: rgba(76, 175, 80, 0.5);
 }
 
 /* Schedule button - blue */
@@ -4696,28 +4313,6 @@ body.dark-mode .sd-action-btn--settings {
 
 body.dark-mode .sd-action-btn--settings:hover {
     background: rgba(255, 255, 255, 0.12);
-}
-
-/* Delete button - red */
-.sd-action-btn--delete {
-    background: rgba(244, 67, 54, 0.08);
-    border-color: rgba(244, 67, 54, 0.15);
-    color: #c62828;
-}
-
-.sd-action-btn--delete:hover {
-    background: rgba(244, 67, 54, 0.2);
-    border-color: rgba(244, 67, 54, 0.3);
-}
-
-body.dark-mode .sd-action-btn--delete {
-    background: rgba(244, 67, 54, 0.15);
-    color: #ef9a9a;
-}
-
-body.dark-mode .sd-action-btn--delete:hover {
-    background: rgba(244, 67, 54, 0.25);
-    border-color: rgba(244, 67, 54, 0.3);
 }
 
 /* ============================================
@@ -4768,34 +4363,6 @@ body.dark-mode .sd-popover {
     to { opacity: 1; transform: translateY(0); }
 }
 
-.sd-popover-title {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.sd-popover-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 0;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-primary);
-}
-
-.sd-popover-option input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent-blue);
-    flex-shrink: 0;
-}
-
 /* ============================================
  * SD Card — Mobile Responsive
  * ============================================ */
@@ -4834,28 +4401,6 @@ body.dark-mode .sd-popover {
         flex-wrap: wrap;
     }
 
-    .sd-file-thumb {
-        width: 44px;
-        height: 44px;
-    }
-
-    /* Disable thumbnail zoom on touch/mobile */
-    #sd-thumb-zoom-overlay {
-        display: none !important;
-    }
-
-    .sd-file-thumb-icon {
-        font-size: 20px;
-    }
-
-    .sd-file-meta {
-        grid-template-columns: 1fr;
-    }
-
-    .sd-file-name {
-        font-size: 13px;
-    }
-
     .sd-action-btn {
         min-width: auto;
         padding: 6px 8px;
@@ -4870,25 +4415,6 @@ body.dark-mode .sd-popover {
         max-width: 100%;
         width: 100%;
     }
-
-    /* On mobile: actions wrap to horizontal bottom row */
-    .sd-file-actions {
-        flex-direction: row;
-        width: 100%;
-        justify-content: flex-end;
-        padding-top: 6px;
-        border-top: 1px solid var(--border-color);
-        margin-top: 4px;
-    }
-}
-
-/* Dreistufige Druckoption (automatisch / ein / aus) — der Drucker kennt die
- * Kalibrierungen so, nicht als Haekchen. Optik wie die uebrigen Eintraege
- * der Optionsliste, nur mit Segment-Knoepfen rechts. */
-.sd-popover-option--tri {
-    justify-content: space-between;
-    gap: 12px;
-    cursor: default;
 }
 
 .sd-popover-tri {
@@ -4926,9 +4452,9 @@ body.dark-mode .sd-popover {
 }
 
 /* ============================================
- * Druckvorbereitung — Blatt vor dem Start
- * Nutzt dieselben Bausteine wie die uebrigen Dialoge (modal-overlay /
- * modal-panel) und die Segment-Knoepfe der Optionsliste (.sd-popover-tri).
+ * Print preparation — a sheet before starting
+ * Uses the same building blocks as the other dialogs (modal-overlay /
+ * modal-panel) and the segment buttons from the options list (.sd-popover-tri).
  * ============================================ */
 .prep-section-title {
     font-size: 12px;
@@ -4986,8 +4512,8 @@ body.dark-mode .sd-popover {
 
 .prep-filament__name { opacity: 0.75; }
 
-/* Schalter in der Vorbereitung — gleiche Anmutung wie die Segment-Knoepfe
-   daneben, damit die Zeilen zusammen ruhig wirken. */
+/* Toggle in the prep sheet — same look as the segment buttons
+   next to it, so the rows feel calm together. */
 .prep-switch input { position: absolute; opacity: 0; pointer-events: none; }
 
 .prep-switch span {
@@ -5043,29 +4569,10 @@ body.dark-mode .sd-popover {
     color: var(--text-primary);
 }
 
-.prep-btn {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    border: 1px solid transparent;
-    padding: 8px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s;
-}
-
-.prep-btn:hover { transform: translateY(-1px); }
-
-.prep-btn--go {
-    background: var(--accent-blue);
-    color: #fff;
-    font-weight: 600;
-}
-
-/* Druckvorbereitung ueber die volle Breite (Planen-Dialog): Vorschau links,
-   Angaben rechts daneben, Optionen darunter in zwei Spalten — sonst steht
-   alles in einer schmalen Saeule und daneben bleibt es leer. */
+/* Print prep across the full width (schedule dialog): preview on the
+   left, details beside it on the right, options below in two columns —
+   otherwise everything sits in one narrow column with empty space
+   beside it. */
 .prep-wide .prep-rows {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -5073,15 +4580,477 @@ body.dark-mode .sd-popover {
     gap: 0 24px;
 }
 
-/* Die drei Auto/Ein/Aus-Reihen (Bett/Fluss/Duesenversatz) stapeln in der
-   rechten Spalte untereinander, die einfachen Schalter links — sonst
-   stehen die Dreifach-Schalter kreuz und quer im Raster. */
+/* The three auto/on/off rows (bed/flow/nozzle offset) stack in the
+   right column, the simple toggles on the left — otherwise the
+   three-way switches sit scattered across the grid. */
 .prep-wide .prep-row--sw { grid-column: 1; }
 .prep-wide .prep-row--tri { grid-column: 2; }
 
 @media (max-width: 640px) {
     .prep-wide .prep-rows { grid-template-columns: 1fr; }
 }
+
+.sd-liste {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.sd-zeile {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 12px 14px;
+}
+
+.sd-zeile + .sd-zeile { border-top: 1px solid var(--border-color); }
+.sd-zeile:hover { background: var(--bg-card-variant); }
+
+.sd-zeile--korrupt {
+    background: rgba(192, 57, 43, 0.06);
+    box-shadow: inset 3px 0 0 var(--accent-red, #c0392b);
+}
+
+.sd-zeile-bild {
+    width: 58px;
+    height: 58px;
+    border-radius: 9px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.sd-zeile-bild img { width: 100%; height: 100%; object-fit: contain; }
+.sd-zeile-platzhalter { font-size: 22px; opacity: 0.55; }
+
+.sd-zeile-text { flex: 1; min-width: 0; }
+
+.sd-zeile-name {
+    font-weight: 640;
+    font-size: 14px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 3px;
+}
+
+/* The four fields you search a file by. */
+.sd-zeile-fakten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.sd-zeile-fakten > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.sd-zeile-fakten:empty { display: none; }
+
+.sd-zeile-marken {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.sd-marke {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sd-marke--neu {
+    background: rgba(76, 175, 80, 0.13);
+    border-color: rgba(76, 175, 80, 0.32);
+    color: #2e7d32;
+}
+
+.sd-marke--gedruckt {
+    background: rgba(255, 152, 0, 0.13);
+    border-color: rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+}
+
+.sd-marke--korrupt {
+    background: rgba(192, 57, 43, 0.13);
+    border-color: rgba(192, 57, 43, 0.35);
+    color: #c0392b;
+}
+
+/* Where the file comes from — USB stick or the printer's internal
+   storage. Deliberately restrained: an origin is not a state like "new"
+   or "corrupt", it shouldn't outshine the colored badges next to it. */
+.sd-marke--speicher {
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.28);
+    color: #1565c0;
+}
+
+body.dark-mode .sd-marke--speicher { color: #7fb8f0; }
+body.dark-mode .sd-marke--neu { color: #8bd18e; }
+body.dark-mode .sd-marke--gedruckt { color: #ffb74d; }
+body.dark-mode .sd-marke--korrupt { color: #ef8a80; }
+
+/* No print job in the file — a plain project. Amber rather than red: the
+   file is not broken, it is just not sliced yet. */
+.sd-marke--ungeschnitten {
+    background: rgba(214, 137, 16, 0.13);
+    border-color: rgba(214, 137, 16, 0.35);
+    color: #b3730d;
+}
+
+body.dark-mode .sd-marke--ungeschnitten { color: #e8b563; }
+
+/* Details stay in place, just collapsed. */
+.sd-mehr {
+    border: 0;
+    background: none;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 11.5px;
+    cursor: pointer;
+    padding: 3px 6px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sd-mehr:hover { background: rgba(128, 128, 128, 0.12); color: var(--text-primary); }
+.sd-mehr .hd-ic { transition: transform 0.15s; }
+.sd-zeile.offen .sd-mehr .hd-ic { transform: rotate(90deg); }
+
+.sd-zeile-details {
+    display: none;
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px dashed var(--border-color);
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 5px 18px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-zeile.offen .sd-zeile-details { display: grid; }
+.sd-zeile-details b { font-weight: 600; color: var(--text-primary); }
+
+.sd-zeile-spule {
+    display: none;
+    margin-top: 9px;
+    align-items: center;
+    gap: 9px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-zeile.offen .sd-zeile-spule { display: flex; }
+.sd-zeile-spule .sd-spool-select { flex: 1; min-width: 0; }
+
+/* Print carries color, schedule and delete are icons — three equally
+   sized colored buttons drew more attention than the files themselves. */
+.sd-zeile-akt {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+}
+
+.sd-btn-haupt {
+    border: 1px solid var(--color-green, #4CAF50);
+    background: var(--color-green, #4CAF50);
+    color: #fff;
+    border-radius: var(--knopf-radius);
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    justify-content: center;
+    font: inherit;
+    font-size: var(--knopf-schrift);
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.sd-btn-haupt:hover { filter: brightness(1.07); }
+
+.sd-btn-haupt:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(0.35);
+}
+
+.sd-btn-haupt:disabled:hover { filter: grayscale(0.35); }
+
+.sd-iknopf {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.sd-iknopf:hover { background: var(--bg-card-variant); color: var(--text-primary); }
+.sd-iknopf--rot:hover { border-color: #e5534b; color: #e5534b; }
+
+/* Toolbar: search up front and wide, the rest compact.
+   Do NOT set min-width to 0 — then the field shrinks in the tight
+   row down to the width of the magnifying glass and the sort control
+   slides over it. */
+.sd-toolbar .sd-search-wrap {
+    flex: 1 1 200px;
+    min-width: 170px;
+    max-width: none;
+}
+
+/* The spool chip holds the right end. Without it, the free space
+   collected at the search field and the row sat exactly on the edge at
+   full modal width — one more character in the spool name and it wrapped. */
+.sd-toolbar .sd-aktive-spule {
+    margin-left: auto;
+    /* Stays put on the right and truncates the name if needed, instead of
+       pushing the whole bar apart. */
+    max-width: 42%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+    .sd-zeile { flex-wrap: wrap; }
+    .sd-zeile-akt { width: 100%; justify-content: flex-end; }
+}
+
+/* Active spool in the toolbar. */
+.sd-aktive-spule {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--text-primary);
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sd-aktive-spule:hover { border-color: var(--color-blue, #2196F3); }
+.sd-aktive-spule--leer { color: var(--text-secondary); font-style: italic; }
+
+/* Note under an option — e.g. why drying is being suggested. */
+.prep-hinweis {
+    grid-column: 1 / -1;
+    font-size: 12px;
+    color: var(--color-orange, #FF9800);
+    padding: 2px 0 8px;
+}
+
+/* Spool recommendation in the file row: which spool fits this file?
+   Kept calm — it sits next to duration, weight and material and must
+   not take over the row. */
+.sd-spulwahl {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--accent-blue, #3b82f6);
+    white-space: nowrap;
+}
+
+.sd-spulwahl:empty { display: none; }
+.sd-spulwahl--keine { color: #b26a00; font-weight: 600; }
+body.dark-mode .sd-spulwahl--keine { color: #ffb74d; }
+
+/* ==========================================================================
+   Sync with the printer
+   --------------------------------------------------------------------------
+   The refresh button fills in — the feedback sits where you clicked,
+   and covers nothing.
+   ========================================================================== */
+.sd-modal-header { position: relative; }
+
+.sd-refresh--laeuft {
+    position: relative;
+    overflow: hidden;
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.35);
+    color: var(--accent-blue);
+    opacity: 1;             /* Do NOT dim it — it is the display */
+    cursor: default;
+}
+
+.sd-refresh-fuell {
+    position: absolute;
+    inset: 0;
+    width: 0;
+    background: rgba(33, 150, 243, 0.16);
+    transition: width .25s ease-out;
+}
+
+.sd-refresh--laeuft > *:not(.sd-refresh-fuell) { position: relative; }
+
+/* First open, no list yet: there the sync indicator can have the whole
+   area — it pushes nothing away, because nothing is there. */
+.sd-sync-gross { padding: 40px 18px; text-align: center; }
+.sd-sync-titel { margin-top: 14px; font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.sd-sync-rest { margin-top: 8px; font-size: 12px; color: var(--text-secondary); }
+
+.sd-sync-balken {
+    margin: 14px auto 0;
+    max-width: 280px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.20);
+    overflow: hidden;
+}
+
+.sd-sync-balken > i {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--accent-blue);
+    transition: width .25s ease-out;
+}
+
+.sd-sync-kreisel {
+    display: inline-block;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 3px solid rgba(128, 128, 128, 0.25);
+    border-top-color: var(--accent-blue);
+    animation: sd-dreh .8s linear infinite;
+}
+
+@keyframes sd-dreh { to { transform: rotate(360deg); } }
+
+/* ============================================
+ * Pagination bar under the file list
+ *
+ * The server slices the list into pages (routes/sdcard.py
+ * _seitenweise) — this shows which page you're on and how to
+ * move on. Search, filter and sort run server-side over the
+ * WHOLE set, not just the visible page.
+ *
+ * The bar hides itself when there is only one page
+ * (.sd-blaettern--eine) — with a handful of files there should be
+ * nothing there.
+ * ============================================ */
+
+.sd-blaettern {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding: 11px 14px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+
+.sd-blaettern--eine { display: none; }
+
+.sd-blaettern-stand { white-space: nowrap; }
+.sd-blaettern-stand b { color: var(--text-primary); font-weight: 600; }
+.sd-blaettern-luecke { flex: 1; }
+
+.sd-seiten {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.sd-seiten button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: none;
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.sd-seiten button:hover:not(:disabled) {
+    background: rgba(127, 127, 127, 0.10);
+}
+
+/* Active = fill + border, not just a thin line. */
+.sd-seiten button.an {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: rgba(33, 150, 243, 0.25);
+    color: var(--accent-blue);
+    font-weight: 640;
+    cursor: default;
+}
+
+.sd-seiten button:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.sd-seiten .sd-seiten-punkte {
+    padding: 0 2px;
+    color: var(--text-secondary);
+    user-select: none;
+}
+
+body.dark-mode .sd-seiten button.an {
+    color: #90caf9;
+}
+
+@media (max-width: 560px) {
+    .sd-blaettern { gap: 8px; }
+    .sd-blaettern-luecke { flex-basis: 100%; height: 0; }
+}
+
+
+/* Archive toggle in the header bar. It looks like "Load file" and "Refresh"
+   next to it — until it is on: then it carries fill AND border, like every
+   active state in this house. A thin border line on its own is not enough,
+   that was rejected once already. */
+.sd-header-btn--an {
+    background: var(--accent-soft, rgba(59,130,246,.16));
+    border-color: var(--accent, #3b82f6);
+    color: var(--accent, #3b82f6);
+}
+.sd-header-btn--an svg { color: var(--accent, #3b82f6); }
 
 
 /* ---- schedule.css ---- */
@@ -5166,52 +5135,6 @@ body.dark-mode .sd-popover {
     margin: 24px 0;
 }
 
-/* ============================================
- * Schedule Print Form (Druck planen)
- * ============================================ */
-
-.sched-form-filename {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    word-break: break-all;
-    margin-bottom: 16px;
-}
-
-.sched-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
-}
-
-.sched-form-col {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.sched-form-section {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sched-form-label {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.sched-form-row {
-    display: flex;
-    gap: 8px;
-}
-
 .sched-form-input {
     flex: 1;
     padding: 8px 12px;
@@ -5227,43 +5150,6 @@ body.dark-mode .sd-popover {
     outline: none;
     border-color: var(--accent-blue);
     box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
-}
-
-.sched-form-check {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    color: var(--text-primary);
-}
-
-.sched-form-check input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--accent-blue);
-    cursor: pointer;
-    flex-shrink: 0;
-}
-
-.sched-form-options {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 10px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.sched-form-scheduled {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 12px;
-    margin-top: 12px;
-    max-height: 200px;
-    overflow-y: auto;
 }
 
 .sched-form-error {
@@ -5286,18 +5172,761 @@ body.dark-mode .sched-form-error {
     color: #ef9a9a;
 }
 
-.sched-form-actions {
-    margin-top: 16px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
+/* ======================================================================
+   Pre-drying in the scheduling dialog
+   ====================================================================== */
+
+.sched-dry-feld {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    padding: 2px 8px;
 }
 
-@media (max-width: 768px) {
-    .sched-form-grid {
-        grid-template-columns: 1fr;
-    }
+.sched-dry-feld input {
+    width: 46px;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    font: inherit;
+    text-align: right;
+    padding: 4px 0;
 }
+
+.sched-dry-feld input::-webkit-outer-spin-button,
+.sched-dry-feld input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+.sched-dry-einheit { color: var(--text-secondary); font-size: 12px; }
+
+/* Calculated power-on time — shown as a warning if lead time is too tight. */
+.sched-dry-hinweis {
+    margin: 0 0 4px 24px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sched-dry-hinweis.warnung { color: var(--color-orange); font-weight: 600; }
+
+/* Pre-drying: type, degrees, hours */
+.sp-dry-zeile {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 10px 0 8px 26px;
+}
+
+.sp-dry-zeile select { flex: 1; min-width: 0; }
+
+/* Timeline: printer on -> drying -> print. Replaces the running text,
+   because the sequence is the whole point. */
+.sp-strahl {
+    margin: 0 0 6px 26px;
+    padding: 11px 13px;
+    background: var(--bg-card-variant);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+}
+
+.sp-strahl:empty { display: none; }
+
+.sp-strahl-punkt {
+    flex: 1;
+    position: relative;
+    padding-top: 16px;
+    font-size: 12px;
+    min-width: 0;
+}
+
+.sp-strahl-punkt::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--color-blue);
+}
+
+.sp-strahl-punkt::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 9px;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.sp-strahl-punkt:last-child::after { display: none; }
+.sp-strahl-punkt--trocknen::before { background: var(--color-orange); }
+.sp-strahl-punkt--druck::before { background: var(--color-green); }
+
+.sp-strahl-zeit { font-weight: 660; font-variant-numeric: tabular-nums; }
+.sp-strahl-was {
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Footer: buttons compact on the right, set apart from the content. */
+.ui-fuss {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    padding: 14px 20px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+}
+
+/* File card: preview left, name and key details right. */
+.prep-datei {
+    display: flex;
+    gap: 13px;
+    align-items: center;
+}
+
+.prep-datei__bild {
+    width: 74px;
+    height: 74px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: 0 0 auto;
+}
+
+.prep-datei__text { min-width: 0; flex: 1; }
+
+.prep-datei__name {
+    font-weight: 640;
+    font-size: 14px;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Key details without a box — as chips they competed visually with
+   the controls below them. */
+.prep-datei .prep-fact {
+    background: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.prep-datei .prep-facts { gap: 6px 14px; }
+
+/* Options card: rows like above, so toggles and step selectors line up. */
+.ui-karte .prep-row { padding: 9px 0; }
+.ui-karte .prep-rows > .prep-row { border-top: 1px solid var(--border-color); }
+.ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
+
+@media (max-width: 640px) {
+    .ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
+}
+
+/* Each appointment gets its own card with spacing. */
+.sched-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sched-eintrag {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 13px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+}
+.sched-eintrag--vorbei { opacity: 0.5; }
+
+.sched-eintrag-bild {
+    width: 56px;
+    height: 56px;
+    border-radius: 9px;
+    background: rgba(127, 127, 127, 0.10);
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+.sched-eintrag-bild img { width: 100%; height: 100%; object-fit: contain; }
+.sched-eintrag-text { flex: 1; min-width: 0; }
+
+.sched-eintrag-kopf {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 3px;
+}
+
+.sched-eintrag-name {
+    font-weight: 640;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+    color: var(--text-primary);
+}
+
+/* The appointment is the reason for the entry — hence it comes first,
+   not somewhere in the row of details. */
+.sched-eintrag-zeit {
+    font-size: 13px;
+    font-weight: 640;
+    font-variant-numeric: tabular-nums;
+    flex: none;
+    color: var(--text-primary);
+}
+
+.sched-eintrag-rest { font-size: 12px; color: var(--text-secondary); flex: none; }
+
+.sched-eintrag-fakten {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 13px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 7px;
+}
+
+.sched-eintrag-fakten span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+}
+
+.sched-eintrag-fakten:empty { display: none; }
+
+.sched-marken { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.sched-marke {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.18);
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.sched-marke--gruen {
+    background: rgba(76, 175, 80, 0.12);
+    border-color: rgba(76, 175, 80, 0.30);
+    color: #2e7d32;
+}
+
+.sched-marke--orange {
+    background: rgba(255, 152, 0, 0.13);
+    border-color: rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+}
+
+body.dark-mode .sched-marke--gruen { color: #8bd18e; }
+body.dark-mode .sched-marke--orange { color: #ffb74d; }
+
+/* Icon buttons: two colored text buttons per entry drew more attention
+   than the print itself. */
+.sched-eintrag-akt { display: flex; flex-direction: column; gap: 6px; flex: none; }
+
+.sched-iknopf {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+}
+
+.sched-iknopf:hover { background: var(--bg-card-variant); color: var(--text-primary); }
+.sched-iknopf--rot:hover { border-color: #e5534b; color: #e5534b; }
+
+@media (max-width: 560px) {
+    .sched-eintrag-kopf { flex-wrap: wrap; }
+    .sched-eintrag-name { flex-basis: 100%; }
+}
+
+/* ======================================================================
+   Multi-material assignment
+   One row per filament: color, name and type on the left, the spool
+   on the right.
+   ====================================================================== */
+.mf-punkt {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    flex: none;
+}
+
+.mf-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mf-typ { color: var(--text-secondary); font-size: 12px; flex: none; }
+
+/* The spool choice is the actual task here — it may be wide,
+   but not swallow the whole row. */
+.mf-wahl { flex: 0 1 300px; min-width: 0; }
+
+/* Wrong material chosen: border plus a notice below it. Without this,
+   a PETG spool for an ASA print slips through when skimming. */
+.mf-wahl--falsch {
+    border-color: var(--accent-orange, #f59e0b) !important;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35);
+}
+
+/* The row is otherwise single-line — with a notice it may wrap. */
+.ui-zeile:has(.mf-warnung:not([style*="none"])) { flex-wrap: wrap; }
+
+.mf-warnung {
+    flex-basis: 100%;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--accent-orange, #b26a00);
+}
+
+@media (max-width: 560px) {
+    .ui-zeile:has(.mf-wahl) { flex-wrap: wrap; }
+    .mf-wahl { flex-basis: 100%; }
+}
+
+/* Notice in the spool dialog when nothing fits. */
+.fm-hinweis {
+    background: rgba(255, 152, 0, 0.13);
+    border: 1px solid rgba(255, 152, 0, 0.32);
+    color: #b26a00;
+    border-radius: 9px;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    margin-bottom: 10px;
+}
+
+body.dark-mode .fm-hinweis { color: #ffb74d; }
+
+/* Selection row: the radio button sits up front, color and name beside it. */
+.fm-option { gap: 10px; }
+.fm-radio { flex: none; margin: 0; accent-color: var(--color-green, #4CAF50); }
+
+/* Spool recommendation under the selection: says WHY this spool is
+   listed. */
+.sched-spulhinweis {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.sched-spulhinweis--warnung { color: #b26a00; font-weight: 600; }
+body.dark-mode .sched-spulhinweis--warnung { color: #ffb74d; }
+
+/* Color dot before the filament name in the file card — same size as
+   in the file list (.sd-filament-dot). */
+.prep-fil-punkt {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    margin-right: 2px;
+    vertical-align: -1px;
+}
+
+
+/* ---- spool-picker.css ---- */
+/* ==========================================================================
+   Spool picker
+   --------------------------------------------------------------------------
+   A window instead of the selection list in the material card. When
+   switching spools you look for COLOR and remaining amount — both used
+   to be just text at the end of the row in the list.
+
+   The wheel is the core: outer ring in the filament color, filled as
+   far as the spool is full, percentage in the middle.
+   ========================================================================== */
+
+.spw-panel {
+    position: absolute;
+    width: 96%;
+    max-width: 1180px;
+    max-height: 90vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: var(--radius-xl, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    /* .modal-panel sits at 95% opacity with blur over the dark
+       veil — that tints the area gray, while the cards on top of it are
+       opaque white. Opaque here too, as in the design. */
+    background: var(--bg-card) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.spw-kopf {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.spw-titel {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.spw-kopf .sd-close-btn { margin-left: auto; }
+
+/* ---- Werkzeugleiste ---- */
+.spw-werkzeuge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.spw-suche { position: relative; flex: 1 1 200px; min-width: 170px; }
+.spw-suche svg {
+    position: absolute; left: 11px; top: 50%;
+    transform: translateY(-50%); color: var(--text-secondary);
+}
+.spw-suche input {
+    width: 100%;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13.5px;
+}
+.spw-suche input:focus { outline: none; border-color: var(--accent-blue); }
+
+.spw-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.spw-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-variant);
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.spw-chip b { color: var(--text-primary); font-weight: 700; }
+.spw-chip--an {
+    background: rgba(33, 150, 243, 0.12);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+.spw-chip--an b { color: inherit; }
+.spw-chip-punkt { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+
+.spw-sortierung {
+    padding: 7px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius, 10px);
+    background: var(--bg-card-variant);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 12.5px;
+    cursor: pointer;
+}
+
+/* ---- Empfehlungsband ---- */
+.spw-band {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 10px 18px;
+    background: rgba(33, 150, 243, 0.07);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 12.5px;
+    color: var(--text-secondary);
+}
+.spw-band .hd-ic { color: var(--accent-blue); }
+.spw-band--leer { background: rgba(255, 152, 0, 0.08); }
+.spw-band--leer .hd-ic { color: var(--accent-orange); }
+
+/* ---- Raster ---- */
+.spw-raster {
+    display: grid;
+    /* minmax(0, 1fr) instead of 1fr: a 1fr column does NOT shrink below its
+       content. Long names like "PolyLite™ ASA Dark Green" pushed the grid
+       past the edge, the third column got cut off, and a horizontal
+       scrollbar appeared at the bottom. */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 16px 18px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+}
+@media (max-width: 1000px) { .spw-raster { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .spw-raster { grid-template-columns: minmax(0, 1fr); } }
+
+.spw-leer {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+/* ---- One spool ---- */
+.spw-spule {
+    position: relative;
+    min-width: 0;
+    max-width: 100%;
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 13px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, transform .12s, box-shadow .15s;
+}
+.spw-spule:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--text-secondary);
+}
+.spw-spule--passt { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
+.spw-spule--aktiv { border-color: var(--accent-green); box-shadow: 0 0 0 1px var(--accent-green) inset; }
+.spw-spule--knapp { border-color: var(--accent-orange); }
+/* The chosen selection carries the strongest border — it stands out
+   even next to "fits" and "active". */
+.spw-spule--wahl { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue) inset; }
+.spw-spule--leer { opacity: .45; cursor: not-allowed; }
+.spw-spule--leer:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
+
+.spw-rad {
+    --fuell: 0;
+    --farbe: #8a8a8a;
+    width: 62px; height: 62px;
+    flex: none;
+    position: relative;
+    border-radius: 50%;
+    background: conic-gradient(var(--farbe) calc(var(--fuell) * 1%), rgba(128, 128, 128, 0.16) 0);
+}
+.spw-rad::after {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+}
+.spw-rad > span {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    font-size: 12.5px; font-weight: 700;
+    color: var(--text-primary);
+    z-index: 1;
+}
+
+.spw-text { flex: 1; min-width: 0; display: block; }
+.spw-hersteller { display: block; font-size: 11.5px; color: var(--text-secondary); }
+.spw-name {
+    display: block;
+    font-size: 14px; font-weight: 650;
+    margin: 1px 0 5px;
+    padding-right: 4px;
+    color: var(--text-primary);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.spw-zeile { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+.spw-material {
+    font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    padding: 2px 7px; border-radius: 999px;
+    background: rgba(128, 128, 128, 0.12);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+.spw-rest { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.spw-meter { font-size: 11.5px; color: var(--text-secondary); }
+
+.spw-fuss {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-top: 7px;
+    font-size: 11px; color: var(--text-secondary);
+}
+.spw-fuss span { display: inline-flex; align-items: center; gap: 4px; }
+
+/* Humidity memory: only for spools that actually sat in the AMS. Dry
+   stays gray — otherwise half the list lights up without saying anything. */
+.spw-feucht {
+    padding: 2px 7px; border-radius: 999px; font-weight: 600;
+    background: rgba(128,128,128,0.12);
+}
+.spw-feucht--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.spw-feucht--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+/* The badge is clickable and opens the history. */
+.spw-feucht { cursor: pointer; gap: 4px; }
+.spw-feucht:hover { filter: brightness(0.95); }
+.spw-feucht .hd-ic:last-child { opacity: 0.55; margin-left: -1px; }
+
+/* Window with a spool's history. */
+.spf-box { max-width: 540px; width: 100%; }
+.spf-kopf {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin: -2px 0 10px; font-size: 12px; color: var(--text-secondary);
+}
+.spf-urteil { padding: 2px 9px; border-radius: 999px; font-weight: 700; font-size: 11.5px; }
+.spf-urteil--trocken { background: rgba(34,197,94,0.16); color: #16a34a; }
+.spf-urteil--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.spf-urteil--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+.spf-spanne { flex: 1; }
+.spf-grenze { opacity: 0.8; }
+.spf-box .fk-kurve { height: 96px; }
+.spf-werte {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 8px; margin: 12px 0 4px;
+}
+.spf-wert {
+    padding: 8px 11px; border-radius: 9px;
+    background: rgba(128,128,128,0.10);
+}
+.spf-wert-kopf {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.03em;
+    text-transform: uppercase; color: var(--text-secondary); margin-bottom: 3px;
+}
+.spf-wert-zahl {
+    font-size: 15px; font-weight: 700; color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+
+
+.spw-marke {
+    position: absolute; top: 10px; right: 10px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10.5px; font-weight: 700;
+    padding: 3px 8px; border-radius: 999px;
+}
+.spw-marke--aktiv { background: rgba(76, 175, 80, 0.15); color: #2e7d32; }
+.spw-marke--passt { background: rgba(33, 150, 243, 0.15); color: #1565c0; }
+.spw-marke--knapp { background: rgba(255, 152, 0, 0.16); color: #b26a00; }
+body.dark-mode .spw-marke--aktiv { color: #8bd18e; }
+body.dark-mode .spw-marke--passt { color: #8fc6f5; }
+body.dark-mode .spw-marke--knapp { color: #ffb74d; }
+
+/* ---- Fusszeile des Fensters ---- */
+.spw-fussleiste {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 12px 18px;
+    border-top: 1px solid var(--border-color);
+}
+
+.modal-btn--gruen {
+    background: rgba(76, 175, 80, 0.12) !important;
+    border-color: rgba(76, 175, 80, 0.35) !important;
+    color: #2e7d32 !important;
+}
+body.dark-mode .modal-btn--gruen { color: #8bd18e !important; }
+.modal-btn--gruen:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ---- The button in the material card that opens the window ----
+   It already shows WHICH spool is active: color dot plus name. */
+.mz-spulknopf {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--knopf-radius, 10px);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.mz-spulknopf:hover { border-color: var(--text-secondary); background: var(--bg-card-variant); }
+.mz-spulknopf #mz-spulknopf-text,
+.mz-spulknopf > span:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mz-spulknopf .hd-ic { color: var(--text-secondary); }
+
+.mz-spulknopf__punkt {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex: none;
+    border: 1px solid var(--border-color);
+    background: rgba(128,128,128,0.25);
+}
+
+/* Notice for an AMS tray without a Spoolman assignment.
+   The server no longer guesses assignments, so this needs to be
+   shown. */
+.spw-hinweis:empty { display: none; }
+.spw-hinweis {
+    margin: 0 0 10px;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.spw-hinweis-zeile {
+    font-size: 12px; line-height: 1.4;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--accent-orange, #f59e0b) 10%, transparent);
+    border-left: 3px solid var(--accent-orange, #f59e0b);
+    border-radius: 0 6px 6px 0;
+    padding: 7px 10px;
+}
+.spw-hinweis-zeile b { color: var(--text-primary); font-weight: 600; }
 
 
 /* ---- temperature.css ---- */
@@ -5454,9 +6083,10 @@ body.dark-mode .temp-preset-btn:hover {
 }
 
 .temp-btn {
-    padding: 10px 24px;
-    border-radius: 10px;
-    font-size: 13px;
+    padding: var(--knopf-polster);
+    min-height: var(--knopf-hoehe);
+    border-radius: var(--knopf-radius);
+    font-size: var(--knopf-schrift);
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
@@ -5503,7 +6133,7 @@ body.dark-mode .temp-btn--apply:hover {
 
 /* ---- printer-control.css ---- */
 /* ============================================
- * Printer Control Modal (Drucker Steuerung)
+ * Printer Control Modal
  * ============================================ */
 
 /* Camera Preview */
@@ -5521,6 +6151,34 @@ body.dark-mode .temp-btn--apply:hover {
     width: 100%;
     height: auto;
     display: block;
+}
+
+.ctrl-camera-light-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.15s;
+    z-index: 2;
+}
+
+.ctrl-camera-light-btn:hover { background: rgba(0, 0, 0, 0.8); }
+
+/* On = green border, same language as the light button in the overview. */
+.ctrl-camera-light-btn.ctrl-licht-an {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35);
 }
 
 .ctrl-camera-source-btn {
@@ -5595,21 +6253,6 @@ body.dark-mode .ctrl-tab:hover {
     font-weight: 600;
 }
 
-/* Movement Grid Layout */
-.ctrl-movement-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-}
-
-/* XY D-Pad Grid */
-.ctrl-dpad {
-    display: grid;
-    grid-template-columns: repeat(3, 56px);
-    gap: 6px;
-    justify-content: center;
-}
-
 /* Move Buttons (arrows, home) */
 .ctrl-move-btn {
     border: 1px solid transparent;
@@ -5629,130 +6272,9 @@ body.dark-mode .ctrl-tab:hover {
     transform: scale(0.95);
 }
 
-/* Blue direction buttons */
-.ctrl-move-btn--dir {
-    background: rgba(33, 150, 243, 0.12);
-    border-color: rgba(33, 150, 243, 0.25);
-    color: #1565c0;
-    padding: 12px 8px;
-}
-
-.ctrl-move-btn--dir:hover {
-    background: rgba(33, 150, 243, 0.22);
-    border-color: rgba(33, 150, 243, 0.4);
-}
-
-body.dark-mode .ctrl-move-btn--dir {
-    background: rgba(33, 150, 243, 0.18);
-    border-color: rgba(33, 150, 243, 0.3);
-    color: #90caf9;
-}
-
-body.dark-mode .ctrl-move-btn--dir:hover {
-    background: rgba(33, 150, 243, 0.28);
-    border-color: rgba(33, 150, 243, 0.45);
-}
-
-/* Orange home button */
-.ctrl-move-btn--home {
-    background: rgba(255, 152, 0, 0.12);
-    border-color: rgba(255, 152, 0, 0.25);
-    color: #e65100;
-    padding: 12px 8px;
-}
-
-.ctrl-move-btn--home:hover {
-    background: rgba(255, 152, 0, 0.22);
-    border-color: rgba(255, 152, 0, 0.4);
-}
-
-body.dark-mode .ctrl-move-btn--home {
-    background: rgba(255, 152, 0, 0.18);
-    border-color: rgba(255, 152, 0, 0.3);
-    color: #ffb74d;
-}
-
-body.dark-mode .ctrl-move-btn--home:hover {
-    background: rgba(255, 152, 0, 0.28);
-    border-color: rgba(255, 152, 0, 0.45);
-}
-
-/* Green Z buttons */
-.ctrl-move-btn--z {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.25);
-    color: #2e7d32;
-    padding: 16px 32px;
-    font-size: 15px;
-}
-
-.ctrl-move-btn--z:hover {
-    background: rgba(76, 175, 80, 0.22);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-body.dark-mode .ctrl-move-btn--z {
-    background: rgba(76, 175, 80, 0.18);
-    border-color: rgba(76, 175, 80, 0.3);
-    color: #a5d6a7;
-}
-
-body.dark-mode .ctrl-move-btn--z:hover {
-    background: rgba(76, 175, 80, 0.28);
-    border-color: rgba(76, 175, 80, 0.45);
-}
-
-/* Z Column layout */
-.ctrl-z-column {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: center;
-}
-
-/* Step size selectors */
-.ctrl-step-row {
-    margin-top: 12px;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
 .ctrl-step-label {
     color: var(--text-secondary);
     font-size: 12px;
-}
-
-.ctrl-step-select {
-    padding: 5px 28px 5px 10px;
-    background: var(--bg-card);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23888' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 6l3.5 4 3.5-4z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    background-size: 14px;
-}
-
-.ctrl-step-select:focus {
-    outline: none;
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
-}
-
-/* Quick Actions Bar */
-.ctrl-quick-actions {
-    margin-top: 16px;
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    flex-wrap: wrap;
 }
 
 .ctrl-quick-btn {
@@ -5767,48 +6289,6 @@ body.dark-mode .ctrl-move-btn--z:hover {
 
 .ctrl-quick-btn:active {
     transform: scale(0.96);
-}
-
-.ctrl-quick-btn--home {
-    background: rgba(255, 152, 0, 0.12);
-    border-color: rgba(255, 152, 0, 0.25);
-    color: #e65100;
-}
-
-.ctrl-quick-btn--home:hover {
-    background: rgba(255, 152, 0, 0.22);
-    border-color: rgba(255, 152, 0, 0.4);
-}
-
-body.dark-mode .ctrl-quick-btn--home {
-    background: rgba(255, 152, 0, 0.18);
-    border-color: rgba(255, 152, 0, 0.3);
-    color: #ffb74d;
-}
-
-body.dark-mode .ctrl-quick-btn--home:hover {
-    background: rgba(255, 152, 0, 0.28);
-}
-
-.ctrl-quick-btn--action {
-    background: rgba(33, 150, 243, 0.12);
-    border-color: rgba(33, 150, 243, 0.25);
-    color: #1565c0;
-}
-
-.ctrl-quick-btn--action:hover {
-    background: rgba(33, 150, 243, 0.22);
-    border-color: rgba(33, 150, 243, 0.4);
-}
-
-body.dark-mode .ctrl-quick-btn--action {
-    background: rgba(33, 150, 243, 0.18);
-    border-color: rgba(33, 150, 243, 0.3);
-    color: #90caf9;
-}
-
-body.dark-mode .ctrl-quick-btn--action:hover {
-    background: rgba(33, 150, 243, 0.28);
 }
 
 /* Extruder Tab — Temp Display */
@@ -5833,14 +6313,6 @@ body.dark-mode .ctrl-quick-btn--action:hover {
     font-size: 14px;
 }
 
-/* Extruder Temp Presets */
-.ctrl-temp-presets {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
 .ctrl-preset-btn {
     border: 1px solid transparent;
     padding: 10px 6px;
@@ -5855,81 +6327,6 @@ body.dark-mode .ctrl-quick-btn--action:hover {
 
 .ctrl-preset-btn:active {
     transform: scale(0.95);
-}
-
-/* Off preset */
-.ctrl-preset-btn--off {
-    background: var(--bg-card);
-    border-color: var(--border-color);
-    color: var(--text-secondary);
-}
-
-.ctrl-preset-btn--off:hover {
-    background: var(--bg-secondary);
-    border-color: var(--text-secondary);
-}
-
-/* PLA preset - blue */
-.ctrl-preset-btn--pla {
-    background: rgba(33, 150, 243, 0.12);
-    border-color: rgba(33, 150, 243, 0.25);
-    color: #1565c0;
-}
-
-.ctrl-preset-btn--pla:hover {
-    background: rgba(33, 150, 243, 0.22);
-    border-color: rgba(33, 150, 243, 0.4);
-}
-
-body.dark-mode .ctrl-preset-btn--pla {
-    background: rgba(33, 150, 243, 0.18);
-    color: #90caf9;
-}
-
-body.dark-mode .ctrl-preset-btn--pla:hover {
-    background: rgba(33, 150, 243, 0.28);
-}
-
-/* PETG preset - green */
-.ctrl-preset-btn--petg {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.25);
-    color: #2e7d32;
-}
-
-.ctrl-preset-btn--petg:hover {
-    background: rgba(76, 175, 80, 0.22);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-body.dark-mode .ctrl-preset-btn--petg {
-    background: rgba(76, 175, 80, 0.18);
-    color: #a5d6a7;
-}
-
-body.dark-mode .ctrl-preset-btn--petg:hover {
-    background: rgba(76, 175, 80, 0.28);
-}
-
-/* ABS preset - orange */
-.ctrl-preset-btn--abs {
-    background: rgba(255, 152, 0, 0.12);
-    border-color: rgba(255, 152, 0, 0.25);
-    color: #e65100;
-}
-
-.ctrl-preset-btn--abs:hover {
-    background: rgba(255, 152, 0, 0.22);
-    border-color: rgba(255, 152, 0, 0.4);
-}
-
-body.dark-mode .ctrl-preset-btn--abs {
-    background: rgba(255, 152, 0, 0.18);
-    color: #ffb74d;
-}
-
-body.dark-mode .ctrl-preset-btn--abs:hover {
-    background: rgba(255, 152, 0, 0.28);
 }
 
 /* Custom Temp Row */
@@ -5988,21 +6385,6 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     background: rgba(33, 150, 243, 0.28);
 }
 
-/* Extruder Movement Section */
-.ctrl-section-divider {
-    text-align: center;
-    margin: 20px 0 12px;
-    color: var(--text-primary);
-    font-size: 14px;
-    font-weight: 600;
-}
-
-.ctrl-extrude-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
 /* Extrude button - green */
 .ctrl-extrude-btn {
     border: 1px solid transparent;
@@ -6018,47 +6400,6 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 
 .ctrl-extrude-btn:active {
     transform: scale(0.96);
-}
-
-.ctrl-extrude-btn--push {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.25);
-    color: #2e7d32;
-}
-
-.ctrl-extrude-btn--push:hover {
-    background: rgba(76, 175, 80, 0.22);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-body.dark-mode .ctrl-extrude-btn--push {
-    background: rgba(76, 175, 80, 0.18);
-    color: #a5d6a7;
-}
-
-body.dark-mode .ctrl-extrude-btn--push:hover {
-    background: rgba(76, 175, 80, 0.28);
-}
-
-/* Retract button - red */
-.ctrl-extrude-btn--pull {
-    background: rgba(244, 67, 54, 0.08);
-    border-color: rgba(244, 67, 54, 0.2);
-    color: #c62828;
-}
-
-.ctrl-extrude-btn--pull:hover {
-    background: rgba(244, 67, 54, 0.18);
-    border-color: rgba(244, 67, 54, 0.35);
-}
-
-body.dark-mode .ctrl-extrude-btn--pull {
-    background: rgba(244, 67, 54, 0.15);
-    color: #ef9a9a;
-}
-
-body.dark-mode .ctrl-extrude-btn--pull:hover {
-    background: rgba(244, 67, 54, 0.25);
 }
 
 /* Filament Tab — Action Cards */
@@ -6095,90 +6436,6 @@ body.dark-mode .ctrl-extrude-btn--pull:hover {
     font-weight: 600;
 }
 
-/* Load - green */
-.ctrl-filament-btn--load {
-    background: rgba(76, 175, 80, 0.12);
-    border-color: rgba(76, 175, 80, 0.25);
-    color: #2e7d32;
-}
-
-.ctrl-filament-btn--load:hover {
-    background: rgba(76, 175, 80, 0.22);
-    border-color: rgba(76, 175, 80, 0.4);
-}
-
-body.dark-mode .ctrl-filament-btn--load {
-    background: rgba(76, 175, 80, 0.18);
-    color: #a5d6a7;
-}
-
-body.dark-mode .ctrl-filament-btn--load:hover {
-    background: rgba(76, 175, 80, 0.28);
-}
-
-/* Unload - orange */
-.ctrl-filament-btn--unload {
-    background: rgba(255, 152, 0, 0.12);
-    border-color: rgba(255, 152, 0, 0.25);
-    color: #e65100;
-}
-
-.ctrl-filament-btn--unload:hover {
-    background: rgba(255, 152, 0, 0.22);
-    border-color: rgba(255, 152, 0, 0.4);
-}
-
-body.dark-mode .ctrl-filament-btn--unload {
-    background: rgba(255, 152, 0, 0.18);
-    color: #ffb74d;
-}
-
-body.dark-mode .ctrl-filament-btn--unload:hover {
-    background: rgba(255, 152, 0, 0.28);
-}
-
-/* Change - blue */
-.ctrl-filament-btn--change {
-    background: rgba(33, 150, 243, 0.12);
-    border-color: rgba(33, 150, 243, 0.25);
-    color: #1565c0;
-}
-
-.ctrl-filament-btn--change:hover {
-    background: rgba(33, 150, 243, 0.22);
-    border-color: rgba(33, 150, 243, 0.4);
-}
-
-body.dark-mode .ctrl-filament-btn--change {
-    background: rgba(33, 150, 243, 0.18);
-    color: #90caf9;
-}
-
-body.dark-mode .ctrl-filament-btn--change:hover {
-    background: rgba(33, 150, 243, 0.28);
-}
-
-/* Purge - red */
-.ctrl-filament-btn--purge {
-    background: rgba(244, 67, 54, 0.08);
-    border-color: rgba(244, 67, 54, 0.2);
-    color: #c62828;
-}
-
-.ctrl-filament-btn--purge:hover {
-    background: rgba(244, 67, 54, 0.18);
-    border-color: rgba(244, 67, 54, 0.35);
-}
-
-body.dark-mode .ctrl-filament-btn--purge {
-    background: rgba(244, 67, 54, 0.15);
-    color: #ef9a9a;
-}
-
-body.dark-mode .ctrl-filament-btn--purge:hover {
-    background: rgba(244, 67, 54, 0.25);
-}
-
 /* Filament Tip Box */
 .ctrl-tip-box {
     margin-top: 16px;
@@ -6199,17 +6456,9 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
         grid-template-columns: 1fr;
     }
 
-    .ctrl-dpad {
-        grid-template-columns: repeat(3, 52px);
-    }
-
     .ctrl-tab {
         padding: 8px 12px;
         font-size: 12px;
-    }
-
-    .ctrl-temp-presets {
-        grid-template-columns: repeat(2, 1fr);
     }
 
     .ctrl-quick-btn {
@@ -6219,9 +6468,9 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 }
 
 /* ============================================================
- * Klipper-Direct Steuerung (Achsen/Extruder/Maschine) —
- * Parität zur Android-App (Mainsail-Stil). Nur im Klipper-Modus
- * per JS in die Tabs injiziert (printer-control.js buildKlipperControl).
+ * Klipper-Direct control (axes/extruder/machine) —
+ * Parity with the Android app (Mainsail style). Only injected into
+ * the tabs via JS in Klipper mode (printer-control.js buildKlipperControl).
  * ============================================================ */
 .kctrl-pos-row { display: flex; gap: 8px; margin-bottom: 12px; }
 .kctrl-pos {
@@ -6275,10 +6524,10 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 .kctrl-macro-empty { color: var(--text-secondary); padding: 4px; }
 
 /* ============================================================
- * Display-Stil fuers Steuerungs-Fenster (Mockup 18aug26)
+ * Display style for the control window
  * ============================================================ */
 
-/* Tabs als Segmente statt Unterstrich-Reiter */
+/* Tabs as segments instead of underline tabs */
 .ctrl-tabs {
     background: rgba(128, 128, 128, 0.08);
     border-radius: 12px;
@@ -6301,7 +6550,50 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
     font-weight: 600;
 }
 
-/* --- Achsen: rundes Jog-Pad --- */
+/* --- Device calibration: checklist like in Studio's dialog --- */
+.cali-schritte {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 6px 16px; margin-bottom: 12px;
+}
+.cali-schritt {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13px; color: var(--text-primary); cursor: pointer;
+    padding: 5px 2px;
+}
+.cali-schritt input { width: 16px; height: 16px; accent-color: #22c55e; cursor: pointer; }
+.cali-fuss {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap;
+}
+.cali-fuss .ext-sub { flex: 1 1 240px; }
+
+/* The individual runs: stacked, full card width — unlike
+   the combined button, because each row here is its own pass. */
+.cali-laeufe {
+    display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;
+}
+.cali-laeufe .cali-lauf-btn { width: 100%; text-align: center; }
+
+/* Running pass in the calibration tab */
+.cali-stufe {
+    font-size: 14px; font-weight: 600; color: var(--text-primary);
+    margin-bottom: 10px;
+}
+.cali-balken {
+    height: 8px; border-radius: 999px; overflow: hidden;
+    background: rgba(128, 128, 128, 0.18);
+}
+.cali-balken span {
+    display: block; height: 100%; border-radius: 999px;
+    background: #3b82f6; transition: width 0.4s ease;
+}
+.cali-zahlen {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; font-size: 12px; color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Axes: round jog pad --- */
 .jog-layout { display: flex; gap: 12px; }
 .jog-panel { flex: 1; display: flex; flex-direction: column; align-items: center; }
 .jog-pad { width: 230px; max-width: 100%; }
@@ -6320,6 +6612,111 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 .jog-home text { fill: #4ade80; font-size: 17px; cursor: pointer; }
 .jog-lbl { fill: var(--text-secondary); font-size: 12px; pointer-events: none; }
 .jog-lbl--s { font-size: 10px; opacity: 0.7; }
+
+/* -- Map view: bed from above, machine from the side ------------------ */
+
+/* The switch sits above both layouts, so neither panel owns it. */
+.jog-switch {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin: 0 0 12px;
+    padding: 3px;
+    background: rgba(128, 128, 128, 0.10);
+    border-radius: 10px;
+    width: fit-content;
+    margin-inline: auto;
+}
+.jog-switch-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 5px 16px;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+/* Active state carries fill AND border -- a thin rule alone was rejected
+   as too quiet to read at a glance. */
+.jog-switch-btn--on {
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.55);
+    color: var(--text-primary);
+}
+
+.bed-map {
+    width: 240px;
+    max-width: 100%;
+    cursor: crosshair;
+}
+.bed-area {
+    fill: rgba(128, 128, 128, 0.08);
+    stroke: rgba(128, 128, 128, 0.30);
+}
+.bed-grid {
+    stroke: rgba(128, 128, 128, 0.16);
+    stroke-width: 1;
+}
+.bed-empty {
+    fill: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* The mark says one of two things, and has to look like it: a commanded
+   target is drawn hollow and dashed, a measured position solid with a
+   centre dot. Same geometry, so the eye compares shape, not position. */
+.bed-mark { pointer-events: none; }
+.bed-mark circle { fill: none; stroke-width: 2; }
+.bed-mark line { stroke-width: 1.5; }
+.bed-mark text { font-size: 11px; font-weight: 600; }
+
+.bed-mark--target circle { stroke: #ba7517; stroke-dasharray: 4 3; }
+.bed-mark--target line   { stroke: #ba7517; stroke-dasharray: 4 3; }
+.bed-mark--target text   { fill: #ba7517; }
+
+.bed-mark--live circle { stroke: #1d9e75; }
+.bed-mark--live line   { stroke: #1d9e75; }
+.bed-mark--live text   { fill: #1d9e75; }
+.bed-mark-core { fill: #1d9e75; stroke: none; }
+
+.bed-note {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin: 10px 0 0;
+    text-align: center;
+}
+.bed-note b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+.z-side-wrap {
+    align-items: stretch;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.z-side { height: 240px; width: 120px; }
+.side-frame {
+    fill: rgba(128, 128, 128, 0.06);
+    stroke: rgba(128, 128, 128, 0.30);
+}
+.side-nozzle { fill: rgba(128, 128, 128, 0.55); }
+.side-bed { stroke: #1d9e75; stroke-width: 4; stroke-linecap: round; }
+
+/* Vertical, because the axis it drives is vertical -- a horizontal slider
+   for Z reads backwards next to the side view. */
+.z-slider {
+    accent-color: #1d9e75;
+    cursor: pointer;
+    /* Chrome dropped slider-vertical for writing-mode; keep the old
+       property so older engines still stand the track upright. */
+    -webkit-appearance: slider-vertical;
+    appearance: slider-vertical;
+    direction: rtl;
+    writing-mode: vertical-lr;
+    height: 240px;
+    width: 24px;
+}
 
 .jog-zcol { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 190px; }
 .jog-zbtn {
@@ -6347,6 +6744,10 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
     font-family: inherit;
 }
 .jog-abtn:hover { background: rgba(59, 130, 246, 0.24); }
+/* Locked: during a print or a running calibration the server rejects
+   the same command anyway (action_guards). */
+.jog-abtn:disabled { opacity: 0.4; cursor: not-allowed; }
+.jog-abtn:disabled:hover { background: rgba(59, 130, 246, 0.14); }
 .jog-abtn--home { background: rgba(240, 160, 60, 0.14); color: #f0b46a; }
 
 /* --- Extruder --- */
@@ -6387,14 +6788,70 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 /* --- Filament --- */
 .fil-actions { display: flex; gap: 9px; margin-top: 12px; }
 .fil-abtn { flex: 1; text-align: center; padding: 10px 8px; }
-/* Waehrend Druck/laufendem Filament-Ablauf gesperrt */
+/* Locked during a print / a running filament flow */
 .fil-abtn:disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
 
-/* Ganzer Tab gesperrt (Achsen/Extruder waehrend des Drucks) */
+/* Running filament flow: the button carries the current step
+   ("heating nozzle", "cutting filament") — the same information as the
+   printer's own screen. It stays locked, but must NOT be grayed out:
+   right at its most informative moment it would be hardest to read.
+   Full opacity, a set-off border, a calm pulse as a sign that something
+   is running. */
+.fil-abtn--laeuft:disabled {
+    opacity: 1;
+    color: var(--accent-blue, #2196f3);
+    border-color: var(--accent-blue, #2196f3);
+    background: color-mix(in srgb, var(--accent-blue, #2196f3) 14%, transparent);
+    font-weight: 600;
+    animation: fil-laeuft 1.8s ease-in-out infinite;
+}
+@keyframes fil-laeuft {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-blue, #2196f3) 45%, transparent); }
+    50%      { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent-blue, #2196f3) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .fil-abtn--laeuft:disabled { animation: none; }
+}
+
+/* Whole tab locked (axes/extruder during a print) */
 .ctrl-gesperrt { opacity: 0.35; pointer-events: none; }
+
+/* Camera and notice side by side. The image is capped at 380px,
+   leaving room beside it — the notice sits there instead of squeezing
+   between the frames under the tabs. */
+.ctrl-kopfzeile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.ctrl-kopfzeile .ctrl-camera-wrap { margin-bottom: 0; }
+/* Replaces the spacing the camera itself used to contribute via its own margin. */
+.ctrl-kopfzeile { margin-bottom: 16px; }
+
+/* Says why nothing is happening right now. A gray box with no
+   explanation looks broken. */
+.ctrl-busy-hinweis {
+    flex: 0 1 240px;
+    padding: 12px 14px;
+    border: 1px solid var(--accent-orange, #ff9800);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent-orange, #ff9800) 12%, transparent);
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+}
+
+/* Narrow window: the notice slides under the image and takes the
+   full width — side by side, both would be too narrow there. */
+@media (max-width: 720px) {
+    .ctrl-busy-hinweis { flex: 1 1 100%; }
+}
 #fil-slots .mz-sec:first-child { margin-top: 0; }
 
-/* --- Geraet-Tab: Panels im kv-Listen-Look --- */
+/* --- Device tab: panels in key-value list look --- */
 #device-tab .ctrl-panel {
     background: rgba(128, 128, 128, 0.06);
     border: 1px solid rgba(128, 128, 128, 0.12);
@@ -6410,12 +6867,12 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 #device-tab .dev-row:last-child,
 #device-tab .dev-fan-row:last-child { border-bottom: none; }
 
-/* Geraet-Tab: zwei Spalten wie im Mockup */
+/* Device tab: two columns as in the mockup */
 .dev-cols { display: flex; gap: 10px; align-items: flex-start; }
 .dev-col { flex: 1; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 @media (max-width: 560px) { .dev-cols { flex-direction: column; } }
 
-/* Schalter-Optik (Anzeige, xcam ist nicht setzbar) */
+/* Toggle look (display only, xcam is not settable) */
 .dev-sw {
     width: 34px; height: 19px;
     background: rgba(128, 128, 128, 0.25);
@@ -6436,12 +6893,12 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 .dev-sw--click { cursor: pointer; }
 .dev-sw--click:hover { box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.35); }
 
-/* Geraet-Tab: kompakter, Duesen untereinander statt gequetscht */
+/* Device tab: more compact, nozzles stacked instead of squeezed */
 #device-tab .ctrl-panel { padding: 10px 12px; }
 #device-tab .ctrl-panel-title { margin-bottom: 6px; font-size: 13px; }
 #device-tab .dev-nozzle-grid { grid-template-columns: 1fr; gap: 8px; }
 
-/* Dropdowns im Steuerungs-Fenster im App-Stil (wie Einstellungen) */
+/* Dropdowns in the control window in app style (like settings) */
 #printerControlModal select {
     background: var(--input-bg, var(--bg-secondary));
     color: var(--text-primary);
@@ -6454,8 +6911,8 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
     cursor: pointer;
 }
 
-/* Geraet-Tab Feinschliff: Titel links + klein wie im Mockup,
-   Kammerheizung als kompakte Zeile statt Riesen-Anzeige */
+/* Device tab polish: title left + small as in the mockup,
+   chamber heating as a compact row instead of a giant display */
 #device-tab .ctrl-panel-title {
     text-align: left;
     font-size: 12px;
@@ -6495,15 +6952,15 @@ body.dark-mode .ctrl-filament-btn--purge:hover {
 
 #device-tab .dev-nozzle-temp { font-size: 16px; }
 
-/* An/Aus-Knoepfe der Zusatzlichter kompakt rechtsbuendig */
+/* On/off buttons for the auxiliary lights, compact and right-aligned */
 #dev-lights-panel .dev-row span:last-child { display: inline-flex; gap: 6px; }
 #dev-lights-panel .ams-rfid-btn { padding: 3px 12px; font-size: 12px; border-radius: 999px; }
 
 .hd-ic--lg { width: 20px; height: 20px; }
 .ctrl-tab .hd-ic { width: 14px; height: 14px; vertical-align: -2.5px; opacity: 0.85; }
 
-/* Druck-Aktionen als Karten im Uebersichts-Grid — der wiederverwendbare
- * Aktions-Baustein: .ov-card--btn + Farbvariante (--warn/--ok/--danger). */
+/* Print actions as cards in the overview grid — the reusable
+ * action building block: .ov-card--btn + color variant (--warn/--ok/--danger). */
 .ov-card--btn {
     display: flex;
     align-items: center;
@@ -6544,8 +7001,8 @@ body.dark-mode .ov-card--ok { color: #a5d6a7; }
 body.dark-mode .ov-card--danger { color: #f87171; }
 
 /* ============================================================
- * Display-Stil-Fenster (Temperatur / Luefter / Tempo / Luftfuehrung)
- * Bausteine: dsp-card (Wert-Karte), dsp-chip (Preset), dsp-step
+ * Display-style windows (temperature / fan / speed / airflow)
+ * Building blocks: dsp-card (value card), dsp-chip (preset), dsp-step
  * ============================================================ */
 .dsp-card {
     background: rgba(128, 128, 128, 0.09);
@@ -6553,60 +7010,8 @@ body.dark-mode .ov-card--danger { color: #f87171; }
     border-radius: 14px;
     padding: 13px 16px;
 }
-
-.dsp-head { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-secondary); }
 .dsp-head .hd-ic { width: 15px; height: 15px; }
-.dsp-val { font-size: 21px; font-weight: 800; margin-top: 4px; font-variant-numeric: tabular-nums; color: var(--text-primary); }
-.dsp-val small { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
-
-.dsp-chips {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
-    gap: 6px;
-    margin-top: 10px;
-}
-.dsp-chip {
-    background: var(--bg-card);
-    border: 1px solid rgba(128, 128, 128, 0.18);
-    border-radius: 999px;
-    padding: 4px 6px;
-    text-align: center;
-    white-space: nowrap;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-family: inherit;
-}
-.dsp-chip:hover { border-color: rgba(59, 130, 246, 0.5); }
 .dsp-chip.dsp-on { border-color: var(--accent-blue); color: var(--accent-blue); background: rgba(59, 130, 246, 0.08); }
-
-.dsp-step { display: flex; gap: 8px; margin-top: 10px; }
-.dsp-step button {
-    flex: 1;
-    background: var(--bg-card);
-    border: 1px solid rgba(128, 128, 128, 0.18);
-    border-radius: 10px;
-    padding: 7px 0;
-    font-weight: 800;
-    font-size: 14px;
-    color: var(--text-primary);
-    cursor: pointer;
-    font-family: inherit;
-}
-.dsp-step button:hover { border-color: rgba(59, 130, 246, 0.5); }
-
-.dsp-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(18, 22, 30, 0.85);
-    color: #fff;
-    border-radius: 999px;
-    padding: 2px 10px;
-    font-size: 11px;
-    font-weight: 700;
-}
 
 .dsp-active {
     font-size: 11px;
@@ -6622,29 +7027,10 @@ body.dark-mode .dsp-active { color: #a5d6a7; }
 
 .dsp-hint { margin-top: 12px; font-size: 12px; color: var(--text-secondary); display: flex; gap: 6px; align-items: center; }
 .dsp-hint .hd-ic { width: 13px; height: 13px; flex: none; }
-
-/* Temperatur: Duesen-Reihe mit Render mittig */
-.dt-nozzles { display: grid; grid-template-columns: 1fr 132px 1fr; gap: 14px; align-items: stretch; }
-.dt-nozzles--single { grid-template-columns: 1fr 132px; }
-.dt-noz-img { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
-.dt-noz-img img { height: 108px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
-.dt-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
 .dt-grid2 .dsp-card:only-child { grid-column: span 2; }
-
-/* Luefter: Maschine + Karten */
-.df-top { display: grid; grid-template-columns: 220px 1fr; gap: 18px; align-items: center; }
-.df-mach { position: relative; }
-.df-mach img { width: 100%; }
-.df-tag { position: absolute; }
-.df-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.df-pct { font-size: 24px; font-weight: 800; margin: 2px 0 8px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-.df-note { margin-top: 9px; font-size: 11.5px; font-weight: 700; color: #e65100; display: flex; align-items: center; gap: 5px; }
-body.dark-mode .df-note { color: #ffb74d; }
-.df-auto { margin-top: 9px; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); }
 .df-slider { width: 100%; cursor: pointer; accent-color: var(--accent-blue); margin-top: 2px; }
-.df-span2 { grid-column: span 2; }
 
-/* Tempo: vier Stufen-Karten */
+/* Speed: four step cards */
 .ds-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .ds-card { text-align: center; padding: 16px 10px 14px; position: relative; cursor: pointer; }
 .ds-card .hd-ic { width: 22px; height: 22px; color: var(--text-secondary); }
@@ -6659,22 +7045,14 @@ body.dark-mode .df-note { color: #ffb74d; }
     display: none; align-items: center; justify-content: center;
 }
 .ds-card.dsp-on .ds-check { display: flex; }
-
-/* Luftfuehrung: Modus-Karten */
-.da-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.da-card { display: flex; align-items: center; gap: 14px; padding: 16px; cursor: pointer; position: relative; }
 .da-card .hd-ic { width: 30px; height: 30px; flex: none; color: var(--text-secondary); }
-.da-card b { font-size: 15px; color: var(--text-primary); }
-.da-card small { display: block; color: var(--text-secondary); font-size: 11.5px; margin-top: 2px; }
 .da-card.dsp-on { border-color: #e65100; box-shadow: 0 0 0 1px #e65100 inset; }
 .da-card.dsp-on .hd-ic { color: #e65100; }
-.da-card.dsp-on--cool { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
 .da-card.dsp-on--cool .hd-ic { color: var(--accent-blue); }
-.da-badge { background: rgba(230, 81, 0, 0.9); }
 
-/* Temperatur-Fenster: gleiche Display-Stage wie das Luefter-Fenster.
- * Zonen-Details klappen unter dem Eintrag aus — zwei buendige
- * Segmentleisten (Stepper, Presets) im Stil des Modus-Toggles. */
+/* Temperature window: same display stage as the fan window.
+ * Zone details expand below the entry — two flush
+ * segment bars (stepper, presets) in the style of the mode toggle. */
 .dtx-hw { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
 .dtx-detail { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 .dfx-col--l .dtx-detail { align-items: flex-end; }
@@ -6709,8 +7087,8 @@ body.dark-mode .df-note { color: #ffb74d; }
 .dtx-seg button:hover { background: rgba(128, 128, 128, 0.12); }
 .dtx-seg button.dtx-on { background: rgba(59, 130, 246, 0.16); color: var(--accent-blue, #3b82f6); }
 
-/* Luefter-Fenster im X2D-Display-Layout: Modus-Toggle, Maschine mittig,
- * Eintraege aussen mit gepunkteten Linien zur Maschine. */
+/* Fan window in the X2D display layout: mode toggle, machine centered,
+ * entries on the outside with dotted lines to the machine. */
 .dfx-modes { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
 .dfx-mode {
     display: inline-flex; align-items: center; gap: 8px;
@@ -6741,9 +7119,10 @@ body.dark-mode .dfx-mode--on { color: #4ade80; }
 body.dark-mode .dfx-fan-note { color: #ffb74d; }
 .dfx-slider { max-width: 150px; margin-top: 6px; }
 
-/* Gepunktete Verbindungslinien wie am X2D-Display: vom Eintrag horizontal,
- * dann Knick senkrecht ans Bauteil, offener Kreis als Endpunkt. Das SVG
- * liegt als Overlay ueber der ganzen Stage (dfxDrawWires in fan-modal.js). */
+/* Dotted connector lines like on the X2D display: horizontal from the
+ * entry, then a bend down to the component, an open circle as the
+ * endpoint. The SVG sits as an overlay over the whole stage
+ * (dfxDrawWires in fan-modal.js). */
 .dfx-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .dfx-wires polyline {
     fill: none;
@@ -6756,9 +7135,9 @@ body.dark-mode .dfx-fan-note { color: #ffb74d; }
 body.dark-mode .dfx-wires polyline { stroke: rgba(220, 220, 220, 0.55); }
 body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 
-/* --- Filament-Editor (Tray-Edit) — Aufbau wie das Display
-   (wiki screen-operation/015.png): Formularzeilen mit zwei Dropdowns,
-   Farbquadrat, Temp-Anzeige, unten Abbrechen | Bestaetigen. --- */
+/* --- Filament editor (tray edit) — laid out like the display
+   (wiki screen-operation/015.png): form rows with two dropdowns,
+   color square, temp display, cancel | confirm at the bottom. --- */
 .tray-edit-overlay {
     position: fixed; inset: 0; z-index: 10050;
     background: rgba(0, 0, 0, 0.45);
@@ -6773,7 +7152,99 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
     display: flex; flex-direction: column; gap: 18px;
 }
-.tray-edit-box h4 { margin: 0; font-size: 17px; }
+.tray-edit-box h4 { margin: 0; font-size: 17px; display: flex; align-items: baseline; }
+/* Active drying: values left, AMS image right in the free space. */
+.dry-inhalt { display: flex; align-items: center; gap: 18px; }
+.dry-werte { flex: 1; min-width: 0; }
+/* Measurement columns like in the material card, here as 2x2. Side by
+   side, only three fit next to the AMS image — the fourth ("done at")
+   ended up alone on a second row. */
+.dry-mess { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px 22px; }
+/* This unit's trays — color dot and type, like in the card.
+   With a heading, otherwise it's not clear what the badges
+   stand for. */
+.dry-faecher-titel { margin-top: 14px; margin-bottom: 5px; font-size: 11px;
+            color: var(--text-secondary); opacity: 0.85; }
+.dry-faecher { display: flex; flex-wrap: wrap; gap: 6px; }
+.dry-fach { display: inline-flex; align-items: center; gap: 6px;
+            padding: 3px 10px 3px 4px; border-radius: 999px;
+            background: rgba(128,128,128,0.10);
+            border: 1px solid rgba(128,128,128,0.16);
+            font-size: 12px; color: var(--text-secondary); }
+.dry-fach .mz-slot-col { width: 13px; height: 13px; border-radius: 50%;
+            border: 1px solid rgba(128,128,128,0.35); }
+
+/* --- Humidity memory in the AMS dialog ------------------------------------
+   The current value up top doesn't say whether drying is needed. The curve
+   shows the trend, the row below it the verdict per tray. */
+.fk-block { margin: 12px 0 4px; }
+.fk-block:empty { display: none; }
+.fk-kopf { display: flex; align-items: baseline; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+           text-transform: uppercase; color: var(--text-secondary);
+           margin-bottom: 6px; }
+.fk-schwelle-text { font-weight: 500; text-transform: none; letter-spacing: 0;
+           opacity: 0.75; }
+.fk-spanne { flex: 1; font-weight: 500; text-transform: none;
+            letter-spacing: 0; opacity: 0.75; }
+.fk-kurve { display: block; width: 100%; height: 46px;
+            border-radius: 8px; background: rgba(128,128,128,0.08); }
+/* Only fills above the threshold. A fill from the value down to the
+   bottom looked the same for every calm spool — just a half-blue box. */
+.fk-nass { fill: rgba(239,68,68,0.20); stroke: none; }
+.fk-linie { fill: none; stroke: #3b82f6; stroke-width: 1.6;
+            vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.fk-schwelle { stroke: #ef4444; stroke-width: 1; stroke-dasharray: 4 3;
+            vector-effect: non-scaling-stroke; opacity: 0.55; }
+/* Tooltip on the pointer: its own element on body, not inside the
+   window — otherwise the frame would clip it, and the window's z-index
+   would hide it behind the spool selection. */
+.fk-schild {
+    position: fixed; z-index: 2147483646; display: none;
+    pointer-events: none;
+    padding: 6px 9px; border-radius: 8px;
+    background: rgba(20, 24, 32, 0.94); color: #f3f5f8;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    font-size: 12px; line-height: 1.35; white-space: nowrap;
+    display: none;
+}
+.fk-schild b { font-weight: 700; margin-right: 7px; }
+.fk-schild span { color: #cdd5df; margin-right: 7px; }
+.fk-schild .fk-schild-zeit { display: block; margin: 2px 0 0; opacity: 0.75; }
+.fk-kurve[data-fk] { cursor: crosshair; }
+
+.fk-frisch { font-size: 12px; color: var(--text-secondary);
+            padding: 9px 11px; border-radius: 8px;
+            background: rgba(128,128,128,0.08); }
+.fk-fach { display: flex; align-items: center; gap: 8px; margin-top: 7px;
+           font-size: 12px; color: var(--text-secondary); }
+.fk-fach .mz-slot-col { width: 12px; height: 12px; border-radius: 50%; flex: none;
+           border: 1px solid rgba(128,128,128,0.35); }
+.fk-fach-name { font-weight: 600; color: var(--text-primary); flex: none; }
+.fk-urteil { flex: none; padding: 2px 8px; border-radius: 999px;
+             font-size: 11px; font-weight: 600; }
+.fk-urteil--trocken { background: rgba(34,197,94,0.16); color: #16a34a; }
+.fk-urteil--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
+.fk-urteil--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
+.fk-detail { min-width: 0; overflow: hidden; text-overflow: ellipsis;
+             white-space: nowrap; }
+
+/* Measured notice in print prep: it overrides the estimate derived from
+   storage time, so it must not look like a side remark. */
+.prep-hinweis--mess { color: #b45309; font-weight: 600; }
+
+/* Dried filament as a badge — it's a property of the run,
+   not a measured value, so not a fourth column. */
+.dry-chip-kopf { font-size: 10.5px; font-weight: 600; opacity: 0.7;
+            margin-right: 7px; text-transform: uppercase; letter-spacing: 0.03em; }
+.dry-chip { display: inline-flex; align-items: center; margin-bottom: 12px;
+            padding: 4px 11px; border-radius: 999px; font-size: 12.5px;
+            font-weight: 650; background: rgba(128,128,128,0.12);
+            color: var(--text-primary); }
+/* Not glued to the right edge — the image sits indented, just as
+   the values on the left also keep distance from the edge. */
+.dry-ams { flex: none; width: 105px; height: auto; object-fit: contain;
+           margin-right: 34px; }
 .tray-edit-zeile {
     display: flex; align-items: center; gap: 14px;
 }
@@ -6789,7 +7260,38 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
     border-radius: 10px;
     background: var(--bg-secondary, #f2f3f5);
     color: var(--text-primary, #222);
-    padding: 9px 10px;
+    padding: 9px 30px 9px 10px;
+    /* Own arrow instead of the operating system's glyph — one source
+       for all UIs, see `--pfeil` in design-tokens.css. */
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: var(--pfeil);
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+    background-size: 15px;
+    cursor: pointer;
+}
+/* The Spoolman spool is the same kind of choice as manufacturer and type
+   above it, just from a different source — so it looks the same way too.
+   As a bare button, only the background color applied: the sizing lives in
+   `.tray-edit-actions button`, and it isn't part of that group. */
+.tray-edit-spoolknopf {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 9px;
+    font: inherit; font-size: 13.5px; text-align: left;
+    border: 1px solid rgba(128, 128, 128, 0.28);
+    border-radius: 10px;
+    background: var(--bg-secondary, #f2f3f5);
+    color: var(--text-primary, #222);
+    padding: 9px 10px; cursor: pointer;
+}
+.tray-edit-spoolknopf:hover { border-color: rgba(128, 128, 128, 0.5); }
+.tray-edit-spoolpunkt {
+    display: none; flex: 0 0 auto; width: 13px; height: 13px;
+    border-radius: 50%; border: 1px solid rgba(128, 128, 128, 0.35);
+}
+.tray-edit-spoolname {
+    flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .tray-edit-swatch {
     width: 46px; height: 34px; border-radius: 9px;
@@ -6812,18 +7314,18 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 .tray-edit-twert { font-size: 14px; font-weight: 700; margin-right: 10px; }
 .tray-edit-actions { display: flex; justify-content: flex-end; gap: 10px; }
 .tray-edit-actions button {
-    border: none; border-radius: 10px; padding: 10px 22px;
-    font-size: 13.5px; font-weight: 600; cursor: pointer;
+    border: none; border-radius: var(--knopf-radius); padding: var(--knopf-polster);
+    font-size: var(--knopf-schrift); font-weight: 600; cursor: pointer;
 }
 .tray-edit-cancel { background: rgba(128, 128, 128, 0.15); color: var(--text-primary, #222); }
 .tray-edit-save { background: #4ade80; color: #fff; }
-/* Leert das Fach — muss sich von "Abbrechen" unterscheiden.
-   Beide trugen dieselbe Klasse und standen nebeneinander. */
+/* Empties the tray — must be visually distinct from "Cancel":
+   the two sit right next to each other. */
 .tray-edit-danger { background: rgba(220, 38, 38, 0.10); color: #c62828;
     box-shadow: inset 0 0 0 1.5px rgba(220, 38, 38, 0.45); }
 body.dark-mode .tray-edit-danger { color: #ff8a80; }
 
-/* Stift-Knopf in den Fach-Zeilen des Filament-Tabs */
+/* Pencil button in the tray rows of the filament tab */
 .mz-edit-btn {
     margin-left: 6px; flex: 0 0 auto;
     border: 1px solid rgba(128, 128, 128, 0.35);
@@ -6832,7 +7334,7 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 }
 .mz-edit-btn:hover { color: var(--text-primary, #222); }
 
-/* Trocknungs-Dialog (014): Feuchte-Zeile + Grad/Stunden-Felder */
+/* Drying dialog (014): humidity row + degree/hours fields */
 .dry-feuchte { font-size: 14px; color: var(--text-secondary, #777); }
 .dry-feld {
     display: inline-flex; align-items: center; gap: 4px;
@@ -6847,17 +7349,65 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 }
 .dry-einheit { font-size: 12.5px; color: var(--text-secondary, #777); }
 
+/* Rotate while drying. Sits below the numbers, not beside
+   them: it's a decision, not a measured value, and on one line with
+   °C and h it would read as a third value. */
+.dry-drehen {
+    display: flex; align-items: center; gap: 9px;
+    margin: 10px 0 2px; font-size: 13px; cursor: pointer;
+    color: var(--text-primary, #222);
+}
+.dry-drehen input { width: 16px; height: 16px; accent-color: var(--color-blue, #2196F3); }
+
+/* "Cool printer down" — sits next to the mode buttons but carries no
+   selection meaning: it's an action, not a state. Hence tinted blue
+   instead of using a selection dot. */
+.dfx-kuehlen {
+    gap: 7px;
+    background: rgba(33, 150, 243, 0.10);
+    border-color: rgba(33, 150, 243, 0.35);
+    color: var(--accent-blue);
+}
+
+.dfx-kuehlen:hover { background: rgba(33, 150, 243, 0.18); }
+
+/* While cooling is running, the button carries the warning color: it then
+   stops something instead of starting it. */
+.dfx-kuehlen--an {
+    background: rgba(255, 152, 0, 0.12);
+    border-color: rgba(255, 152, 0, 0.40);
+    color: #b26a00;
+}
+
+.dfx-kuehlen--an:hover { background: rgba(255, 152, 0, 0.20); }
+body.dark-mode .dfx-kuehlen--an { color: #ffb74d; }
+
+/* The cooling button sits centered below the machine, not in the
+   mode row: the two modes are a selection, this here is an action. */
+.dfx-kuehl-zeile { display: flex; justify-content: center; margin-top: 14px; }
+
+/* The printer's follow-up question after loading — visible only while it
+   waits (filament step 8). Set apart so it doesn't look like another
+   action row. */
+.fil-confirm {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--border-color, rgba(128,128,128,.35));
+    border-radius: 10px;
+    text-align: center;
+}
+/* The two buttons centered and only as wide as needed — they shouldn't
+   fill the full width like the action row above them. */
+.fil-confirm .fil-actions {
+    justify-content: center;
+}
+.fil-confirm .fil-actions .jog-abtn {
+    flex: 0 0 auto;
+}
+
 
 /* ---- responsive.css ---- */
-/* ============================================
- * Responsive - Media Queries
- * Phone < 768px | Tablet 768-1023px | Desktop >= 1024px
- * ============================================ */
 
-/* ========== PHONE (Default - Mobile First) ========== */
-.main-grid {
-    display: block;
-}
 
 /* ========== TABLET (>= 768px) ========== */
 @media (min-width: 768px) {
@@ -6879,9 +7429,9 @@ body.dark-mode .tray-edit-danger { color: #ff8a80; }
 
 
 /* ---- thumb-preview.css ---- */
-/* Vergroesserte Thumbnail-Vorschau beim Ueberfahren mit der Maus.
-   Liegt ueber allem und faengt selbst keine Mausereignisse ab, sonst wuerde
-   sie unter dem Zeiger sofort ihr eigenes mouseleave ausloesen. */
+/* Enlarged thumbnail preview on mouse hover.
+   Sits above everything and doesn't capture mouse events itself, otherwise
+   it would trigger its own mouseleave immediately under the cursor. */
 .thumb-preview {
     position: fixed;
     z-index: 10000;
@@ -6914,12 +7464,12 @@ body:not(.dark-mode) .thumb-preview {
     max-width: 100%;
     max-height: 100%;
     border-radius: 8px;
-    /* Freigestellte Vorschauen sind transparent — ein Schachbrett waere
-       unruhig, ein neutraler Grund zeigt helle wie dunkle Modelle. */
+    /* Cutout previews are transparent — a checkerboard pattern would be
+       distracting, a neutral background shows light and dark models alike. */
     background: rgba(127, 127, 127, 0.10);
 }
 
-/* Zeigt an, dass es etwas zu vergroessern gibt. */
+/* Indicates there's something to enlarge. */
 .thumb-preview-source {
     cursor: zoom-in;
 }

@@ -34,9 +34,9 @@ class SpoolmanManager {
             const statusIndicator = document.getElementById('spoolman-connection');
             const spoolmanContent = document.getElementById('spoolman-content');
 
-            // spoolman-card-grid existiert nur noch im Klipper-Betrieb — im
-            // Bambu-Betrieb lebt der Block in der Material-Zone. Die Karte
-            // ist deshalb KEINE Voraussetzung mehr.
+            // spoolman-card-grid exists only in Klipper mode -- in Bambu mode
+            // the block lives in the material zone. The card is therefore NO
+            // longer a precondition.
             if (!statusIndicator || !spoolmanContent) return;
 
             if (data.enabled && data.connected) {
@@ -76,8 +76,8 @@ class SpoolmanManager {
         try {
             const response = await apiCall('/api/spoolman/spools');
             const spools = await response.json();
-            // Merken: die Dateiliste zeigt die aktive Spule in ihrer
-            // Werkzeugleiste und braucht dafuer mehr als nur die ID.
+            // Remembered: the file list shows the active spool in its toolbar
+            // and needs more than just the id for that.
             this.spools = spools;
             if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
             this._knopfBeschriften();
@@ -262,15 +262,15 @@ class SpoolmanManager {
                 window.activeSpoolId = parseInt(spoolId);
                 this.activeSpoolId = parseInt(spoolId);
                 this.updateDisplay();
-                // Wurde mitten im Druck gewechselt, hat der Server den bis
-                // dahin verbrauchten Anteil auf die alte Rolle gebucht — das
-                // gehoert gesagt, sonst wundert man sich ueber die Restmenge.
+                // If the change happened mid-print, the server booked the
+                // share used up to that point onto the old spool -- that wants
+                // saying, or the remaining amount looks puzzling.
                 if (data.booked_to_previous) {
                     skToast((texts.toast_spool_changed_booked || '')
                         .replace('{g}', Math.round(data.booked_to_previous))
                         || `${Math.round(data.booked_to_previous)} g auf die alte Rolle gebucht`, 'success');
                 } else {
-                    // Mit Bezug: "Spule aktiviert" allein sagt nicht, welche.
+                    // With context: "spool activated" alone does not say which one.
                     const gewaehlt = (this.spools || []).find(x => x.id === parseInt(spoolId));
                     const fil = (gewaehlt && gewaehlt.filament) || {};
                     const hersteller = (fil.vendor && fil.vendor.name) || '';
@@ -306,9 +306,9 @@ class SpoolmanManager {
     }
 
     /**
-     * Der Knopf der Material-Karte traegt die aktive Spule: Farbpunkt und
-     * Name. Ohne das saehe man erst nach dem Oeffnen des Fensters, was
-     * gerade eingelegt ist — die alte Auswahlliste zeigte es direkt.
+     * The button on the material card carries the active spool: a colour dot
+     * and the name. Without it you would only see what is loaded after opening
+     * the window -- the old dropdown showed it directly.
      */
     _knopfBeschriften() {
         const text = document.getElementById('mz-spulknopf-text');
@@ -375,11 +375,10 @@ class SpoolmanManager {
                         const lastUsedDate = new Date(spool.last_used);
                         const now = new Date();
                         const diffTime = Math.abs(now - lastUsedDate);
-                        // floor statt ceil: ein angefangener Tag ist kein
-                        // ganzer. Mit ceil zeigte der Hinweis bei exakt 30
-                        // Tagen "31" und sprang einen Tag zu frueh an —
-                        // dieselbe Rechnung nutzt der Trocknungs-Schalter in
-                        // der Druckvorbereitung.
+                        // floor rather than ceil: a day that has begun is not a
+                        // whole one. With ceil the hint read "31" at exactly 30
+                        // days and fired a day too early -- the drying switch in
+                        // the print preparation uses the same arithmetic.
                         daysSinceUse = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
                         lastUsed = lastUsedDate.toLocaleDateString('de-DE', {
@@ -391,9 +390,9 @@ class SpoolmanManager {
                         });
                     }
 
-                    // Die Feuchte-Vorgeschichte steht in der Spulenauswahl,
-                    // nicht hier: auf der Startseite war sie nur eine weitere
-                    // Kachel, die niemand gesucht hat (27aug26 verworfen).
+                    // The humidity history stands in the spool picker, not
+                    // here: on the home page it was just another tile that
+                    // nobody was looking for.
                     const dryingHint = ((daysSinceUse && daysSinceUse > 30) ? `
                         <div style="grid-column:1/4; text-align:center; margin-top:8px;
                              padding:6px 10px; background:rgba(255,152,0,0.1);

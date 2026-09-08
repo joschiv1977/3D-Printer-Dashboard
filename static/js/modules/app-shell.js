@@ -1,6 +1,6 @@
 /**
- * App Shell - Content Loading System für SPA-ähnliches Verhalten
- * Lädt Seiten-Content dynamisch ohne Full Page Reload
+ * App shell - the content loading system for SPA-like behaviour.
+ * Loads page content dynamically, without a full page reload.
  */
 class AppShell {
     constructor() {
@@ -12,13 +12,13 @@ class AppShell {
     }
 
     /**
-     * Initialisiert das App Shell System
+     * Initialise the app shell system
      */
     init() {
-        // Erstelle Main Content Container (falls nicht vorhanden)
+        // Create the main content container (when it is missing)
         this.ensureMainContainer();
 
-        // Event Listener für Browser Back/Forward
+        // The event listener for the browser back/forward buttons
         window.addEventListener('popstate', (event) => {
             if (event.state && event.state.page) {
                 this.loadPage(event.state.url, false); // false = kein pushState
@@ -31,15 +31,15 @@ class AppShell {
     }
 
     /**
-     * Stellt sicher dass der Main Content Container existiert
+     * Makes sure the main content container exists
      */
     ensureMainContainer() {
         let container = document.getElementById(this.mainContentId);
         if (!container) {
-            // Suche nach dem Haupt-Content-Bereich
+            // Look for the main content area
             const body = document.body;
 
-            // Erstelle einen Container für den dynamischen Content
+            // Create a container for the dynamic content
             container = document.createElement('div');
             container.id = this.mainContentId;
             container.style.width = '100%';
@@ -51,7 +51,7 @@ class AppShell {
     }
 
     /**
-     * Erkennt den Seitennamen aus einer URL
+     * Works out the page name from a URL
      */
     detectPageName(url) {
         if (url.includes('settings.html')) return 'settings';
@@ -62,14 +62,14 @@ class AppShell {
     }
 
     /**
-     * Lädt eine Seite dynamisch
-     * @param {string} url - URL der zu ladenden Seite
-     * @param {boolean} pushState - Ob pushState aufgerufen werden soll (default: true)
+     * Load a page dynamically
+     * @param {string} url - the URL of the page to load
+     * @param {boolean} pushState - whether pushState should be called (default: true)
      */
     async loadPage(url, pushState = true) {
         const pageName = this.detectPageName(url);
 
-        // Prüfe Cache
+        // Check the cache
         if (this.cacheEnabled && this.cache.has(url)) {
             const cachedContent = this.cache.get(url);
             this.renderContent(cachedContent);
@@ -83,10 +83,10 @@ class AppShell {
         }
 
         try {
-            // Zeige Loading-Indikator
+            // Show the loading indicator
             this.showLoading();
 
-            // Lade Seite
+            // Load the page
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -94,10 +94,10 @@ class AppShell {
 
             const html = await response.text();
 
-            // Extrahiere nur den relevanten Content
+            // Extract only the relevant content
             const content = this.extractContent(html, pageName);
 
-            // Cache speichern
+            // Store it in the cache
             if (this.cacheEnabled) {
                 this.addToCache(url, content);
             }
@@ -124,7 +124,7 @@ class AppShell {
     }
 
     /**
-     * Extrahiert den relevanten Content aus einer HTML-Seite
+     * Extracts the relevant content out of an HTML page
      */
     extractContent(html, pageName) {
         const parser = new DOMParser();
@@ -132,21 +132,21 @@ class AppShell {
 
         let content = { html: '', css: '', scripts: [] };
 
-        // Extrahiere CSS aus <style> Tags
+        // Extract the CSS from the <style> tags
         const styleTags = doc.querySelectorAll('style');
         styleTags.forEach(style => {
             content.css += style.textContent;
         });
 
-        // Extrahiere Content basierend auf Seitentyp
+        // Extract the content according to the page type
         if (pageName === 'settings') {
-            // Settings hat eine admin-container Struktur
+            // Settings has an admin-container structure
             const adminContainer = doc.querySelector('.admin-container');
             if (adminContainer) {
                 content.html = adminContainer.outerHTML;
             }
         } else if (pageName === 'slicer' || pageName === 'maintenance' || pageName === 'users') {
-            // Andere Seiten haben eine .container Struktur
+            // Other pages have a .container structure
             const container = doc.querySelector('.container');
             if (container) {
                 content.html = container.outerHTML;
@@ -165,23 +165,23 @@ class AppShell {
     }
 
     /**
-     * Rendert den Content in den Main Container
+     * Renders the content into the main container
      */
     renderContent(content) {
         const container = document.getElementById(this.mainContentId);
         if (!container) return;
 
-        // Setze HTML
+        // Set the HTML
         container.innerHTML = content.html;
 
-        // Füge CSS hinzu (falls nicht bereits vorhanden)
+        // Add the CSS (when it is not there already)
         if (content.css) {
             this.injectCSS(content.css);
         }
 
-        // Führe Scripts aus (optional und vorsichtig!)
-        // WICHTIG: Scripts sollten idealerweise nicht in Seiten-Content sein
-        // sondern als externe Module geladen werden
+        // Run the scripts (optional, and carefully!)
+        // IMPORTANT: ideally scripts should not sit in page content but be
+        // loaded as external modules
         if (content.scripts && content.scripts.length > 0) {
             console.warn('⚠️ Content contains inline scripts. Consider moving to external modules.');
             // content.scripts.forEach(scriptCode => {
@@ -193,7 +193,7 @@ class AppShell {
             // });
         }
 
-        // Wende Übersetzungen an
+        // Apply the translations
         if (window.i18nManager) {
             window.i18nManager.applyTranslations();
         }
@@ -203,7 +203,7 @@ class AppShell {
     }
 
     /**
-     * Fügt CSS in den Head ein
+     * Inserts the CSS into the head
      */
     injectCSS(css) {
         const styleId = 'app-shell-dynamic-styles';
@@ -219,10 +219,10 @@ class AppShell {
     }
 
     /**
-     * Fügt Content zum Cache hinzu
+     * Adds content to the cache
      */
     addToCache(url, content) {
-        // LRU Cache: Entferne älteste wenn zu groß
+        // An LRU cache: drop the oldest when it grows too large
         if (this.cache.size >= this.maxCacheSize) {
             const firstKey = this.cache.keys().next().value;
             this.cache.delete(firstKey);
@@ -232,7 +232,7 @@ class AppShell {
     }
 
     /**
-     * Leert den Cache
+     * Empties the cache
      */
     clearCache() {
         this.cache.clear();
@@ -259,11 +259,11 @@ class AppShell {
      * Versteckt Loading-Indikator
      */
     hideLoading() {
-        // Loading wird durch renderContent ersetzt
+        // The loading state is replaced by renderContent
     }
 
     /**
-     * Zeigt Fehler-Nachricht
+     * Shows the error message
      */
     showError(message) {
         const container = document.getElementById(this.mainContentId);
@@ -285,8 +285,8 @@ class AppShell {
     }
 }
 
-// NICHT automatisch erstellen - nur wenn explizit gewünscht
+// NOT created automatically - only on request
 // window.appShell = new AppShell();
 
-// Export für manuelle Initialisierung
+// Exported for manual initialisation
 window.AppShell = AppShell;

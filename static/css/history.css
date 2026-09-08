@@ -8,12 +8,9 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    padding-bottom: 90px;
+    padding-bottom: var(--dock-freiraum, 94px);
 }
 
-/* Seitenkopf: eine Zeile ohne Kasten. Vorher eine eigene Karte mit
-   20px Innenabstand und 20px Rand — rund 100px allein fuer Titel und
-   zwei Knoepfe, die der Liste darunter fehlten. */
 .hist-header {
     display: flex;
     align-items: center;
@@ -80,8 +77,8 @@ body:not(.dark-mode) .hist-btn:hover {
     color: var(--accent-blue);
 }
 
-/* Im hellen Modus gewinnt sonst `body:not(.dark-mode) .hist-btn` mit
-   seinem grauen Grund — die Schrift war blau, der Knopf grau. */
+/* In light mode, `body:not(.dark-mode) .hist-btn` otherwise wins with
+   its gray background — the text was blue, the button gray. */
 body:not(.dark-mode) .hist-btn--primary {
     background: rgba(33, 150, 243, 0.12);
     border-color: rgba(33, 150, 243, 0.25);
@@ -119,7 +116,7 @@ body.dark-mode .hist-btn--primary {
     justify-content: center;
 }
 
-/* Tab Navigation — echte Pill-Buttons */
+/* Tab Navigation — real pill buttons */
 .hist-tabs {
     display: flex;
     gap: 8px;
@@ -174,7 +171,7 @@ body:not(.dark-mode) .hist-dropdown {
     background: rgba(0, 0, 0, 0.03);
 }
 
-/* Filterleiste: Suche */
+/* Filter bar: search */
 .hist-search-box {
     position: relative;
     display: flex;
@@ -204,7 +201,7 @@ body:not(.dark-mode) .hist-dropdown {
     border-color: var(--accent-blue);
 }
 
-/* Filterleiste: Reihe mit Selects + Toggle */
+/* Filter bar: row with selects + toggle */
 .hist-filter-row {
     display: flex;
     gap: 8px;
@@ -236,7 +233,7 @@ body:not(.dark-mode) .hist-dropdown {
     color: #fff;
 }
 
-/* Filterleiste: Farb-Punkte */
+/* Filter bar: color dots */
 .hist-color-row {
     display: flex;
     align-items: center;
@@ -358,7 +355,7 @@ body:not(.dark-mode) .hist-section {
     padding: 12px 20px;
     position: relative;
     z-index: 2;
-    border-bottom: none;  /* Trennlinie unter dem Header raus (geteilte Klasse nur hier) */
+    border-bottom: none;  /* Divider under the header removed (shared class, only here) */
 }
 
 .hist-detail-thumb {
@@ -527,7 +524,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 @media (max-width: 768px) {
     .hist-container {
         padding: 12px;
-        padding-bottom: 90px;
+        padding-bottom: var(--dock-freiraum, 94px);
     }
 
     .hist-tab-btn {
@@ -541,15 +538,12 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 
 /* ==========================================================================
-   Meister-Detail statt Modal  (21aug26)
+   Master-detail instead of modal
    --------------------------------------------------------------------------
-   Vorher lag jeder Druck in einem Overlay-Modal: zum naechsten Druck kam man
-   nur ueber Schliessen -> Liste -> anderer Eintrag. Zum Durchblaettern von
-   ein paar Drucken war das drei Klicks pro Druck. Jetzt steht die Liste
-   links und wechselt nur der rechte Teil; ueber Pfeiltasten geht es ganz
-   ohne Maus weiter.
-   Unter 900px gibt es keinen Platz fuer zwei Spalten — dort schiebt sich das
-   Detail wie bisher ueber die Liste, mit Zurueck-Knopf statt Kreuz.
+   The list stays on the left and only the right side changes; arrow keys
+   move through prints without a mouse.
+   Below 900px there is no room for two columns — there the detail slides
+   over the list instead, with a back button rather than a cross.
    ========================================================================== */
 .hist-container { --linie: rgba(0, 0, 0, 0.08); }
 [data-theme="dark"] .hist-container { --linie: rgba(255, 255, 255, 0.10); }
@@ -561,13 +555,13 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     align-items: start;
 }
 
-/* Statistik braucht die ganze Breite — Liste und Detail treten beiseite. */
+/* Statistics need the full width — list and detail step aside. */
 .hv-rahmen.hv-statistik { grid-template-columns: 1fr; }
 .hv-rahmen.hv-statistik > .hv-spalte,
 .hv-rahmen.hv-statistik > .hv-detail { display: none; }
-/* Nur verstecken, nie den sichtbaren Zustand setzen: das Dashboard bringt
-   sein eigenes display:grid mit (zwei Spalten). Ein display:block hier
-   gewann durch hoehere Spezifitaet und legte alle Karten untereinander. */
+/* Only hide it, never set the visible state: the dashboard brings
+   its own display:grid (two columns). A display:block here
+   won by higher specificity and stacked all the cards on top of each other. */
 .hv-rahmen:not(.hv-statistik) > .hv-stat { display: none; }
 
 .hv-spalte,
@@ -579,7 +573,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     overflow: hidden;
 }
 
-/* ---- Liste ---- */
+/* ---- List ---- */
 .hv-listenkopf {
     padding: 11px 12px;
     border-bottom: 1px solid var(--linie);
@@ -618,12 +612,11 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     font-weight: 620; font-size: 13px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-/* Die einzelnen Angaben duerfen NICHT schrumpfen. Sonst wird ihre Box
-   schmaler als ihr Text (gemessen 48 px Box fuer 67 px Inhalt), der Text
-   laeuft heraus und schiebt sich ueber den Nachbarn. Sichtbar wurde das,
-   sobald rechts eine Marke Platz braucht — also genau bei laufenden und
-   fehlgeschlagenen Drucken. Jetzt behalten sie ihre Breite und die Zeile
-   schneidet sauber ab. */
+/* The individual fields must NOT shrink. Otherwise their box gets
+   narrower than their text (measured 48px box for 67px of content), the
+   text overflows and pushes over its neighbor. This became visible as
+   soon as a badge on the right needed space — exactly for running and
+   failed prints. Now they keep their width and the row cuts off cleanly. */
 .hv-e-meta > * { flex: none; }
 
 .hv-e-meta {
@@ -699,7 +692,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-d-koerper { padding: 15px; max-height: calc(100vh - 260px); overflow-y: auto; }
 
-/* Nichts gewaehlt: Platzhalter statt leerer weisser Flaeche. */
+/* Nothing selected: a placeholder instead of an empty white area. */
 .hv-nichts {
     padding: 70px 20px; text-align: center; color: var(--text-secondary);
 }
@@ -707,7 +700,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 
 @media (max-width: 900px) {
     .hv-rahmen { grid-template-columns: 1fr; }
-    /* Detail liegt ueber der Liste, sobald ein Druck gewaehlt ist. */
+    /* Detail sits over the list as soon as a print is selected. */
     .hv-detail { display: none; }
     .hv-rahmen.hv-offen > .hv-spalte { display: none; }
     .hv-rahmen.hv-offen > .hv-detail { display: block; }
@@ -715,10 +708,9 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     .hv-d-koerper, .hv-liste { max-height: none; }
 }
 
-/* --- Filterleiste in der schmalen Listenspalte ---------------------------
-   Suche, Reiter und Filter sassen vorher in einer 1100px breiten Karte. In
-   352px brauchen sie kleinere Masse, sonst bricht jeder Filter in eine
-   eigene Zeile und der Kopf wird hoeher als die Liste darunter. */
+/* --- Filter bar in the narrow list column ---------------------------
+   At 352px they need smaller dimensions, otherwise every filter wraps
+   onto its own line and the header ends up taller than the list below it. */
 .hv-listenkopf .hist-controls { margin-bottom: 0; gap: 8px; }
 .hv-listenkopf .hist-search-box input { padding: 8px 12px 8px 33px; font-size: 13px; }
 .hist-search-box .hd-ic {
@@ -736,12 +728,12 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-listenkopf .hist-color-row { margin: 0; }
 
-/* --- Feste Bildschirmhoehe statt mitwachsender Seite ---------------------
-   Liste und Detail sollen nebeneinander stehenbleiben und JEWEILS fuer sich
-   scrollen. Ohne feste Rahmenhoehe wuchs die Seite mit dem laengeren der
-   beiden und lief unter die schwebende Navigationsleiste. */
+/* --- Fixed viewport height instead of a growing page ---------------------
+   List and detail are meant to stay side by side and EACH scroll on their
+   own. Without a fixed frame height, the page grew with whichever was
+   longer and ran under the floating navigation bar. */
 .hv-rahmen { height: calc(100vh - 176px); min-height: 420px; }
-/* Reiterleiste ueber beiden Spalten — bleibt in jedem Modus erreichbar. */
+/* Tab bar spans both columns — stays reachable in every mode. */
 .hv-reiter { grid-column: 1 / -1; margin-bottom: 0; gap: 6px; flex-wrap: wrap; }
 .hv-reiter .hist-tab-btn { padding: 7px 16px; font-size: 13px; border-radius: 999px; }
 .hv-spalte,
@@ -757,8 +749,8 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 .hv-rahmen.hv-statistik { height: auto; }
 .hv-stat { overflow: visible; }
 
-/* Die Reiter im Detail sind Unterstriche, keine blauen Kacheln — sonst
-   konkurrieren sie optisch mit den Listenreitern links daneben. */
+/* The tabs in the detail are underlines, not blue tiles — otherwise
+   they visually compete with the list tabs right next to them. */
 .hv-d-reiter .hist-detail-tab {
     background: none; border: 0; border-radius: 0;
     color: var(--text-secondary); font-weight: 500;
@@ -780,16 +772,15 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     .hv-d-koerper { max-height: none; }
 }
 
-/* --- Ereignisse als Zeitstrahl ------------------------------------------
-   Vorher: 46 Zeilen mit immer demselben Stecknadel-Emoji davor. Jetzt eine
-   durchgehende Linie mit farbigem Punkt je Art (Start, Ende, Fehler,
-   Neustart) — man sieht auf einen Blick, wo etwas schiefging. */
+/* --- Events as a timeline ------------------------------------------
+   A continuous line with a colored dot per type (start, end, error,
+   restart) — you see at a glance where something went wrong. */
 /* ============================================================
-   Phasen dieses Drucks — der Balken ueber der Ereignisliste.
+   Phases of this print — the bar above the event list.
 
-   Der Drucker meldet jeden Stufenwechsel; bis 27aug26 standen die nur als
-   Zeilen untereinander. Als Balken sieht man auf einen Blick, WO die Zeit
-   hinging: bei Druck 1319 waren zehn von zwoelf Minuten Vorkonditionierung.
+   The printer reports every stage change. As a bar you see at a glance
+   WHERE the time went: for print 1319, ten of twelve minutes were
+   preconditioning.
    ============================================================ */
 .hv-phasen { margin-bottom: 18px; }
 .hv-phasen-kopf {
@@ -807,13 +798,13 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-balken i {
     display: block; min-width: 3px; height: 100%;
-    /* Keine Luecken: die Abschnitte stossen aneinander, sonst sieht der
-       Balken loecherig aus, obwohl die Zeit lueckenlos verlaeuft. */
+    /* No gaps: the segments touch each other, otherwise the bar
+       looks full of holes even though time runs without gaps. */
     box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.35);
 }
 .hv-balken i:last-child { box-shadow: none; }
-/* Aufteilung Drucken vs. Vorbereitung — die eine Zahl, die der Balken
-   selbst nicht hergibt. */
+/* Split between printing vs. preparation — the one number the bar
+   itself doesn't provide. */
 .hv-split {
     display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 10px;
 }
@@ -828,9 +819,8 @@ body:not(.dark-mode) .hist-day-print-item:hover {
     font-variant-numeric: tabular-nums; margin-right: 4px;
 }
 
-/* Rangliste statt Legende: nach Dauer sortiert, der Anteil steckt als
-   Fuellung hinter der Zeile. Die alte 3-Spalten-Legende war chronologisch
-   sortiert und bis zu 33 Zeilen lang — man sah nicht, wo die Zeit blieb. */
+/* Ranking instead of a legend: sorted by duration, the share sits as
+   a fill behind the row. */
 .hv-rangliste { margin-top: 12px; }
 .hv-rang, .hv-mehr {
     position: relative; display: flex; align-items: center; gap: 10px;
@@ -891,11 +881,11 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-ev-text { flex: 1; min-width: 0; font-size: 13px; word-break: break-word; }
 
-/* --- Detailkarten nach dem Entwurf --------------------------------------
-   Eine Kartenform fuer alle Abschnitte statt vier verschiedener Kachelarten
-   mit je eigener Schriftgroesse und Farbe. Zahlen stehen in Textfarbe;
-   Orange, Blau und Gruen quer durch die Werte ordneten nichts, sie lenkten
-   nur ab. Farbe bleibt dem Status vorbehalten. */
+/* --- Detail cards per the design --------------------------------------
+   One card shape for every section instead of four different tile types
+   each with their own font size and color. Numbers use the text color;
+   orange, blue and green scattered across the values didn't organize
+   anything, they only distracted. Color stays reserved for status. */
 .hv-karte {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -917,7 +907,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 .hv-wert-zahl small { font-size: 11.5px; font-weight: 500; color: var(--text-secondary); }
 .hv-wert-zahl--leer { color: var(--text-secondary); font-weight: 500; }
 
-/* Zwei Spalten: was geplant war, was wirklich passiert ist. */
+/* Two columns: what was planned, what actually happened. */
 .hv-paar { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 16px; }
 .hv-paar-kopf {
     font-size: 11px; font-weight: 640; letter-spacing: .04em; text-transform: uppercase;
@@ -936,16 +926,17 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 .hv-fil-typ, .hv-fil-g, .hv-fil-nr { font-size: 11.5px; color: var(--text-secondary); flex: none; }
 .hv-fil-nr { margin-left: auto; }
 
-/* Status als Chip im Kopf, nicht als Wort in der Unterzeile. */
+/* Status as a chip in the header, not as a word in the subline. */
 .hv-marke {
     display: inline-flex; align-items: center; gap: 5px; flex: none;
     font-size: 11.5px; padding: 3px 9px; border-radius: 999px; white-space: nowrap;
 }
 
-/* --- Zeitraffer ---------------------------------------------------------
-   Feste 16:9-Buehne mit schwarzem Grund. Das Video wird eingepasst, statt
-   die Flaeche zu bestimmen: hochkant aufgenommene Zeitraffer machten die
-   Karte sonst ueber 900px hoch und die Bedienleiste lag unter dem Falz. */
+/* --- Timelapse ---------------------------------------------------------
+   Fixed 16:9 stage with a black background. The video is fitted in
+   instead of sizing the area: portrait-recorded timelapses would
+   otherwise make the card over 900px tall and put the control bar below
+   the fold. */
 .hv-video {
     width: 100%; max-width: 640px; margin: 0 auto;
     aspect-ratio: 16 / 9;
@@ -955,7 +946,7 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-video video { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-/* Status-Marken: nur bei Abweichung vom Normalfall. */
+/* Status badges: only shown when deviating from the normal case. */
 .hv-marke--success   { background: rgba(76, 175, 80, .13);  border: 1px solid rgba(76, 175, 80, .3);  color: #2e7d32; }
 .hv-marke--running   { background: rgba(33, 150, 243, .13); border: 1px solid rgba(33, 150, 243, .3); color: #1565c0; }
 .hv-marke--failed    { background: rgba(244, 67, 54, .13);  border: 1px solid rgba(244, 67, 54, .3);  color: #c62828; }
@@ -976,10 +967,10 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 [data-theme="dark"] .hv-e-marke--failed    { color: #ef9a9a; }
 [data-theme="dark"] .hv-e-marke--cancelled { color: #ffb74d; }
 
-/* Systemlauf (Kalibrierung). Violett, weil die vier Statusfarben schon
-   belegt sind — und weil das hier KEIN Status ist: eine Kalibrierung kann
-   genauso gelingen oder scheitern wie ein Druck. Die Marke steht deshalb
-   vor dem Namen, nicht bei der Statusmarke rechts. */
+/* System run (calibration). Purple, because the four status colors are
+   already taken — and because this is NOT a status: a calibration can
+   succeed or fail just like a print. The badge therefore sits before
+   the name, not with the status badge on the right. */
 .hv-e-marke--system {
     background: rgba(168, 85, 247, .14);
     color: #7e22ce;
@@ -988,16 +979,16 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 [data-theme="dark"] .hv-e-marke--system { color: #d8b4fe; }
 
-/* Der Streifen links traegt den Status mit — auch ohne Auswahl. */
+/* The strip on the left carries the status along — even without a selection. */
 .hv-eintrag--failed    { border-left-color: var(--color-red); }
 .hv-eintrag--cancelled { border-left-color: var(--color-orange); }
 .hv-eintrag--running   { border-left-color: var(--color-blue); }
 .hv-eintrag--system    { border-left-color: #a855f7; }
 
-/* --- Verlauf: Chips statt Chart-Legende ---------------------------------
-   Die eingebaute Legende von Chart.js war eine Zeile grauer Kaestchen ohne
-   Werte. Die Chips tragen den zuletzt gemessenen Wert mit und schalten die
-   jeweilige Kurve an und aus. */
+/* --- History: chips instead of a chart legend ---------------------------
+   Chart.js's built-in legend is a row of gray boxes with no values. The
+   chips carry the most recently measured value and toggle their curve
+   on and off. */
 .hv-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
 .hv-chip {
     display: inline-flex; align-items: center; gap: 7px;
@@ -1014,17 +1005,18 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 
 .hist-container { padding-top: 14px; }
 
-/* Auf schmalen Schirmen verschwinden die Beschriftungen, das Icon genuegt. */
+/* On narrow screens the labels disappear, the icon is enough. */
 @media (max-width: 560px) {
     .hist-header .hist-btn span { display: none; }
     .hist-header .hist-btn { padding: 7px 9px; }
 }
 
-/* --- Übersichtsleiste zum Zoomen ---------------------------------------
-   Ein fünfstündiger Druck bringt rund 660 Messpunkte; auf 1000 Pixel trägt
-   damit jeder Pixel zwei Messungen und die Düsenkurve wird zum Zickzack-Band.
-   Die Leiste zeigt immer den ganzen Druck, das Fenster darin den Ausschnitt —
-   so weiß man beim Hineinzoomen jederzeit, wo im Druck man gerade ist. */
+/* --- Overview bar for zooming ---------------------------------------
+   A five-hour print produces around 660 data points; over 1000 pixels
+   that means every pixel carries two measurements and the nozzle curve
+   turns into a zigzag band. The bar always shows the whole print, the
+   window inside it the visible section — so when zooming in you always
+   know where in the print you are. */
 .hv-spur {
     position: relative; height: 54px; margin-top: 10px;
     border: 1px solid var(--border-color); border-radius: 9px;
@@ -1069,16 +1061,17 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 }
 .hv-bereich button:hover { color: var(--text-primary); background: var(--bg-card); }
 
-/* Ziehen im Diagramm darf keine Textauswahl auslösen. */
+/* Dragging in the chart must not trigger a text selection. */
 .hv-leinwand { user-select: none; touch-action: none; }
 
-/* --- Aktionen in der Reiterzeile ----------------------------------------
-   Die eigene Fußzeile kostete 78px Höhe für drei Knöpfe. Rechts neben den
-   Reitern steht ohnehin leerer Platz — der Verlauf bekommt die Höhe. */
+/* --- Actions in the tab row ----------------------------------------
+   A dedicated footer cost 78px of height for three buttons. There's
+   already empty space to the right of the tabs — the history gets the
+   height back. */
 .hv-reiter-luft { flex: 1; }
 .hv-d-aktionen { display: flex; align-items: center; gap: 6px; padding: 0 0 0 8px; flex: none; }
-/* Spezifischer als `.hv-d-reiter button`, sonst gewinnt dessen
-   background:none und der Hauptknopf bleibt farblos. */
+/* More specific than `.hv-d-reiter button`, otherwise its
+   background:none wins and the primary button stays colorless. */
 .hv-d-reiter .hv-akt-btn {
     border: 1px solid var(--border-color); background: var(--bg-card);
     color: var(--text-secondary); border-radius: var(--knopf-radius);
@@ -1091,9 +1084,9 @@ body:not(.dark-mode) .hist-day-print-item:hover {
 .hv-d-reiter .hv-akt-btn:hover {
     color: var(--text-primary); border-color: var(--color-blue); background: var(--bg-card);
 }
-/* Hauptknopf wie in den Dialogen der ganzen App (.modal-btn-primary):
-   getoenter Grund, blaue Schrift. Vollflaechig blau war hier der
-   Ausreisser — daneben stand in der Wartung ein getoentes "Erstellen". */
+/* Primary button like in dialogs across the app (.modal-btn-primary):
+   tinted background, blue text. Solid blue was the outlier here —
+   maintenance has a tinted "Create" right next to it. */
 .hv-d-reiter .hv-akt-btn--haupt {
     background: rgba(33, 150, 243, 0.15); border-color: rgba(33, 150, 243, 0.3);
     color: #1565c0; font-weight: 600;
@@ -1112,7 +1105,7 @@ body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
 }
 .hv-d-reiter { align-items: center; padding-right: 12px; }
 
-/* Kurzer Hinweis, wie man zoomt — ohne ihn ist die Leiste nur ein Bild. */
+/* Short hint on how to zoom — without it the bar is just a picture. */
 .hv-zoom-hilfe {
     display: flex; gap: 14px; flex-wrap: wrap;
     font-size: 11.5px; color: var(--text-secondary); margin-top: 8px;
@@ -1123,13 +1116,13 @@ body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
 }
 
 @media (max-width: 900px) {
-    /* Auf schmalen Schirmen wandern die Aktionen unter die Reiter. */
+    /* On narrow screens the actions move below the tabs. */
     .hv-d-aktionen { padding: 0 0 8px 15px; }
     .hv-d-reiter { flex-wrap: wrap; }
     .hv-reiter-luft { flex-basis: 100%; }
 }
 
-/* Hinweiszeile, wenn kein Vorschaubild da ist. */
+/* Notice line for when there's no preview image. */
 .hv-kein-bild-zeile { display: flex; align-items: flex-start; gap: 11px; }
 .hv-kein-bild-ic {
     width: 40px; height: 40px; border-radius: 9px; flex: none;
@@ -1140,9 +1133,9 @@ body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
 .hv-kein-bild-zeile span span { font-size: 12px; color: var(--text-secondary); }
 .hv-e-bild.kein-bild, .hv-d-bild.kein-bild { border: 1px solid var(--linie); }
 
-/* --- Zeitraffer: eigene Bedienleiste ------------------------------------
-   Die eingebauten Steuerelemente des Browsers sehen überall anders aus und
-   können kein Tempo vorgeben. Unter dem Video ist ohnehin Platz. */
+/* --- Timelapse: own control bar ------------------------------------
+   The browser's built-in controls look different everywhere and can't
+   set a playback speed. There's room below the video anyway. */
 .hv-tl-leiste {
     display: flex; align-items: center; gap: 9px; margin-top: 11px; flex-wrap: wrap;
 }
@@ -1179,9 +1172,8 @@ body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
 .hv-tl-tempo button.an { background: var(--color-blue); color: #fff; font-weight: 600; }
 .hv-tl-tempo button:hover:not(.an) { color: var(--text-primary); }
 
-/* --- Einstellungen als Menü am Knopf ------------------------------------
-   Vorher eine aufklappbare Karte über der Liste, die beim Öffnen den ganzen
-   Inhalt nach unten schob. Am Knopf bleibt die Seite stehen. */
+/* --- Settings as a menu on the button ------------------------------------
+   The page stays in place with the menu anchored to the button. */
 .hv-menue-huelle { position: relative; display: inline-flex; }
 .hv-menue {
     position: absolute; right: 0; top: calc(100% + 6px); z-index: 60;
@@ -1210,3 +1202,32 @@ body.dark-mode .hv-d-reiter .hv-akt-btn--haupt:hover {
     display: flex; justify-content: flex-end;
     padding: 9px 10px 5px; margin-top: 3px; border-top: 1px solid var(--linie);
 }
+
+/* ── Delete events ──────────────────────────────────────────────
+   The buttons hold back: visible only on hovering the row, so the
+   list is there for reading, not for tidying up.
+   On a touch screen there's no hover — there they stay
+   permanently visible, but faint. */
+.hv-ev-aktion {
+    margin-left: auto; flex: none; display: flex; gap: 4px;
+    opacity: 0; transition: opacity .12s ease;
+}
+.hv-ereignis:hover .hv-ev-aktion,
+.hv-ev-aktion:focus-within { opacity: 1; }
+@media (hover: none) { .hv-ev-aktion { opacity: .45; } }
+
+.hv-ev-weg {
+    border: none; background: transparent; cursor: pointer;
+    color: var(--text-secondary); font-size: 12px; line-height: 1;
+    padding: 3px 6px; border-radius: 6px;
+    font-variant-numeric: tabular-nums;
+}
+.hv-ev-weg:hover { background: var(--accent-red, #ef4444); color: #fff; }
+.hv-ev-weg--alle { font-size: 11px; }
+
+/* Header row above the list, when there are repeats. */
+.hv-ev-werkzeuge {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.hv-ev-hinweis { font-size: 12px; color: var(--text-secondary); }

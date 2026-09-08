@@ -117,7 +117,7 @@ body.dark-mode .sched-form-error {
 }
 
 /* ======================================================================
-   Vortrocknung im Planungs-Dialog
+   Pre-drying in the scheduling dialog
    ====================================================================== */
 
 .sched-dry-feld {
@@ -145,7 +145,7 @@ body.dark-mode .sched-form-error {
 
 .sched-dry-einheit { color: var(--text-secondary); font-size: 12px; }
 
-/* Errechnete Einschaltzeit — bei zu knapper Vorlaufzeit als Warnung. */
+/* Calculated power-on time — shown as a warning if lead time is too tight. */
 .sched-dry-hinweis {
     margin: 0 0 4px 24px;
     font-size: 12px;
@@ -154,7 +154,7 @@ body.dark-mode .sched-form-error {
 
 .sched-dry-hinweis.warnung { color: var(--color-orange); font-weight: 600; }
 
-/* Vortrocknung: Typ, Grad, Stunden */
+/* Pre-drying: type, degrees, hours */
 .sp-dry-zeile {
     display: flex;
     gap: 8px;
@@ -164,8 +164,8 @@ body.dark-mode .sched-form-error {
 
 .sp-dry-zeile select { flex: 1; min-width: 0; }
 
-/* Zeitstrahl: Drucker an -> Trocknung -> Druck. Ersetzt den Fliesstext,
-   weil die Abfolge der Kern der Sache ist. */
+/* Timeline: printer on -> drying -> print. Replaces the running text,
+   because the sequence is the whole point. */
 .sp-strahl {
     margin: 0 0 6px 26px;
     padding: 11px 13px;
@@ -218,7 +218,7 @@ body.dark-mode .sched-form-error {
     white-space: nowrap;
 }
 
-/* Fusszeile: Knoepfe kompakt rechts, abgesetzt vom Inhalt. */
+/* Footer: buttons compact on the right, set apart from the content. */
 .ui-fuss {
     display: flex;
     justify-content: flex-end;
@@ -228,7 +228,7 @@ body.dark-mode .sched-form-error {
     border-top: 1px solid var(--border-color);
 }
 
-/* Datei-Karte: Vorschau links, Name und Eckdaten rechts. */
+/* File card: preview left, name and key details right. */
 .prep-datei {
     display: flex;
     gap: 13px;
@@ -255,8 +255,8 @@ body.dark-mode .sched-form-error {
     white-space: nowrap;
 }
 
-/* Eckdaten ohne Kasten — als Chips standen sie in Konkurrenz zu den
-   Bedienelementen darunter. */
+/* Key details without a box — as chips they competed visually with
+   the controls below them. */
 .prep-datei .prep-fact {
     background: none;
     padding: 0;
@@ -267,7 +267,7 @@ body.dark-mode .sched-form-error {
 
 .prep-datei .prep-facts { gap: 6px 14px; }
 
-/* Optionen-Karte: Zeilen wie oben, damit Schalter und Stufenwahl fluchten. */
+/* Options card: rows like above, so toggles and step selectors line up. */
 .ui-karte .prep-row { padding: 9px 0; }
 .ui-karte .prep-rows > .prep-row { border-top: 1px solid var(--border-color); }
 .ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
@@ -276,15 +276,7 @@ body.dark-mode .sched-form-error {
     .ui-karte .prep-rows > .prep-row:first-child { border-top: 0; }
 }
 
-/* ======================================================================
-   Uebersicht der geplanten Drucke — Aufbau vom 21aug26
-   EIN Kasten fuer die Liste, Eintraege durch eine Linie getrennt. Vorher
-   war jeder Eintrag eine eigene Karte mit vollem Datei-Datenblatt
-   (Groesse, Slicer, Schichthoehe) — bei zehn Drucken eine Wand.
-   ====================================================================== */
-/* Jeder Termin eine eigene Karte mit Abstand. Vorher lagen sie in EINEM
-   Kasten, nur durch eine Linie getrennt — zwei Termine sahen aus wie ein
-   Block, und die Zeilen liefen ineinander. */
+/* Each appointment gets its own card with spacing. */
 .sched-liste {
     display: flex;
     flex-direction: column;
@@ -335,8 +327,8 @@ body.dark-mode .sched-form-error {
     color: var(--text-primary);
 }
 
-/* Der Termin ist der Grund fuer den Eintrag — darum vorne und nicht
-   irgendwo in der Angabenreihe. */
+/* The appointment is the reason for the entry — hence it comes first,
+   not somewhere in the row of details. */
 .sched-eintrag-zeit {
     font-size: 13px;
     font-weight: 640;
@@ -395,8 +387,8 @@ body.dark-mode .sched-form-error {
 body.dark-mode .sched-marke--gruen { color: #8bd18e; }
 body.dark-mode .sched-marke--orange { color: #ffb74d; }
 
-/* Symbolknoepfe: zwei farbige Textknoepfe je Eintrag zogen mehr Blick auf
-   sich als der Druck selbst. */
+/* Icon buttons: two colored text buttons per entry drew more attention
+   than the print itself. */
 .sched-eintrag-akt { display: flex; flex-direction: column; gap: 6px; flex: none; }
 
 .sched-iknopf {
@@ -420,10 +412,9 @@ body.dark-mode .sched-marke--orange { color: #ffb74d; }
 }
 
 /* ======================================================================
-   Multimaterial-Zuordnung
-   Eine Zeile je Filament: links Farbe, Name und Typ, rechts die Spule.
-   Vorher war jedes Filament ein eigener grauer Kasten mit einer
-   Ueberschrift darin — bei acht Filamenten acht Kaesten untereinander.
+   Multi-material assignment
+   One row per filament: color, name and type on the left, the spool
+   on the right.
    ====================================================================== */
 .mf-punkt {
     width: 14px;
@@ -443,18 +434,18 @@ body.dark-mode .sched-marke--orange { color: #ffb74d; }
 
 .mf-typ { color: var(--text-secondary); font-size: 12px; flex: none; }
 
-/* Die Spulenwahl ist hier die eigentliche Aufgabe — sie darf breit sein,
-   aber nicht die ganze Zeile schlucken. */
+/* The spool choice is the actual task here — it may be wide,
+   but not swallow the whole row. */
 .mf-wahl { flex: 0 1 300px; min-width: 0; }
 
-/* Falsche Sorte gewaehlt: Rand und Hinweis darunter. Ohne das rutscht eine
-   PETG-Spule fuer einen ASA-Druck beim Ueberfliegen durch. */
+/* Wrong material chosen: border plus a notice below it. Without this,
+   a PETG spool for an ASA print slips through when skimming. */
 .mf-wahl--falsch {
     border-color: var(--accent-orange, #f59e0b) !important;
     box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.35);
 }
 
-/* Die Zeile ist sonst einzeilig — mit Hinweis darf sie umbrechen. */
+/* The row is otherwise single-line — with a notice it may wrap. */
 .ui-zeile:has(.mf-warnung:not([style*="none"])) { flex-wrap: wrap; }
 
 .mf-warnung {
@@ -469,9 +460,7 @@ body.dark-mode .sched-marke--orange { color: #ffb74d; }
     .mf-wahl { flex-basis: 100%; }
 }
 
-/* Hinweis im Spulen-Dialog, wenn nichts passt. Trug frueher fest
-   verdrahtete Dunkel-Farben (#442222 auf #ffb0b0) und war im hellen
-   Modus unlesbar. */
+/* Notice in the spool dialog when nothing fits. */
 .fm-hinweis {
     background: rgba(255, 152, 0, 0.13);
     border: 1px solid rgba(255, 152, 0, 0.32);
@@ -484,13 +473,12 @@ body.dark-mode .sched-marke--orange { color: #ffb74d; }
 
 body.dark-mode .fm-hinweis { color: #ffb74d; }
 
-/* Auswahlzeile: der Radioknopf sitzt vorn, Farbe und Name daneben. */
+/* Selection row: the radio button sits up front, color and name beside it. */
 .fm-option { gap: 10px; }
 .fm-radio { flex: none; margin: 0; accent-color: var(--color-green, #4CAF50); }
 
-/* Spulen-Empfehlung unter der Auswahl: sagt, WARUM diese Spule dasteht.
-   Vorher stand dort kommentarlos die aktive Spule — auch bei falschem
-   Material. */
+/* Spool recommendation under the selection: says WHY this spool is
+   listed. */
 .sched-spulhinweis {
     margin-top: 6px;
     font-size: 12px;
@@ -500,8 +488,8 @@ body.dark-mode .fm-hinweis { color: #ffb74d; }
 .sched-spulhinweis--warnung { color: #b26a00; font-weight: 600; }
 body.dark-mode .sched-spulhinweis--warnung { color: #ffb74d; }
 
-/* Farbpunkt vor dem Filamentnamen in der Dateikarte — dieselbe Groesse wie
-   in der Dateiliste (.sd-filament-dot). */
+/* Color dot before the filament name in the file card — same size as
+   in the file list (.sd-filament-dot). */
 .prep-fil-punkt {
     display: inline-block;
     width: 10px;

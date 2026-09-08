@@ -1,6 +1,6 @@
 /**
- * I18n Manager - Verwaltet Internationalisierung für die gesamte App
- * Wird von allen Seiten gemeinsam genutzt
+ * The i18n manager - handles the internationalisation for the whole app.
+ * Shared by every page.
  */
 class I18nManager {
     constructor() {
@@ -11,13 +11,13 @@ class I18nManager {
     }
 
     init() {
-        // Sprache aus URL oder localStorage laden
+        // Load the language from the URL or from localStorage
         const urlParams = new URLSearchParams(window.location.search);
         const urlLang = urlParams.get('lang');
 
         this.currentLang = urlLang || localStorage.getItem('language') || 'de';
 
-        // Translations Map erstellen (erwartet dass Sprachdateien bereits geladen sind)
+        // Build the translations map (it expects the language files to be loaded already)
         this.translationsMap = {
             'de': typeof translations_de !== 'undefined' ? translations_de : {},
             'en': typeof translations_en !== 'undefined' ? translations_en : {},
@@ -28,13 +28,13 @@ class I18nManager {
 
         this.texts = this.translationsMap[this.currentLang] || this.translationsMap['en'] || {};
 
-        // Übersetzungen anwenden
+        // Apply the translations
         this.applyTranslations();
     }
 
     /**
-     * Wechselt die Sprache
-     * @param {string} lang - Sprachcode (de, en, fr, es, it)
+     * Switch the language
+     * @param {string} lang - the language code (de, en, fr, es, it)
      */
     switchLanguage(lang) {
         localStorage.setItem('language', lang);
@@ -42,16 +42,16 @@ class I18nManager {
     }
 
     /**
-     * Holt einen übersetzten Text
-     * @param {string} key - Übersetzungsschlüssel
-     * @param {string} fallback - Fallback-Text
+     * Fetch a translated text
+     * @param {string} key - the translation key
+     * @param {string} fallback - the fallback text
      */
     getText(key, fallback = '') {
         return this.texts && this.texts[key] ? this.texts[key] : fallback;
     }
 
     /**
-     * Wendet Übersetzungen auf Elemente mit data-i18n an
+     * Applies the translations to the elements carrying data-i18n
      */
     applyTranslations() {
         const elements = document.querySelectorAll('[data-i18n]');
@@ -62,29 +62,37 @@ class I18nManager {
                 el.textContent = translation;
             }
         });
-        // Platzhalter in Suchfeldern: standen sonst in jeder Sprache deutsch da.
+        // The placeholders in the search fields: they otherwise stood there in
+        // German whatever the language.
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const t = this.getText(el.getAttribute('data-i18n-placeholder'));
             if (t) el.setAttribute('placeholder', t);
         });
+        // The tooltips (title). hms-banner.js has always set data-i18n-title,
+        // only nobody evaluated it here -- so the tooltip stayed German. The
+        // same pattern as above, one attribute further.
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const t = this.getText(el.getAttribute('data-i18n-title'));
+            if (t) el.setAttribute('title', t);
+        });
     }
 
     /**
-     * Gibt die aktuelle Sprache zurück
+     * Returns the current language
      */
     getCurrentLang() {
         return this.currentLang;
     }
 
     /**
-     * Gibt alle Übersetzungen zurück
+     * Returns every translation
      */
     getAllTexts() {
         return this.texts;
     }
 }
 
-// Globale Instanz erstellen (nach DOM-Load)
+// Create the global instance (after the DOM has loaded)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.i18nManager = new I18nManager();
@@ -93,7 +101,7 @@ if (document.readyState === 'loading') {
     window.i18nManager = new I18nManager();
 }
 
-// Backwards Compatibility: Alte Funktionen behalten
+// Backwards compatibility: the old functions are kept
 window.switchLanguage = (lang) => {
     if (window.i18nManager) {
         window.i18nManager.switchLanguage(lang);

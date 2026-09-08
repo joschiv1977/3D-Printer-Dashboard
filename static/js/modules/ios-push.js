@@ -15,13 +15,13 @@ class IOSPushManager {
 
         // Setup on DOM ready
         document.addEventListener('DOMContentLoaded', () => {
-            // Warte auf Auth Handler Initialisierung
+            // Wait for the auth handler to initialise
             if (typeof authHandler !== 'undefined') {
                 // Check ob eingeloggt
                 const checkAuthAndSetupPush = async () => {
                     const token = localStorage.getItem('access_token');
                     if (token) {
-                        // Warte kurz bis alles geladen ist
+                        // Wait a moment until everything is loaded
                         setTimeout(() => {
                             this.setup();
                         }, 1000);
@@ -30,13 +30,13 @@ class IOSPushManager {
                 checkAuthAndSetupPush();
             }
 
-            // Listen für Login Events
+            // Listen for login events
             window.addEventListener('user-logged-in', () => {
                 console.log('[Push] User logged in - Setup Push');
                 this.setup();
             });
 
-            // Listen für Logout Events
+            // Listen for logout events
             window.addEventListener('user-logged-out', () => {
                 console.log('[Push] User logged out - Cleanup Push');
                 if ('serviceWorker' in navigator) {
@@ -51,7 +51,7 @@ class IOSPushManager {
     }
 
     async setup() {
-        // ZUERST AUTH CHECK!
+        // THE AUTH CHECK FIRST!
         const token = localStorage.getItem('access_token');
         if (!token) {
             console.log('[Push] not logged in - skipping push setup');
@@ -78,7 +78,7 @@ class IOSPushManager {
         if (!isIOS) return; // Nur für iOS
 
         if (!isPWA) {
-            // Zeige Install-Hinweis für iOS
+            // Show the install hint for iOS
             if (!localStorage.getItem('ios_install_dismissed')) {
                 this.showInstallHint();
             }
@@ -95,7 +95,7 @@ class IOSPushManager {
                 const registration = await navigator.serviceWorker.register('/static/sw.js');
                 console.log('[Push] SW registered for iOS');
 
-                // Check ob bereits subscribed
+                // Check whether it is subscribed already
                 const existingSubscription = await registration.pushManager.getSubscription();
                 if (existingSubscription) {
                     console.log('[Push] Already subscribed');
@@ -111,7 +111,7 @@ class IOSPushManager {
                         applicationServerKey: this._urlBase64ToUint8Array(window.JINJA_CONFIG.vapidPublicKey)
                     });
 
-                    // An Server MIT AUTH senden
+                    // Send it to the server WITH AUTH
                     const response = await apiCall('/api/webpush/subscribe', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -135,7 +135,7 @@ class IOSPushManager {
                 }
             } catch (error) {
                 console.error((texts.console_push_setup_failed || 'Push setup failed') + ':', error);
-                // Cleanup bei Fehler
+                // Clean up after an error
                 const reg = await navigator.serviceWorker.ready;
                 const sub = await reg.pushManager.getSubscription();
                 if (sub) await sub.unsubscribe();
@@ -173,8 +173,8 @@ class IOSPushManager {
         // Einfache Console Notification
         console.log(`[Push] ${type || 'info'}: ${message}`);
 
-        // Optional: Browser Notification falls verfügbar
-        // ELECTRON: Keine Browser-Notifications - Electron nutzt FCM Push
+        // Optional: a browser notification when one is available.
+        // ELECTRON: no browser notifications - Electron uses FCM push.
         if (!window.electronAPI && 'Notification' in window && Notification.permission === 'granted') {
             new Notification(message, {
                 icon: '/static/icon-192x192.png'

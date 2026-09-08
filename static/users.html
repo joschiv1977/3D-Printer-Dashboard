@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="/static/css/benutzer.css?v=1">
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -24,10 +24,8 @@
     <script src="/static/lang/it.js"></script>
 
     <style>
-        /* Die Optik der Seite steckt in benutzer.css. Hier bleibt nur, was
-           die geteilten Bausteine (Alerts, Formulare) noch brauchen — das
-           alte Kachelraster fuer #devicesList und die drei .section-Karten
-           sind ersatzlos weg. */
+        /* Page styling lives in benutzer.css. This only holds what the
+           shared building blocks (alerts, forms) still need. */
         .alert {
             display: none;
             padding: 11px 13px;
@@ -88,11 +86,11 @@
     <script src="/static/js/modules/theme-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
     <script src="/static/js/modules/tab-bar-manager.js"></script>
+    <script src="/static/js/modules/device-names.js"></script>
 
     <div class="container">
-        <!-- Kopf: eine Zeile. Der Benutzer steht als Chip rechts, "Abmelden"
-             daneben — vorher war das ein eigener Abschnitt mit Ueberschrift
-             ganz unten, so gross wie die Geraeteliste darueber. -->
+        <!--Header: one line. The user appears as a chip on the right,
+             "Sign out" next to it.-->
         <div class="bn-kopf">
             <h1 class="bn-kopf-titel">
                 <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
@@ -117,10 +115,9 @@
 
         <div class="bn-rahmen">
             <div>
-                <!-- Benutzername, Passwort und Sprache sind Einstellungen, die
-                     man selten anfasst — als Aufklapper in einer Karte statt
-                     drei nebeneinanderstehender Formulare, von denen das
-                     dritte halb leer war. -->
+                <!--Username, password and language are settings people
+                     rarely touch -- as a collapsible section in one card instead of
+                     three side-by-side forms, one of which was half empty.-->
                 <div class="bn-karte">
                     <div class="bn-karte-kopf">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/></svg>
@@ -193,7 +190,7 @@
                     </div>
                 </div>
 
-                <!-- Nur fuer Administratoren -->
+                <!--Admins only-->
                 <div class="bn-karte" id="user-management-section" style="display:none;">
                     <div class="bn-karte-kopf">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2 21c0-3.5 3.1-5.5 7-5.5s7 2 7 5.5"/><path d="M17 11h5M19.5 8.5v5"/></svg>
@@ -210,8 +207,8 @@
                     <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="14" height="10" rx="2"/><path d="M2 18h20"/><rect x="17" y="8" width="5" height="9" rx="1"/></svg>
                     <span id="devices-sessions-title">Angemeldete Geräte</span>
                     <span class="bn-karte-luft"></span>
-                    <!-- Fuenf Sitzungen einzeln wegzuklicken ist genau der Fall,
-                         den man will, wenn ein Geraet verloren ging. -->
+                    <!--Dismissing five sessions one by one is exactly what
+                         you want when a device was lost.-->
                     <button class="bn-btn bn-btn--klein bn-btn--weg" id="bn-alle-weg"
                             onclick="alleAnderenAbmelden()" style="display:none;">
                         <span id="bn-alle-weg-text">Alle anderen abmelden</span>
@@ -245,7 +242,7 @@
             updateTexts();
         });
 
-        // Aufklapper in „Mein Konto".
+        // Toggle for the collapsible rows in "My Account".
         function bnKlapp(el) { el.classList.toggle('bn-auf-an'); }
 
         function updateTexts() {
@@ -322,7 +319,7 @@
         const bnName = localStorage.getItem('username') || texts.users_unknown || '?';
         const bnRolle = localStorage.getItem('role') || '';
         document.getElementById('username').textContent = bnName;
-        // Rolle im Klartext statt "admin" — die Kopfzeile ist keine Datenbank.
+        // Show the role as plain text instead of "admin" — the header isn't a database view.
         document.getElementById('role').textContent = bnRolle === 'admin'
             ? (texts.users_role_admin || 'Administrator')
             : (texts.users_role_user || 'Benutzer');
@@ -330,14 +327,12 @@
             bnName.replace(/[^\p{L}\p{N}]/gu, '').slice(0, 2).toUpperCase() || '?';
         document.getElementById('bn-aktueller-name').textContent = bnName;
 
-        // Benutzerverwaltung nur für Admins anzeigen
         const currentRole = localStorage.getItem('role');
         if (currentRole === 'admin') {
             document.getElementById('user-management-section').style.display = 'block';
             loadAllUsers();
         }
 
-        // NEU: Handler für Benutzernamen-Änderung
         document.getElementById('usernameForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const newUsername = document.getElementById('newUsername').value;
@@ -396,24 +391,22 @@
             const loadingText = texts.users_loading_devices || 'Loading devices and sessions...';
             listContainer.innerHTML = `<div class="loading"></div> ${loadingText}`;
             try {
-                // Nur /api/auth/sessions nutzen - enthält bereits alle Sessions!
+                // Only use /api/auth/sessions - it already contains all sessions!
                 const sessionsRes = await apiCall('/api/auth/sessions');
 
                 if (sessionsRes.status === 401) return authHandler.redirectToLogin();
 
                 const allSessions = sessionsRes.ok ? await sessionsRes.json() : [];
 
-                // ID für jeden Eintrag setzen
                 allSessions.forEach(s => {
                     s.id = s.session_id || s.device_id;
                 });
 
-                // KEINE Deduplizierung mehr — Admin sieht jede Session wie
-                // sie gespeichert ist, konsistent zur macOS-Server-App.
-                // Wenn ein Electron-Client zusätzlich eine Web-Session hat
-                // (z.B. frische Registrierung vor Device-Token-Issue),
-                // werden beide gezeigt damit der Admin sie einzeln
-                // ausloggen kann.
+                // No deduplication — the admin sees every session exactly as
+                // it is stored, consistent with the macOS server app.
+                // If an Electron client also has a web session (e.g. a fresh
+                // registration before the device token was issued), both are
+                // shown so the admin can log them out individually.
                 allSessions.sort((a, b) => new Date(b.last_used) - new Date(a.last_used));
                 window._bnEintraege = allSessions;
                 displayEntries(allSessions);
@@ -424,7 +417,7 @@
             }
         }
 
-        // Linien-Icons statt Emoji, die je nach System anders aussehen.
+        // Line icons instead of emoji, which render differently across systems.
         const BN_ICONS = {
             desktop: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
             laptop:  '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M2 20h20"/>',
@@ -449,10 +442,9 @@
         }
 
         /**
-         * "vor 2 Minuten" statt "21.8.2026, 11:20:19". Wer eine Sitzung
-         * beendet, will wissen wie lange sie her ist — nicht die Sekunde. Der
-         * genaue Zeitpunkt steht im Tooltip. Ausserdem stand vor dem
-         * Zeitstempel das englische "Last active:".
+         * "2 minutes ago" instead of "8/21/2026, 11:20:19 AM". Someone
+         * ending a session wants to know how long ago it was — not the
+         * exact second. The precise timestamp is available in the tooltip.
          */
         function bnHer(datum) {
             const t = new Date(datum).getTime();
@@ -492,7 +484,7 @@
             const escHtml = (v) => String(v == null ? '' : v)
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            // Eigene Sitzung nach oben, der Rest nach letzter Aktivitaet.
+            // Own session first, the rest sorted by last activity.
             const sortiert = entries.slice().sort((a, b) => {
                 if (a.is_current !== b.is_current) return a.is_current ? -1 : 1;
                 return new Date(b.last_used || b.last_activity || 0) - new Date(a.last_used || a.last_activity || 0);
@@ -501,19 +493,13 @@
             if (alleWeg) alleWeg.style.display = sortiert.length > 1 ? 'inline-flex' : 'none';
 
             container.innerHTML = sortiert.map(entry => {
-                const { type, device_name, device_model, last_used, last_activity,
+                const { type, last_used, last_activity,
                         is_current, id, session_id, device_id, app_version, device_type } = entry;
 
-                // "Electron App auf macOS" und "Mac mini (M4, 2024)" waren
-                // dieselbe App auf demselben System, nur unterschiedlich
-                // benannt: der Modellname gewinnt, die Plattform steht als
-                // Chip daneben. Nur wenn Electron ein generisches
-                // "darwin-arm64" schickt, ist der Hostname aussagekraeftiger.
-                const generisch = device_model && /^(darwin|win32|linux)-(arm64|x64|ia32)$/i.test(device_model);
-                const name = type === 'web'
-                    ? (device_name || device_model || '?')
-                    : (generisch ? (device_name || device_model || '?')
-                                 : (device_model || device_name || '?'));
+                // What a device is called lives in device-names.js — the
+                // message history needs the same answer, and two copies of
+                // the rule drift apart.
+                const name = window.deviceNames.nameVon(entry) || '?';
 
                 const artNamen = { web: 'Web', electron: 'Electron', ios: 'iOS',
                                    ipados: 'iPadOS', macos: 'macOS', android: 'Android' };
@@ -548,8 +534,8 @@
             }).join('');
         }
 
-        // Fuenf Sitzungen einzeln wegzuklicken ist genau der Fall, den man
-        // will, wenn ein Geraet verloren ging.
+        // Dismissing five sessions one by one is exactly what you want
+        // when a device was lost.
         async function alleAnderenAbmelden() {
             const frage = texts.users_confirm_logout_all
                 || 'Alle anderen Geräte und Sitzungen abmelden?';
@@ -595,12 +581,10 @@
                     showSuccess(successMessage);
                     loadDevicesAndSessions();
                 } else if (response.status === 401 || response.status === 403) {
-                    // Abmelden braucht einen CSRF-Token, und den gibt es nur
-                    // mit gueltiger Sitzung. Ist die abgelaufen, scheitert
-                    // auch der Nachhol-Versuch — dann half die Meldung
-                    // „Aktion fehlgeschlagen" nicht weiter (26aug26: ein
-                    // Geraet blieb in der Liste stehen, ohne dass klar war,
-                    // warum).
+                    // Logging out requires a CSRF token, which only exists
+                    // with a valid session. If the session has expired, the
+                    // retry fails too, so a generic "Action failed" message
+                    // would leave the user without a clue why.
                     showError(texts.users_session_expired
                         || 'Session expired — please sign in again.');
                 } else {
@@ -640,15 +624,14 @@
                 const createdLabel = texts.users_created || 'Erstellt:';
                 const languageLabel = texts.users_language_short || 'Sprache:';
 
-                // Zähle wie viele Admins es gibt
                 const adminCount = users.filter(u => u.role === 'admin').length;
 
                 listContainer.innerHTML = users.map(user => {
                     const isCurrentUser = user.username === currentUsername;
                     const isAdmin = user.role === 'admin';
 
-                    // Loeschen erlauben wenn: nicht man selbst UND entweder
-                    // kein Admin ODER es gibt mehr als einen Admin.
+                    // Allow deletion when: not the user themselves AND
+                    // either not an admin OR there is more than one admin.
                     const canDelete = !isCurrentUser && (!isAdmin || adminCount > 1);
 
                     const escHtml = (v) => String(v == null ? '' : v)
@@ -720,14 +703,15 @@
 
         const logout = () => authHandler.logout();
 
-        // Gemeinsamer Toast-Stapel oben rechts — siehe skHinweis in
-        // confirm-dialog.js. Vorher: ein Balken im Seitenfluss, der den
-        // Inhalt verschob, und in Electron ein Dialog mitten im Bild.
+        // Shared toast stack top right — see skHinweis in confirm-dialog.js,
+        // instead of a bar in the page flow shifting content or an Electron
+        // dialog covering the middle of the screen.
         function showSuccess(msg) { window.skHinweis.erfolg(msg); }
         function showError(msg)   { window.skHinweis.fehler(msg); }
 
-        // Wrapper für confirm() - nutzt Electron showConfirm oder native confirm
-        async function showConfirmDialog(message, title = 'Bestätigung') {
+        // Wrapper for confirm() - uses Electron's showConfirm or the native confirm
+        async function showConfirmDialog(message, title) {
+            title = title || texts.confirm_title || 'Bestätigung';
             if (window.electronAPI && window.showConfirm) {
                 return await window.showConfirm({ title: title, message: message, type: 'warning' });
             } else if (window.skConfirm) {
@@ -739,9 +723,9 @@
 
         const langNames = { de: 'Deutsch', en: 'English', fr: 'Français', es: 'Español', it: 'Italiano' };
 
-        // Das Eigenbau-Dropdown mit Flaggen-SVGs ist einem <select> gewichen:
-        // dasselbe in fuenf Zeilen, mit Tastaturbedienung und ohne
-        // Aussenklick-Behandlung.
+        // The custom dropdown with flag SVGs has been replaced with a
+        // <select>: the same result in five lines, with keyboard support
+        // and no need for outside-click handling.
         function selectLang(lang) {
             document.getElementById('languageSelect').value = lang;
             const sel = document.getElementById('bn-sprache');
@@ -817,22 +801,19 @@
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
 
-            // Prüfe, ob wir uns in der Android App befinden
             if (urlParams.get('app') === 'android') {
                 const backButton = document.getElementById('back-to-dashboard');
                 if (backButton) {
-                    // Wandle den Link in einen Button um, der die native Java-Funktion aufruft.
-                    backButton.href = "javascript:void(0);"; // Verhindert die Standard-Navigation
+                    // Turn the link into a button that calls the native Java function.
+                    backButton.href = "javascript:void(0);";
 
                     backButton.onclick = function(event) {
-                        event.preventDefault(); // Stoppt das Link-Verhalten sicher
+                        event.preventDefault();
 
-                        // Prüfe, ob die Bridge-Funktion existiert
                         if (window.Android && typeof window.Android.goBackToDashboard === 'function') {
-                            // Rufe die native Funktion in MainActivity.java auf
+                            // Call the native function in MainActivity.java
                             window.Android.goBackToDashboard();
                         } else {
-                            // Fallback, falls die Bridge nicht da ist
                             console.error("Android Bridge nicht gefunden!");
                             window.location.href = '/?app=android';
                         }
@@ -891,5 +872,6 @@
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

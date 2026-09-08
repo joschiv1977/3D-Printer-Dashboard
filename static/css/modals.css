@@ -292,12 +292,10 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
 }
 
 /* ======================================================================
-   Verlauf (Sensor-Charts) — Optik der Startseite
+   History (sensor charts) — dashboard look
    ======================================================================
-   Frueher: nackte Versalien-Ueberschriften ueber randlosen Canvas-Kaesten
-   und eine Chart.js-Legende aus schwer lesbaren Ringen. Jetzt je Gruppe
-   eine Karte wie auf der Startseite, die Legende als Chip-Reihe mit dem
-   MOMENTANWERT — Klick blendet die Kurve aus. */
+   One card per group, like on the dashboard, the legend as a chip row
+   with the CURRENT VALUE — click to hide a curve. */
 
 .vl-zeitwahl {
     display: flex;
@@ -351,9 +349,9 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
     margin-bottom: 12px;
 }
 
-/* Der Ruhestand unter der Leistungskurve: was der Drucker ausserhalb von
-   Druecken zieht, ueber Wochen gemittelt. Ruhiger als die Chips darueber —
-   es ist kein Messwert von jetzt, sondern ein Bestand. */
+/* Idle draw below the power curve: what the printer draws outside of
+   printing, averaged over weeks. Calmer than the chips above it — it's
+   not a measurement from right now, but a running total. */
 .vl-ruhe {
     display: flex; flex-wrap: wrap; gap: 16px;
     margin-top: 10px; padding-top: 9px;
@@ -384,7 +382,7 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
     flex: none;
 }
 
-/* Tabellenziffern: sonst zappelt die Chip-Breite bei jedem Messwert. */
+/* Tabular figures: otherwise the chip width jitters with every measurement. */
 .vl-chip .vl-wert { font-weight: 660; font-variant-numeric: tabular-nums; }
 
 .vl-chip.aus { opacity: 0.38; }
@@ -393,12 +391,9 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
 .vl-leinwand { height: 190px; position: relative; }
 .vl-leinwand--klein { height: 160px; }
 
-/* Teile ueberspringen.
-   Farben ueber die Token der Oberflaeche (design-tokens.css), damit das
-   Fenster hell und dunkel mitgeht. Erst standen hier geratene Namen
-   (--karte, --card-bg), die es gar nicht gibt — dann war es immer weiss.
-   Danach die festen dunklen Werte von skConfirm — dann war es im hellen
-   Layout ein dunkler Kasten. Beides am Geraet gesehen (29aug26). */
+/* Skip parts.
+   Colors via the UI's tokens (design-tokens.css), so the window follows
+   light and dark mode. */
 .sk-teile-ov {
     position: fixed; inset: 0; z-index: 2147483640;
     background: rgba(0, 0, 0, .45);
@@ -418,9 +413,9 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
 .sk-teile-hinweis {
     margin: 0; font-size: 13px; color: var(--text-secondary, #5a6270);
 }
-/* Die Platte von oben. Zwei Leinwaende uebereinander: unten die
-   Draufsicht aus der 3MF, darueber die Einfaerbung der gewaehlten Teile.
-   Die Trefferkarte selbst wird nie gezeigt, nur ausgelesen. */
+/* The plate from above. Two canvases stacked: the top-down view from
+   the 3MF at the bottom, the coloring of the selected parts on top.
+   The hit map itself is never shown, only read. */
 .sk-teile-platte {
     position: relative;
     width: 100%;
@@ -444,8 +439,8 @@ body.dark-mode .modal-panel > div[style*="sticky"] {
     overflow-y: auto; display: flex; flex-direction: column; gap: 2px;
     margin: 2px -6px;
 }
-/* Ohne das steht die Liste trotz `hidden` da: das eigene `display: flex`
-   sticht die `display: none` des Browsers aus. */
+/* Without this the list still shows despite `hidden`: its own
+   `display: flex` outranks the browser's `display: none`. */
 .sk-teile-liste[hidden] { display: none; }
 .sk-teil {
     display: flex; align-items: center; gap: 12px;

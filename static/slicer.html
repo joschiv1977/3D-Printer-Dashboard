@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="page-title">Slicer - 3D Printer Dashboard</title>
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -169,7 +169,6 @@
             font-weight: 600;
         }
 
-        /* Grid Layout für Settings */
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -308,8 +307,8 @@
     </script>
 
     <div class="container">
-        <!-- Kopf: eine Zeile statt lila Farbverlauf-Balken. Die seltenen
-             Sachen (Profile, Updates, Sicherung) stecken hinter „Verwalten". -->
+        <!--Header: one line instead of a purple gradient bar. The rare
+             stuff (profiles, updates, backup) sits behind "Manage".-->
         <div class="sl-kopf">
             <h1 class="sl-kopf-titel">
                 <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
@@ -323,9 +322,7 @@
             <div id="errorAlert" class="alert alert-error"></div>
             <div id="infoAlert" class="alert alert-info"></div>
 
-            <!-- Modell links, Einstellungen rechts. Vorher lagen vier Bloecke
-                 untereinander und man musste fuer die sechs Auswahlfelder
-                 unter eine 300px hohe Ablageflaeche scrollen. -->
+            <!--Model on the left, settings on the right.-->
             <div class="sl-rahmen">
 
                 <div class="sl-karte" id="uploadSection">
@@ -334,7 +331,7 @@
                         <span id="sl-datei-titel">Modell</span>
                     </div>
 
-                    <!-- Ohne Datei: Ablageflaeche. -->
+                    <!--Without a file: drop zone.-->
                     <div class="sl-ablage" id="uploadArea" onclick="document.getElementById('stlFile').click()">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
                         <b id="sl-ablage-titel">Datei hierher ziehen oder klicken</b>
@@ -342,7 +339,7 @@
                     </div>
                     <input type="file" id="stlFile" accept=".stl,.step,.stp" style="display:none;" onchange="handleFileSelect(event)">
 
-                    <!-- Mit Datei: die Flaeche schrumpft zur Zeile. -->
+                    <!--With a file: the area shrinks to a single line.-->
                     <div class="sl-datei" id="fileInfo">
                         <span class="sl-datei-bild">
                             <svg viewBox="0 0 88 88" aria-hidden="true">
@@ -360,9 +357,8 @@
                                 id="sl-datei-weg" title="Datei entfernen">&times;</button>
                     </div>
 
-                    <!-- Beim Slicen: die vier Schritte stehen HIER, wo vorher
-                         die Datei stand — kein zusaetzlicher Block, der die
-                         Seite nach unten schiebt. -->
+                    <!--While slicing: the four steps appear HERE -- no
+                         extra block that pushes the page down.-->
                     <div class="sl-schritte-wrap" id="slicingStatus">
                         <div class="sl-schritte">
                             <div class="sl-schritt" id="step-upload">
@@ -440,7 +436,7 @@
                 </div>
             </div>
 
-            <!-- Startleiste: sagt, was noch fehlt, statt nur grau zu sein. -->
+            <!--Start bar: says what is still missing, instead of just being greyed out.-->
             <div class="sl-start" id="actionSection">
                 <span class="sl-start-t">
                     <b id="sl-start-titel">Noch keine Datei</b>
@@ -455,8 +451,8 @@
                 </div>
             </div>
 
-            <!-- Profile: unter dem Arbeitsablauf, nicht in einem Overlay —
-                 der Platz ist da, und so sieht man den Stand ohne Klick. -->
+            <!--Profiles: below the workflow, not in an overlay --
+                 the space is there, so you see the state without a click.-->
             <div class="sl-karte sl-profile">
                 <div class="sl-karte-kopf">
                     <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
@@ -535,15 +531,14 @@
     <!-- Page-specific JavaScript -->
     <script>
         let selectedFile = null;
-        let allFilaments = []; // Cache für alle Filamente
-        let allProcesses = []; // Cache für alle Process Profiles
-        let filamentTypes = []; // Extrahierte Filament-Typen (PLA, PETG, etc.)
+        let allFilaments = []; // Cache of all filaments
+        let allProcesses = []; // Cache of all process profiles
+        let filamentTypes = []; // Extracted filament types (PLA, PETG, etc.)
 
         // Helper function to get translation (uses global i18nManager)
-        // Fehlt ein Schluessel, kommt LEER zurueck — sonst liefert t() den
-        // Schluessel selbst, der ist truthy, und jedes `t('x') || 'Rueckfall'`
-        // im Code greift nie. So stand im Ergebniskasten "49 slicer_new"
-        // statt "49 neu".
+        // If a key is missing, this returns an empty string — otherwise t() would return
+        // the key itself, which is truthy, so every `t('x') || 'fallback'` in the code
+        // would never trigger.
         function t(key, replacements = {}) {
             if (!window.i18nManager) return '';
             let text = window.i18nManager.getText(key) || '';
@@ -565,21 +560,21 @@
             document.getElementById('page-title').textContent = t('slicer_page_title') || 'Slicer - 3D Printer Dashboard';
             setz('header-title', 'slicer_title_plain', 'Slicer');
 
-            // Ablauf beim Slicen
+            // Slicing workflow
             setz('sl-datei-titel-laeuft', 'slicer_processing_file', 'Wird verarbeitet');
             document.querySelector('#step-upload .slicing-step-text').textContent = t('slicer_step_upload') || 'Datei hochladen';
             document.querySelector('#step-slicing .slicing-step-text').textContent = t('slicer_step_slicing') || 'Modell schneiden';
             document.querySelector('#step-thumbnail .slicing-step-text').textContent = t('slicer_step_thumbnail') || 'Vorschaubild erzeugen';
             document.querySelector('#step-saving .slicing-step-text').textContent = t('slicer_step_saving') || '3MF auf SD-Karte legen';
 
-            // Modell
+            // Model
             setz('sl-datei-titel', 'slicer_model', 'Modell');
             setz('sl-ablage-titel', 'slicer_click_or_drag', 'Datei hierher ziehen oder klicken');
             setz('sl-ablage-formate', 'slicer_supported_formats', 'STL, STEP oder STP');
             const weg = document.getElementById('sl-datei-weg');
             if (weg) weg.title = t('slicer_remove_file') || 'Datei entfernen';
 
-            // Einstellungen
+            // Settings
             setz('sl-einst-titel', 'slicer_settings_short', 'Einstellungen');
             setz('sl-l-drucker',  'slicer_printer_short',  'Drucker');
             setz('sl-l-duese',    'slicer_nozzle_short',   'Düse');
@@ -590,10 +585,10 @@
             setz('infoProcessProfile', 'slicer_info_process_short',
                  'Schichthöhe, Füllung und Stützen kommen aus dem gewählten Qualitätsprofil.');
 
-            // Startleiste
+            // Start bar
             setz('sl-slice-text', 'slicer_btn_slice_short', 'Slicen und auf SD-Karte legen');
 
-            // Profil-Karte
+            // Profile card
             setz('profileManagementTitle','slicer_profiles',        'Profile');
             setz('slicer-check-updates',  'slicer_check_updates',   'Auf Updates prüfen');
             setz('slicer-update-profiles','slicer_update_profiles', 'Profile aktualisieren');
@@ -613,7 +608,7 @@
             setz('githubCreateTokenLabel', 'slicer_github_create_short', 'Token erstellen unter');
         }
 
-        // Datei wieder loswerden, ohne die Seite neu zu laden.
+        // Clears the selected file without reloading the page.
         function dateiEntfernen() {
             selectedFile = null;
             const f = document.getElementById('stlFile');
@@ -742,8 +737,8 @@
             selectedFile = file;
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileSize').textContent = formatFileSize(file.size);
-            // Die Ablageflaeche weicht der Datei-Zeile — vorher blieb der leere
-            // 300px-Kasten stehen und die Angaben standen als Text darunter.
+            // The drop zone gives way to the file row, instead of leaving an
+            // empty 300px box with the file details as text underneath it.
             document.getElementById('fileInfo').classList.add('sl-datei--an');
             document.getElementById('uploadArea').style.display = 'none';
 
@@ -769,8 +764,8 @@
             const bereit = hasFile && !fehlt.length;
             document.getElementById('sliceBtn').disabled = !bereit;
 
-            // Statt eines grauen Knopfes ohne Begruendung steht daneben, was
-            // noch fehlt — oder womit gleich geschnitten wird.
+            // Instead of a greyed-out button with no explanation, it shows next
+            // to it what's still missing — or what it's about to slice with.
             const titel = document.getElementById('sl-start-titel');
             const text = document.getElementById('sl-start-text');
             if (!titel || !text) return;
@@ -794,7 +789,7 @@
         }
 
         function formatFileSize(bytes) {
-            // Deutsches Dezimalkomma statt Punkt — toFixed liefert immer "4.20".
+            // German decimal comma instead of a point — toFixed always outputs "4.20".
             const zahl = n => n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return zahl(bytes / 1024) + ' KB';
@@ -826,10 +821,9 @@
                     updateFilamentTypeList(); // Fills type dropdown, which triggers updateFilamentList
                     updateProcessList();
 
-                    // Der in den Einstellungen gewaehlte Drucker steht in
-                    // data.current_printer. Er wird nur VORgewaehlt — eine
-                    // eigene Wahl aus dem letzten Besuch schlaegt ihn
-                    // (restoreSelectionsAfterLoad laeuft danach).
+                    // The printer selected in settings is in data.current_printer.
+                    // It is only PRE-selected — the user's own choice from the last
+                    // visit overrides it (restoreSelectionsAfterLoad runs afterward).
                     if (data.current_printer) {
                         printerSelect.value = data.current_printer;
                         updateProcessList();
@@ -846,14 +840,14 @@
             }
         }
 
-        // Bekannte Filament-Typen mit Priorität (Reihenfolge)
+        // Known filament types with priority (ordering)
         const FILAMENT_TYPE_ORDER = ['PLA', 'PETG', 'ABS', 'ASA', 'TPU', 'PA', 'PC', 'PVA', 'HIPS', 'PET', 'PP', 'PPS'];
 
-        // Extrahiert den Filament-Typ aus dem Namen
+        // Extracts the filament type from the name
         function extractFilamentType(name) {
             const upperName = name.toUpperCase();
 
-            // Spezielle Patterns für Typen
+            // Special patterns for types
             const patterns = [
                 { type: 'PLA', regex: /\bPLA\b|PLA[-+\s]?(?:HT|HS|CF|GF|Silk|Pro|Basic|Matte)?/i },
                 { type: 'PETG', regex: /\bPETG\b|\bPET[-]?G\b|easyPETG/i },
@@ -876,10 +870,10 @@
                 }
             }
 
-            return 'Andere'; // Fallback für unbekannte Typen
+            return 'Andere'; // Fallback for unknown types
         }
 
-        // Extrahiert alle einzigartigen Filament-Typen aus den Profilen
+        // Extracts all unique filament types from the profiles
         function extractFilamentTypes() {
             const nozzleSize = document.getElementById('nozzleSize').value;
 
@@ -1065,9 +1059,9 @@
             if (t2) t2.textContent = t('slicer_model') || 'Modell';
         }
 
-        // Linien-Icons statt Sanduhr- und Haken-Emoji, und die tatsaechliche
-        // Dauer je Schritt: bei "Modell schneiden" sieht man dann, ob 40
-        // Sekunden normal sind oder ob etwas haengt.
+        // Line icons instead of hourglass/checkmark emoji, plus the actual duration
+        // per step: for the "slice model" step you can then see whether 40 seconds
+        // is normal or whether something is stuck.
         const SL_ICONS = {
             offen:  '<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
             laeuft: '<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/></svg>',
@@ -1108,8 +1102,8 @@
             const fill = document.getElementById('slicingProgressFill');
             fill.style.width = percent + '%';
 
-            // Titel und Untertitel stehen jetzt in der Startleiste, wo vorher
-            // der Slice-Knopf war — der Ablauf bleibt an einer Stelle.
+            // Title and subtitle live in the start bar, keeping the whole
+            // workflow in one place.
             const st = document.getElementById('sl-start-titel');
             const sx = document.getElementById('sl-start-text');
             if (title && st) st.textContent = title;
@@ -1126,9 +1120,9 @@
         }
 
         // Hide upload UI elements during processing
-        // Waehrend des Slicens bleibt das Bild ruhig: nur der Inhalt der
-        // linken Karte wechselt, die Einstellungen bleiben stehen. Vorher
-        // verschwand die halbe Seite und ein neuer Block schob alles nach unten.
+        // While slicing, the layout stays calm — only the content of the left
+        // card changes and the settings stay in place, instead of half the page
+        // disappearing and everything jumping down.
         function hideUploadUI() {
             document.getElementById('uploadArea').style.display = 'none';
             document.getElementById('fileInfo').classList.remove('sl-datei--an');
@@ -1294,10 +1288,9 @@
             validateSliceButton(); // Will disable button since no file selected
         }
 
-        // Gemeinsamer Toast-Stapel oben rechts — siehe skHinweis in
-        // confirm-dialog.js. Die Pruefung auf eine bereits vorhandene
-        // window.showSuccess entfaellt: in Electron gewann je nach
-        // Ladereihenfolge mal die eine, mal die andere Fassung.
+        // Shared toast stack top-right — see skHinweis in confirm-dialog.js. The
+        // check for an already-existing window.showSuccess is skipped: in Electron,
+        // depending on load order, sometimes one version won, sometimes the other.
         window.showSuccess = (msg) => window.skHinweis.erfolg(msg);
         window.showError   = (msg) => window.skHinweis.fehler(msg);
         window.showInfo    = (msg) => window.skHinweis.info(msg);
@@ -1329,8 +1322,8 @@
                     if (data.backup?.exists) {
                         document.getElementById('backupInfo').style.display = 'flex';
                         if (data.backup.created) {
-                            // Ohne Sekunden und in der Sprache des Nutzers —
-                            // 'de-DE' war fest verdrahtet, die Sekunde sagt nichts.
+                            // No seconds, and in the user's own language — hardcoding
+                            // 'de-DE' ignored that, and seconds add no value here.
                             document.getElementById('backupDate').textContent =
                                 new Date(data.backup.created).toLocaleString(undefined,
                                     { day: '2-digit', month: '2-digit', year: 'numeric',
@@ -1355,47 +1348,48 @@
                         document.getElementById('lastCheckInfo').style.display = 'none';
                     }
 
-                    // Prüfe ob Update läuft und stelle Fortschrittsanzeige wieder her
+                    // Check whether an update is running and restore the progress display
                     if (data.update_in_progress && data.current_progress) {
                         reconnectToUpdateStream(data.current_progress);
                     }
                 }
             } catch (error) {
                 console.error('Error loading profile status:', error);
-                document.getElementById('profileCount').textContent = 'Fehler beim Laden';
+                document.getElementById('profileCount').textContent =
+                        t('slicer_profiles_load_error') || 'Fehler beim Laden';
             }
         }
 
-        // Verbindet sich wieder mit laufendem Update-Stream
+        // Reconnects to a currently running update stream
         function reconnectToUpdateStream(initialProgress) {
             const btn = document.getElementById('updateProfilesBtn');
             const checkBtn = document.getElementById('checkUpdatesBtn');
             const resultDiv = document.getElementById('updateResult');
 
-            // UI in Update-Modus setzen
+            // Put the UI into update mode
             btn.disabled = true;
             checkBtn.disabled = true;
             btn.innerHTML = '⏳ Aktualisiere...';
             btn.style.display = 'inline-block';
 
-            // Progress-HTML mit aktuellem Stand
+            // Progress HTML with the current state
             resultDiv.style.display = 'block';
             resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
             resultDiv.innerHTML = updateFortschrittHtml(true);
 
-            // Zeige initialen Fortschritt sofort an
+            // Show initial progress immediately
             if (initialProgress.phase) {
                 updateProgressUI(initialProgress);
             }
 
-            // Mit SSE-Stream verbinden
+            // Connect to the SSE stream
             connectToUpdateStream(btn, checkBtn, resultDiv);
         }
 
-        // Verbindet sich mit dem Update-Stream
+        // Connects to the update stream
         async function connectToUpdateStream(btn, checkBtn, resultDiv) {
-            // Hole Token vom Server für EventSource (HttpOnly Cookie kann nicht in JS gelesen werden)
-            // Der Server gibt den Token zurück wenn der User über Cookie authentifiziert ist
+            // Get a token from the server for EventSource (an HttpOnly cookie can't be read from JS)
+            // The server returns the token when the user is authenticated via cookie
             let tokenParam = '';
             try {
                 const tokenResponse = await fetch('/api/auth/sse-token', {
@@ -1440,10 +1434,10 @@
             };
         }
 
-        // Aktualisiert die Fortschritts-UI
-        // Ein Bauplan fuer die Fortschrittsanzeige. Vorher stand dasselbe
-        // Markup zweimal im Code — inklusive des lila Farbverlaufs und der
-        // fest verdrahteten Farben, die im dunklen Design nicht lesbar waren.
+        // Updates the progress UI
+        // Single template for the progress display, avoiding duplicate markup —
+        // including the purple gradient and hardcoded colors that weren't
+        // readable in dark mode.
         function updateFortschrittHtml(wiederverbunden) {
             const zusatz = wiederverbunden
                 ? ` <span class="sl-fort-zusatz">${t('slicer_reconnected') || '(wieder verbunden)'}</span>` : '';
@@ -1472,7 +1466,7 @@
             const phaseEl = document.getElementById('updatePhase');
             if (phaseEl) phaseEl.textContent = phaseNames[data.phase] || data.phase;
 
-            // Gesamtfortschritt berechnen
+            // Calculate overall progress
             let progress = 0;
             if (data.phase === 'backup') {
                 progress = data.current * 5;
@@ -1488,8 +1482,8 @@
 
             const progressBar = document.getElementById('updateProgressBar');
             if (progressBar) progressBar.style.width = progress + '%';
-            // Die Zahl steht neben der Ueberschrift, nicht im Balken: der ist
-            // acht Pixel hoch, da passt keine Schrift hinein.
+            // The number sits next to the heading, not inside the bar: the bar
+            // is eight pixels tall, so no text fits in it.
             const prozentEl = document.getElementById('updateProgressText');
             if (prozentEl) prozentEl.textContent = Math.round(progress) + ' %';
 
@@ -1499,7 +1493,7 @@
             }
         }
 
-        // Verarbeitet das Update-Ergebnis
+        // Handles the update result
         function handleUpdateResult(data, btn, checkBtn, resultDiv) {
             if (data.success) {
                 resultDiv.style.background = '#d4edda';
@@ -1565,9 +1559,9 @@
 
                     resultDiv.style.display = 'block';
 
-                    // Ergebnis in der Kartensprache statt gruener Vollflaeche
-                    // mit Aufzaehlungspunkten: drei Zahlen sind eine Tabelle,
-                    // kein Fliesstext.
+                    // Result in the card's own style instead of a solid green block
+                    // with bullet points: three numbers form a table, not
+                    // running text.
                     const zeile = (name, wert) =>
                         `<span class="sl-erg-zeile"><span>${name}</span><b>${wert}</b></span>`;
 
@@ -1631,16 +1625,16 @@
             checkBtn.disabled = true;
             btn.innerHTML = t('slicer_updating_profiles') || 'Aktualisiere...';
 
-            // Progress-HTML vorbereiten
+            // Prepare the progress HTML
             resultDiv.style.display = 'block';
             resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
             resultDiv.innerHTML = updateFortschrittHtml(false);
 
-            // Mit Update-Stream verbinden (verwendet gemeinsame Funktionen)
+            // Connect to the update stream (uses shared functions)
             connectToUpdateStream(btn, checkBtn, resultDiv);
         }
 
-        // Alte updateProfiles Funktion als Fallback (ohne SSE)
+        // Old updateProfiles function, kept as a fallback (no SSE)
         async function updateProfilesFallback() {
             const btn = document.getElementById('updateProfilesBtn');
             const resultDiv = document.getElementById('updateResult');
@@ -1750,10 +1744,10 @@
 
         // ========== GITHUB TOKEN SETTINGS ==========
 
-        // Auf- und Zuklappen macht das <details> selbst. Nur beim Seitenaufbau
-        // entscheidet der Serverstand, ob der Abschnitt offen startet — danach
-        // laeuft loadGithubTokenSettings() bei jedem Klick auf die Zeile und
-        // duerfte den Nutzer sonst gegen seinen Willen wieder aufklappen.
+        // Expanding/collapsing is handled by the <details> element itself. Only
+        // at page build time does the server state decide whether the section
+        // starts open — after that, loadGithubTokenSettings() runs on every click
+        // on the row and would otherwise re-open it against the user's will.
         function githubKarteOeffnen(auf) {
             const karte = document.getElementById('githubTokenSettings');
             if (karte) karte.open = auf;
@@ -1776,17 +1770,17 @@
                     // Show badge and collapse if token is set
                     if (data.github_token_enabled && data.github_token_set) {
                         badge.style.display = 'inline';
-                        if (beimStart) githubKarteOeffnen(false);   // Token laeuft — nichts zu tun
+                        if (beimStart) githubKarteOeffnen(false);   // token is active — nothing to do
                         statusDiv.style.display = 'block';
-                        statusDiv.innerHTML = '<span style="color: #4caf50;">Token ist gespeichert und aktiv</span>';
+                        statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || 'Token ist gespeichert und aktiv'}</span>`;
                     } else if (data.github_token_enabled && !data.github_token_set) {
                         badge.style.display = 'none';
-                        if (beimStart) githubKarteOeffnen(true);    // Token fehlt noch
+                        if (beimStart) githubKarteOeffnen(true);    // token is missing
                         statusDiv.style.display = 'block';
-                        statusDiv.innerHTML = '<span style="color: #ff9800;">Bitte Token eingeben</span>';
+                        statusDiv.innerHTML = `<span style="color: #ff9800;">${t('slicer_github_token_enter') || 'Bitte Token eingeben'}</span>`;
                     } else {
                         badge.style.display = 'none';
-                        if (beimStart) githubKarteOeffnen(false);   // gar nicht eingeschaltet
+                        if (beimStart) githubKarteOeffnen(false);   // not enabled at all
                         statusDiv.style.display = 'none';
                     }
                 }
@@ -1804,7 +1798,7 @@
 
             container.style.display = checkbox.checked ? 'block' : 'none';
 
-            // Wenn deaktiviert, Token auch im Backend deaktivieren
+            // If disabled, also disable the token in the backend
             if (!checkbox.checked) {
                 badge.style.display = 'none';
                 saveGithubToken(false);
@@ -1819,7 +1813,7 @@
             const enabled = checkbox.checked;
             const token = tokenInput.value.trim();
 
-            // Validierung
+            // Validation
             if (enabled && !token) {
                 statusDiv.style.display = 'block';
                 statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_github_token_enter') || 'Bitte Token eingeben'}</span>`;
@@ -1842,7 +1836,7 @@
                 if (data.success) {
                     if (enabled) {
                         statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || 'Token ist gespeichert und aktiv'}</span>`;
-                        tokenInput.value = ''; // Token aus Input löschen (Sicherheit)
+                        tokenInput.value = ''; // Clear the token from the input (security)
                         tokenInput.placeholder = '••••••••••••••••';
                     } else {
                         statusDiv.innerHTML = `<span style="color: var(--text-secondary);">${t('slicer_github_token_deactivated') || 'Token deaktiviert'}</span>`;
@@ -1930,5 +1924,6 @@
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

@@ -56,7 +56,7 @@ class ChartManager {
         }, 8000);
     }
 
-    /** Farbwert aus den Design-Tokens — damit Hell/Dunkel stimmt. */
+    /** A colour value from the design tokens -- so light and dark match. */
     _token(name, ersatz) {
         const v = getComputedStyle(document.documentElement)
             .getPropertyValue(name).trim();
@@ -68,8 +68,8 @@ class ChartManager {
         const text = this._token('--text-secondary', '#8a8f9a');
         const karte = this._token('--bg-card', '#1A1F2E');
         const haupt = this._token('--text-primary', '#E8EAED');
-        // Gitter aus der Textfarbe abgeleitet: haelt in beiden Modi Abstand
-        // zur Flaeche, ohne eine zweite Token-Reihe zu brauchen.
+        // The grid derived from the text colour: it keeps its distance from
+        // the surface in both modes without needing a second row of tokens.
         const gitter = 'rgba(128,128,128,0.14)';
 
         return {
@@ -78,8 +78,8 @@ class ChartManager {
             animation: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-                // Eigene Chip-Legende ueber dem Chart — die von Chart.js
-                // zeigte nur Ringe ohne Werte.
+                // A chip legend of our own above the chart -- the Chart.js one
+                // showed only rings without values.
                 legend: { display: false },
                 tooltip: {
                     backgroundColor: karte, titleColor: haupt, bodyColor: haupt,
@@ -103,8 +103,8 @@ class ChartManager {
                     min: yMin, max: yMax,
                     grid: { color: gitter, drawTicks: false },
                     border: { display: false },
-                    // Einheit am Tick statt als gedrehter Achsentitel — spart
-                    // Breite und liest sich besser.
+                    // The unit on the tick instead of a rotated axis title --
+                    // it saves width and reads better.
                     ticks: { color: text, font: { size: 10 }, padding: 8,
                              maxTicksLimit: 5, callback: v => v + ' ' + einheit }
                 }
@@ -112,11 +112,11 @@ class ChartManager {
         };
     }
 
-    /** Chip-Legende mit Momentanwert; Klick blendet die Kurve aus.
+    /** A chip legend with the current value; a click hides the curve.
      *
-     *  Baut nur beim ersten Mal auf. Danach wird bloss der Wert ersetzt —
-     *  wuerde die Reihe alle paar Sekunden neu entstehen, verloere man mit
-     *  jedem Auffrischen die ausgeblendeten Kurven und den Mauszeiger-Fokus.
+     *  It only builds the first time. After that just the value is replaced --
+     *  if the row were rebuilt every few seconds, every refresh would lose the
+     *  hidden curves and the hover focus.
      */
     _baueChips(behaelterId, chart, einheit) {
         const box = document.getElementById(behaelterId);
@@ -127,7 +127,7 @@ class ChartManager {
             return (letzte != null ? letzte.toFixed(1) : '--') + ' ' + einheit;
         };
 
-        // Aufbauen, wenn die Reihe noch nicht zu diesem Chart passt.
+        // Build when the row does not match this chart yet.
         if (box.children.length !== chart.data.datasets.length) {
             box.innerHTML = '';
             chart.data.datasets.forEach((ds, i) => {
@@ -136,8 +136,8 @@ class ChartManager {
                 b.innerHTML =
                     '<span class="vl-punkt" style="background:' +
                     (ds.borderColor || '#888') + '"></span>' +
-                    // Einheit steckt schon im Label — im Chip raus, sie steht
-                    // ja direkt beim Wert.
+                    // The unit is already in the label -- out of the chip, it
+                    // stands right next to the value anyway.
                     (ds.label || '').replace(/\s*\([^)]*\)\s*$/, '') +
                     ' <span class="vl-wert"></span>';
                 b.onclick = () => {
@@ -150,7 +150,7 @@ class ChartManager {
             });
         }
 
-        // Werte nachziehen und den Ein-/Aus-Zustand spiegeln.
+        // Pull the values along and mirror the on/off state.
         chart.data.datasets.forEach((ds, i) => {
             const b = box.children[i];
             if (!b) return;
@@ -161,14 +161,14 @@ class ChartManager {
     }
 
     /**
-     * Was der Drucker ausserhalb von Druecken zieht.
+     * What the printer draws outside of prints.
      *
-     * Die Kurve darueber zeigt Minuten; das hier den Bestand ueber Wochen.
-     * Beides gehoert in dieselbe Karte, weil es dieselbe Groesse ist — nur
-     * einmal als Verlauf und einmal als Mittel.
+     * The curve above shows minutes; this one the stock over weeks. Both
+     * belong in the same card because it is the same quantity -- once as a
+     * trace and once as an average.
      *
-     * Faellt die Abfrage aus oder wurde noch nichts aufgezeichnet, bleibt
-     * die Zeile weg. Eine leere Ueberschrift waere schlechter als nichts.
+     * When the query fails or nothing has been recorded yet, the row stays
+     * away. An empty heading would be worse than nothing.
      */
     async _zeigeRuhestand() {
         const kasten = document.getElementById('vl-ruhe');
@@ -195,7 +195,7 @@ class ChartManager {
         }
     }
 
-    /** Nur die letzten N Minuten zeigen (5 s je Punkt). */
+    /** Show only the last N minutes (5 s per point). */
     _kuerze(daten, minuten) {
         const punkte = Math.max(1, Math.round(minuten * 60 / 5));
         if (!daten || daten.length <= punkte) return daten;
@@ -224,45 +224,44 @@ class ChartManager {
 
             const texts = window.texts || {};
 
-            // Sortiere Datasets nach UNIT (statt Name-Substring) — sonst
-            // landen Klipper-Sensoren wie "cartographer_coil" / "ebbcan_temp"
-            // / "host_temp" / "mcu_fan" nicht im richtigen Chart.
+            // Sort the datasets by UNIT (not by a name substring) -- otherwise
+            // Klipper sensors like "cartographer_coil" / "ebbcan_temp" /
+            // "host_temp" / "mcu_fan" do not land in the right chart.
             const tempData  = data.datasets.filter(d => d.unit === '°C');
             const fanData   = data.datasets.filter(d => d.unit === '%');
             const powerData = data.datasets.filter(d => d.unit === 'W');
 
-            // Leere Sub-Charts ausblenden (Klipper-Direct hat oft keine Lüfter-/Watt-
-            // Daten → sonst leere Kästen „Lüfter"/„Leistung").
+            // Hide empty sub-charts (Klipper direct often has no fan or watt
+            // data, which would leave empty "fans"/"power" boxes).
             const _sec = (id, n) => { const e = document.getElementById(id); if (e) e.style.display = n ? '' : 'none'; };
             _sec('chart-section-temp', tempData.length);
             _sec('chart-section-fans', fanData.length);
             _sec('chart-section-power', powerData.length);
 
-            // Zeitachse gehoert unter das UNTERSTE sichtbare Chart. Sie hing
-            // fest an der Leistung — und die wird ausgeblendet, wenn keine
-            // Watt-Daten da sind. Dann sah man nirgends, welcher Zeitraum das
-            // ueberhaupt ist.
+            // The time axis belongs under the BOTTOMMOST visible chart. It hung
+            // fixed on the power one -- and that is hidden when there is no
+            // watt data. One then saw nowhere which period this even was.
             const zeitAchse = powerData.length ? 'power' : (fanData.length ? 'fans' : 'temp');
 
-            // Translate labels. Unbekannte Klipper-Sensoren (kein Translation-Key)
-            // werden via raw sensorType angezeigt; underscore→space + Title-Case
-            // damit "cartographer_coil" → "Cartographer Coil".
+            // Translate the labels. Unknown Klipper sensors (no translation
+            // key) are shown by their raw sensorType; underscore to space plus
+            // title case, so "cartographer_coil" becomes "Cartographer Coil".
             const prettify = (key) => key.replace(/_/g, ' ')
                 .replace(/\b\w/g, c => c.toUpperCase());
             const tl = ds => ds.map(d => {
-                // yAxisID stammt aus dem alten KOMBINIERTEN Chart (Temperatur
-                // auf y, Luefter auf y1). Die getrennten Charts haben nur eine
-                // y-Achse — bleibt das Feld drin, legt Chart.js fuer 'y1' eine
-                // zweite, unkonfigurierte Achse an. Genau das waren die
-                // sinnlosen 0…1- und -1…1-Skalen neben der echten.
+                // yAxisID comes from the old COMBINED chart (temperature on y,
+                // fans on y1). The separated charts have only one y axis -- if
+                // the field stays in, Chart.js creates a second, unconfigured
+                // axis for 'y1'. Those were exactly the pointless 0…1 and -1…1
+                // scales beside the real one.
                 const { yAxisID, ...rest } = d;
                 return {
                     ...rest,
                     label: (texts['sensor_' + d.sensorType] || prettify(d.sensorType))
                            + ' (' + d.unit + ')',
                     tension: 0.35, borderWidth: 2, pointRadius: 0,
-                    // Leicht gefuellt wie im Entwurf — macht mehrere Kurven
-                    // uebereinander lesbarer als nackte Linien.
+                    // Lightly filled as in the design -- it makes several
+                    // curves over each other more readable than bare lines.
                     fill: true,
                     backgroundColor: (d.borderColor || 'rgb(128,128,128)')
                         .replace('rgb(', 'rgba(').replace(')', ', 0.10)'),
@@ -273,7 +272,7 @@ class ChartManager {
             // Destroy old charts
             Object.values(this.stackedCharts).forEach(c => c && c.destroy());
 
-            // Zeitraum anwenden (Standard: eine Stunde = der ganze Puffer)
+            // Apply the period (default: one hour = the whole buffer)
             this._zeitwahlAnbinden();
             const min = this.zeitraumMinuten || 60;
             const labels = this._kuerze(data.labels, min);
@@ -303,7 +302,7 @@ class ChartManager {
                 options: this.makeChartOptions('W', 0, undefined, zeitAchse === 'power')
             });
 
-            // Chip-Legenden mit Momentanwert
+            // Chip legends with the current value
             this._baueChips('vl-chips-temp',  this.stackedCharts.temp,  '\u00b0C');
             this._baueChips('vl-chips-fans',  this.stackedCharts.fans,  '%');
             this._baueChips('vl-chips-power', this.stackedCharts.power, 'W');
@@ -330,8 +329,8 @@ class ChartManager {
             _sec('chart-section-fans', fanData.length);
             _sec('chart-section-power', powerData.length);
 
-            // Denselben Zeitraum wie beim Aufbau anwenden, sonst springt die
-            // Ansicht beim naechsten Auffrischen auf den vollen Puffer zurueck.
+            // Apply the same period as at build time, or the view jumps back
+            // to the full buffer on the next refresh.
             const min = this.zeitraumMinuten || 60;
             const labels = this._kuerze(data.labels, min);
             const kuerze = this._kuerze.bind(this);
@@ -351,8 +350,8 @@ class ChartManager {
             updateChart(this.stackedCharts.fans, fanData);
             updateChart(this.stackedCharts.power, powerData);
 
-            // Momentanwerte in den Chips mitziehen — ohne die zeigten sie
-            // dauerhaft den Wert vom Oeffnen des Fensters.
+            // Pull the current values along in the chips -- without that they
+            // showed the value from when the window was opened, for good.
             this._baueChips('vl-chips-temp',  this.stackedCharts.temp,  '\u00b0C');
             this._baueChips('vl-chips-fans',  this.stackedCharts.fans,  '%');
             this._baueChips('vl-chips-power', this.stackedCharts.power, 'W');
@@ -361,7 +360,7 @@ class ChartManager {
         }
     }
 
-    // NEUE Update-Funktion ohne Animation
+    // The update function without animation
     async updateCombinedChart() {
         const texts = window.texts || {};
         if (!this.currentChart) return;
@@ -370,7 +369,7 @@ class ChartManager {
             const response = await apiCall('/api/sensor_history/all');
             const data = await response.json();
 
-            // Nur Daten updaten, Chart-Struktur bleibt
+            // Only update the data, the chart structure stays
             this.currentChart.data.labels = data.labels || [];
 
             // Datasets updaten
@@ -382,7 +381,7 @@ class ChartManager {
                 });
             }
 
-            // Smooth Update mit requestAnimationFrame
+            // A smooth update with requestAnimationFrame
             const chart = this.currentChart;
             requestAnimationFrame(() => {
                 chart.update('none');
@@ -401,14 +400,14 @@ class ChartManager {
 
             const ctx = document.getElementById('sensorChart').getContext('2d');
 
-            // Alten Chart zerstoeren falls vorhanden
+            // Destroy the old chart if there is one
             if (this.currentChart) {
                 this.currentChart.destroy();
             }
 
-            // Keine Daten?
+            // No data?
             if (!data.datasets || data.datasets.length === 0) {
-                // Canvas Groesse abrufen
+                // Fetch the canvas size
                 const centerX = ctx.canvas.width / 2;
                 const centerY = ctx.canvas.height / 2;
 
@@ -540,7 +539,7 @@ class ChartManager {
     closeChartModal() {
         document.getElementById('chartModal').style.display = 'none';
 
-        // Stats wieder anzeigen fuer normale Charts
+        // Show the stats again for normal charts
         document.getElementById('chartStats').style.display = 'flex';
         document.getElementById('sensorChart').style.display = 'block';
         document.getElementById('stackedChartsContainer').style.display = 'none';
@@ -581,12 +580,12 @@ class ChartManager {
 
             const ctx = document.getElementById('sensorChart').getContext('2d');
 
-            // Alten Chart zerstoeren falls vorhanden
+            // Destroy the old chart if there is one
             if (this.currentChart) {
                 this.currentChart.destroy();
             }
 
-            // Farben basierend auf Sensor-Typ
+            // Colours based on the sensor type
             const colors = {
                 'nozzle_temp': 'rgb(255, 99, 132)',  // Rot
                 'bed_temp': 'rgb(54, 162, 235)',     // Blau
@@ -596,7 +595,7 @@ class ChartManager {
 
             const mainColor = colors[sensorType] || 'rgb(75, 192, 192)';
 
-            // Min/Max/Avg Linien als zusaetzliche Datasets
+            // Min/max/avg lines as additional datasets
             const datasets = [{
                 label: texts.chart_label_current,
                 data: data.data || [],
@@ -761,7 +760,7 @@ class ChartManager {
                 }
             });
 
-            // Zeige Stats in separater Zeile
+            // Show the stats in a separate row
             if (data.min !== null && data.max !== null) {
                 document.getElementById('statMin').innerHTML = `<span style="color:#3498db;">▼</span> Min: ${data.min}${unit}`;
                 document.getElementById('statMax').innerHTML = `<span style="color:#e74c3c;">▲</span> Max: ${data.max}${unit}`;
@@ -781,12 +780,12 @@ class ChartManager {
             const response = await apiCall(`/api/sensor_history/${sensorType}`);
             const data = await response.json();
 
-            // Nur updaten wenn neue Daten
+            // Only update on new data
             if (JSON.stringify(this.currentChart.data.datasets[0].data) !== JSON.stringify(data.data)) {
                 this.currentChart.data.labels = data.labels || [];
                 this.currentChart.data.datasets[0].data = data.data || [];
 
-                // Smooth Update mit requestAnimationFrame
+                // A smooth update with requestAnimationFrame
                 const chart = this.currentChart;
                 requestAnimationFrame(() => {
                     chart.update('none');

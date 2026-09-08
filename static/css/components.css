@@ -135,9 +135,9 @@ body.dark-mode .control-btn {
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-/* iOS Press Animation - subtiles Scale damit der Cursor beim Klick
-   nicht außerhalb des geschrumpften Buttons landet (sonst kommt kein
-   click-Event mehr bei nicht-mittigen Klicks, z.B. Licht-Button). */
+/* iOS Press Animation - a subtle scale so the cursor doesn't end up
+   outside the shrunk button on click (otherwise no click event fires
+   for off-center clicks, e.g. the light button). */
 .control-btn:active {
     transform: scale(0.96) translateZ(0) !important;
     opacity: 0.7;
@@ -165,6 +165,26 @@ body.dark-mode .control-btn:hover {
 
 body.dark-mode .control-btn.disabled {
     background: #1a1f2e;
+}
+
+/* A command has been sent but the printer has not carried it out yet
+   (job_state 6/7/11). The button stays where it is -- moving or hiding it
+   under the finger is worse than dimming it -- but it does not take a
+   second press. */
+.control-btn--laeuft {
+    opacity: 0.55;
+    cursor: progress;
+    pointer-events: none;
+    animation: sk-puls 1.4s ease-in-out infinite;
+}
+
+@keyframes sk-puls {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .control-btn--laeuft { animation: none; }
 }
 
 /* === Colored Button Variants (Dark Mode) === */
@@ -481,8 +501,9 @@ body.dark-mode #spool-selector {
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
 }
 
-/* Duesenwahl im Filament-Tab — nur bei Doppelduesen-Geraeten sichtbar
-   (X2D, H2D, H2D Pro, H2C). Waehlt die externe Spule der jeweiligen Duese. */
+/* Nozzle selector in the filament tab — visible only on dual-nozzle
+   devices (X2D, H2D, H2D Pro, H2C). Selects the external spool for the
+   respective nozzle. */
 .ctrl-nozzle-select {
     display: flex;
     align-items: center;
@@ -504,7 +525,7 @@ body.dark-mode #spool-selector {
     font-size: 13px;
 }
 
-/* --- Geraet-Tab (Doppelduese, Kammer, Luefter, Luftfuehrung) ------------- */
+/* --- Device tab (dual nozzle, chamber, fan, airflow) ------------- */
 .dev-nozzle-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -523,8 +544,8 @@ body.dark-mode #spool-selector {
     margin-bottom: 4px;
 }
 .dev-nozzle-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
-/* Punkt markiert die gerade aktive Duese; per visibility geschaltet, damit
-   die Zeile nicht springt. */
+/* Dot marks the currently active nozzle; toggled via visibility so
+   the row doesn't jump. */
 .dev-nozzle-active { color: #51cf66; font-size: 12px; visibility: hidden; }
 .dev-nozzle-temp { font-size: 20px; font-weight: 700; color: var(--text-primary); }
 .dev-nozzle-target { font-size: 13px; font-weight: 400; color: var(--text-secondary); }
@@ -574,7 +595,7 @@ body.dark-mode #spool-selector {
     font-size: 12px;
 }
 
-/* --- AMS im Geraet-Tab --------------------------------------------------- */
+/* --- AMS in the device tab --------------------------------------------------- */
 .ams-card {
     padding: 10px;
     margin-bottom: 10px;
@@ -597,7 +618,7 @@ body.dark-mode #spool-selector {
     gap: 8px;
     font-size: 12px;
 }
-/* Farbpunkt des Fachs; gestrichelt = leer/keine Farbe gemeldet */
+/* Tray's color dot; dashed = empty/no color reported */
 .ams-tray-dot {
     width: 14px; height: 14px;
     border-radius: 50%;
@@ -637,7 +658,7 @@ body.dark-mode #spool-selector {
     font-size: 12px;
 }
 
-/* Filament-Editor eines AMS-Fachs (fuer Rollen ohne Bambu-RFID) */
+/* Filament editor for an AMS tray (for spools without Bambu RFID) */
 .ams-edit {
     display: flex;
     gap: 6px;
@@ -670,10 +691,10 @@ body.dark-mode #spool-selector {
 }
 
 /* ======================================================================
-   Planen-Dialog — Aufbau vom 21aug26
-   Vier gleich gebaute Karten statt vier verschiedener Bauarten. Alles hier
-   traegt das Praefix sp-, damit es sich nicht mit den alten sched-form-*
-   Regeln beisst (die noch andere Dialoge bedienen).
+   Schedule dialog
+   Four identically built cards instead of four different constructions.
+   Everything here carries the sp- prefix, so it doesn't clash with the
+   old sched-form-* rules (which still serve other dialogs).
    ====================================================================== */
 .ui-koerper {
     display: flex;
@@ -703,7 +724,7 @@ body.dark-mode #spool-selector {
 
 .ui-karte-kopf .hd-ic { opacity: 0.75; }
 
-/* Eine Zeile = ein Bedienelement. Trennlinie statt Kasten je Zeile. */
+/* One row = one control. A divider line instead of a box per row. */
 .ui-zeile {
     display: flex;
     align-items: center;
@@ -727,8 +748,8 @@ body.dark-mode #spool-selector {
 .ui-zeile-name .hd-ic { color: var(--text-secondary); }
 .ui-breit { flex: 1; min-width: 0; }
 
-/* Schalter — gleiche Bauform wie in der Druckvorbereitung (.prep-switch),
-   hier nur ohne deren Zeilenrahmen. */
+/* Toggle — same construction as in print prep (.prep-switch),
+   just without its row border here. */
 .ui-schalter { position: relative; flex: none; display: inline-flex; }
 .ui-schalter input { position: absolute; opacity: 0; pointer-events: none; }
 
@@ -759,10 +780,10 @@ body.dark-mode #spool-selector {
 .ui-schalter input:checked + span::after { transform: translateX(18px); }
 
 /* ======================================================================
-   Linien-Icons statt Emoji
-   Lag bis 21aug26 in progress-card.css — inzwischen tragen alle Dialoge
-   diese Icons in ihren Kopfzeilen, und ohne die Basisregel rendern sie als
-   grosse schwarze Flaechen (fill statt stroke). Gehoert darum hierher.
+   Line icons instead of emoji
+   All dialogs now carry these icons in their headers, and without this
+   base rule they render as large black shapes (fill instead of stroke).
+   That's why it belongs here.
    ====================================================================== */
 .hd-ic {
     width: 17px;
@@ -776,22 +797,22 @@ body.dark-mode #spool-selector {
     flex: 0 0 auto;
 }
 .hd-ic--xs { width: 13px; height: 13px; vertical-align: -2px; }
-/* Leerzustaende: das Symbol traegt die Flaeche, nicht der Text daneben. */
+/* Empty states: the icon carries the area, not the text beside it. */
 .hd-ic--xl { width: 40px; height: 40px; stroke-width: 1.4; vertical-align: 0; opacity: 0.55; }
 
-/* Die Drucker-Meldungen (.mld*) wohnen in meldungen.css — sie werden auf
-   jeder Seite gebraucht, nicht nur dort, wo components.css liegt. */
+/* The printer messages (.mld*) live in meldungen.css — they're needed
+   on every page, not just wherever components.css is loaded. */
 /* ==========================================================================
-   Platzhalter, wenn es kein Vorschaubild gibt  (21aug26)
+   Placeholder for when there is no preview image
    --------------------------------------------------------------------------
-   Drucke, die direkt aus Bambu Studio gestartet werden, legen ihre 3MF im
-   internen Speicher des Druckers ab. Der FTPS-Dienst auf Port 990 zeigt auf
-   jedem Bambu-Modell nur den externen Speicher (Stick/SD) — an die Datei und
-   damit an das Vorschaubild kommt niemand heran, auch die Home-Assistant-
-   Integration und Bambuddy nicht.
+   Prints started directly from Bambu Studio store their 3MF in the
+   printer's internal storage. The FTPS service on port 990 exposes only
+   external storage (stick/SD) on every Bambu model — nobody can reach the
+   file, and thus the preview image, not even the Home Assistant
+   integration or Bambuddy.
 
-   Statt eines leeren grauen Kastens steht dort jetzt ein Symbol. Der Grund
-   steht im title-Attribut und, wo Platz ist, als Text daneben.
+   Instead of an empty gray box, there's now an icon there. The reason
+   is in the title attribute and, where there's room, as text beside it.
    ========================================================================== */
 .kein-bild {
     display: grid !important;
@@ -801,16 +822,16 @@ body.dark-mode #spool-selector {
     color: var(--text-secondary);
     position: relative;
 }
-/* Ein per visibility versteckte Bild belegt weiter eine Rasterzeile und
-   schiebt das Symbol nach unten. In dieser Ansicht haelt der Platzhalter
-   selbst den Platz, das Bild darf ganz raus. */
+/* An image hidden via visibility still occupies a grid row and
+   pushes the icon down. In this view the placeholder itself holds
+   the space, so the image can be removed entirely. */
 .kein-bild > img { display: none !important; }
 .kein-bild::after {
     content: "";
     grid-area: 1 / 1;
-    /* Die Breite MUSS aus der Höhe kommen: `width: 58%` bezieht sich in
-       einem `place-items: center`-Raster auf die Spaltenbreite, und die
-       richtet sich wiederum nach dem Inhalt — das Ergebnis ist 0px. */
+    /* The width MUST come from the height: `width: 58%` in a
+       `place-items: center` grid refers to the column width, which in
+       turn is sized by the content — the result is 0px. */
     height: 58%; aspect-ratio: 1; width: auto;
     max-height: 46px;
     opacity: 0.42;
@@ -819,9 +840,9 @@ body.dark-mode #spool-selector {
     mask: var(--kein-bild-form) center / contain no-repeat;
 }
 :root {
-    /* Würfelumriss mit gestrichelter Deckfläche: „ein Modell, von dem wir
-       kein Bild haben" — nicht das übliche durchgestrichene Fotosymbol, hier
-       fehlt ja keine Datei, sondern der Blick hinein. */
+    /* Cube outline with a dashed top face: "a model we have no picture
+       of" — not the usual crossed-out photo icon, since no file is
+       missing here, just the view inside it. */
     --kein-bild-form: url("data:image/svg+xml;utf8,\
 <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' \
 stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'>\

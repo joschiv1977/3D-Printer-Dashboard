@@ -1,19 +1,47 @@
 /**
- * Druckvorbereitung — der Schritt zwischen "Drucken" und dem eigentlichen Start.
+ * Print preparation — the step between "Print" and the actual start.
  *
- * Der Drucker macht es auf seinem Display genauso: erst ein Blatt mit Vorschau,
- * Platte, Duesen, Filament und allen Optionen, dann losdrucken. Bei uns steckten
- * die Optionen vorher im Zahnrad der Dateiliste — wer sie beim Drucken sehen
- * wollte, musste sie vorher geoeffnet haben.
+ * The printer does the same thing on its own display: first a sheet with
+ * preview, plate, nozzles, filament and all options, then start printing.
+ * For us the options used to sit behind the gear icon in the file list —
+ * anyone who wanted to see them while printing had to have opened it first.
  *
- * Die Optionsfelder tragen bewusst dieselben Klassen und data-file-Attribute wie
- * vorher in der Liste: collectPrintOptions() in print-actions.js liest sie
- * unveraendert weiter aus.
+ * The option fields deliberately keep the same classes and data-file
+ * attributes as before in the list: collectPrintOptions() in
+ * print-actions.js still reads them out unchanged.
  */
 (function () {
     'use strict';
 
     let aktuell = null;   // { filename, location, daten, plate }
+
+    /**
+     * Label for a plate tile.
+     *
+     * The server does send a `name` field, but it's hardcoded in English
+     * ("Plate 3") — next to it sat the translated heading "PLATTE".
+     * The number lives in `index`; the rest of the label is built here,
+     * so the language matches too.
+     */
+    const plattenName = (p) => `${t('print_prepare_plate', 'Platte')} ${p.index}`;
+
+    /**
+     * Label for the start button.
+     *
+     * If a spool question still follows this sheet, "Drucken" (Print)
+     * promises too much. The answer comes from the server
+     * (`spulenauswahl_noetig`) and is the same one the print command later
+     * relies on. Before, there was a guess of our own here — "multiple
+     * filaments" — which caught multi-color prints but not a single-filament
+     * print whose material doesn't match the loaded spool (reported 02sep26).
+     */
+    function setzeStartKnopf(daten) {
+        const knopf = document.getElementById('prep-start');
+        if (!knopf) return;
+        knopf.textContent = daten && daten.spulenauswahl_noetig
+            ? t('print_prepare_continue', 'Weiter')
+            : t('print', 'Drucken');
+    }
 
     const esc = (t) => String(t == null ? '' : t)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -30,14 +58,14 @@
         return h > 0 ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
     }
 
-    /** Strichsymbol vor einer Zeilenbeschriftung. Das Label selbst laeuft
-     *  durch esc(), Markup kann also nicht darin stehen. */
+    /** Icon glyph before a row label. The label itself is passed through
+     *  esc(), so it cannot contain markup. */
     function zeichen(name) {
         return name ? window.skIcon(name, 'hd-ic--xs') + ' ' : '';
     }
 
-    /** Segment-Auswahl (automatisch / ein / aus) — dieselben Bausteine wie in
-     *  der bisherigen Optionsliste, damit die Optik gleich bleibt. */
+    /** Segmented choice (auto / on / off) — the same building blocks as in
+     *  the previous options list, so the look stays the same. */
     function stufenReihe(cls, datei, label, vorgabe, symbol) {
         const knopf = (v, txt) =>
             `<label class="sd-popover-tri__opt">` +
@@ -67,9 +95,9 @@
 
         let html = schalterReihe('print-opt-timelapse', datei,
             t('timelapse', 'Timelapse'), vorgaben.timelapse !== false, 'kamera');
-        // Wohin die Timelapse geht. Der Drucker uebernimmt das Ziel aus
-        // dem Auftrag, einen eigenen Einstellungsbefehl gibt es nicht —
-        // darum steht die Wahl hier und nicht in den Einstellungen.
+        // Where the timelapse goes. The printer takes the destination from
+        // the job — there's no separate settings command for it — that's
+        // why the choice lives here and not in settings.
         html += schalterReihe('print-opt-timelapse-intern', datei,
             t('timelapse_intern', 'Timelapse intern speichern'),
             vorgaben.timelapse_intern === true, 'karte');
@@ -81,10 +109,10 @@
         html += stufenReihe('print-opt-flow-cali', datei,
             t('flow_calibration_short', 'Fluss-Kalibrierung'),
             stufe(vorgaben.flow_cali_mode, vorgaben.flow_cali === true, 2), 'welle');
-        // Der Duesenversatz bleibt immer sichtbar. Was er soll, entscheidet
-        // die VORBELEGUNG vom Server: benutzt der Druck beide Duesen, steht
-        // er auf "ein", sonst auf "aus". Von Hand umstellen geht weiter —
-        // ihn ganz auszublenden war am 28aug26 die falsche Antwort.
+        // The nozzle offset row always stays visible. What it defaults to
+        // is decided by the server's PRESET: if the print uses both nozzles
+        // it starts on "on", otherwise "off". You can still switch it by
+        // hand — hiding it entirely was the wrong answer on 28aug26.
         html += stufenReihe('print-opt-nozzle-offset', datei,
             t('nozzle_offset_short', 'Düsenversatz'),
             stufe(vorgaben.nozzle_offset_mode, false, 0), 'ziel');
@@ -98,9 +126,9 @@
                 vorgaben.manual_color_change !== false, 'palette');
         }
 
-        // Trocknung waehrend des Drucks. Nur mit heizendem AMS, und
-        // vorgeschlagen, wenn die aktive Spule lange lag — Spoolman fuehrt
-        // last_used, dieselbe Quelle wie der Hinweis in der Material-Zone.
+        // Drying during the print. Only with a heated AMS, and suggested
+        // when the active spool has been sitting for a while — Spoolman
+        // tracks last_used, the same source as the hint in the material zone.
         const lagerhinweis = trocknungVorschlag();
         if (lagerhinweis.moeglich) {
             const gemessen = feuchteHinweis();
@@ -119,12 +147,12 @@
     }
 
     /**
-     * Soll die Trocknung waehrend des Drucks vorgeschlagen werden?
+     * Should drying during the print be suggested?
      *
-     * `moeglich` haengt am heizenden AMS (AMS HT / 2 Pro), `vorschlagen` an
-     * der Lagerzeit der aktiven Spule. Die 30 Tage sind dieselbe Schwelle
-     * wie beim Hinweis in der Material-Zone — eine Zahl, zwei Stellen waeren
-     * eine zu viel, darum steht sie hier als Konstante mit demselben Namen.
+     * `moeglich` depends on a heated AMS (AMS HT / 2 Pro), `vorschlagen` on
+     * how long the active spool has been sitting. The 30 days is the same
+     * threshold as the hint in the material zone — one number in two places
+     * would be one too many, so it lives here as a constant with the same name.
      */
     const TAGE_BIS_FEUCHT = 30;
 
@@ -137,27 +165,27 @@
         const spule = (sm && sm.spools || []).find(x => x.id === (sm && sm.activeSpoolId));
         if (!spule || !spule.last_used) return { moeglich: true, vorschlagen: false, tage: 0 };
 
-        // floor, nicht ceil: ceil rundet jeden angefangenen Tag auf, dann
-        // stuenden bei exakt 30 Tagen "31 Tage" da und der Schalter ginge
-        // einen Tag zu frueh an.
+        // floor, not ceil: ceil rounds any started day up, so at exactly
+        // 30 days it would show "31 days" and the switch would turn on
+        // one day too early.
         const tage = Math.floor(Math.abs(Date.now() - new Date(spule.last_used)) / 86400000);
         return { moeglich: true, vorschlagen: tage > TAGE_BIS_FEUCHT, tage: tage > TAGE_BIS_FEUCHT ? tage : 0 };
     }
 
     /**
-     * Was das AMS gemessen hat, schlaegt die Lagerzeit aus Spoolman.
+     * What the AMS measured takes priority over the storage time from Spoolman.
      *
-     * `last_used` sagt nur, wann die Spule zuletzt dran war — ob sie in der
-     * Zeit feucht wurde, weiss es nicht. Das Feuchte-Gedaechtnis weiss es.
-     * Deshalb steht der gemessene Hinweis vor dem geschaetzten; nur wenn
-     * nichts gemessen wurde, bleibt es beim alten Tagezaehler.
+     * `last_used` only says when the spool was last active — it doesn't know
+     * whether it got humid during that time. The humidity memory does know.
+     * That's why the measured hint comes before the estimated one; only when
+     * nothing was measured does it fall back to the old day counter.
      */
     function feuchteHinweis() {
         const daten = feuchteStand;
         if (!daten) return null;
         const nass = (daten.spulen || []).filter(sp => sp.urteil === 'trocknen');
         if (!nass.length) return null;
-        // Die laengste Liegezeit gibt den Ton an — sie ist der Grund.
+        // The longest time sitting sets the tone — it's the reason given.
         nass.sort((a, b) => b.tage_ueber - a.tage_ueber);
         const s = nass[0];
         return {
@@ -169,13 +197,13 @@
         };
     }
 
-    // Der Stand wird beim Oeffnen geholt; zeichneOptionen laeuft synchron und
-    // kann nicht warten. Fehlt er noch, greift der Tagezaehler.
+    // The status is fetched on open; zeichneOptionen runs synchronously and
+    // can't wait for it. If it's not there yet, the day counter takes over.
     let feuchteStand = null;
 
     async function holeFeuchte() {
-        if (!window.amsFeuchte) return null;
-        try { feuchteStand = await window.amsFeuchte.hole(14); } catch (e) { feuchteStand = null; }
+        if (!window.amsHumidity) return null;
+        try { feuchteStand = await window.amsHumidity.hole(14); } catch (e) { feuchteStand = null; }
         return feuchteStand;
     }
 
@@ -212,18 +240,18 @@
             <button class="prep-plate${p.index === aktuell.plate ? ' prep-plate--on' : ''}"
                     onclick="window.printPrepare.waehlePlatte(${p.index})">
                 ${p.thumbnail ? `<img src="${imageDataUrl(p.thumbnail)}" alt="">` : ''}
-                <span>${esc(p.name || ('#' + p.index))}</span>
+                <span>${esc(plattenName(p))}</span>
             </button>`).join('');
     }
 
     /**
-     * Welches Filament die Datei verlangt — mit Farbpunkt wie in der
-     * Dateiliste. Gehoert in JEDE Dateikarte: ohne die Angabe muss man
-     * erst „Details" aufklappen, um zu sehen, wofuer man die Spule waehlt.
+     * Which filament the file needs — with a color dot like in the file
+     * list. Belongs on EVERY file card: without it you'd have to expand
+     * "Details" first just to see which spool you're choosing for.
      *
-     * Bei gesliceten .gcode.3mf liefert /api/print_preview keine
-     * `filaments` (der Parser gibt bei EINEM Filament eine leere Liste
-     * zurueck) — dann steht die Angabe nur in der Dateiliste.
+     * For sliced .gcode.3mf files, /api/print_preview returns no
+     * `filaments` (the parser returns an empty list for a SINGLE filament)
+     * — then the info only lives in the file list.
      */
     function filamentFakt(daten, filename) {
         let liste = daten.filaments || [];
@@ -303,8 +331,8 @@
         document.getElementById('prep-options-title').textContent = t('print_options', 'Optionen');
         document.getElementById('prep-loading').style.display = 'block';
         document.getElementById('prep-body').style.display = 'none';
-        // Die Fusszeile liegt seit dem Umbau ausserhalb von prep-body und
-        // muss darum mitgeschaltet werden.
+        // Since the rework, the footer sits outside prep-body and so has
+        // to be toggled along with it.
         const fuss0 = document.getElementById('prep-fuss');
         if (fuss0) fuss0.style.display = 'none';
         modal.style.display = 'block';
@@ -320,14 +348,17 @@
             aktuell.plate = daten.plate;
             zeichne(daten);
 
-            // Bei mehreren Filamenten folgt nach diesem Blatt noch die
-            // Spulen-Zuordnung — dann verspricht „Drucken" zu viel.
-            const ausListe = window.sdDateiFinden ? window.sdDateiFinden(filename)
-                : (window.lastSDFiles || []).find(f => f && f.name === filename);
-            const nochZuordnen = !!(ausListe && ausListe.is_multifilament && ausListe.all_filaments);
-            document.getElementById('prep-start').textContent = nochZuordnen
-                ? t('print_prepare_continue', 'Weiter')
-                : t('print', 'Drucken');
+            // Does a spool question still follow this sheet? Then "Drucken"
+            // (Print) promises too much.
+            //
+            // The answer comes from the server (`spulenauswahl_noetig`) and
+            // is the same one the print command later relies on. Before,
+            // there was a guess of our own here: "multiple filaments" —
+            // which caught multi-color prints but not a single-filament
+            // print whose material doesn't match the loaded spool. There it
+            // said "Drucken" (Print), and the spool prompt showed up right
+            // after anyway (reported 02sep26).
+            setzeStartKnopf(daten);
             document.getElementById('prep-loading').style.display = 'none';
             document.getElementById('prep-body').style.display = '';
             const fuss = document.getElementById('prep-fuss');
@@ -335,8 +366,8 @@
             return true;
         } catch (e) {
             console.error('Print preparation not loaded:', e);
-            // Lieber ohne Vorbereitung drucken als gar nicht — der alte Weg
-            // funktioniert weiterhin.
+            // Better to print without preparation than not at all — the old
+            // path still works.
             modal.style.display = 'none';
             aktuell = null;
             return false;
@@ -352,8 +383,8 @@
         if (!aktuell) return;
         const { filename, location, plate } = aktuell;
         schliesse();
-        // Die Platte ist hier schon gewaehlt — der spaetere Plattendialog
-        // wuerde sonst nochmal fragen.
+        // The plate is already chosen here — otherwise the later plate
+        // dialog would ask again.
         if (typeof plate === 'number') window.pendingPlateOverride = plate;
         if (window.printActions && typeof window.printActions.beginPrintFlow === 'function') {
             window.printActions.beginPrintFlow(filename, location);
@@ -362,20 +393,21 @@
     }
 
     /**
-     * Denselben Inhalt in einen fremden Behaelter zeichnen — der
-     * Planen-Dialog zeigt damit genau das, was auch vor dem Sofortdruck steht.
+     * Render the same content into a foreign container — the schedule
+     * dialog uses this to show exactly what appears before an immediate
+     * print too.
      *
-     * `vorgaben` ueberschreibt die Standardwerte (beim Bearbeiten eines
-     * geplanten Drucks kommen sie aus dem gespeicherten Eintrag).
+     * `vorgaben` overrides the defaults (when editing a scheduled print,
+     * they come from the saved entry).
      *
-     * `ziele` teilt die Ausgabe auf mehrere Behaelter auf:
-     * `{ datei, platte, filament, optionen }`. Der Planen-Dialog setzt damit
-     * jeden Teil in seine eigene Karte — vorher lag alles in einem Block
-     * unter der Ueberschrift "Druckoptionen", weshalb Vorschau und Eckdaten
-     * dort standen, wo man Schalter erwartet. Ohne `ziele` bleibt es beim
-     * einen Block (Sofortdruck).
+     * `ziele` splits the output across multiple containers:
+     * `{ datei, platte, filament, optionen }`. The schedule dialog uses this
+     * to put each part into its own card — before, everything sat in one
+     * block under the heading "Druckoptionen", which meant the preview and
+     * key facts ended up where you'd expect toggles. Without `ziele` it
+     * stays as one block (immediate print).
      *
-     * Rueckgabe: { plate() } — die gewaehlte Platte.
+     * Returns: { plate() } — the chosen plate.
      */
     async function rendereIn(behaelter, filename, vorgaben, ziele) {
         if (!behaelter) return null;
@@ -404,7 +436,7 @@
                 <button type="button" class="prep-plate${p.index === zustand.plate ? ' prep-plate--on' : ''}"
                         data-plate="${p.index}">
                     ${p.thumbnail ? `<img src="${imageDataUrl(p.thumbnail)}" alt="">` : ''}
-                    <span>${esc(p.name || ('#' + p.index))}</span>
+                    <span>${esc(plattenName(p))}</span>
                 </button>`).join('');
             liste.querySelectorAll('.prep-plate').forEach(knopf => {
                 knopf.onclick = () => {
@@ -414,8 +446,8 @@
             });
         };
 
-        // Eckdaten mit Strich-Icons statt Emoji — gleiche Bildsprache wie
-        // die Kopfzeilen der Dialoge.
+        // Key facts with line icons instead of emoji — same visual language
+        // as the dialog headers.
         const ic = (pfad) => `<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true">${pfad}</svg>`;
         const IC_ZEIT = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>';
         const IC_GEWICHT = '<path d="M12 3v10M7 21h10M6 13h12l-2 8H8z"/>';
@@ -437,7 +469,7 @@
         const filamente = daten.filaments || [];
         const mehrPlatten = (daten.plates || []).length > 1;
 
-        // Die vier Bausteine einmal bauen, dann je nach Aufrufer verteilen.
+        // Build the four building blocks once, then distribute them per caller.
         const teilDatei = `
             <div class="prep-datei">
                 ${daten.thumbnail ? `<img class="prep-datei__bild" src="${imageDataUrl(daten.thumbnail)}" alt="">` : ''}
@@ -456,8 +488,8 @@
             daten.manual_color_change_possible === true)}</div>`;
 
         if (ziele) {
-            // Aufgeteilt: jeder Teil in seine eigene Karte. Leere Behaelter
-            // blendet der Aufrufer aus, damit keine leeren Karten stehen.
+            // Split up: each part into its own card. The caller hides empty
+            // containers so no empty cards are shown.
             behaelter.innerHTML = '';
             const setze = (el, html) => {
                 if (!el) return;
@@ -486,10 +518,41 @@
     window.printPrepare = {
         oeffne,
         rendereIn,
-        waehlePlatte(index) {
-            if (!aktuell) return;
+        /**
+         * A different plate was chosen — and its data needs to be fetched
+         * fresh.
+         *
+         * In slice_info.config everything sits in per-plate blocks, including
+         * the nozzle assignment. The server returns it for the plate given in
+         * `?plate=`; without that it takes the first one. Before, only the
+         * tiles were redrawn here, and the filament section kept plate 1's
+         * assignment — for a file with six plates it showed "Links" (Left)
+         * three times, even though plate 2 puts its second filament on the
+         * second nozzle (measured 02sep26).
+         *
+         * The tiles redraw immediately so the tap doesn't feel ignored; the
+         * data follows after.
+         */
+        async waehlePlatte(index) {
+            if (!aktuell || aktuell.plate === index) return;
             aktuell.plate = index;
             zeichnePlatten(aktuell.daten);
+            try {
+                const antwort = await apiCall(
+                    '/api/print_preview/' + encodeURIComponent(aktuell.filename)
+                    + '?plate=' + encodeURIComponent(index));
+                const daten = await antwort.json();
+                if (daten.error) throw new Error(daten.error);
+                // Keep the chosen plate: the server responds with its own
+                // `plate`, and it's the same one — but if it falls back to
+                // the first one for an unknown number, the tile selection
+                // shouldn't jump.
+                aktuell.daten = daten;
+                zeichne(daten);          // also redraws the tiles
+                setzeStartKnopf(daten);
+            } catch (e) {
+                console.warn('Plate change: preview not reloaded', e);
+            }
         },
     };
     window.closePrintPrepare = schliesse;

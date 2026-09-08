@@ -1,27 +1,26 @@
 /**
- * Hotend-Magazin (H2C) — Karte fuellen.
+ * The hotend rack (H2C) -- filling the card.
  *
- * Der H2C druckt an zwei Stellen, aber nur eine davon nimmt Wechsel-Hotends:
- * Bambu Studio gibt ihm `extruder_max_nozzle_count ['1','6']` — Extruder 1
- * traegt eine feste Duese, Extruder 2 bis zu sechs Hotends aus dem Magazin.
- * Der Drucker meldet die Plaetze als Duesen-ids 16-21; der Server trennt sie
- * in `hardware.hotend_rack` ab (services/printer_state.py).
+ * The H2C prints from two positions, but only one of them takes exchangeable
+ * hotends: Bambu Studio gives it `extruder_max_nozzle_count ['1','6']` --
+ * extruder 1 carries a fixed nozzle, extruder 2 up to six hotends from the
+ * rack. The printer reports the slots as nozzle ids 16-21; the server splits
+ * them off into `hardware.hotend_rack` (services/printer_state.py).
  *
- * Die Karte sagt NICHT, welche Seite die feste und welche die wechselbare
- * ist. Studio nummeriert Extruder 1 und 2, der MQTT-Block nummeriert Duesen
- * 0 und 1 (0 = rechts, 1 = links) — welche Nummer welcher entspricht, steht
- * in keiner Quelle, die wir haben. Belegt ist dagegen, WELCHER Platz
- * aufgesetzt ist: das sagt `tar_id`.
+ * The card does NOT say which side is the fixed one and which the
+ * exchangeable one. Studio numbers extruders 1 and 2, the MQTT block numbers
+ * nozzles 0 and 1 (0 = right, 1 = left) -- which number corresponds to which
+ * stands in no source we have. What is documented is WHICH slot is mounted:
+ * `tar_id` says so.
  *
- * Zwei Werte kommen bewusst roh durch, weil ihre Bedeutung in keiner
- * Bambu-Quelle steht, die wir haben:
- *   - der Typ-Code ("SS", "HS", …) wird angezeigt wie gemeldet. Die
- *     Home-Assistant-Integration liest die zweite Stelle als Fluss
- *     (H = High Flow); das ist die Lesart eines Drittanbieters und wird hier
- *     nicht als Tatsache verkauft.
- *   - der Verschleiss steht als Zahl da, ohne Balken. Der Drucker meldet
- *     keinen Maximalwert, ein Balken waere geraten.
- * Beides gehoert an einem echten H2C nachgesehen, dann kann hier mehr stehen.
+ * Two values deliberately come through raw, because their meaning stands in no
+ * Bambu source we have:
+ *   - the type code ("SS", "HS", …) is shown as reported. The Home Assistant
+ *     integration reads the second character as the flow (H = high flow); that
+ *     is a third party's reading and is not sold here as fact.
+ *   - the wear stands there as a number, without a bar. The printer reports no
+ *     maximum, so a bar would be guesswork.
+ * Both want checking on a real H2C, and then more can stand here.
  */
 (function (global) {
     'use strict';
@@ -32,8 +31,8 @@
         }
 
         /**
-         * Aus dem Status-Paket fuellen.
-         * @param {object} daten – die Antwort von /api/status bzw. der Push.
+         * Fill from the status packet.
+         * @param {object} daten – the answer from /api/status, or the push.
          */
         aktualisieren(daten) {
             const karte = document.getElementById('hotend-rack-card-grid');
@@ -42,8 +41,8 @@
             const magazin = (daten && daten.hardware && daten.hardware.hotend_rack) || {};
             const plaetze = magazin.slots || [];
 
-            // Keine Plaetze gemeldet = kein Magazin. Die Karte verschwindet,
-            // statt leer dazustehen; sie taucht nicht am Modellnamen auf.
+            // No slots reported = no rack. The card disappears instead of
+            // standing there empty; it does not appear from the model name.
             if (!plaetze.length) {
                 if (karte.style.display !== 'none') {
                     karte.style.display = 'none';
@@ -62,7 +61,7 @@
             this._plaetze(t, magazin, plaetze);
         }
 
-        /** Titel, Zaehler und was gerade aufgesetzt ist. */
+        /** The title, the counter and what is mounted right now. */
         _kopf(t, magazin, plaetze) {
             const setzen = (id, text) => {
                 const el = document.getElementById(id);
@@ -103,7 +102,7 @@
             this._wechselzeile(t, magazin, plaetze, laeuft);
         }
 
-        /** Die Zeile, die den laufenden Wechsel beschreibt. */
+        /** The line that describes the change in progress. */
         _wechselzeile(t, magazin, plaetze, laeuft) {
             const zeile = document.getElementById('hr-wechsel');
             if (!zeile) return;
@@ -131,14 +130,14 @@
             }
         }
 
-        /** Das Raster der sechs Plaetze. */
+        /** The grid of the six slots. */
         _plaetze(t, magazin, plaetze) {
             const behaelter = document.getElementById('hr-plaetze');
             if (!behaelter) return;
 
             const laeuft = this._wechselLaeuft(magazin);
-            // Nur neu zeichnen, wenn sich wirklich etwas geaendert hat — sonst
-            // baut der 1-Sekunden-Push das Raster dauernd neu auf.
+            // Only redraw when something has really changed -- otherwise the
+            // one-second push rebuilds the grid constantly.
             const signatur = JSON.stringify([plaetze, magazin.src_id, magazin.tar_id, laeuft]);
             if (signatur === this._letzteSignatur) return;
             this._letzteSignatur = signatur;
@@ -203,8 +202,8 @@
             });
         }
 
-        /** Laeuft gerade ein Wechsel? `state` != 0 sagt es, und Quelle und
-         *  Ziel muessen sich unterscheiden. */
+        /** Is a change running? `state` != 0 says so, and the source and the
+         *  target have to differ. */
         _wechselLaeuft(magazin) {
             const zustand = magazin.state;
             if (typeof zustand !== 'number' || zustand === 0) return false;
@@ -213,7 +212,7 @@
                 && magazin.tar_id !== null && magazin.tar_id !== undefined;
         }
 
-        /** Aus der Duesen-id (16-21) die Platznummer fuer Menschen (1-6). */
+        /** From the nozzle id (16-21) to the slot number for humans (1-6). */
         _platzNummer(id, plaetze) {
             const index = plaetze.findIndex(p => p.id === id);
             return index < 0 ? null : index + 1;

@@ -3,10 +3,10 @@
  * Controls filament drying feature with material selection, progress tracking
  */
 class FilamentDryingManager {
-    /** Der Server fuehrt je Material einen farbigen Kreis als Emoji. In der
-     *  Oberflaeche steht dafuer ein echter Punkt — dieselbe Sprache wie die
-     *  Farbpunkte an den AMS-Faechern. Im Auswahlfeld (<option>) geht kein
-     *  Markup, dort bleibt der Name allein. */
+    /** The server carries a coloured circle as an emoji per material. The
+     *  interface shows a real dot instead -- the same language as the colour
+     *  dots on the AMS trays. Inside an <option> no markup works, so the name
+     *  stands alone there. */
     materialFarbe(emoji) {
         return {
             '🟢': '#22c55e', '🔵': '#3b82f6', '🟡': '#eab308', '🟠': '#f97316',
@@ -20,19 +20,19 @@ class FilamentDryingManager {
         this.selectedMaterial = null;
         this.filamentDryingEnabled = false;
 
-        // Beim Laden initialisieren — Drying-Card ist non-critical, deferren
+        // Initialise on load -- the drying card is non-critical, so defer it
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof deferNonCritical === 'function') {
                 deferNonCritical(() => {
                     this.initMaterialSelector();
                     this.updateUI();
-                    // Einmal beim Laden holen, danach fuettert der Socket
-                    // (socket-manager: 'filament_drying_status' ruft
-                    // updateStatus(daten) auf).
+                    // Fetch once on load, after that the socket feeds it
+                    // (socket-manager: 'filament_drying_status' calls
+                    // updateStatus(daten)).
                     this.updateStatus();
-                    // Netz fuer den Fall, dass ein Push verlorengeht — und
-                    // nur waehrend wirklich getrocknet wird. Ohne laufende
-                    // Trocknung gibt es hier nichts nachzufragen.
+                    // A net in case a push is lost -- and only while drying
+                    // really runs. Without a running dry there is nothing to
+                    // ask about here.
                     setInterval(() => {
                         if (window.isFilamentDrying) this.updateStatus();
                     }, 60000);
@@ -41,7 +41,7 @@ class FilamentDryingManager {
         });
     }
 
-    // Filament Card Sichtbarkeit basierend auf Drucker-Status und Feature-Flag
+    // Card visibility, based on the printer state and the feature flag
     updateCardVisibility() {
         const card = document.getElementById('filament-drying-card-grid');
         const content = document.getElementById('filament-drying-content');
@@ -49,10 +49,10 @@ class FilamentDryingManager {
 
         const prevDisplay = card.style.display;
 
-        // Drucker ist online wenn: Switch ist ON UND MQTT verbunden
-        // Siehe status-manager.js: ohne eingerichtete Steckdose entscheidet
-        // die Verbindung. Vorher blieb diese Karte auf einer Anlage ohne Dose
-        // fuer immer verborgen, obwohl sie in den Einstellungen an war.
+        // The printer is online when the switch is ON AND MQTT is connected.
+        // See status-manager.js: without a configured socket the connection
+        // decides. This card used to stay hidden forever on a rig without a
+        // socket, although it was switched on in the settings.
         const switchOn = window.lastKnownSwitchState === 'on';
         const mqttConnected = window.lastMqttStatus === true;
         const printerOnline = (typeof window.druckerDa === 'boolean')
@@ -62,23 +62,22 @@ class FilamentDryingManager {
         if (window.cardDryingHiddenBySettings || !printerOnline || !this.filamentDryingEnabled) {
             card.style.display = 'none';
         } else {
-            // Alles OK - Card und Content anzeigen
+            // All good -- show the card and its content
             card.style.display = '';
-            // '' statt 'block': die Karte ist im Stylesheet ein flex mit
-            // zwoelf Punkten Abstand. Ein Inline-Stil schlaegt jede Regel —
-            // damit stand sie auf block, `gap` war wirkungslos und alle
-            // Zeilen klebten aneinander (27aug26 am lebenden Objekt
-            // gemessen: 623 → 623, 652 → 652).
+            // '' instead of 'block': in the stylesheet the card is a flex with
+            // twelve points of gap. An inline style beats every rule -- it
+            // stood on block, `gap` did nothing and all the rows stuck
+            // together.
             content.style.display = '';
         }
 
-        // Grid-Höhe anpassen wenn sich Sichtbarkeit geändert hat
+        // Adjust the grid height when the visibility changed
         if (prevDisplay !== card.style.display) {
             setTimeout(() => { if (typeof adjustGridHeight === 'function') adjustGridHeight(); }, 50);
         }
     }
 
-    // Material-Liste laden
+    // Load the material list
     async loadMaterials() {
         const texts = window.texts || {};
         try {
@@ -86,7 +85,7 @@ class FilamentDryingManager {
             const data = await response.json();
 
             if (data.success) {
-                // Check ob Drucker geschlossenes Gehäuse hat
+                // Check whether the printer has an enclosed chamber
                 if (data.has_chamber === false) {
                     console.log(`Filament drying not available: ${data.message || 'closed printers only'}`);
                     this.filamentDryingEnabled = false;
@@ -105,25 +104,24 @@ class FilamentDryingManager {
                 this.zeigeNativHinweis();
                 const selector = document.getElementById('material-selector');
 
-                // Dropdown füllen
+                // Fill the dropdown
                 selector.innerHTML = `<option value="">${texts.select_filament}</option>`;
                 data.materials.forEach(material => {
                     const option = document.createElement('option');
                     option.value = material.name;
-                    // NUR der Name. Grad und Dauer stehen direkt darunter in
-                    // den beiden Kaestchen — in der Auswahl waren sie ein
-                    // zweites Mal da und sprengten dabei die Breite: aus
-                    // "ABS (90-100°C, 12h)" wurde "ABS (90-100°C, 12"
-                    // (27aug26). Die Spanne bleibt als Kurzhinweis erhalten.
+                    // The name ONLY. Degrees and duration stand right below
+                    // in the two boxes -- in the picker they were there a
+                    // second time and blew the width: "ABS (90-100°C, 12h)"
+                    // became "ABS (90-100°C, 12". The range stays as a hint.
                     option.textContent = material.name;
                     option.title = `${material.temp_min}-${material.temp_max}°C · ${material.duration_hours}h`;
                     selector.appendChild(option);
                 });
 
-                // Feature Status speichern (nur wenn has_chamber)
+                // Store the feature state (only when has_chamber)
                 this.filamentDryingEnabled = data.enabled && data.has_chamber;
 
-                // Card Sichtbarkeit aktualisieren (berücksichtigt Drucker-Status)
+                // Update the card visibility (it accounts for the printer state)
                 this.updateCardVisibility();
             }
         } catch (error) {
@@ -180,10 +178,10 @@ class FilamentDryingManager {
             const materialInfo = document.getElementById('material-info');
 
             if (this.selectedMaterial) {
-                // Material-Info anzeigen
+                // Show the material info
                 const tempAvg = Math.round((this.selectedMaterial.temp_min + this.selectedMaterial.temp_max) / 2);
-                // Die Voreinstellung FUELLT die Felder — sie sind aenderbar.
-                // Die empfohlene Spanne haengt als Kurzhinweis am Feld.
+                // The default FILLS the fields -- they stay editable.
+                // The recommended range hangs off the field as a hint.
                 const tempFeld = document.getElementById('material-temp');
                 // If the printer dries by itself, ITS values apply — read off
                 // the display (30aug26). Otherwise our default from the
@@ -196,19 +194,19 @@ class FilamentDryingManager {
                     : `${this.selectedMaterial.temp_min}-${this.selectedMaterial.temp_max}°C`;
                 document.getElementById('material-duration').value =
                     nativStunden || this.selectedMaterial.duration_hours;
-                // '' statt 'block': die Zeile ist im Stylesheet ein flex —
-                // 'block' haette Beschriftung und Felder untereinander gestellt.
+                // '' instead of 'block': in the stylesheet the row is a flex --
+                // 'block' would have put label and fields underneath each other.
                 materialInfo.style.display = '';
 
-                // Button nur aktivieren wenn KEIN Druck läuft
+                // Enable the button only when NO print is running
                 const isPrinting = window.lastPrintData &&
                                   (window.lastPrintData.gcode_state === 'RUNNING' ||
                                    window.lastPrintData.gcode_state === 'PREPARE');
                 if (!isPrinting) {
                     startBtn.disabled = false;
                     startBtn.style.opacity = '';
-                    // NUR die Beschriftung setzen: textContent auf dem Knopf
-                    // wuerde das Zeichen daneben mit wegwerfen.
+                // Set the LABEL only: textContent on the button would throw
+                // the glyph beside it away with it.
                     const beschriftung = document.getElementById('start-drying-text');
                     if (beschriftung) beschriftung.textContent = texts.start_drying;
                 }
@@ -220,7 +218,7 @@ class FilamentDryingManager {
         });
     }
 
-    // Trocknung starten
+    // Start the drying
     async start() {
         const texts = window.texts || {};
         if (!this.selectedMaterial) {
@@ -247,8 +245,8 @@ class FilamentDryingManager {
                 body: JSON.stringify({
                     material: this.selectedMaterial.name,
                     skip_positioning: skipHoming,
-                    // Was in den Feldern steht — der Server stutzt es in den
-                    // Rahmen, den das Druckbett hergibt.
+                    // Whatever stands in the fields -- the server trims it to
+                    // the range the print bed allows.
                     temp: Number(document.getElementById('material-temp').value) || undefined,
                     hours: Number(document.getElementById('material-duration').value) || undefined,
                     ignoriere: ignoriere || undefined
@@ -274,8 +272,8 @@ class FilamentDryingManager {
                 const currentLang = window.currentLang || 'de';
                 const positioningText = skipHoming ? (window.currentLang === 'de' ? ' (ohne Homing)' : ' (without homing)') : '';
                 // On the native path the preparation runs first — and we say
-                // so. "Drying started" would be a lie, it only begins
-                // erst danach an (30aug26 am Geraet gesehen).
+                // so. "Drying started" would be a lie, it only begins after
+                // that.
                 const meldung = this.nativ
                     ? (texts.toast_drying_prepare || texts.toast_drying_started)
                     : texts.toast_drying_started;
@@ -290,7 +288,7 @@ class FilamentDryingManager {
         }
     }
 
-    // Trocknung stoppen
+    // Stop the drying
     async stop() {
         const texts = window.texts || {};
         try {
@@ -312,16 +310,15 @@ class FilamentDryingManager {
         }
     }
 
-    // Status aktualisieren
+    // Refresh the status
     /**
-     * @param {Object} [daten] Status aus dem Socket. Ohne Angabe wird geholt.
+     * @param {Object} [daten] status from the socket. Without it, fetched.
      *
-     * Der Server pusht den Trocknungsstand ohnehin (Ereignis
-     * 'filament_drying_status', und seit 20aug26 steckt er zusaetzlich als
-     * `filament_drying` in jedem print_progress). Das Holen hier lief
-     * trotzdem alle 10 Sekunden weiter — auch wenn gar nicht getrocknet
-     * wurde, und es zog ueber _applyControlsVisibility noch einen
-     * /api/status-Aufruf hinterher.
+     * The server pushes the drying state anyway (the event
+     * 'filament_drying_status', and it additionally sits as `filament_drying`
+     * in every print_progress). The fetch here nevertheless ran every 10
+     * seconds -- even when nothing was drying, and it dragged another
+     * /api/status call along through _applyControlsVisibility.
      */
     async updateStatus(daten) {
         const texts = window.texts || {};
@@ -339,19 +336,19 @@ class FilamentDryingManager {
 
             // Global Status aktualisieren
             window.isFilamentDrying = status.active;
-            // Steuerung/Print-Status SOFORT passend setzen (nicht erst beim nächsten
-            // Live-Socket-Update) — fixt: Steuerung blitzt beim Öffnen auf, bis ein
-            // filament_drying_status-Event kam, und ist nach Reopen wieder da.
+            // Set the controls and print state to match IMMEDIATELY (not only
+            // on the next live socket update) -- fixes the controls flashing
+            // on open until a filament_drying_status event arrived.
             this._applyControlsVisibility(status.active);
 
             if (status.active) {
-                // Card anzeigen
+                // Show the card
                 selectionDiv.style.display = 'none';
                 activeDiv.style.display = '';   // siehe oben: flex aus dem Stylesheet
                 indicator.style.background = 'var(--accent-green)';
 
-                // Banner Details aktualisieren (der Helfer entscheidet danach,
-                // ob die Meldung ueberhaupt stehen bleibt).
+                // Update the banner details (the helper then decides whether
+                // the message stays at all).
                 if (status.end_time_formatted) {
                     const temp = Math.round(status.temperature);
                     details.textContent = texts.filament_drying_banner_with_endtime
@@ -399,14 +396,14 @@ class FilamentDryingManager {
         }
     }
 
-    // Steuerung (Dev-Control-Card) + Print-Status zur Trocknung ein-/ausblenden.
-    // Genutzt vom sofortigen Poll (updateStatus) UND vom Live-Socket-Handler
-    // (socket-manager) → eine Logik, kein Lag, keine Dopplung.
+    // Show or hide the controls (dev control card) and the print state for
+    // drying. Used by the immediate poll (updateStatus) AND by the live socket
+    // handler (socket-manager) -> one logic, no lag, no duplication.
     _applyControlsVisibility(active) {
-        // GANZE Dev-Control-Card (Karte + Buttons) über checkDeveloperMode steuern: das
-        // liest window.isFilamentDrying (vorher gesetzt) und blendet via hideDevCards()/
-        // showDevCards() die KOMPLETTE Karte aus/ein. Vorher wurde nur .control-grid
-        // versteckt → leere Karten-Hülle (Rahmen/Titel) blieb bei Trocknung stehen.
+        // Steer the WHOLE dev control card (card plus buttons) through
+        // checkDeveloperMode: it reads window.isFilamentDrying (set before)
+        // and hides or shows the COMPLETE card via hideDevCards()/showDevCards().
+        // Hiding only .control-grid left an empty card shell (frame and title).
         if (typeof checkDeveloperMode === 'function') checkDeveloperMode();
         const printStatus = document.getElementById('print-status-container');
         if (printStatus) printStatus.style.display = active ? 'none' : '';
@@ -439,16 +436,16 @@ window.updateDryingStatus = () => window.filamentDryingManager.updateStatus();
 window.applyDryingControlsVisibility = (active) => window.filamentDryingManager._applyControlsVisibility(active);
 
 /**
- * Die Trocknungs-Meldung steht, solange getrocknet wird.
+ * The drying message stands while drying runs.
  *
- * Hier geht es NUR um die manuelle Trocknung ueber das Druckbett — die
- * blockiert Homing, Parken und den Druckstart, das muss im Bild stehen.
+ * This is ONLY about the manual drying over the print bed -- that blocks
+ * homing, parking and the print start, and that has to be visible.
  *
- * Bis 27aug26 stand hier ein Sonderweg fuer "das AMS trocknet nebenbei
- * waehrend eines Drucks". Der gehoerte nie hierher: die AMS-Trocknung
- * laeuft ueber die Materialkarte, zeigt ihren Stand dort und sperrt gar
- * nichts. Diese Karte hatte nur deshalb damit zu tun, weil der Server ihre
- * Trocknung ans AMS umleitete — das tut er nicht mehr.
+ * A special path for "the AMS dries alongside a print" used to stand here.
+ * It never belonged: the AMS drying runs through the material card, shows
+ * its state there and blocks nothing. This card only had anything to do with
+ * it because the server redirected its drying to the AMS -- which it no
+ * longer does.
  */
 window.applyDryingBanner = function (status) {
     const el = document.getElementById('filament-drying-banner');

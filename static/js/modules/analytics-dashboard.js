@@ -1,11 +1,11 @@
-// analytics-dashboard.js — Web-Pendant zu Androids AnalyticsDashboard.
-// Rendert das komplette Analyse-Dashboard (14 Sektionen + Tag-Dialog +
-// Flugschreiber) aus der Druckliste. Deep-Analysen laden Detail-JSONs (gecacht).
-// Nutzt window.HistoryAnalytics (analytics.js) + Chart.js.
+// analytics-dashboard.js — web counterpart to Android's AnalyticsDashboard.
+// Renders the full analytics dashboard (14 sections + day dialog +
+// flight recorder) from the print list. Deep analyses load detail JSONs (cached).
+// Uses window.HistoryAnalytics (analytics.js) + Chart.js.
 (function () {
   'use strict';
 
-  // ---- Lokalisierung (alle 5 Sprachen, self-contained) ----
+  // ---- Localization (all 5 languages, self-contained) ----
   const T = {
     de: {
       period: 'Zeitraum', r7: '7T', r30: '30T', r90: '90T', r1y: '1J', rall: 'Alle',
@@ -18,7 +18,7 @@
       quickstats: 'Schnellstatistiken',
       count: 'Anzahl', success: 'Erfolg', wasted_filament: 'Verschwendetes Filament', wasted_cost: 'Verschwendete Kosten',
       dur_dist: 'Druckdauer', fil_dist: 'Filament', lay_dist: 'Schichten',
-      nozzle: 'Düse', bed: 'Bett', chamber: 'Kammer', humidity: 'Feuchte', avg_power: 'Ø Leistung', success_score: 'Qualität', max: 'Max',
+      nozzle: 'Düse', bed: 'Bett', chamber: 'Kammer', humidity: 'Feuchte', avg_power: 'Ø Leistung', max: 'Max',
       ph_soak: 'Heat-Soak', ph_purge: 'Reinigen', ph_prepare: 'Vorbereiten', ph_print: 'Drucken',
       c_layer_height: 'Schichthöhe', c_infill: 'Infill', c_speed: 'Geschwindigkeit', c_nozzle: 'Düsentemp',
       slicer_faster: 'schneller als geschätzt', slicer_slower: 'länger als geschätzt', slicer_exact: 'exakt wie geschätzt',
@@ -48,7 +48,7 @@
       quickstats: 'Quick stats',
       count: 'Count', success: 'Success', wasted_filament: 'Wasted filament', wasted_cost: 'Wasted cost',
       dur_dist: 'Print duration', fil_dist: 'Filament', lay_dist: 'Layers',
-      nozzle: 'Nozzle', bed: 'Bed', chamber: 'Chamber', humidity: 'Humidity', avg_power: 'Avg power', success_score: 'Quality', max: 'Max',
+      nozzle: 'Nozzle', bed: 'Bed', chamber: 'Chamber', humidity: 'Humidity', avg_power: 'Avg power', max: 'Max',
       ph_soak: 'Heat soak', ph_purge: 'Clean', ph_prepare: 'Prepare', ph_print: 'Print',
       c_layer_height: 'Layer height', c_infill: 'Infill', c_speed: 'Speed', c_nozzle: 'Nozzle temp',
       slicer_faster: 'faster than estimated', slicer_slower: 'slower than estimated', slicer_exact: 'exactly as estimated',
@@ -78,7 +78,7 @@
       quickstats: 'Statistiques rapides',
       count: 'Nombre', success: 'Réussite', wasted_filament: 'Filament gaspillé', wasted_cost: 'Coût gaspillé',
       dur_dist: 'Durée', fil_dist: 'Filament', lay_dist: 'Couches',
-      nozzle: 'Buse', bed: 'Plateau', chamber: 'Caisson', humidity: 'Humidité', avg_power: 'Élec. moy', success_score: 'Qualité', max: 'Max',
+      nozzle: 'Buse', bed: 'Plateau', chamber: 'Caisson', humidity: 'Humidité', avg_power: 'Élec. moy', max: 'Max',
       ph_soak: 'Préchauffe', ph_purge: 'Nettoyage', ph_prepare: 'Préparation', ph_print: 'Impression',
       c_layer_height: 'Hauteur couche', c_infill: 'Remplissage', c_speed: 'Vitesse', c_nozzle: 'Temp buse',
       slicer_faster: 'plus rapide que prévu', slicer_slower: 'plus lent que prévu', slicer_exact: 'exactement comme prévu',
@@ -108,7 +108,7 @@
       quickstats: 'Estadísticas rápidas',
       count: 'Cantidad', success: 'Éxito', wasted_filament: 'Filamento desperdiciado', wasted_cost: 'Coste desperdiciado',
       dur_dist: 'Duración', fil_dist: 'Filamento', lay_dist: 'Capas',
-      nozzle: 'Boquilla', bed: 'Cama', chamber: 'Cámara', humidity: 'Humedad', avg_power: 'Energía med', success_score: 'Calidad', max: 'Máx',
+      nozzle: 'Boquilla', bed: 'Cama', chamber: 'Cámara', humidity: 'Humedad', avg_power: 'Energía med', max: 'Máx',
       ph_soak: 'Calentamiento', ph_purge: 'Limpieza', ph_prepare: 'Preparación', ph_print: 'Impresión',
       c_layer_height: 'Altura de capa', c_infill: 'Relleno', c_speed: 'Velocidad', c_nozzle: 'Temp boquilla',
       slicer_faster: 'más rápido que lo estimado', slicer_slower: 'más lento que lo estimado', slicer_exact: 'exacto a lo estimado',
@@ -138,7 +138,7 @@
       quickstats: 'Statistiche rapide',
       count: 'Numero', success: 'Successo', wasted_filament: 'Filamento sprecato', wasted_cost: 'Costo sprecato',
       dur_dist: 'Durata', fil_dist: 'Filamento', lay_dist: 'Strati',
-      nozzle: 'Ugello', bed: 'Piano', chamber: 'Camera', humidity: 'Umidità', avg_power: 'Energia med', success_score: 'Qualità', max: 'Max',
+      nozzle: 'Ugello', bed: 'Piano', chamber: 'Camera', humidity: 'Umidità', avg_power: 'Energia med', max: 'Max',
       ph_soak: 'Riscaldamento', ph_purge: 'Pulizia', ph_prepare: 'Preparazione', ph_print: 'Stampa',
       c_layer_height: 'Altezza strato', c_infill: 'Riempimento', c_speed: 'Velocità', c_nozzle: 'Temp ugello',
       slicer_faster: 'più veloce del previsto', slicer_slower: 'più lento del previsto', slicer_exact: 'esatto come previsto',
@@ -171,16 +171,16 @@
   };
   const hhmm = s => { const t = String(s || ''); return t.length >= 16 ? t.slice(11, 16) : ''; };
 
-  // ---- CSS einmalig injizieren ----
+  // ---- Inject CSS once ----
   function injectCss() {
     if (document.getElementById('ad-style')) return;
     const css = `
-/* Zwei Spalten statt einer endlosen Saeule: Erfolgsrate und Material stehen
-   nebeneinander, breite Sachen (Kennzahlen, Verlauf, Kalender) ueber beide. */
+/* Two columns instead of one endless column: success rate and material sit
+   side by side, wide items (stats, trend, calendar) span both. */
 .ad-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px 2px 24px;align-items:start;}
 .ad-wrap>.ad-filter,.ad-wrap>.ad-breit{grid-column:1 / -1;}
 @media(max-width:1000px){.ad-wrap{grid-template-columns:1fr;}}
-/* Stundenband: ein Balken je Stunde. */
+/* Hour band: one bar per hour. */
 .ad-band{display:flex;align-items:flex-end;gap:2px;height:52px;}
 .ad-band i{flex:1;background:var(--bg-card-variant);border-radius:2px;min-height:3px;display:block;}
 .ad-band-f{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-secondary);margin-top:4px;}
@@ -205,17 +205,17 @@
 .ad-herostat{gap:18px;}
 .ad-herostat div b{font-size:19px;font-weight:680;font-variant-numeric:tabular-nums;}
 .ad-herostat div span{font-size:11.5px;}
-/* Fehlschlaege nach Phase — eine ruhige Zeile unter der Quote, mit Trennlinie
-   darueber, damit sie nicht als weitere Kennzahl gelesen wird. */
+/* Failures by phase — a quiet line under the rate, with a divider
+   above it so it doesn't read as another metric. */
 .ad-failphase{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;
   margin-top:12px;padding-top:10px;border-top:1px solid var(--border-color);}
 .ad-failphase-t{font-size:11.5px;color:var(--text-secondary);width:100%;}
 .ad-failphase-i{font-size:12px;color:var(--text-secondary);white-space:nowrap;}
 .ad-failphase-i b{font-size:14px;font-weight:680;font-variant-numeric:tabular-nums;
   margin-right:3px;}
-/* Fehler-Steckbrief: eine Zeile je Code, Nummer und Beschreibung links,
-   die Zahlen rechts. Keine Tabelle — bei zwoelf Zeilen liest sich das so
-   schneller. */
+/* Error profile: one line per code, number and description on the left,
+   the counts on the right. No table — with a dozen lines this reads
+   faster. */
 .ad-hms{display:flex;flex-direction:column;gap:2px;}
 .ad-hms-z{display:flex;align-items:baseline;justify-content:space-between;
   gap:14px;padding:7px 0;border-bottom:1px solid var(--border-color);}
@@ -240,12 +240,12 @@
 .ad-sel{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;}
 .ad-sel select{background:var(--input-bg,#111);color:var(--text-primary);border:1px solid var(--border-color);border-radius:10px;padding:6px 10px;font-size:13px;}
 .ad-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;padding:13px 14px;}
-/* Gleicher Kartenkopf wie im Druck-Detail: klein, grau, Grossbuchstaben. */
+/* Same card header as in the print detail: small, grey, uppercase. */
 .ad-card h3{margin:0 0 11px;font-size:12px;font-weight:640;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:8px;color:var(--text-secondary);}
 .ad-chartbox{position:relative;height:200px;width:100%;}
 .ad-chartbox canvas{position:absolute;inset:0;}
 .ad-chartbox--hoch{height:230px;}
-/* Feuchte-Gedaechtnis */
+/* Humidity memory */
 .ad-sub{font-size:12px;color:var(--text-secondary);margin:-4px 0 10px;}
 .ad-fkliste{margin-top:12px;display:flex;flex-direction:column;gap:1px;}
 .ad-fkzeile{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:7px;font-size:12.5px;}
@@ -326,9 +326,9 @@
 .ad-modal-fuss{display:flex;justify-content:flex-end;padding:12px 15px;border-top:1px solid var(--border-color);}
 .ad-modal-fuss .ok{border:1px solid var(--border-color);background:var(--bg-card-variant);color:var(--text-primary);border-radius:9px;padding:7px 16px;cursor:pointer;font:inherit;font-size:13px;font-weight:600;}
 .ad-modal-fuss .ok:hover{border-color:var(--accent-blue,#2196f3);}
-/* Wie die Zeilen der Druckliste: Vorschau links, duenne Trennlinie zwischen
-   den Eintraegen, Flaeche beim Ueberfahren. Kein Kasten je Eintrag — die
-   Vorschau setzt sie schon deutlich genug voneinander ab. */
+/* Like the rows of the print list: thumbnail on the left, thin divider between
+   entries, highlight on hover. No box per entry — the
+   thumbnail already sets them apart clearly enough. */
 .ad-drow{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:9px;cursor:pointer;
   border-left:3px solid transparent;transition:background .12s;}
 .ad-drow + .ad-drow{border-top:1px solid var(--border-color);border-radius:0 9px 9px 0;}
@@ -345,11 +345,11 @@
     document.head.appendChild(el);
   }
 
-  // Linien-Icons statt Emoji: die sahen je nach Betriebssystem anders aus und
-  // passten nicht zu den Icons im Rest der Oberflaeche.
+  // Line icons instead of emoji: those looked different depending on the OS and
+  // didn't match the icons in the rest of the UI.
   const I = (d) => `<svg class="ad-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
-  // Die Pfade stehen in icons.js — eine Quelle fuer Web, Android und iOS
-  // (tools/gen_skikon_swift.py erzeugt daraus SkIkonPfade.swift).
+  // The paths live in icons.js — one source for web, Android and iOS
+  // (tools/gen_skicon_swift.py generates SkIconPaths.swift from it).
   const P = n => (window.skIconPfad ? window.skIconPfad(n) : '');
   const ICO = {
     ziel:      I(P('statZiel')),
@@ -365,15 +365,15 @@
     thermo:    I(P('statThermo')),
     regler:    I(P('statRegler')),
     warnung:   I(P('warnung')),
-    // 'tropfen' ist in icons.js in Wahrheit ein Thermometer —
-    // der echte Tropfen heisst 'wasser'.
+    // 'tropfen' in icons.js is actually a thermometer —
+    // the real drop icon is called 'wasser'.
     wasser:    I(P('wasser'))
   };
 
   const RANGES = [['D7', 'r7'], ['D30', 'r30'], ['D90', 'r90'], ['Y1', 'r1y'], ['ALL', 'rall']];
   const PALETTE = { PLA: '#22c55e', PETG: '#3b82f6', 'PETG-CF': '#2563eb', ABS: '#ef4444', ASA: '#f59e0b', TPU: '#8b5cf6', 'PLA-CF': '#16a34a', '?': '#6b7280' };
   const matColor = m => PALETTE[m] || '#6b7280';
-  // Anzeige-Label fürs Material: unbekannt ('?') → "Druck ohne gespeichertes Filament".
+  // Material display label: unknown ('?') falls back to the no-filament text.
   const matLabel = m => (m === '?' || !m) ? t('no_filament') : m;
   const heatColor = (v, max) => v <= 0 ? 'var(--bg-card-variant)' : `rgba(59,130,246,${0.18 + 0.82 * (v / (max || 1))})`;
 
@@ -389,9 +389,9 @@
 
   function render(container, allPrints, opts) {
     injectCss();
-    // Vertikalen Abstand zwischen den Abschnitts-Karten sicherstellen: das gap der
-    // .ad-wrap-Regel greift nur, wenn der Mount-Container diese Klasse trägt (sonst
-    // kleben die .ad-card-Divs aneinander).
+    // Ensure vertical spacing between the section cards: the gap in the
+    // .ad-wrap rule only applies when the mount container carries this class (otherwise
+    // the .ad-card divs stick together).
     container.classList.add('ad-wrap');
     opts = opts || {};
     const A = window.HistoryAnalytics;
@@ -399,7 +399,7 @@
     const pwr = opts.powerPerKwh || 0.30;
     const state = { range: 'D30', material: null, status: null, matMetric: 'grams' };
     const deepCache = {};
-    const DEEP_CAP = 250; // jüngste N Drucke (Web hat keinen lokalen Detail-Cache → Last begrenzen)
+    const DEEP_CAP = 250; // most recent N prints (web has no local detail cache → limits the load)
     let deep = { samples: 0, loading: false };
     let successChart = null, materialChart = null;
     let deepToken = 0;
@@ -408,8 +408,8 @@
 
     async function loadDeep() {
       const token = ++deepToken;
-      // Deep folgt dem AUSGEWÄHLTEN Zeitraum (+ Material/Status), damit Slicer &
-      // Co. zur Auswahl passen. Bei großen Zeiträumen auf DEEP_CAP jüngste begrenzt.
+      // Deep follows the SELECTED range (+ material/status), so slicer &
+      // co. match the selection. For large ranges it's capped to the DEEP_CAP most recent.
       let set = A.filterPrints(allPrints, { range: state.range, material: state.material, status: state.status });
       set = set.slice().sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, DEEP_CAP);
       deep = { samples: set.length, loading: true };
@@ -420,11 +420,11 @@
         while (i < need.length) {
           const p = need[i++];
           try { deepCache[p.id] = await opts.fetchDetail(p.id); } catch (_) { deepCache[p.id] = null; }
-          if (token !== deepToken) return; // Filter gewechselt → abbrechen
+          if (token !== deepToken) return; // filter changed → abort
         }
       }
       await Promise.all(Array.from({ length: Math.min(6, need.length || 1) }, worker));
-      if (token !== deepToken) return; // veraltetes Ergebnis verwerfen
+      if (token !== deepToken) return; // discard stale result
       const details = set.map(p => deepCache[p.id]).filter(Boolean);
       deep = A.aggregateDeep(details); deep.loading = false;
       paintDeep();
@@ -434,9 +434,9 @@
       const r = curResult();
       container.innerHTML = filterBar() + (r.empty
         ? `<div class="ad-card"><div class="ad-empty">${t('no_data')}</div></div>`
-        // Reihenfolge so, dass immer zwei zusammengehoerende Karten
-        // nebeneinander stehen; nur die wirklich breiten Sachen (Kennzahlen,
-        // Phasen, Rekorde, Kalender) gehen ueber beide Spalten.
+        // Order so that two related cards always sit
+        // side by side; only the genuinely wide items (stats,
+        // phases, records, calendar) span both columns.
         : hero(r) + materialsCard(r) + kpis(r)
           + `<div class="ad-card ad-breit" id="ad-hms"></div>`
           + `<div class="ad-card ad-breit" id="ad-feuchte"></div>`
@@ -450,22 +450,22 @@
       if (!r.empty) { drawHero(r); drawMaterials(r); paintDeep(); ladeHms(); ladeFeuchte(); }
     }
 
-    // ---- Fehler-Steckbrief ----------------------------------------------
-    // Die HMS-Fehler liegen seit jeher in der Datenbank und wurden nur
-    // einmal live gezeigt. Hier beantworten sie, was man beim naechsten Mal
-    // wissen will: kam das schon oefter, bei welchem Material, ging der
-    // Druck danach kaputt.
-    // ---- Feuchte-Gedaechtnis --------------------------------------------
-    // Die Momentfeuchte steht seit jeher in der Oberflaeche, aber niemand
-    // konnte sagen, wie lange eine Spule feucht LAG. Genau das steht hier.
+    // ---- Error profile ----------------------------------------------
+    // HMS errors have always lived in the database but were only ever
+    // shown live. Here they answer what you want to know next time:
+    // has this happened before, with which material, did the
+    // print fail afterwards.
+    // ---- Humidity memory --------------------------------------------
+    // The current humidity has always been shown in the UI, but nobody
+    // could say how long a spool had SAT damp. That's exactly what this shows.
     let feuchteChart = null, feuchteToken = 0;
     async function ladeFeuchte() {
       const el = container.querySelector('#ad-feuchte');
       if (!el) return;
       if (!opts.fetchFeuchte) { el.remove(); return; }
       const token = ++feuchteToken;
-      // Der Zeitraum folgt der Filterleiste wie beim Steckbrief; „alle"
-      // deckelt bei einem Jahr — laenger reicht die Aufzeichnung ohnehin nicht.
+      // The range follows the filter bar like the profile; 'all'
+      // caps at one year — the recording doesn't go back further anyway.
       const tage = { r7: 7, r30: 30, r90: 90, r1y: 365, rall: 365 }[state.range] || 30;
       let daten = null;
       try { daten = await opts.fetchFeuchte(tage); } catch (_) { daten = null; }
@@ -505,8 +505,8 @@
         borderColor: FARBEN[i % FARBEN.length], backgroundColor: FARBEN[i % FARBEN.length],
         borderWidth: 2, pointRadius: 0, tension: 0.25,
       }));
-      // Die Grenze als eigene Reihe: das Annotation-Plugin ist hier nicht
-      // geladen, und ohne die Linie sagt eine Kurve zwischen 30 und 45 nichts.
+      // The threshold as its own series: the annotation plugin isn't
+      // loaded here, and without the line a curve between 30 and 45 says nothing.
       const alle = reihen.flatMap(r => r.data.map(p => p.x));
       if (alle.length) {
         reihen.push({
@@ -562,9 +562,8 @@
           + `<div class="ad-empty">${esc(t('hms_none'))}</div>`;
         return;
       }
-      // Acht. Vom User so festgelegt (27aug26). Darueber hinaus haengt der
-      // Rest an "{n} weitere Codes zeigen" — abgeschnitten wird nichts
-      // stillschweigend.
+      // Eight. The rest hangs off "Show {n} more codes" —
+      // nothing gets cut silently.
       const ZEIGEN = 8;
       const sichtbar = hmsAlle ? codes : codes.slice(0, ZEIGEN);
       const rest = codes.length - sichtbar.length;
@@ -601,7 +600,7 @@
       });
     }
 
-    // ---- Sektionen ----
+    // ---- Sections ----
     function filterBar() {
       const mats = curResult().materialOptions || A.materialsOf(allPrints);
       return `<div class="ad-filter">
@@ -616,10 +615,10 @@
           </select>
         </div></div>`;
     }
-    // Saeulen als HTML statt Chart.js: die Balken bekommen eine
-    // Maximalbreite (34px), damit aus fuenf Tagen nicht fuenf Flaechen ueber
-    // die halbe Karte werden. Erfolg und Misserfolg stecken IM Balken — die
-    // zweite Achse mit der Erfolgslinie ist damit ueberfluessig.
+    // Columns as HTML instead of Chart.js: the bars get a
+    // max width (34px) so five days don't turn into five blocks spanning
+    // half the card. Success and failure are baked INTO the bar — a
+    // second axis with a success line would be redundant.
     const ST_FARBE = { success: '#22c55e', failed: '#ef4444', cancelled: '#f59e0b', running: '#94a3b8' };
     function trendKarte(r) {
       const maxC = Math.max(1, ...r.trend.map(p => p.count));
@@ -648,9 +647,9 @@
     }
 
     function hero(r) {
-      // „Laeuft" gehoert dazu, sonst geht die Summe nicht auf: bei sieben
-      // erfolgreichen und einem laufenden Druck standen dort 7 + 0 + 0 = 7,
-      // waehrend daneben „8 Drucke" zu lesen war.
+      // "Running" belongs in the count, otherwise the sum doesn't add up: with seven
+      // successful prints and one running, it showed 7 + 0 + 0 = 7,
+      // while "8 prints" was written next to it.
       const zahlen = [
         [r.total, t('prints'), ''],
         [r.successful, t('st_success'), '#22c55e'],
@@ -658,9 +657,9 @@
         [r.cancelled, t('st_cancelled'), r.cancelled ? '#f59e0b' : ''],
         [r.running || 0, t('st_running'), r.running ? '#3b82f6' : '']
       ].filter(x => x[0] > 0 || x[1] === t('prints') || x[1] === t('st_success'));
-      // Wann die Fehlschlaege passierten. Die Quote allein wirft zusammen,
-      // was verschiedene Ursachen hat — ein Abbruch vor der ersten Schicht
-      // ist kein Filamentproblem.
+      // When the failures happened. The rate alone lumps together
+      // things that have different causes — an abort before the first layer
+      // is not a filament problem.
       const ph = r.fehlerPhasen || {};
       const phasen = [
         [ph.pre_first_layer, t('fp_pre'), '#ef4444'],
@@ -681,8 +680,8 @@
         </div></div>${phasenZeile}</div>`;
     }
     function kpis(r) {
-      // Ohne Emoji-Kachel davor: acht bunte Symbole in einer Reihe ordneten
-      // nichts, der Name steht ohnehin unter jeder Zahl.
+      // No emoji tile in front: eight colorful symbols in a row didn't
+      // organize anything, the name is already under every number.
       const k = [
         [A.fmtH(r.totalMinutes), t('time_total')],
         [r.filamentKg.toFixed(2) + ' kg', t('filament')],
@@ -732,13 +731,13 @@
     function calendar(r) {
       const days = Object.keys(r.calendar); if (!days.length) return '';
       const maxC = Math.max(...Object.values(r.calendar));
-      // Feste Wochenzahl je Zeitraum — exakt wie Android (17/26/52). Zellen haben
-      // feste Größe (CSS), werden NICHT auf die Kartenbreite gestreckt (sonst auf
-      // dem breiten Desktop riesig).
+      // Fixed number of weeks per range — exactly like Android (17/26/52). Cells have
+      // a fixed size (CSS), are NOT stretched to the card width (otherwise
+      // huge on a wide desktop).
       const wks = (state.range === 'D90') ? 26 : (state.range === 'Y1' || state.range === 'ALL') ? 52 : 17;
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-      // Start = Montag der Woche, die (wks-1) Wochen vor der aktuellen Woche liegt.
+      // Start = Monday of the week that is (wks-1) weeks before the current week.
       const start = new Date(today);
       start.setDate(start.getDate() - ((start.getDay() + 6) % 7) - (wks - 1) * 7);
       const weeks = [];
@@ -755,17 +754,17 @@
         }
         weeks.push(`<div class="wk">${col.join('')}</div>`);
       }
-      // firstDay/lastDay sind ISO-Schluessel (YYYY-MM-DD) — die gehoeren in
-      // den Lookup, nicht in die Anzeige.
+      // firstDay/lastDay are ISO keys (YYYY-MM-DD) — they belong in the
+      // lookup, not in the display.
       const zeigDatum = k => {
         const d = new Date(k + 'T00:00:00');
         return isNaN(d) ? k : d.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: 'numeric' });
       };
       return `<div class="ad-card"><h3>${ICO.kalender} ${t('calendar')}</h3><div class="ad-cal">${weeks.join('')}</div><div class="ad-cal-cap">${zeigDatum(firstDay)} – ${zeigDatum(lastDay)}</div></div>`;
     }
-    // Ein Balken je Stunde statt eines 7x24-Rasters. Bei einer Handvoll Drucke
-    // waren von 168 Feldern fast alle leer, die Karte trotzdem knapp 400px hoch.
-    // Das Band braucht rund 50px und beantwortet dieselbe Frage.
+    // One bar per hour instead of a 7x24 grid. With a handful of prints,
+    // almost all of the 168 cells were empty yet the card was still nearly 400px tall.
+    // The band needs about 50px and answers the same question.
     function hourHeat(r) {
       const je = new Array(24).fill(0);
       for (let d = 0; d < 7; d++) for (let h = 0; h < 24; h++) je[h] += r.hourWeekday[d][h];
@@ -780,8 +779,7 @@
         <div class="ad-band">${balken}</div>
         <div class="ad-band-f"><span>0</span><span>6</span><span>12</span><span>18</span><span>23</span></div></div>`;
     }
-    // Tage ohne Drucke sind KEINE 0 %. Vorher stand fuer jeden druckfreien Tag
-    // ein roter Stummel mit 0 % — das las sich, als waere dort alles misslungen.
+    // Days without prints are NOT 0%.
     function successWeekday(r) {
       const mit = r.successByWeekday
         .map((v, i) => ({ v, i, n: (r.weekday && r.weekday[i]) || 0 }))
@@ -800,8 +798,8 @@
         : '';
       return `<div class="ad-card"><h3>${ICO.haken} ${t('success_weekday')}</h3>${inhalt}${rest}</div>`;
     }
-    // Ohne Abbruch gibt es nichts zu verschwenden. „0 g / 0,00 €" sah aus wie
-    // ein gemessener Wert; hier steht stattdessen, dass es keinen Fall gab.
+    // Without an abort there's nothing wasted. "0 g / €0.00" looked like
+    // a measured value; this instead states that there was no such case.
     function waste(r) {
       const abbrueche = (r.failed || 0) + (r.cancelled || 0);
       const inhalt = abbrueche
@@ -817,7 +815,7 @@
         `<div class="ad-rec" data-rec="${esc(rec.filename)}"><div class="rv">${esc(rec.value)}</div><div class="rl">${t('rec_' + rec.labelKey)}</div><div class="rf">${esc(clean(rec.filename))}</div></div>`
       ).join('') + `</div></div>`;
     }
-    // Deep-Bodies
+    // Deep bodies
     function machineBody() {
       if (!deep.samples) return `<h3>${ICO.thermo} ${t('machine')}</h3><div class="ad-empty">${t('no_deep')}</div>`;
       const row = (l, v) => v == null ? '' : `<div class="ad-kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`;
@@ -834,14 +832,14 @@
     }
     function phasesBody() {
       if (!deep.phases || !deep.phases.length) return `<h3>${ICO.uhr} ${t('phases')}</h3><div class="ad-empty">${t('no_deep')}</div>`;
-      // Bambu-Stages bringen ihr (uebersetztes) Label mit, Klipper-Phasen
-      // laufen weiter ueber die ph_*-Sprachschluessel.
+      // Bambu stages bring their own (translated) label, Klipper phases
+      // continue to run through the ph_* language keys.
       const zuBalken = p => ({
         label: p.label || t('ph_' + p.key), value: p.avgMin,
         valText: p.avgMin.toFixed(1) + ' min', color: '#8b5cf6'
       });
-      // Nur die fuenf laengsten stehen offen. Der Rest lag durchweg unter einer
-      // Minute und machte die Karte doppelt so hoch, ohne etwas zu erklaeren.
+      // Only the five longest are shown open. The rest was consistently under a
+      // minute and made the card twice as tall without explaining anything.
       const oben = deep.phases.slice(0, 5), rest = deep.phases.slice(5);
       return `<h3>${ICO.uhr} ${t('phases')}</h3>` + bars(oben.map(zuBalken))
         + (rest.length ? `<details class="ad-mehr"><summary>${t('more_phases').replace('{n}', rest.length)}</summary>${bars(rest.map(zuBalken))}</details>` : '')
@@ -906,7 +904,7 @@
       const st = container.querySelector('#ad-st'); if (st) st.onchange = () => { state.status = st.value || null; paint(); loadDeep(); };
       container.querySelectorAll('[data-act^="mat:"]').forEach(el => el.onclick = () => {
         const m = el.dataset.act.slice(4);
-        // Toggle wie Android: Klick auf das bereits aktive Material → zurück zu „alle".
+        // Toggle like Android: clicking the already-active material → back to "all".
         state.material = (state.material === m) ? null : m;
         paint(); loadDeep();
       });
@@ -929,9 +927,9 @@
       const rows = sorted.map(p => {
         const mat = A.materialCategory(p.filament_type);
         const meta = [hhmm(p.start_time), A.fmtH(+p.duration_minutes || 0), mat !== '?' ? mat : null, (+p.filament_grams > 0 ? Math.round(p.filament_grams) + ' g' : null)].filter(Boolean).join('  ·  ');
-        // Gleiche Bauform wie die Zeilen der Druckliste: Vorschau, Name,
-        // Angaben. Die Vorschau setzt die Eintraege voneinander ab, ohne dass
-        // jeder in einen eigenen Kasten muss.
+        // Same layout as the rows of the print list: thumbnail, name,
+        // details. The thumbnail sets the entries apart without
+        // each one needing its own box.
         const abweichend = p.status !== 'success';
         const bild = p.has_thumbnail
           ? `<img src="/api/history/${p.id}/thumbnail" alt=""
@@ -948,8 +946,7 @@
         </div>`;
       }).join('') || `<div class="ad-empty">—</div>`;
 
-      // Kopf, Chips und Zeilen in derselben Form wie die Karten daneben —
-      // vorher waren es Emoji-Pillen und ein blauer Vollflaechen-Knopf.
+      // Header, chips and rows in the same form as the cards next to them.
       const chip = (farbe, text) =>
         `<span class="ad-chip2"><i style="background:${farbe}"></i>${text}</span>`;
 

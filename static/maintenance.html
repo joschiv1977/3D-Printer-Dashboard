@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="/static/css/maintenance.css?v=2">
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -68,16 +68,14 @@
     <script src="/static/js/modules/theme-manager.js"></script>
     <script src="/static/js/modules/i18n-manager.js"></script>
     <script src="/static/js/modules/tab-bar-manager.js"></script>
-    <!-- Lokal gevendort → PDF-Export funktioniert offline (kein CDN). -->
+    <!--Vendored locally -> PDF export works offline (no CDN).-->
     <script src="/static/js/vendor/jspdf.umd.min.js"></script>
     <script src="/static/js/vendor/jspdf.plugin.autotable.min.js"></script>
 
     <!-- Main Content -->
     <div class="container">
-        <!-- Kopf: eine Zeile. Vorher stand hier eine Karte mit Titel und fuenf
-             gleichrangigen Knoepfen — darunter ein rot eingefaerbtes „Drucker
-             entfernen" direkt neben dem, was man taeglich braucht. Die
-             seltenen Sachen stecken jetzt hinter „Verwalten". -->
+        <!--Header: a single line. The rare actions now sit behind
+             "Manage".-->
         <div class="maint-kopf">
             <h1 class="maint-kopf-titel">
                 <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/></svg>
@@ -134,13 +132,13 @@
             <div id="alert-success" class="maint-alert maint-alert--success"></div>
             <div id="alert-error" class="maint-alert maint-alert--error"></div>
 
-            <!-- Ein Satz statt drei Zaehlkarten: „0 Ueberfaellig · 0 Faellig ·
-                 12 Geplant" nahm ein Drittel des Bildschirms fuer zwei Nullen. -->
+            <!--One sentence instead of three count cards: "0 overdue . 0 due .
+                 12 planned" used a third of the screen for two zeros.-->
             <div id="maint-lage"></div>
 
-            <!-- Nach Dringlichkeit gruppiert, nicht nach Status. Verbrauchs-
-                 wartungen stehen unten fuer sich: „alle 5 Rollen" hat keinen
-                 Termin, das dort gezeigte Datum war eine Hochrechnung. -->
+            <!--Grouped by urgency, not by status. Usage-based
+                 maintenance stands on its own at the bottom: "every 5 rolls" has
+                 no due date -- the date shown there was only an estimate.-->
             <div id="maint-gruppen"></div>
         </div>
     </div>
@@ -361,8 +359,8 @@
             </div>
             <div class="sd-modal-body">
                 <p id="postpone-task-name" style="font-weight:640; margin:0 0 14px; font-size:14px;"></p>
-                <!-- Drei Chips statt drei bildschirmbreiter Knoepfe mit
-                     Erklaertext darunter: „+7 Tage" erklaert sich selbst. -->
+                <!--Three chips instead of three screen-wide buttons with
+                     explanatory text underneath: "+7 days" explains itself.-->
                 <div class="maint-chips">
                     <button onclick="postponeTask(7)" data-i18n="maintenance_postpone_7days">+ 7 Tage</button>
                     <button onclick="postponeTask(14)" data-i18n="maintenance_postpone_14days">+ 14 Tage</button>
@@ -495,12 +493,12 @@
 
         async function loadPrinterSelector() {
             try {
-                // Lade Drucker
+                // Load printers
                 const printersRes = await apiCall('/api/maintenance/printers');
                 if (printersRes.ok) {
                     const printers = await printersRes.json();
 
-                    // Aktualisiere Header-Dropdown
+                    // Update header dropdown
                     const selector = document.getElementById('printer-selector');
                     selector.innerHTML = '';
 
@@ -517,13 +515,13 @@
 
                         currentPrinterId = realPrinters[0].printer_id;
 
-                        // Prüfe ob Wartungen initialisiert sind (nur wenn ECHTE Drucker vorhanden)
+                        // Check whether maintenance is initialized (only when REAL printers exist)
                         await checkAndInitialize();
 
-                        // Lade Wartungen
+                        // Load tasks
                         await loadTasks();
                     } else {
-                        // Keine ECHTEN Drucker vorhanden
+                        // No REAL printers present
                         const option = document.createElement('option');
                         option.value = '';
                         option.textContent = getText('maintenance_no_printers', 'Keine Drucker vorhanden');
@@ -573,8 +571,8 @@
                     showError(getText('maintenance_delete_printer_failed', 'Löschen fehlgeschlagen') + ': ' + (err.error || res.status));
                     return;
                 }
-                // Selector neu laden — der gelöschte Drucker fliegt raus,
-                // der erste verbleibende wird ausgewählt.
+                // Reload selector — the deleted printer drops out,
+                // the first remaining one gets selected.
                 await loadPrinterSelector();
             } catch (e) {
                 console.error('deleteCurrentPrinter failed:', e);
@@ -587,8 +585,7 @@
                 const tasksRes = await apiCall(`/api/maintenance/tasks?printer_id=${currentPrinterId}`);
                 if (tasksRes.ok) {
                     const tasks = await tasksRes.json();
-                    
-                    // Wenn keine Tasks, automatisch initialisieren
+
                     if (tasks.length === 0) {
                         const initRes = await apiCall(`/api/maintenance/printers/${currentPrinterId}/initialize`, {
                             method: 'POST',
@@ -622,9 +619,9 @@
             }
         }
 
-        // Linien-Icon je Wartung. Die Pfade stehen in icons.js — eine
-        // Quelle fuer Web, Android und iOS (tools/gen_skikon_swift.py).
-        // Vorher standen sie nur hier, und iOS zeichnete leere Kacheln.
+        // Line icon per maintenance task. Paths live in icons.js — a single
+        // source for Web, Android and iOS (tools/gen_skikon_swift.py), so
+        // iOS doesn't end up drawing empty tiles.
         const MI = n => '<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true">'
             + (window.skIconPfad ? window.skIconPfad(n) : '') + '</svg>';
         function taskIconSvg(name) {
@@ -650,13 +647,12 @@
         const esc = v => String(v == null ? '' : v)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-        // Verbrauchs-Wartungen haben keinen Termin: "alle 5 Rollen" und "alle
-        // 720 Betriebsstunden" wurden bisher ueber die bisherige Verbrauchsrate
-        // in ein Datum umgerechnet und standen als "Faellig in 87 Tagen" neben
-        // echten Terminen. Sie bekommen einen eigenen Block mit dem Stand.
-        // `prints` gehoert dazu: „alle 10 Drucke" ist ein Verbrauch wie
-        // Stunden und Rollen. Bis 31aug26 fehlte es hier, und die Aufgabe
-        // stand mit einem gerechneten Datum zwischen echten Terminen.
+        // Usage-based maintenance has no due date: converting "every 5 rolls"
+        // or "every 720 print hours" into a date via the current consumption
+        // rate and showing it as "due in 87 days" next to real due dates is
+        // misleading, so these get their own block showing current status
+        // instead. `prints` belongs here too: "every 10 prints" is a
+        // consumption metric just like hours and rolls.
         const istVerbrauch = t => t.interval_type === 'hours'
             || t.interval_type === 'filament_rolls'
             || t.interval_type === 'prints';
@@ -670,8 +666,8 @@
                         ? getText('maintenance_prints_unit', 'Drucke')
                         : getText('maintenance_rolls_unit', 'Rollen');
                 const anteil = soll > 0 ? ist / soll : 0;
-                // Drucke sind ganze Zahlen, Stunden gerundet, Rollen mit
-                // einer Nachkommastelle.
+                // Prints are whole numbers, hours are rounded, rolls get
+                // one decimal place.
                 const stellen = (task.interval_type === 'filament_rolls') ? 1 : 0;
                 const zahl = n => Number(n).toLocaleString(undefined,
                     { maximumFractionDigits: stellen });
@@ -781,28 +777,48 @@
 
             const nachZeit = currentTasks.filter(t => !istVerbrauch(t));
             const verbrauch = currentTasks.filter(istVerbrauch);
+            // Overdue tasks stay in the time list -- they are not lifted into a
+            // group of their own. The status line above already names them and
+            // offers the done tick; a second copy at the top says the same
+            // thing twice and takes the row out of the place it is looked for.
+            // The row carries its own red "N Tage ueberfaellig".
             const ueber   = nachZeit.filter(t => t.days_until_due < 0)
                                     .sort((a, b) => a.days_until_due - b.days_until_due);
-            const woche   = nachZeit.filter(t => t.days_until_due >= 0 && t.days_until_due <= 7)
+            const woche   = nachZeit.filter(t => t.days_until_due <= 7)
                                     .sort((a, b) => a.days_until_due - b.days_until_due);
             const monat   = nachZeit.filter(t => t.days_until_due > 7 && t.days_until_due <= 31)
                                     .sort((a, b) => a.days_until_due - b.days_until_due);
             const spaeter = nachZeit.filter(t => t.days_until_due > 31)
                                     .sort((a, b) => a.days_until_due - b.days_until_due);
-            // Verbrauch nach Naehe zum Ziel, nicht nach hochgerechnetem Datum.
+            // Sort consumption tasks by proximity to target, not by an extrapolated date.
             verbrauch.sort((a, b) => (b.progress_percent || 0) - (a.progress_percent || 0));
 
-            // Ein Satz statt drei Zaehlkarten.
+            // One sentence instead of three count cards.
             const faelligeVerbrauch = verbrauch.filter(t => (t.progress_percent || 0) >= 100);
             const dringend = [...ueber, ...faelligeVerbrauch];
             if (dringend.length) {
+                // The names ARE the buttons. The warning says what is due; from
+                // here it takes one click to record it, instead of hunting for
+                // the row further down. With a single one the whole banner
+                // reacts — there is nothing to choose then.
+                const einzeln = dringend.length === 1;
+                const namen = dringend.map(t =>
+                    `<button type="button" class="maint-lage-name"
+                             onclick="event.stopPropagation(); showCompleteModal('${esc(t.task_id)}')">${
+                        esc(t.name)}</button>`).join(', ');
                 lage.innerHTML = `
-                    <div class="maint-lage maint-lage--achtung">
+                    <div class="maint-lage maint-lage--achtung${einzeln ? ' maint-lage--klickbar' : ''}"
+                         ${einzeln ? `onclick="showCompleteModal('${esc(dringend[0].task_id)}')"` : ''}>
                         <span class="maint-lage-ic"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 17H3z"/><path d="M12 10v4M12 17v.5"/></svg></span>
                         <span class="maint-lage-t">
-                            <b>${esc(getText('maintenance_overdue_count', '{n} Wartungen überfällig')
+                            <b>${esc((einzeln
+                                ? getText('maintenance_overdue_count_one', '{n} Wartung überfällig')
+                                : getText('maintenance_overdue_count', '{n} Wartungen überfällig'))
                                 .replace('{n}', dringend.length))}</b>
-                            <span>${dringend.map(t => esc(t.name)).join(', ')}</span>
+                            <span>${namen}</span>
+                        </span>
+                        <span class="maint-lage-haken" title="${esc(getText('maintenance_mark_complete', 'Als erledigt markieren'))}">
+                            <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         </span>
                     </div>`;
             } else {
@@ -820,16 +836,15 @@
             }
 
             ziel.innerHTML =
-                  gruppeHtml(getText('maintenance_group_overdue', 'Überfällig'), ueber)
-                + gruppeHtml(getText('maintenance_group_week', 'Diese Woche'), woche)
+                  gruppeHtml(getText('maintenance_group_week', 'Diese Woche'), woche)
                 + gruppeHtml(getText('maintenance_group_month', 'Diesen Monat'), monat)
                 + gruppeHtml(getText('maintenance_group_later', 'Später'), spaeter)
                 + gruppeHtml(getText('maintenance_group_usage', 'Nach Verbrauch'), verbrauch);
         }
 
-        function updateStats() { /* Die Zaehlkarten sind der Lage-Zeile gewichen. */ }
+        function updateStats() { /* Count cards have been replaced by the status line. */ }
 
-        // Menue hinter „Verwalten".
+        // Menu behind "Manage".
         function menueUmschalten(e) {
             e.stopPropagation();
             document.getElementById('maint-menue').classList.toggle('maint-menue--auf');
@@ -1142,10 +1157,9 @@
             try {
                 showSuccess(getText('maintenance_generating_pdf', 'PDF wird generiert...'));
 
-                // Lese Checkbox-Wert
                 const includePrints = document.getElementById('include-prints-checkbox').checked;
 
-                // Sammle PDF-Übersetzungen aus den Sprachdateien
+                // Collect PDF translations from the language files
                 const pdfTranslations = {
                     title: getText('pdf_title', 'Wartungsprotokoll'),
                     printer: getText('pdf_printer', 'Drucker:'),
@@ -1168,7 +1182,6 @@
                     history_task: getText('pdf_history_task', 'Wartung'),
                     history_notes: getText('pdf_history_notes', 'Notizen'),
                     no_history: getText('pdf_no_history', 'Keine Wartungshistorie vorhanden.'),
-                    // NEU: Print History Übersetzungen
                     print_history: getText('pdf_print_history', 'Druckhistorie'),
                     print_summary: getText('pdf_print_summary', 'Zusammenfassung Drucke'),
                     since_last_maintenance: getText('pdf_since_last_maintenance', 'Seit letzter Wartung'),
@@ -1197,9 +1210,9 @@
 
                 const t = pdfTranslations;
 
-                // Daten lokal/offline beschaffen — alle Endpunkte sind im Electron-
-                // Adapter cache-first, funktionieren also auch bei ausgeschaltetem
-                // Drucker. PDF wird clientseitig erzeugt (kein Companion nötig).
+                // Fetch data locally/offline — all endpoints are cache-first in the
+                // Electron adapter, so this also works while the printer is off.
+                // The PDF is generated client-side (no Companion needed).
                 let printer = null;
                 try {
                     const pr = await apiCall('/api/maintenance/printers');
@@ -1215,10 +1228,11 @@
                 } catch (_) {}
                 if (!Array.isArray(mHistory)) mHistory = [];
 
-                // Drucke (nur wenn aktiviert) aus dem LOKALEN History-Cache, seit der
-                // letzten Wartungsrunde (Fallback: letzte 30 Tage) — wie Companion/Android.
-                // Frisch abgehakte Wartung wuerde den Zeitraum leeren (Export passiert
-                // direkt nach dem Abhaken) → dann eine Wartungsrunde weiter zurueck.
+                // Prints (only when enabled) come from the LOCAL history cache, since
+                // the last maintenance round (fallback: last 30 days) — same as
+                // Companion/Android. A maintenance task just checked off would empty
+                // the period (export happens right after checking it off), so in that
+                // case fall back one maintenance round further.
                 let prints = [];
                 let periodStart = null;
                 if (includePrints) {
@@ -1240,8 +1254,8 @@
                     } catch (_) {}
                 }
 
-                // === PDF clientseitig rendern (jsPDF + AutoTable) — Look wie das
-                // Server-Original: lila Titel, Infobox, farbige Tabellen, Seitenumbrüche.
+                // === Render the PDF client-side (jsPDF + AutoTable) — matches the
+                // server original's look: purple title, info box, colored tables, page breaks.
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF({ unit: 'mm', format: 'a4' });
                 const PW = doc.internal.pageSize.getWidth();
@@ -1287,8 +1301,8 @@
                     return overdue ? `${n} — ${t.due_since} ${days} ${t.days}` : `${n} — ${t.due_in} ${days} ${t.day_s}`;
                 };
 
-                // Datumsformatierung deutsch (dd.MM.yyyy) — naive Komponenten direkt
-                // aus dem ISO-String, KEINE Zeitzonen-Verschiebung (passt zu Android/Server).
+                // German date formatting (dd.MM.yyyy) — naive components taken
+                // directly from the ISO string, NO timezone shift (matches Android/server).
                 const pad2 = n => String(n).padStart(2, '0');
                 const deDate = (iso) => {
                     const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -1301,12 +1315,12 @@
                 const nowD = new Date();
                 const createdStr = `${pad2(nowD.getDate())}.${pad2(nowD.getMonth() + 1)}.${nowD.getFullYear()} ${pad2(nowD.getHours())}:${pad2(nowD.getMinutes())}`;
 
-                // Titel (lila, zentriert)
+                // Title (purple, centered)
                 doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(...PURPLE);
                 doc.text(`${t.title}${printer ? ' - ' + (printer.name || '') : ''}`, PW / 2, y, { align: 'center' });
                 y += 12;
 
-                // Drucker-Infobox
+                // Printer info box
                 if (printer) {
                     table({
                         body: [
@@ -1322,7 +1336,7 @@
                     });
                 }
 
-                // Wartungsaufgaben
+                // Maintenance tasks
                 heading(t.current_tasks, 14);
                 const overdueT = (currentTasks || []).filter(x => x.status === 'overdue');
                 const dueT = (currentTasks || []).filter(x => x.status === 'due');
@@ -1330,7 +1344,7 @@
                 if (dueT.length) { heading(t.due_soon, 11, [214, 137, 16]); dueT.forEach(x => para('• ' + fmtTask(x, false))); }
                 if (!overdueT.length && !dueT.length) para('—', [120, 120, 120]);
 
-                // Wartungshistorie (eigene Seite)
+                // Maintenance history (own page)
                 doc.addPage(); y = 20;
                 heading(t.history, 14);
                 if (mHistory.length) {
@@ -1343,7 +1357,7 @@
                     });
                 } else para(t.no_history, [120, 120, 120]);
 
-                // Druckhistorie (eigene Seite)
+                // Print history (own page)
                 if (includePrints) {
                     doc.addPage(); y = 20;
                     heading(t.print_history, 14);
@@ -1374,8 +1388,8 @@
                             columnStyles: { 0: { fontStyle: 'bold', fillColor: GREYBG, cellWidth: 80 } },
                         });
                         heading(t.print_details, 11);
-                        // Woerter statt Symbolen: jsPDF-Standardfonts (WinAnsi) koennen
-                        // ✓/✗/⊘ nicht rendern (kam als Muell-Glyphen im PDF an).
+                        // Words instead of symbols: jsPDF's standard fonts (WinAnsi) can't
+                        // render ✓/✗/⊘ (they came out as garbage glyphs in the PDF).
                         const statusTxt = {
                             success: t.st_success,
                             failed: t.st_failed,
@@ -1416,7 +1430,7 @@
         async function showAddPrinterModal() {
             document.getElementById('add-printer-form').reset();
 
-            // Versuche Seriennummer aus API Config zu holen
+            // Try to get the serial number from the API config
             try {
                 const response = await apiCall('/api/config');
                 if (response.ok) {
@@ -1507,7 +1521,6 @@
                     const result = await response.json();
                     let message = getText('maintenance_init_success', 'Wartungsplan erfolgreich geladen: {count} Aufgaben').replace('{count}', result.tasks_created || result.created || 0);
 
-                    // Info über initialisierte Baselines
                     if (result.baselines_initialized > 0) {
                         message += `\n${result.baselines_initialized} Stunden/Rollen-Tasks initialisiert`;
                     }
@@ -1534,7 +1547,7 @@
             return intervalTexts[type] || `${getText('maintenance_every', 'Alle')} ${value}`;
         }
 
-        // Leitet ein passendes Icon aus dem Task-Namen ab (mehrsprachige Schlüsselwörter).
+        // Derives a matching icon from the task name (multilingual keywords).
         function getPriorityText(priority) {
             const priorityMap = {
                 'low': getText('maintenance_priority_low', 'Niedrig'),
@@ -1545,14 +1558,15 @@
             return priorityMap[priority] || priority;
         }
 
-        // Gemeinsamer Toast-Stapel oben rechts (skHinweis in
-        // confirm-dialog.js) statt eines Balkens im Seitenfluss bzw. eines
-        // Dialogs mitten im Bild, sobald die Seite in Electron laeuft.
+        // Shared toast stack top-right (skHinweis in confirm-dialog.js)
+        // instead of an inline banner or a dialog in the middle of the
+        // screen, whenever the page runs inside Electron.
         function showSuccess(message) { window.skHinweis.erfolg(message); }
         function showError(message)   { window.skHinweis.fehler(message); }
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

@@ -1,0 +1,8 @@
+version: 2.2.20
+files:
+  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-Setup-2.2.20.exe
+    sha512: 6c+c8wVgq9XwlRlZ2IMVb21eqGr/utwfzbRMPcMc7cI3Rh1nqgI7Qh0hlzayu980V+tbVEmD9x72xujtRUgL5A==
+    size: 104789141
+path: Dashboard-Setup-2.2.20.exe
+sha512: 6c+c8wVgq9XwlRlZ2IMVb21eqGr/utwfzbRMPcMc7cI3Rh1nqgI7Qh0hlzayu980V+tbVEmD9x72xujtRUgL5A==
+releaseDate: '2026-09-08T14:59:37.273Z'

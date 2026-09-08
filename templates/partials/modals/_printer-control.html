@@ -8,19 +8,19 @@
                 </div>
             </div>
             <div class="sd-modal-body">
-                <!-- Kamera und Beschaeftigt-Hinweis nebeneinander: neben dem
-                     380 px breiten Bild ist ohnehin Platz, und unter den
-                     Reitern klebte der Hinweis zwischen den Rahmen. -->
+                <!--Camera and busy notice side by side: there is room
+                     next to the 380px-wide image anyway, and below the
+                     tabs the notice was wedged between the borders.-->
                 <div class="ctrl-kopfzeile">
-                <!-- Live Kamera Vorschau -->
+                <!--Live camera preview-->
                 <div class="ctrl-camera-wrap">
-                    <!-- Kein src initial — sonst laedt der Browser /api/camera
-                         beim Page-Load (auch im Klipper-Mode) und der Backend
-                         feuert "BambuCameraClient not initialized!". JS setzt
-                         die URL beim Modal-Open je nach aktivem Drucker. -->
+                    <!--No src initially -- otherwise the browser loads /api/camera
+                         on page load (even in Klipper mode) and the backend
+                         fires "BambuCameraClient not initialized!". JS sets
+                         the URL when the modal opens, depending on the active printer.-->
                     <img loading="lazy" decoding="async" id="control-camera" alt="">
-                    <!-- Licht liegt am Bild, nicht im Uebersichts-Reiter: so ist
-                         es aus jedem Reiter erreichbar. -->
+                    <!--The light control sits on the image, not in the overview tab: this
+                         way it is reachable from every tab.-->
                     <button class="ctrl-camera-light-btn" id="ctrl-camera-light" onclick="toggleLight()"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V18h8v-3.3A7 7 0 0 0 12 2z"/></svg> <span id="ctrl-camera-light-label">Licht</span></button>
                     <button id="control-camera-source-toggle-btn" class="ctrl-camera-source-btn" onclick="toggleControlCameraSource()">
                         <span id="control-camera-source"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="m23 7-7 5 7 5z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg> <span id="control-camera-source-text"></span></span>
@@ -46,14 +46,14 @@
                     <button class="ctrl-tab bambu-only" id="ctrl-tab-cali" onclick="switchControlTab('cali')" data-tab="cali">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg> <span id="ctrl-tab-cali-label"></span>
                     </button>
-                    <!-- Nur sichtbar, wenn der Drucker etwas davon hat. -->
+                    <!--Only visible when the printer actually has one.-->
                     <button class="ctrl-tab" id="ctrl-tab-device" onclick="switchControlTab('device')" data-tab="device" style="display:none;">
                         <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> <span id="control-tab-device"></span>
                     </button>
                 </div>
 
-                <!-- Uebersicht (X2D-Display-Stil): Karten mit Ist/Soll, rechts
-                     die Geraetegrafik mit Licht-Schalter. Nur Bambu. -->
+                <!--Overview (X2D display style): cards with actual/target, right
+                     the device graphic with light switch. Bambu only.-->
                 <div id="ctrlov-tab" class="control-tab-content bambu-only" style="display:none;">
                     <div class="ov-layout">
                         <div class="ov-cards">
@@ -76,9 +76,9 @@
                                 <div class="ov-card-head"><img loading="lazy" decoding="async" src="data:image/svg+xml;utf8,%3csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e %3crect x='1.5' y='1.5' width='12.172' height='13.1247' rx='0.546278' stroke='currentColor'/%3e %3crect x='3.77051' y='4.23242' width='7.62995' height='2.18946' rx='0.546278' stroke='currentColor'/%3e %3crect x='3.77051' y='9.70117' width='4.9047' height='2.18946' rx='0.546278' stroke='currentColor'/%3e %3c/svg%3e" class="ov-ic" alt=""> <span id="ov-chamber-label">Kammer</span> <span class="ov-arrow">›</span></div>
                                 <div class="ov-card-value" id="ov-chamber-value">--</div>
                             </div>
-                            <!-- Druck-Aktionen: gleiche Kartenoptik, dritte
-                                 Zeile im Grid; zustandsgesteuert ueber
-                                 socket-manager updatePcbActions -->
+                            <!--Print actions: same card look, third
+                                 row in the grid; state-driven via
+                                 socket-manager updatePcbActions-->
                             <button class="ov-card ov-card--btn ov-card--warn" id="ov-pause" onclick="pausePrint()" style="display:none;">
                                 <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>
                                 <span data-i18n="pause">Pausieren</span>
@@ -99,9 +99,33 @@
                     </div>
                 </div>
 
-                <!-- Movement Tab: rundes Jog-Pad wie am Display -->
+                <!--Movement tab: round jog pad, same as on the display-->
                 <div id="movement-tab" class="control-tab-content">
-                    <div class="jog-layout">
+                    <div class="jog-switch">
+                        <button type="button" class="jog-switch-btn" data-view="buttons"
+                                onclick="setMovementView('buttons')"><span id="move-view-buttons"></span></button>
+                        <button type="button" class="jog-switch-btn jog-switch-btn--on" data-view="map"
+                                onclick="setMovementView('map')"><span id="move-view-map"></span></button>
+                    </div>
+                    <div class="jog-layout" id="jog-layout-map">
+                        <div class="ctrl-panel jog-panel">
+                            <h4 class="ctrl-panel-title" id="control-xy-movement-map"></h4>
+                            <svg viewBox="0 0 240 256" class="bed-map" id="bed-map"></svg>
+                            <p class="bed-note" id="move-bed-clear"></p>
+                        </div>
+                        <div class="ctrl-panel jog-panel">
+                            <h4 class="ctrl-panel-title" id="control-z-movement-map"></h4>
+                            <div class="z-side-wrap">
+                                <svg viewBox="0 0 120 240" class="z-side" id="z-side"></svg>
+                                <input type="range" class="z-slider" id="z-slider"
+                                       min="0" max="256" step="0.5" value="0"
+                                       oninput="zSliderMoved(this.value)"
+                                       onchange="zSliderReleased(this.value)">
+                            </div>
+                            <p class="bed-note"><span id="move-height-label"></span> <b id="z-slider-value">—</b></p>
+                        </div>
+                    </div>
+                    <div class="jog-layout" id="jog-layout-buttons" style="display:none">
                         <div class="ctrl-panel jog-panel">
                             <h4 class="ctrl-panel-title" id="control-xy-movement"></h4>
                             <svg viewBox="0 0 220 220" class="jog-pad">
@@ -139,13 +163,13 @@
                         <button class="jog-abtn" onclick="centerHead()"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg> <span id="control-center-head"></span></button>
                         <button class="jog-abtn" id="jog-freilauf" onclick="motorenFreigeben()"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 9.5-2"/><rect x="4" y="10" width="16" height="10" rx="2"/></svg> <span id="control-free-move"></span></button>
                     </div>
-                    <!-- moveAxis() liest weiter diese Schrittweiten — unsichtbar,
-                         das Rad ruft jogAxis() mit festen Schritten. -->
+                    <!--moveAxis() still reads these step sizes -- hidden,
+                         the wheel calls jogAxis() with fixed steps.-->
                     <select id="xy-step-size" style="display:none;"><option value="10" selected>10</option></select>
                     <select id="z-step-size" style="display:none;"><option value="1" selected>1</option></select>
                 </div>
 
-                <!-- Extruder Tab: Seitenwahl wie "Duese & Extruder" am Display -->
+                <!--Extruder tab: side selector like "Nozzle & Extruder" on the display-->
                 <div id="extruder-tab" class="control-tab-content" style="display:none;">
                     <div class="ext-seg" id="ext-seg" style="display:none;">
                         <span class="ext-seg-btn ext-seg-btn--on" id="ext-seg-l" onclick="extSelectSide(1)">Links ✓</span>
@@ -155,10 +179,10 @@
                         <div class="ctrl-panel ext-panel">
                             <div class="ext-bigtemp" id="ext-bigtemp">--</div>
                             <div class="ext-sub" id="ext-hw">--</div>
-                            <!-- Direkt hier einstellen statt das grosse Fenster
-                                 zu oeffnen: derselbe Aufbau wie dort (Stepper
-                                 und Materialvorgaben), aber fuer die oben
-                                 gewaehlte Seite. -->
+                            <!--Set it directly here instead of opening the big window:
+                                 the same layout as there (stepper
+                                 and material presets), but for the side
+                                 selected above.-->
                             <div class="dtx-seg ext-temp-step" id="ext-temp-step" style="margin-top:10px;">
                                 <button onclick="extTempStep(-10)">−10</button>
                                 <button onclick="extTempStep(-1)">−1</button>
@@ -180,23 +204,24 @@
                             <button class="ext-arrow" onclick="extrudeFilament(-10)">▼</button>
                         </div>
                     </div>
-                    <!-- extrudeFilament() liest die Laenge hier — fest 10 mm -->
+                    <!--extrudeFilament() reads the length here -- fixed at 10mm-->
                     <select id="extrude-length" style="display:none;"><option value="10" selected>10</option></select>
                     <input type="number" id="custom-temp" style="display:none;" value="200">
                 </div>
 
-                <!-- Filament Tab: Faecher statt Formular -->
+                <!--Filament tab: slots instead of a form-->
                 <div id="filament-tab" class="control-tab-content" style="display:none;">
-                    <div id="fil-slots"><!-- Faecher (JS: renderFilamentSlots) --></div>
+                    <div id="fil-slots"><!--Slots (JS: renderFilamentSlots)--></div>
                     <div class="fil-actions">
                         <button class="jog-abtn fil-abtn" onclick="loadFilament()">⬇ <span id="control-load"></span></button>
                         <button class="jog-abtn fil-abtn" onclick="unloadFilament()">⬆ <span id="control-unload"></span></button>
                         <button class="jog-abtn fil-abtn" onclick="purgeFilament()"><svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5"/></svg> <span id="control-purge"></span></button>
                     </div>
-                    <!-- Rueckfrage des Druckers: nach dem Laden fragt er, ob
-                         vorne schon Filament austritt. Bis das beantwortet ist,
-                         steht der Ablauf (Filament-Schritt 8). Sichtbar nur
-                         dann — renderFilamentSlots blendet es ein. -->
+                    <!--Printer confirmation prompt: after loading, it asks whether
+                         filament is already coming out the front. The
+                         process (filament step 8) pauses until that is
+                         answered. Only visible then -- renderFilamentSlots
+                         shows it.-->
                     <div id="fil-confirm" class="fil-confirm" style="display:none;">
                         <div class="ext-sub" id="fil-confirm-text"></div>
                         <div class="fil-actions" style="margin-top:6px;">
@@ -207,8 +232,8 @@
                         </div>
                     </div>
                     <div class="ext-sub" style="margin-top:8px;" id="fil-hint"></div>
-                    <!-- loadFilament()/unloadFilament() lesen die Zielseite hier;
-                         Klick auf ein Fach setzt den Wert (254 links, 255 rechts). -->
+                    <!--loadFilament()/unloadFilament() read the target side here;
+                         clicking a slot sets the value (254 left, 255 right).-->
                     <div id="ctrl-nozzle-select" style="display:none;">
                         <select id="ctrl-nozzle">
                             <option value="254" selected>1</option>
@@ -217,12 +242,12 @@
                     </div>
                 </div>
 
-                <!-- Geraet-Tab: alles, was nur bestimmte Modelle haben. Jeder
-                     Block blendet sich selbst aus, wenn der Drucker die Sache
-                     nicht meldet (siehe printer-control.js applyDeviceTab). -->
-                <!-- Kalibrierung: links die Schritte, rechts der Ablauf.
-                     Eigener Reiter statt Karte im Geraet-Tab — hier ist Platz,
-                     einen laufenden Durchgang mitzuzeigen. -->
+                <!--Device tab: everything only certain models have. Each
+                     block hides itself when the printer does not report that
+                     feature (see printer-control.js applyDeviceTab).-->
+                <!--Calibration: steps on the left, progress on the right.
+                     Its own tab instead of a card in the device tab -- there is room
+                     here to show a run in progress.-->
                 <div id="cali-tab" class="control-tab-content" style="display:none;">
                     <div class="dev-cols">
                         <div class="dev-col">
@@ -240,9 +265,9 @@
                                 <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="6"/></svg> <span id="cali-lauf-titel"></span></h4>
                                 <div id="cali-lauf"></div>
                             </div>
-                            <!-- Zwei Kalibrierungen laufen nicht ueber die
-                                 Bitmaske, sondern als eigener Firmware-Gcode
-                                 — je ein Durchgang, deshalb eigene Knoepfe. -->
+                            <!--Two calibrations do not run through the
+                                 bitmask, but as their own firmware G-code
+                                 -- one pass each, hence their own buttons.-->
                             <div class="ctrl-panel">
                                 <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M12 4v16"/><circle cx="12" cy="12" r="3"/></svg> <span id="cali-laeufe-titel"></span></h4>
                                 <div class="cali-laeufe" id="cali-laeufe"></div>
@@ -257,7 +282,7 @@
                 <div id="device-tab" class="control-tab-content" style="display:none;">
                     <div class="dev-cols">
                         <div class="dev-col">
-<!-- Zusatzlichter: zweites Kammerlicht (H2/X2), Heizbett (H2) -->
+<!--Extra lights: second chamber light (H2/X2), heated bed (H2)-->
                     <div class="ctrl-panel" id="dev-lights-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V18h8v-3.3A7 7 0 0 0 12 2z"/></svg> <span id="dev-lights-title"></span></h4>
                         <div class="dev-row" id="dev-light2-row" style="display:none;">
@@ -275,12 +300,12 @@
                             </span>
                         </div>
                     </div>
-<!-- Luftfuehrung -->
+<!--Air duct-->
                     <div class="ctrl-panel" id="dev-airduct-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7a2.5 2.5 0 1 1-2.5 2.5"/></svg> <span id="dev-airduct-title"></span></h4>
                         <select id="dev-airduct" class="dev-select" onchange="setAirductMode(this.value)"></select>
                     </div>
-<!-- Kammerheizung -->
+<!--Chamber heater-->
                     <div class="ctrl-panel" id="dev-chamber-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg> <span id="dev-chamber-title"></span></h4>
                         <div class="ctrl-temp-display">
@@ -296,14 +321,14 @@
                         </div>
                         <div class="ctrl-tip-box" id="dev-chamber-hint"></div>
                     </div>
-<!-- Tuer + Werkzeug -->
+<!--Door + tool-->
                     <div class="ctrl-panel" id="dev-misc-panel" style="display:none;">
                         <div class="dev-row"><span id="dev-door-label"></span><strong id="dev-door-value">--</strong></div>
                         <div class="dev-row" id="dev-tool-row" style="display:none;">
                             <span id="dev-tool-label"></span><strong id="dev-tool-value">--</strong>
                         </div>
                     </div>
-<!-- Summer (nur H2-Reihe) -->
+<!--Buzzer (H2 series only)-->
                     <div class="ctrl-panel" id="dev-buzzer-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg> <span id="dev-buzzer-title"></span></h4>
                         <div class="ctrl-filament-grid">
@@ -323,7 +348,7 @@
                     </div>
                         </div>
                         <div class="dev-col">
-<!-- Zwei Duesen -->
+<!--Two nozzles-->
                     <div class="ctrl-panel" id="dev-nozzles-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/><path d="M12 9v6"/></svg> <span id="dev-nozzles-title"></span></h4>
                         <div class="dev-nozzle-grid">
@@ -349,31 +374,31 @@
                             </div>
                         </div>
                     </div>
-<!-- Luefter -->
+<!--Fan-->
                     <div class="ctrl-panel" id="dev-fans-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5"/><path d="M12 9.5c0-3 1-6 3.5-6 2 0 2.5 2.5 0 4-1.5.9-3.5 2-3.5 2z"/><path d="M14.5 12c3 0 6 1 6 3.5 0 2-2.5 2.5-4 0-.9-1.5-2-3.5-2-3.5z"/><path d="M9.5 12c-3 0-6-1-6-3.5 0-2 2.5-2.5 4 0 .9 1.5 2 3.5 2 3.5z"/><path d="M12 14.5c0 3-1 6-3.5 6-2 0-2.5-2.5 0-4 1.5-.9 3.5-2 3.5-2z"/></svg> <span id="dev-fans-title"></span></h4>
                         <div id="dev-fans-list"></div>
                     </div>
-<!-- Erkannte Druckplatte -->
+<!--Detected print plate-->
                     <div class="ctrl-panel" id="dev-plate-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 17h20M4 17V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8M4 17v3M20 17v3"/></svg> <span id="dev-plate-title"></span></h4>
                         <div class="dev-row">
                             <span id="dev-plate-label"></span><strong id="dev-plate-value">--</strong>
                         </div>
                     </div>
-<!-- Speicher: USB-Stick und interner Flash -->
+<!--Storage: USB stick and internal flash-->
                     <div class="ctrl-panel" id="dev-storage-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v6h8V3M8 21v-6h8v6"/></svg> <span id="dev-storage-title"></span></h4>
                         <div id="dev-storage-list"></div>
                         <div class="ctrl-tip-box" id="dev-storage-hint" style="display:none;"></div>
                     </div>
-<!-- Externe Spulen. Der Drucker meldet sie als vir_slot
-                         (X2D/H2D) bzw. vt_tray; eine Karte je Seite. -->
+<!--External spools. The printer reports them as vir_slot
+                         (X2D/H2D) or vt_tray; one card per side.-->
                     <div class="ctrl-panel" id="dev-spools-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg> <span id="dev-spools-title"></span></h4>
                         <div id="dev-spools-list"></div>
                     </div>
-<!-- Filterbox -->
+<!--Filter box-->
                     <div class="ctrl-panel" id="dev-vent-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><circle cx="12" cy="12" r="4"/><path d="M12 8v8M8 12h8"/></svg> <span id="dev-vent-title"></span></h4>
                         <div class="dev-row">
@@ -383,7 +408,7 @@
                             <span id="dev-vent-speed-label"></span><strong id="dev-vent-speed">--</strong>
                         </div>
                     </div>
-<!-- AMS: eine Karte je Einheit, gebaut aus dem Status -->
+<!--AMS: one card per unit, built from the status-->
                     <div class="ctrl-panel" id="dev-ams-panel" style="display:none;">
                         <h4 class="ctrl-panel-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 9h5M2 15h5M17 9h5M17 15h5"/></svg> <span id="dev-ams-title"></span></h4>
                         <div id="dev-ams-list"></div>

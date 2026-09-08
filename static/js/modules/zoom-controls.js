@@ -21,10 +21,11 @@ class ZoomControlsManager {
         });
     }
 
-    // --- Kamera-Rotation/Flip beim Zoom ERHALTEN ---
-    // Bisher setzte der Zoom transform='scale(X)' und überschrieb die Basis-Transform
-    // (z.B. rotate(180deg)) → Bild auf dem Kopf, auch bei Reset. Jetzt: Basis + scale
-    // kombinieren; Origin bei 180°/Flip mitspiegeln, damit Zoom-auf-Cursor stimmt.
+    // --- PRESERVE the camera rotation and flip while zooming ---
+    // The zoom used to set transform='scale(X)' and overwrote the base transform
+    // (rotate(180deg), say) -> the image ended up upside down, on a reset too.
+    // Now the base and the scale are combined, and the origin is mirrored along
+    // at 180° or on a flip, so zoom-to-cursor is right.
     _baseTransform(img) { return (img && img.dataset.baseTransform) || ''; }
     _mapOrigin(base, x, y) {
         let ox = x, oy = y;
@@ -51,11 +52,11 @@ class ZoomControlsManager {
 
         const rect = img.getBoundingClientRect();
 
-        // Mausposition relativ zum Bild (in Prozent)
+        // The mouse position relative to the image (as a percentage)
         const x = ((mouseX - rect.left) / rect.width) * 100;
         const y = ((mouseY - rect.top) / rect.height) * 100;
 
-        // Neuer Scale-Wert
+        // The new scale value
         const newScale = Math.min(Math.max(1, this.fullscreenScale + deltaScale), 5);
 
         if (newScale !== this.fullscreenScale) {
@@ -103,13 +104,13 @@ class ZoomControlsManager {
             document.msExitFullscreen();
         }
 
-        // Container entfernen
+        // Remove the container
         const container = document.getElementById('fullscreen-container');
         if (container) {
             container.remove();
         }
 
-        // Zoom zurücksetzen
+        // Reset the zoom
         this.fullscreenScale = 1;
     }
 
@@ -121,15 +122,15 @@ class ZoomControlsManager {
 
         const rect = img.getBoundingClientRect();
 
-        // Mausposition relativ zum Bild (in Prozent)
+        // The mouse position relative to the image (as a percentage)
         const x = ((mouseX - rect.left) / rect.width) * 100;
         const y = ((mouseY - rect.top) / rect.height) * 100;
 
-        // Neuer Scale-Wert
+        // The new scale value
         const newScale = Math.min(Math.max(1, this.desktopScale + deltaScale), 5);
 
         if (newScale !== this.desktopScale) {
-            // Transform-Origin auf Mausposition setzen
+            // Set the transform origin to the mouse position
             this.transformOriginX = x;
             this.transformOriginY = y;
             this.desktopScale = newScale;
@@ -138,7 +139,7 @@ class ZoomControlsManager {
     }
 
     desktopZoomIn(e) {
-        // Wenn Event vorhanden (von Button), nutze Bildmitte
+        // With an event (from a button), use the centre of the image
         if (!e || !e.clientX) {
             const img = document.getElementById('camera-stream');
             const rect = img.getBoundingClientRect();

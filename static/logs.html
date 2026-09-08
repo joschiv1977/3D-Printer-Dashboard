@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
-    <!-- Sprachdateien laden -->
+    <!--Load language files-->
     <script src="/static/lang/de.js"></script>
     <script src="/static/lang/en.js"></script>
     <script src="/static/lang/fr.js"></script>
@@ -44,9 +44,9 @@
         }
 
         /* ========== HEADER ==========
-           Wie auf Historie, Wartung, Slicer und Benutzer: kein Kasten,
-           Titel 17px. Die Karte drumherum kostete 68px Hoehe fuer eine
-           Zeile Text. */
+           Like the History, Maintenance, Slicer and User pages: no box,
+           17px title. The card around it cost 68px of height for one
+           line of text. */
         .header {
             color: var(--text-primary);
             display: flex;
@@ -73,8 +73,6 @@
             gap: 8px;
         }
 
-        /* Kein !important mehr noetig: die globale Regel, die alle
-           .header-actions versteckte, gehoerte zum entfernten App-Header. */
         .header-actions {
             display: flex;
             gap: 8px;
@@ -147,9 +145,7 @@
         }
 
         /* ========== STATS BAR ========== */
-        /* Stufen sind Filter, keine Deko: antippen blendet eine Stufe aus.
-           Vorher waren es vier Zahlenkaesten, von denen immer nur EINER
-           gleichzeitig aktiv sein konnte — "alles ausser Debug" ging nicht. */
+        /* Levels are filters, not decoration: tapping a level hides it. */
         .stats-bar {
             display: flex;
             gap: 8px;
@@ -192,7 +188,7 @@
 
         .stat-label { font-size: 12.5px; }
 
-        /* aus = ausgeblendet */
+        /* off = hidden */
         .stat-card.aus { opacity: 0.4; }
         .stat-card.aus .stat-value { text-decoration: line-through; }
 
@@ -306,7 +302,7 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
-        /* Klipper-Konsole (Direct): Terminal-Zeilen */
+        /* Klipper console (Direct mode): terminal lines */
         .console-line { white-space: pre-wrap; word-break: break-word; padding: 0 6px; }
         .console-cmd { color: var(--accent-blue, #2196f3); font-weight: 600; }
         .console-resp { color: var(--text-primary); }
@@ -331,10 +327,9 @@
         }
 
         /* ========== LOG LINES ==========
-           Feste Spalten: Zeit, Stufe, Meldung. Vorher rutschte die Meldung
-           je nach Laenge des Zeitstempels. Und die Farbe traegt die STUFE,
-           nicht der Text — gruener Fliesstext auf hellem Grund war schlecht
-           lesbar und liess alles nach "in Ordnung" aussehen. */
+           Fixed columns: time, level, message. The LEVEL carries the color,
+           not the text — green body text on a light background was hard to
+           read and made everything look "fine". */
         .log-line {
             margin: 0;
             padding: 5px 14px;
@@ -395,8 +390,8 @@
 
         .log-line.debug .log-message { color: var(--text-secondary); }
 
-        /* Wiederholungen zaehlen statt stapeln — die Haelfte des Protokolls
-           war dieselbe Zeile hintereinander. */
+        /* Count repeats instead of stacking them — half the log was the
+           same line repeated. */
         .log-wdh {
             flex: none;
             font-size: 10.5px;
@@ -417,7 +412,7 @@
 
         .log-fuss .sp { flex: 1; }
 
-        /* Strich-Icons wie im uebrigen Programm statt Emoji. */
+        /* Line icons like the rest of the app, instead of emoji. */
         .log-ic {
             width: 15px;
             height: 15px;
@@ -429,7 +424,7 @@
             flex: 0 0 auto;
         }
 
-        /* Suche fuellt die Zeile, Rest kompakt. */
+        /* Search fills the line, the rest stays compact. */
         .log-suche {
             position: relative;
             flex: 1;
@@ -456,8 +451,8 @@
             font-size: 13.5px;
         }
 
-        /* "Mitlaufen" als Schalter statt Kaestchen mit dem Text
-           "Auto-Refresh (5 Sek)" — die Sekunden interessieren nicht. */
+        /* "Mitlaufen" as a toggle instead of a checkbox with the text
+           "Auto-Refresh (5 Sek)" — the seconds don't matter. */
         .log-schalt {
             display: inline-flex;
             align-items: center;
@@ -496,8 +491,9 @@
 
         .log-ic--lg { width: 18px; height: 18px; vertical-align: -3px; }
 
-        /* Zeilenzahl im selben Stil wie Suche und Kopfknoepfe — als nacktes
-           Systemfeld sass sie sonst zwischen zwei gestalteten Elementen. */
+        /* Line-count field styled like search and the header buttons — as a
+           bare system field it would otherwise sit between two styled
+           elements. */
         #lines-select {
             border: 1px solid var(--border-color);
             background: var(--bg-card, var(--bg-section));
@@ -610,8 +606,8 @@
                     <div class="stat-label" data-i18n="info">Info</div>
                     <div class="stat-value">0</div>
                 </div>
-                <!-- Debug startet gedimmt: es macht zwei Drittel des
-                     Protokolls aus und verdeckt sonst alles andere. -->
+                <!--Debug starts dimmed: it makes up two thirds of the
+                     log and would otherwise hide everything else.-->
                 <div class="stat-card debug aus" onclick="filterByLevel('debug')" id="stat-debug">
                     <div class="stat-label" data-i18n="debug">Debug</div>
                     <div class="stat-value">0</div>
@@ -620,8 +616,8 @@
 
             <!-- Controls -->
             <div class="controls">
-                <!-- Suche zuerst: bei tausend Zeilen sucht man, statt zu
-                     blaettern. Vorher stand sie hinter zwei Trennstrichen. -->
+                <!--Search first: with a thousand lines you search instead of
+                     scrolling.-->
                 <div class="log-suche">
                     <svg class="log-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
                     <input type="text" id="search-input" placeholder="Im Protokoll suchen"
@@ -657,7 +653,7 @@
                 <span id="log-letzte"></span>
             </div>
 
-            <!-- Klipper-Konsole: Eingabezeile (nur Direct-Modus) -->
+            <!--Klipper console: input line (Direct mode only)-->
             <div class="controls" id="console-input-bar" style="display:none; gap:8px; margin-top:10px;">
                 <input type="text" id="console-input" class="search-input"
                        data-i18n-placeholder="console_input_hint" placeholder="G-Code / Befehl eingeben…"
@@ -670,13 +666,13 @@
     <script src="/static/auth-handler.js"></script>
     <script>
         let allLogs = [];
-        // Zwei Zustaende:
-        //   nurStufe = null  -> Grundansicht: alles ausser Debug. Debug macht
-        //                       zwei Drittel des Protokolls aus und verdeckt
-        //                       sonst alles andere.
-        //   nurStufe = 'x'   -> NUR diese Stufe. Ein Klick auf "Fehler" zeigt
-        //                       die Fehler, er blendet sie nicht aus.
-        // Nochmal auf dieselbe Stufe klicken fuehrt zurueck zur Grundansicht.
+        // Two states:
+        //   nurStufe = null  -> base view: everything except Debug. Debug makes
+        //                       up two thirds of the log and would otherwise
+        //                       hide everything else.
+        //   nurStufe = 'x'   -> ONLY this level. Clicking "Fehler" shows
+        //                       the errors; it doesn't hide them.
+        // Clicking the same level again returns to the base view.
         let nurStufe = null;
         const GRUNDANSICHT = { error: true, warning: true, info: true, debug: false };
 
@@ -695,7 +691,7 @@
             if (window.tabBarManager) window.tabBarManager.render();
             if (window.i18nManager) window.i18nManager.applyTranslations();
 
-            // Direct-Modus → Klipper-Konsole (gcode live + Backlog) statt Backend-Logs.
+            // Direct mode → Klipper console (live gcode + backlog) instead of backend logs.
             let direct = false;
             try {
                 const c = await (window.__directCfgPromise ||
@@ -704,21 +700,21 @@
             } catch (_) {}
             if (direct) { initKlipperConsole(); return; }
 
-            // Bambu-Backend: Logs wie bisher (Polling).
+            // Bambu backend: logs via polling.
             loadLogs();
             const autoRefreshCheckbox = document.getElementById('auto-refresh');
             autoRefreshCheckbox.checked = true;
             toggleAutoRefresh();
         });
 
-        // ===================== Klipper-Konsole (Direct-Modus) =====================
-        // Wie Android: Backlog aus server.gcode_store (GET /api/console) + live über
-        // Socket.IO 'gcode_response' (Adapter relayt notify_gcode_response). Senden
-        // via /api/printer/gcode (lokales Echo). Kein Backend-Log-Polling.
+        // ===================== Klipper console (Direct mode) =====================
+        // Same as Android: backlog from server.gcode_store (GET /api/console) + live
+        // via Socket.IO 'gcode_response' (adapter relays notify_gcode_response). Sending
+        // via /api/printer/gcode (local echo). No backend log polling.
         async function initKlipperConsole() {
             const h1 = document.querySelector('.header h1');
             if (h1) h1.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" style="width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px;"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg> <span>' + getText('console_title', 'Konsole') + '</span>';
-            // Backend-Log-spezifische UI weg (Level-Stats, Auto-Refresh/Zeilen, Datei-Ops).
+            // Hide backend-log-specific UI (level stats, auto-refresh/line count, file ops).
             const statsBar = document.querySelector('.stats-bar');
             if (statsBar) statsBar.style.display = 'none';
             const ctrls = document.querySelector('.content .controls');
@@ -730,7 +726,7 @@
             const container = document.getElementById('log-container');
             if (container) container.innerHTML = '';
 
-            // Backlog laden.
+            // Load backlog.
             try {
                 const r = await apiCall('/api/console?count=300');
                 const d = await r.json();
@@ -738,7 +734,7 @@
             } catch (_) {}
             scrollConsole();
 
-            // Live: Socket.IO 'gcode_response' (Antworten). Befehle echoen wir lokal.
+            // Live: Socket.IO 'gcode_response' (responses). We echo commands locally.
             try {
                 if (typeof io !== 'undefined') {
                     const s = io({ transports: ['polling', 'websocket'] });
@@ -747,7 +743,7 @@
                 }
             } catch (_) {}
 
-            // Eingabe.
+            // Input.
             const inp = document.getElementById('console-input');
             const sendBtn = document.getElementById('console-send');
             if (inp) inp.placeholder = getText('console_input_hint', 'G-Code / Befehl eingeben…');
@@ -755,7 +751,7 @@
             const send = () => {
                 const cmd = (inp && inp.value || '').trim();
                 if (!cmd) return;
-                appendConsole('command', cmd, true);   // lokales Echo
+                appendConsole('command', cmd, true);   // local echo
                 if (inp) inp.value = '';
                 apiCall('/api/printer/gcode', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -771,7 +767,7 @@
             if (!c || message == null) return;
             const div = document.createElement('div');
             const isCmd = type === 'command';
-            // Moonraker-Fehlerantworten beginnen mit "!!".
+            // Moonraker error responses start with "!!".
             const isErr = !isCmd && String(message).trimStart().startsWith('!!');
             div.className = 'console-line ' + (isCmd ? 'console-cmd' : (isErr ? 'console-err' : 'console-resp'));
             div.textContent = (isCmd ? '> ' : '') + message;
@@ -780,9 +776,23 @@
             if (autoscroll) scrollConsole();
         }
 
+        /**
+         * Only follow along while the reader IS at the bottom.
+         *
+         * Jumping unconditionally made reading anything older impossible:
+         * scroll up to an error, the next line arrives, and the view is
+         * dragged back down. Whoever has scrolled away has said what they
+         * want to look at — new lines then land below without moving it.
+         */
+        const AM_ENDE_TOLERANZ = 40;   // px; ein paar Pixel Luft beim Zielen
+
+        function amEnde(c) {
+            return c.scrollHeight - c.scrollTop - c.clientHeight <= AM_ENDE_TOLERANZ;
+        }
+
         function scrollConsole() {
             const c = document.getElementById('log-container');
-            if (c) c.scrollTop = c.scrollHeight;
+            if (c && amEnde(c)) c.scrollTop = c.scrollHeight;
         }
 
         async function loadLogs() {
@@ -875,9 +885,9 @@
         }
 
         /**
-         * Aufeinanderfolgende gleiche Meldungen zusammenfassen. Im Protokoll
-         * stand "pushall nach 11 uebersprungenen Runden" fuenfmal hintereinander;
-         * gezaehlt liest es sich als eine Zeile mit "5x".
+         * Merge consecutive identical messages. The log had
+         * "pushall after 11 skipped rounds" appear five times in a row;
+         * counted, it reads as a single line with "5x".
          */
         function fasseZusammen(zeilen) {
             const raus = [];
@@ -885,7 +895,7 @@
                 const letzte = raus[raus.length - 1];
                 if (letzte && letzte.level === z.level && letzte.message === z.message) {
                     letzte.anzahl = (letzte.anzahl || 1) + 1;
-                    letzte.timestamp = z.timestamp;   // juengster Zeitpunkt gewinnt
+                    letzte.timestamp = z.timestamp;   // latest timestamp wins
                 } else {
                     raus.push({ ...z, anzahl: 1 });
                 }
@@ -895,6 +905,9 @@
 
         function renderLogs() {
             const container = document.getElementById('log-container');
+            // Measured BEFORE the content is replaced — afterwards the old
+            // position is gone and the question cannot be asked any more.
+            const warAmEnde = amEnde(container);
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
 
             let filtered = allLogs.filter(log => stufeSichtbar(log.level));
@@ -925,10 +938,12 @@
             }).join('');
 
             zeigeFuss(gruppiert.length, filtered.length);
-            container.scrollTop = container.scrollHeight;
+            // Same rule as the console: a refresh must not drag the reader
+            // away from what they scrolled to.
+            if (warAmEnde) container.scrollTop = container.scrollHeight;
         }
 
-        /** Fusszeile: wie viel ist zu sehen, was ist ausgeblendet, wie alt. */
+        /** Footer: how much is shown, what's hidden, how old. */
         function zeigeFuss(gezeigt, vorGruppierung) {
             const status = document.getElementById('log-status');
             const letzte = document.getElementById('log-letzte');
@@ -969,13 +984,13 @@
         }
 
         function filterByLevel(level) {
-            // Auf eine Stufe stellen; nochmal darauf zurueck zur Grundansicht.
+            // Switch to a single level; clicking it again returns to the base view.
             nurStufe = (nurStufe === level) ? null : level;
             ['error', 'warning', 'info', 'debug'].forEach(l => {
                 const karte = document.getElementById(`stat-${l}`);
                 if (!karte) return;
                 karte.classList.toggle('active', nurStufe === l);
-                // Gedimmt heisst "kommt in dieser Ansicht nicht vor".
+                // Dimmed means "doesn't appear in this view".
                 karte.classList.toggle('aus', !stufeSichtbar(l));
             });
             renderLogs();
@@ -1002,9 +1017,8 @@
             }
         }
 
-        // Bestaetigung und Meldung kommen aus confirm-dialog.js — dieselben
-        // wie auf allen anderen Seiten. Hier standen bis 21aug26 eigene
-        // Fassungen mit eigenem Kasten und Emoji-Symbolen.
+        // The confirmation and the message come from confirm-dialog.js — the
+        // same ones as on every other page.
         function showConfirmDialog(message, title) {
             return window.skConfirm(message, { title: title });
         }
@@ -1068,5 +1082,6 @@
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
+    <script src="/static/js/modules/notification-stack.js"></script>
 </body>
 </html>

@@ -159,11 +159,23 @@
     "calibration_cancelled": {
       "title": "🔧 Calibración cancelada",
       "body": "{name} fue cancelada."
+    },
+    "scheduled_print_started": {
+      "title": "⏰ Impresión programada iniciada",
+      "body": "'{filename}' se está imprimiendo."
+    },
+    "scheduled_print_failed": {
+      "title": "❌ Impresión programada fallida",
+      "body": "'{filename}' — {reason}"
+    },
+    "update_available": {
+      "title": "⬆️ Nueva versión {version}",
+      "body": "{version} está lista para {produkt}. Instálala en los ajustes."
     }
   },
   "status": {
     "ready": "Listo",
-    "printing": "Imprimiendo:",
+    "printing": "Imprimiendo",
     "preparing": "Preparando...",
     "starting_print": "Iniciando impresión...",
     "print_completed": "Impresión completada",
@@ -280,7 +292,16 @@
     "printing_failed": "❌ Impresión fallida ({duration_minutes} min, capa {layers_done}/{total_layers})",
     "dry_started": "🌡️ Secado filamento iniciado ({material} {temp}°C, {hours}h)",
     "dry_stopped": "⏹️ Secado filamento detenido ({material})",
-    "dry_complete": "✅ Secado filamento completado ({material})"
+    "dry_complete": "✅ Secado filamento completado ({material})",
+    "hms_error": "⚠️ HMS {code}: {text}",
+    "hms_info": "ℹ️ {text}",
+    "hms_more_errors": "📌 {errors} errores nuevos",
+    "hms_more_infos": "ℹ️ {infos} avisos nuevos",
+    "hms_more_mixed": "📌 {errors} errores nuevos, {infos} avisos nuevos",
+    "speed_change": "⚡ Velocidad: {level}",
+    "ams_tray_change": "🔄 {from} → {to} en la capa {layer}",
+    "spool_changed": "🧵 Bobina cambiada — {grams} g cargados a la anterior",
+    "spoolman_tracked": "🧵 {grams} g de filamento cargados (parada manual)"
   },
   "stages": {
     "0": "Imprimiendo",
@@ -371,6 +392,10 @@
       "no_filament_left": "Filamento [{filament_index}] ({spool_name}): ¡Vacío! Requiere {required_weight}g",
       "insufficient_filament": "Filamento [{filament_index}] ({spool_name}): {available_weight}g disponible, {required_weight}g requerido (faltan {shortage}g)",
       "critical_error_scheduling": "No se puede programar la impresión - errores críticos de filamento presentes"
+    },
+    "mismatch": {
+      "title": "El filamento no coincide",
+      "body": "{file} necesita {wanted}: en la bandeja hay {loaded}."
     }
   },
   "maintenance": {
@@ -395,5 +420,15 @@
       "title": "📅 Mantenimiento planificado",
       "body": "{task_name} - en {days} día(s)"
     }
+  },
+  "speed_levels": {
+    "1": "Silencioso",
+    "2": "Estándar",
+    "3": "Sport",
+    "4": "Loco"
+  },
+  "scheduled": {
+    "reason_klipper_boot": "Controlador Klipper inaccesible tras el arranque",
+    "reason_mqtt": "Sin conexión MQTT tras {cycles} ciclos de corriente"
   }
 }

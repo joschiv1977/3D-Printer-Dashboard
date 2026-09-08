@@ -1,18 +1,18 @@
 /**
  * SD Card Manager
  * Handles SD card file browsing, upload, delete, rename, sorting/filtering,
- * print options popovers and sync status. Die Vergroesserung beim
- * Ueberfahren macht thumb-preview.js fuer die ganze Oberflaeche.
+ * print options popovers and sync status. The zoom-on-hover effect
+ * across the whole surface is handled by thumb-preview.js.
  */
 class SDCardManager {
     constructor() {
         const texts = window.texts || {};
 
-        // Track ob Auto-Sync läuft
+        // Track whether auto-sync is running
         this.sdSyncInProgress = false;
 
 
-        // Auto-Close für Print-Options Dropdowns
+        // Auto-close for print-options dropdowns
         this._initAutoCloseDropdowns();
 
         // Close popovers when clicking outside
@@ -23,15 +23,15 @@ class SDCardManager {
     // showSDFiles — open modal + load file list
     // ========================================
     showSDFiles(forceRefresh = false) {
-        // Klipper-Branch: schlanke Datei-Liste via printerAdapter, ohne
-        // Bambu-spezifische AMS/Plate/Spool-Picker. Bambu-Logik unten
-        // bleibt 1:1 unangetastet.
+        // Klipper branch: lean file list via printerAdapter, without
+        // Bambu-specific AMS/plate/spool picker. Bambu logic below
+        // stays completely untouched.
         if (window.isKlipperMode && window.isKlipperMode()) {
             return this._showKlipperFiles();
         }
         const texts = window.texts || {};
 
-        // Spoolman Spulen HTML aus dem Haupt-Selector kopieren
+        // Copy Spoolman spool HTML from the main selector
         if (window.spoolmanManager && window.spoolmanManager.connected) {
             window.spoolmanSpoolsHtml = '';
             const mainSelector = document.getElementById('spool-selector');
@@ -44,25 +44,29 @@ class SDCardManager {
             }
         }
 
+        // The dialog always opens in the live system. The archive is a
+        // detour, not a state you'd expect to land back in next time it opens.
+        window.sdArchivAktiv = false;
+        if (typeof window.sdArchivKnopfSetzen === 'function') window.sdArchivKnopfSetzen();
         document.getElementById('sdCardModal').style.display = 'block';
 
-        // Alte Upload-Status entfernen falls vorhanden
+        // Remove old upload status if present
         const oldStatus = document.getElementById('upload-status');
         if (oldStatus) {
             oldStatus.remove();
         }
 
-        // Bei Auto-Sync: Zeige Info-Banner OBEN
+        // During auto-sync: show info banner at the TOP
         if (this.sdSyncInProgress && !forceRefresh) {
             const modalContent = document.querySelector('#sdCardModal > div');
 
-            // Entferne altes Banner falls vorhanden
+            // Remove old banner if present
             const existingBanner = document.getElementById('sync-banner');
             if (existingBanner) {
                 existingBanner.remove();
             }
 
-            // Erstelle neues Banner
+            // Create new banner
             const syncBanner = document.createElement('div');
             syncBanner.id = 'sync-banner';
             syncBanner.style.cssText = `
@@ -78,16 +82,16 @@ class SDCardManager {
             `;
             syncBanner.innerHTML = `
                 <div class="loading" style="width:16px; height:16px;"></div>
-                <span>Hintergrund-Sync läuft... Neue Dateien werden automatisch hinzugefügt</span>
+                <span>${(window.texts||{}).sd_bg_sync || 'Hintergrund-Sync läuft … neue Dateien kommen von selbst dazu'}</span>
             `;
 
-            // Füge Banner nach der Überschrift ein
+            // Insert banner after the heading
             const h2 = modalContent.querySelector('h2');
             if (h2 && h2.nextSibling) {
                 modalContent.insertBefore(syncBanner, h2.nextSibling);
             }
 
-            // Deaktiviere NUR den Aktualisieren-Button
+            // Disable ONLY the refresh button
             const refreshBtn = document.getElementById('sd-refresh-btn');
             if (refreshBtn) {
                 refreshBtn.disabled = true;
@@ -95,10 +99,10 @@ class SDCardManager {
                 refreshBtn.innerHTML = window.skIcon('sanduhr') + '<span>' + (texts.sync_running || 'Sync läuft…') + '</span>';
             }
 
-            // KEIN Loading anzeigen - direkt Cache laden!
+            // Show NO loading indicator - load cache directly!
             document.getElementById('sd-loading').style.display = 'none';
-            // Deaktiviere NUR den Aktualisieren-Button
-            const syncRefreshBtn = document.getElementById('sd-refresh-btn');  // Anderer Name!
+            // Disable ONLY the refresh button
+            const syncRefreshBtn = document.getElementById('sd-refresh-btn');  // Different name!
             if (syncRefreshBtn) {
                 syncRefreshBtn.disabled = true;
                 syncRefreshBtn.style.opacity = '0.5';
@@ -107,22 +111,22 @@ class SDCardManager {
 
         }
 
-        // Erweiterte Animation nur bei Force Refresh
+        // Extended animation only on force refresh
         let progressInterval = null;
         let startTime = null;
 
         if (forceRefresh) {
-            // Der Abgleich zeigt sich im KOPF, nicht in der Liste.
+            // The sync status shows up in the HEADER, not in the list.
             //
-            // Vorher stand er als Block in #sd-loading mittendrin: er
-            // erschien, schob die ganze Liste nach unten, verschwand, und
-            // alles rutschte zurueck. Bei zwei Sekunden Dauer war das nur
-            // Gezappel. Jetzt laeuft ein duenner Faden unter der Kopfzeile
-            // und der Aktualisieren-Knopf fuellt sich — die Rueckmeldung
-            // sitzt da, wo man gedrueckt hat, und verdeckt nichts.
+            // It used to sit as a block in the middle of #sd-loading: it
+            // appeared, pushed the whole list down, disappeared, and
+            // everything slid back up. At two seconds long, that was just
+            // jitter. Now a thin thread runs under the header
+            // and the refresh button fills up — the feedback
+            // sits right where you clicked, and covers nothing.
             //
-            // Nur wenn noch GAR keine Liste da ist (erstes Oeffnen), bekommt
-            // der Abgleich die Flaeche: dort schiebt er nichts weg.
+            // Only when there's no list at all yet (first open) does
+            // the sync get the whole area: nothing there to push out of the way.
             const listeDa = document.querySelectorAll('#sd-files-list .sd-zeile,'
                 + ' #sd-files-list .sd-file-card').length > 0;
             document.getElementById('sd-error').style.display = 'none';
@@ -141,29 +145,30 @@ class SDCardManager {
                     </div>`;
             }
 
-            // Fortschritt schaetzen — der Drucker meldet keinen.
-            let progress = 0;
-            progressInterval = setInterval(() => {
-                if (progress >= 90) return;
-                progress = Math.min(progress + Math.random() * 15, 90);
-                this._syncStand(progress, texts);
-            }, 200);
+            // The progress comes from the server, via `sd_sync_progress` — a
+            // real number from "file N of M", not guessed.
+            //
+            // Until 02sep26 this was an estimate: a random step every 200 ms
+            // up to 90%. It looked smooth and was made up out of
+            // thin air — and it hid the fact that the server only moved its
+            // progress at all during an actual download. Once everything is
+            // already mirrored, that never happens; Android reads the same
+            // value and so showed nothing at all.
+            this._syncStand(0, texts);
 
             startTime = Date.now();
 
         } else if (!this.sdSyncInProgress) {
-            // Normales Laden - zeige kurz Loading
-            document.getElementById('sd-loading').style.display = 'block';
-            document.getElementById('sd-loading').innerHTML = `
-                <div class="loading"></div>
-                <p style="color:var(--text-secondary); margin-top:10px;">${texts.loading_from_cache}</p>
-            `;
+            // Normal loading — the feedback sits in the button, not above
+            // the list. The block there used to push the whole content down.
+            this._kopfLaedt(texts);
+            document.getElementById('sd-loading').style.display = 'none';
             document.getElementById('sd-error').style.display = 'none';
         }
 
-        // Lade Dateien (Cache oder Force Refresh)
-        // Beim Oeffnen und beim Aktualisieren immer Seite 1 mit den
-        // aktuellen Bedienelementen — Suche/Sortierung bleiben erhalten.
+        // Load files (cache or force refresh)
+        // On open and on refresh, always page 1 with the
+        // current controls — search/sort are preserved.
         if (!this.sdAbfrage) this.sdAbfrage = { page: 1, per_page: 25, sort: 'date' };
         this.sdAbfrage.page = 1;
         const _p = new URLSearchParams();
@@ -177,32 +182,32 @@ class SDCardManager {
 
         apiCall('/api/mqtt/sdcard?' + _p.toString())
             .then(response => {
-                // Prüfe auf FTPS-Konflikt (409)
+                // Check for FTPS conflict (409)
                 if (response.status === 409) {
                     return response.json().then(data => {
-                        // FTPS ist beschäftigt - zeige Meldung
+                        // FTPS is busy - show message
                         if (progressInterval) clearInterval(progressInterval);
                         document.getElementById('sd-loading').style.display = 'none';
                         this._syncKopfAus();
 
-                        skToast(data.message || 'FTPS beschäftigt - bitte warten', 'warning');
+                        skToast(data.message || (window.texts||{}).ftps_busy || 'FTPS ist beschäftigt — bitte warten', 'warning');
 
-                        // Zeige trotzdem Cache-Dateien wenn vorhanden —
-                        // der Server schickt auch im Konfliktfall Seite,
-                        // Seitenzahl und Gesamtzahl mit.
+                        // Still show cached files if available —
+                        // the server also sends page, page count and
+                        // total count even in a conflict.
                         if (data.files && data.files.length > 0) {
                             this.baueWerkzeugleiste();
                             this.zeigeSeite(data);
                         }
-                        return null;  // Verhindere weitere Verarbeitung
+                        return null;  // Prevent further processing
                     });
                 }
                 return response.json();
             })
             .then(data => {
-                if (!data) return;  // War ein 409 Konflikt
+                if (!data) return;  // Was a 409 conflict
 
-                // Bei Force Refresh: Progress auf 100% und Status updaten
+                // On force refresh: set progress to 100% and update status
                 if (forceRefresh && progressInterval) {
                     clearInterval(progressInterval);
 
@@ -216,7 +221,7 @@ class SDCardManager {
                     }
                     this._syncStand(100, texts);
 
-                    // Kurz auf 100 stehen lassen, dann weg.
+                    // Leave it at 100 briefly, then remove.
                     setTimeout(() => {
                         document.getElementById('sd-loading').style.display = 'none';
                         this._syncKopfAus();
@@ -230,8 +235,8 @@ class SDCardManager {
 
                 document.getElementById('sd-files-container').style.display = 'block';
                 this.baueWerkzeugleiste();
-                // Eine Stelle fuer beide Faelle: zeigeSeite zeichnet die
-                // Liste ODER den Leer-Hinweis und setzt die Blaetterleiste.
+                // One place for both cases: zeigeSeite renders the
+                // list OR the empty-state message and sets the pagination bar.
                 this.zeigeSeite(data);
             })
             .catch(error => {
@@ -243,30 +248,34 @@ class SDCardManager {
                 document.getElementById('sd-error').style.display = 'block';
             })
             .finally(() => {
-                // Lade Print-Defaults NACH dem Rendering
+                // Release the button — whether it worked or not.
+                // Only if no sync is still running: that keeps the button
+                // busy longer than this one request and cleans up itself.
+                if (!this.sdSyncInProgress) this._syncKopfAus();
+                // Load print defaults AFTER rendering
                 this.loadPrintDefaults();
             });
     }
 
     // ========================================
     /**
-     * Ist der Drucker gerade aus?
+     * Is the printer currently off?
      *
-     * Die Dateiliste selbst braucht ihn nicht — sie kommt aus dem
-     * Dateispiegel des Servers. Drucken, Loeschen und der Abgleich mit dem
-     * Drucker brauchen ihn sehr wohl; die werden dann gesperrt.
+     * The file list itself doesn't need it — it comes from the server's
+     * file mirror. Printing, deleting and syncing with the
+     * printer do need it though; those get locked then.
      *
-     * Unbekannter Zustand (noch kein Status geladen) gilt NICHT als aus —
-     * sonst waere direkt nach dem Laden alles grundlos gesperrt.
+     * An unknown state (no status loaded yet) does NOT count as off —
+     * otherwise everything would be locked for no reason right after loading.
      */
     druckerAus() {
         return window.lastKnownSwitchState === 'off';
     }
 
     /**
-     * Abgleichen und Hochladen brauchen den Drucker — beide laufen ueber
-     * FTPS. Bei ausgeschaltetem Drucker werden sie gesperrt, statt in
-     * Zeitueberschreitungen zu laufen. Die Liste selbst bleibt lesbar.
+     * Syncing and uploading need the printer — both go over
+     * FTPS. With the printer off, they get locked instead of running into
+     * timeouts. The list itself stays readable.
      */
     setzeKopfKnoepfe() {
         const texts = window.texts || {};
@@ -280,27 +289,28 @@ class SDCardManager {
             abgleich.style.opacity = aus ? '0.45' : '';
         }
 
-        // Das Hochladen haengt an einem <label>; ein label kennt kein
-        // disabled, also das Eingabefeld sperren und das Label abdunkeln.
-        const feld = document.getElementById('sd-file-upload');
-        if (feld) feld.disabled = aus;
+        // Uploading stays possible with the printer off. The route says so
+        // itself: it writes into the cache and does NOT touch FTPS. What
+        // carries the file up is the sync at power-on
+        // (_start_auto_sync_if_needed), the same one that carries a file
+        // sliced while the printer was off. Locking it here only prevented
+        // the preparation, never a failed transfer -- and Android and iOS
+        // never locked it.
         const marke = document.querySelector('label[for="sd-file-upload"]');
         if (marke) {
-            marke.style.opacity = aus ? '0.45' : '';
-            marke.style.pointerEvents = aus ? 'none' : '';
-            marke.title = aus ? grund : '';
+            marke.title = aus ? (texts.sd_upload_offline_hint || '') : '';
         }
     }
 
-    // applySDFilters — liest die Bedienelemente und holt Seite 1
+    // applySDFilters — reads the controls and fetches page 1
     //
-    // Sucht, filtert und sortiert NICHT mehr selbst. Das macht der Server
-    // (routes/sdcard.py::_seitenweise), und zwar ueber den ganzen Bestand
-    // statt nur ueber die 25 sichtbaren Dateien — sonst faende man eine
-    // Datei auf Seite 7 nicht.
+    // No longer searches, filters or sorts itself. The server does that
+    // (routes/sdcard.py::_seitenweise), and over the whole set
+    // rather than just the 25 visible files — otherwise you wouldn't find a
+    // file that's on page 7.
     //
-    // Jede Aenderung an Suche, Sortierung oder Filter springt zurueck auf
-    // Seite 1: das Ergebnis ist ein anderes, "Seite 4" darin waere Zufall.
+    // Any change to search, sort or filter jumps back to
+    // page 1: the result set is different, "page 4" in it would be arbitrary.
     // ========================================
     applySDFilters() {
         const suchFeld = document.getElementById('sd-search-input');
@@ -319,11 +329,11 @@ class SDCardManager {
     }
 
     /**
-     * Holt eine Seite vom Server und zeichnet sie.
+     * Fetches a page from the server and renders it.
      *
-     * Ohne force_refresh — Blaettern und Suchen sollen NIE eine Verbindung
-     * zum Drucker aufmachen. Der Server beantwortet das aus seinem lokalen
-     * Dateispiegel; FTPS laeuft nur beim Aktualisieren-Knopf.
+     * Without force_refresh — paging and searching should NEVER open a connection
+     * to the printer. The server answers that from its local
+     * file mirror; FTPS runs only on the refresh button.
      */
     ladeSeite() {
         const a = this.sdAbfrage || (this.sdAbfrage = { page: 1, per_page: 25, sort: 'date' });
@@ -333,15 +343,23 @@ class SDCardManager {
         if (a.sort) p.set('sort', a.sort);
         if (a.search) p.set('search', a.search);
         if (a.only_new) p.set('only_new', 'true');
-        // Drucker aus: nur den Spiegel lesen. Ohne das versucht der Server
-        // bei leerem Cache eine FTPS-Verbindung und laeuft in Timeouts.
+        // Printer off: only read the mirror. Without this the server
+        // tries an FTPS connection on an empty cache and runs into timeouts.
         if (this.druckerAus()) p.set('cache_only', 'true');
 
-        // Laufende Abfrage merken: tippt man schnell, koennen Antworten in
-        // falscher Reihenfolge eintreffen. Nur die juengste zaehlt.
+        // Track the running request: type quickly and responses can
+        // arrive out of order. Only the latest one counts.
         const marke = (this._sdMarke = (this._sdMarke || 0) + 1);
 
-        return apiCall('/api/mqtt/sdcard?' + p.toString())
+        // The archive is a different source with the same shape — same
+        // paging, same search, same sorting, same pager bar. It used to have
+        // a fetch of its own that handed everything over as one page; that
+        // was fine at six files and stopped being fine as it grew.
+        const quelle = window.sdArchivAktiv
+            ? '/api/sd/archiv?' + p.toString()
+            : '/api/mqtt/sdcard?' + p.toString();
+
+        return apiCall(quelle)
             .then(r => r.json())
             .then(daten => {
                 if (marke !== this._sdMarke) return;
@@ -353,8 +371,8 @@ class SDCardManager {
     }
 
     /**
-     * Zeichnet eine Server-Antwort: Liste, Zaehler, Blaetterleiste.
-     * Eine Stelle fuer beide Betriebsarten (Bambu wie Klipper).
+     * Renders a server response: list, counter, pagination bar.
+     * One place for both modes (Bambu as well as Klipper).
      */
     zeigeSeite(daten) {
         const texts = window.texts || {};
@@ -367,10 +385,10 @@ class SDCardManager {
         };
         if (this.sdAbfrage) this.sdAbfrage.page = this.sdKopf.page;
 
-        // Was man gerade anklicken kann, steht in lastSDFiles — andere
-        // Module schlagen darin die geklickte Datei nach. Zusaetzlich
-        // merken wir jede je gesehene Datei (sdDateiFinden), damit ein
-        // Nachschlag auch nach dem Blaettern noch greift.
+        // What you can currently click sits in lastSDFiles — other
+        // modules look up the clicked file there. In addition
+        // we remember every file ever seen (sdDateiFinden), so a
+        // lookup still works even after paging.
         window.lastSDFiles = dateien;
         this._merkeDateien(dateien);
 
@@ -396,7 +414,7 @@ class SDCardManager {
         this.setzeKopfKnoepfe();
     }
 
-    /** Merkt jede gesehene Datei fuer Nachschlaege ueber Seitengrenzen. */
+    /** Remembers every file seen, for lookups across page boundaries. */
     _merkeDateien(dateien) {
         if (!window.sdGesehen) window.sdGesehen = new Map();
         (dateien || []).forEach(f => {
@@ -405,7 +423,7 @@ class SDCardManager {
         });
     }
 
-    /** Zaehler in der Werkzeugleiste: Treffer bei Suche/Filter, sonst gesamt. */
+    /** Counter in the toolbar: hits for search/filter, otherwise the total. */
     zaehlerSchreiben() {
         const el = document.getElementById('sd-file-count');
         if (!el) return;
@@ -419,12 +437,12 @@ class SDCardManager {
     }
 
     /**
-     * Blaetterleiste unter der Liste.
+     * Pagination bar below the list.
      *
-     * Zeigt hoechstens sieben Knoepfe: erste, letzte, die aktuelle mit je
-     * einem Nachbarn, dazwischen Auslassungspunkte. Bei einer einzigen
-     * Seite bleibt die Leiste unsichtbar — bei neunzehn Dateien soll da
-     * nichts stehen.
+     * Shows at most seven buttons: first, last, the current one each with
+     * one neighbor, with ellipsis dots in between. With just a single
+     * page, the bar stays invisible — with nineteen files there
+     * shouldn't be anything there.
      */
     zeichneBlaettern() {
         const texts = window.texts || {};
@@ -472,7 +490,7 @@ class SDCardManager {
             <div class="sd-seiten">${knoepfe}</div>`;
     }
 
-    /** Seitenwechsel — laedt nur nach, scrollt an den Listenanfang. */
+    /** Page change — just loads more, scrolls to the top of the list. */
     geheZuSeite(n) {
         if (!this.sdAbfrage) return;
         const k = this.sdKopf || { pages: 1 };
@@ -488,13 +506,13 @@ class SDCardManager {
     }
 
     /**
-     * Werkzeugleiste der Dateiliste. Lag zweimal wortgleich im Code (Bambu-
-     * und Klipper-Pfad) und war schon auseinandergelaufen — jetzt eine
-     * Stelle. Idempotent: ist sie da, passiert nichts.
+     * Toolbar for the file list. Used to sit twice, word-for-word, in the code (Bambu
+     * and Klipper paths) and had already drifted apart — now there's one
+     * place. Idempotent: if it's already there, nothing happens.
      *
-     * Suche steht vorn, weil man bei einer Handvoll Dateien sucht statt zu
-     * sortieren. Der Haken hiess frueher wie ein Eintrag der Sortierliste
-     * ("Neue zuerst"), filtert aber — daher "Nur neue".
+     * Search sits up front, because with a handful of files you search rather than
+     * sort. The checkbox used to be named like an entry in the sort list
+     * ("Newest first"), but it filters — hence "Only new".
      */
     baueWerkzeugleiste() {
         if (document.getElementById('sd-sort-options')) return;
@@ -521,9 +539,9 @@ class SDCardManager {
                 <span>${texts.sd_only_new || 'Nur neue'}</span>
             </label>
             <span class="sd-file-count" id="sd-file-count"></span>
-            <!-- Welche Spule gerade aktiv ist. Stand frueher als
-                 Auswahlfeld in JEDER Dateikarte, ueberall mit demselben
-                 Wert — hier steht es einmal, wo es hingehoert. -->
+            <!-- Which spool is active right now. It used to be a dropdown in
+                 EVERY file card, everywhere with the same value -- here it
+                 stands once, where it belongs. -->
             <button class="sd-aktive-spule" id="sd-aktive-spule" style="display:none;"
                     onclick="openSpoolmanFromSD()"></button>
         `;
@@ -534,17 +552,17 @@ class SDCardManager {
     }
 
     // ========================================
-    // createSDFileCardHTML — eine Zeile der Dateiliste
+    // createSDFileCardHTML — one row of the file list
     //
-    // Aufbau vom 21aug26. Vorher trug jede Datei ein Datenblatt aus elf
-    // Angaben in zwei Spalten, eine Spulen-Auswahl ueber die volle Breite
-    // und drei gleich grosse farbige Knoepfe — bei neun Dateien eine Wand.
-    // Jetzt: Vorschau, Name, die vier Angaben nach denen man sucht (Dauer,
-    // Gewicht, Filament, Datum), alles Weitere hinter "Details".
+    // Layout from 21aug26. Before, every file carried a data sheet of eleven
+    // fields in two columns, a spool picker spanning the full width,
+    // and three equally-sized colored buttons — a wall with nine files.
+    // Now: preview, name, the four facts you actually search by (duration,
+    // weight, filament, date), everything else behind "Details".
     //
     // opts.mode:
-    //   'full' (default) — Drucken, Planen, Loeschen
-    //   'schedule-pick'  — nur "Planen" (Datei fuer einen Plan auswaehlen)
+    //   'full' (default) — print, schedule, delete
+    //   'schedule-pick'  — only "schedule" (pick a file for a plan)
     // ========================================
     createSDFileCardHTML(file, opts) {
         const texts = window.texts || {};
@@ -560,21 +578,28 @@ class SDCardManager {
         const IC_GEWICHT = '<path d="M12 3v10M7 21h10M6 13h12l-2 8H8z"/>';
         const IC_DRUCKER = '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>';
 
-        // Korrupte Dateien (abgebrochener Upload, kein gueltiges ZIP) kann
-        // man nur loeschen.
+        // Corrupt files (aborted upload, not a valid ZIP) can
+        // only be deleted.
         const isCorrupt = file.corrupt === true;
-        const isPrintable = !isCorrupt && (file.name.endsWith('.3mf') || file.name.endsWith('.gcode'));
+        // A plain Studio or MakerWorld project carries no
+        // print job: the archive is missing every `Metadata/plate_N.gcode`,
+        // and that's exactly what the print command points at. The server checks this and sets
+        // `nicht_geschnitten` ONLY on a clear no — without a readable copy
+        // the field stays absent and everything behaves as before.
+        const ungeschnitten = file.nicht_geschnitten === true;
+        const isPrintable = !isCorrupt && !ungeschnitten
+            && (file.name.endsWith('.3mf') || file.name.endsWith('.gcode'));
         const printState = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
         const printActive = ['RUNNING', 'PAUSE', 'PREPARE'].includes(printState);
-        // Bei ausgeschaltetem Drucker bleibt die Liste lesbar, aber Drucken
-        // und Loeschen gehen nicht — beides fasst den Drucker an.
+        // With the printer off, the list stays readable, but printing
+        // and deleting don't work — both touch the printer.
         const druckerAus = window.lastKnownSwitchState === 'off';
         const printDisabled = (printActive || druckerAus) ? ' disabled aria-disabled="true"' : '';
         const deleteDisabled = druckerAus ? ' disabled aria-disabled="true"' : '';
         const meta = file.extended_meta || {};
         const mdata = file.metadata || {};
 
-        // --- Druckzeit: Bambu liefert Minuten, Klipper Sekunden ----------
+        // --- Print time: Bambu delivers minutes, Klipper seconds ----------
         const dauerText = () => {
             let min = null;
             if (meta.print_time_minutes) min = meta.print_time_minutes;
@@ -584,7 +609,7 @@ class SDCardManager {
                             : `${Math.floor(min / 60)} h ${min % 60} min`;
         };
 
-        // --- Die vier Angaben, nach denen man eine Datei sucht -----------
+        // --- The four facts you actually search a file by -----------
         const fakten = [];
         const dauer = dauerText();
         if (dauer) fakten.push(ic(IC_ZEIT) + e(dauer));
@@ -602,13 +627,13 @@ class SDCardManager {
             }
         }
         if (file.date) fakten.push(e(file.date));
-        // Spulen-Empfehlung. Sie kommt gesammelt nach (ein Aufruf fuer die
-        // ganze Liste statt einer je Zeile) und traegt hier nur ihren Platz.
+        // Spool recommendation. It arrives afterward, batched (one call for the
+        // whole list instead of one per row) — this just reserves its spot here.
         if (!file.is_multifilament && (file.filament_material || file.filament_type)) {
             fakten.push(`<span class="sd-spulwahl" data-datei="${e(file.name)}"></span>`);
         }
 
-        // --- Alles Weitere: da, nur zusammengeklappt ---------------------
+        // --- Everything else: present, just collapsed ---------------------
         const detail = (label, wert) => wert
             ? `<span>${e(label)} <b>${e(wert)}</b></span>` : '';
         const details = [
@@ -628,10 +653,15 @@ class SDCardManager {
             detail(texts.sd_detail_slicer || 'Slicer', file.slicer),
         ].filter(Boolean).join('');
 
-        // --- Marken: neu / schon gedruckt / korrupt ----------------------
+        // --- Badges: new / already printed / corrupt ----------------------
         const marken = [];
         if (isCorrupt) {
             marken.push(`<span class="sd-marke sd-marke--korrupt">${e(texts.corrupt_file || 'Korrupte Datei')}</span>`);
+        }
+        if (ungeschnitten) {
+            marken.push(`<span class="sd-marke sd-marke--ungeschnitten" title="${
+                e(texts.file_unsliced_hint || 'Diese Datei enthält keinen Druckauftrag. In Bambu Studio öffnen, schneiden und erneut senden.')
+            }">${e(texts.file_unsliced || 'Nicht geschnitten')}</span>`);
         } else if (!file.printed) {
             marken.push(`<span class="sd-marke sd-marke--neu">${e(texts.new_badge || 'Neu')}</span>`);
         }
@@ -639,10 +669,10 @@ class SDCardManager {
             marken.push(`<span class="sd-marke sd-marke--gedruckt">${ic(IC_DRUCKER)}` +
                 e((texts.times_printed || '{count}× gedruckt').replace('{count}', file.print_count)) + '</span>');
         }
-        // Woher die Datei kommt. Der Drucker hat zwei Speicher, und dieselbe
-        // Datei kann auf beiden liegen — beim Loeschen muss man wissen,
-        // welche gemeint ist. Der interne Speicher war bis 29aug26 gar nicht
-        // sichtbar, weil FTPS nur den Stick zeigt.
+        // Where the file comes from. The printer has two storage locations, and the same
+        // file can exist on both — when deleting you need to know
+        // which one is meant. The internal storage wasn't visible at all until 29aug26,
+        // because FTPS only shows the stick.
         if (file.speicher) {
             const intern = file.speicher === 'intern';
             marken.push(`<span class="sd-marke sd-marke--speicher">` +
@@ -650,21 +680,33 @@ class SDCardManager {
                          : (texts.storage_usb || 'USB-Stick')) + '</span>');
         }
 
-        // Spulen-Auswahl nur in der geoeffneten Zeile und nur mit Spoolman.
-        // Sie stand vorher in JEDER Karte ueber die volle Breite.
+        // Spool picker only in the expanded row, and only with Spoolman.
+        // It used to sit in EVERY card, spanning the full width.
+        // In the archive, the same card has different buttons: restore instead
+        // of archive, and the trash icon deletes for good.
+        const imArchiv = file.archiviert === true || file.location === 'archiv';
         const zeigeSpule = mode === 'full'
             && window.spoolmanManager && window.spoolmanManager.connected;
 
-        // --- Aktionen: Drucken traegt Farbe, der Rest sind Symbole -------
+        // --- Actions: printing carries color, the rest are icons -------
         let aktionen;
         if (mode === 'schedule-pick') {
+            // From the archive it takes one step more: fetch it back first,
+            // otherwise the plan points at a file the sync deliberately never
+            // carries onto the printer.
+            const planen = imArchiv
+                ? `schedulePrintFromArchive('${safeFilename}')`
+                : `schedulePrintFromScheduleManager('${safeFilename}', '${fileLocation}')`;
             aktionen = isPrintable ? `
-                <button class="sd-btn-haupt" onclick="schedulePrintFromScheduleManager('${safeFilename}', '${fileLocation}')">
+                <button class="sd-btn-haupt" onclick="${planen}"
+                        title="${e(imArchiv ? (texts.sched_archive_pick
+                                    || 'Aus dem Archiv holen und einplanen')
+                                  : (texts.schedule || 'Planen'))}">
                     ${ic(IC_ZEIT)}${e(texts.schedule || 'Planen')}</button>` : '';
         } else {
             aktionen = `
                 ${isPrintable ? `
-                        <button class="sd-btn-haupt sd-print-action"${printDisabled} onclick="startPrintFromSD('${safeFilename}', '${fileLocation}', this)"
+                        <button class="sd-btn-haupt sd-print-action"${printDisabled} onclick="${imArchiv ? `sdArchivHolenUndDrucken('${safeFilename}', this)` : `startPrintFromSD('${safeFilename}', '${fileLocation}', this)`}"
                             title="${e(druckerAus ? (texts.sd_printer_off || 'Drucker ist aus')
                                 : printActive ? (texts.print_blocked_active || 'Bei aktivem Druck kein Start möglich')
                                 : (texts.print_now || texts.print || 'Drucken'))}">
@@ -672,8 +714,19 @@ class SDCardManager {
                     <button class="sd-iknopf" onclick="schedulePrintFromSD('${safeFilename}', '${fileLocation}')"
                             title="${e(texts.schedule || 'Planen')}">${ic(IC_ZEIT)}</button>
                 ` : ''}
-                <button class="sd-iknopf sd-iknopf--rot"${deleteDisabled} onclick="deleteFileFromSD('${safeFilename}', '${fileLocation}')"
-                        title="${e(druckerAus ? (texts.sd_printer_off || 'Drucker ist aus') : (texts.delete_file || 'Löschen'))}">
+                ${imArchiv ? `
+                    <button class="sd-iknopf" onclick="sdArchivZurueckholen('${safeFilename}')"
+                            title="${e(texts.sd_archive_restore || 'Zurück ins Live-System')}">
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+                    </button>` : `
+                    <button class="sd-iknopf" onclick="sdArchivAblegen('${safeFilename}', '${fileLocation}')"
+                            title="${e(texts.sd_archive_put || 'Ins Archiv legen')}">
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v9h14v-9M10 14h4"/></svg>
+                    </button>`}
+                <button class="sd-iknopf sd-iknopf--rot"${imArchiv ? '' : deleteDisabled} onclick="${imArchiv ? `sdArchivLoeschen('${safeFilename}')` : `deleteFileFromSD('${safeFilename}', '${fileLocation}')`}"
+                        title="${e(imArchiv ? (texts.sd_archive_delete || 'Endgültig löschen')
+                                  : druckerAus ? (texts.sd_printer_off || 'Drucker ist aus')
+                                  : (texts.delete_file || 'Löschen'))}">
                     <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>
                 </button>`;
         }
@@ -719,9 +772,9 @@ class SDCardManager {
     // displaySDFiles — render file cards into container
     // ========================================
     /**
-     * Aktive Spule in der Werkzeugleiste zeigen. Quelle ist derselbe
-     * Zustand wie in der Material-Zone (spoolmanManager); ein Klick fuehrt
-     * dorthin, damit man sie wechseln kann.
+     * Show the active spool in the toolbar. The source is the same
+     * state as in the material zone (spoolmanManager); a click leads
+     * there, so you can switch it.
      */
     zeigeAktiveSpule() {
         const chip = document.getElementById('sd-aktive-spule');
@@ -750,19 +803,13 @@ class SDCardManager {
     }
 
     /**
-     * Abgleich im Kopf anzeigen: duenner Faden unter der Kopfzeile, und der
-     * Aktualisieren-Knopf wird zur Anzeige. Verdeckt nichts und schiebt
-     * nichts — die Liste steht still.
+     * Show sync — in the refresh button, nowhere else.
+     *
+     * Until 02sep26 a two-pixel-thin thread also ran alongside, under the
+     * header. Two indicators for the same thing: the thread was too quiet
+     * to carry it alone, and next to the button it was simply redundant.
      */
     _syncKopfAn() {
-        const kopf = document.querySelector('#sdCardModal .sd-modal-header');
-        if (kopf && !document.getElementById('sd-sync-faden')) {
-            const faden = document.createElement('span');
-            faden.id = 'sd-sync-faden';
-            faden.className = 'sd-sync-faden';
-            faden.innerHTML = '<i></i>';
-            kopf.appendChild(faden);
-        }
         const knopf = document.getElementById('sd-refresh-btn');
         if (knopf) {
             knopf.classList.add('sd-refresh--laeuft');
@@ -770,11 +817,25 @@ class SDCardManager {
         }
     }
 
-    /** Stand setzen — Faden, Knopffuellung und Restzeit in einem. */
+    /**
+     * The brief load from the cache — also in the button.
+     *
+     * A block used to sit above the list for this. It pushed the whole
+     * content down, even though the list was usually already there: it said
+     * nothing you couldn't already see, and cost space and calm for it.
+     */
+    _kopfLaedt(texts) {
+        const knopf = document.getElementById('sd-refresh-btn');
+        if (!knopf) return;
+        knopf.classList.add('sd-refresh--laeuft');
+        knopf.disabled = true;
+        const text = knopf.querySelector('span:not(.sd-refresh-fuell)');
+        if (text) text.textContent = (texts && texts.sd_loading_short) || 'Lädt…';
+    }
+
+    /** Set progress — button fill and remaining time in one. */
     _syncStand(prozent, texts) {
         const p = Math.max(0, Math.min(100, prozent));
-        const faden = document.querySelector('#sd-sync-faden > i');
-        if (faden) faden.style.width = p + '%';
         const balken = document.getElementById('refresh-progress-bar');
         if (balken) balken.style.width = p + '%';
         const knopf = document.getElementById('sd-refresh-btn');
@@ -791,10 +852,8 @@ class SDCardManager {
         }
     }
 
-    /** Zurueck in den Ruhezustand. */
+    /** Back to the idle state. */
     _syncKopfAus() {
-        const faden = document.getElementById('sd-sync-faden');
-        if (faden) faden.remove();
         const knopf = document.getElementById('sd-refresh-btn');
         if (knopf) {
             knopf.classList.remove('sd-refresh--laeuft');
@@ -808,7 +867,7 @@ class SDCardManager {
 
     displaySDFiles(files) {
         const container = document.getElementById('sd-files-list');
-        // EIN Kasten fuer die ganze Liste; die Zeilen trennt eine Linie.
+        // ONE box for the whole list; a line separates the rows.
         container.className = 'sd-liste';
         container.innerHTML = '';
         this.zeigeAktiveSpule();
@@ -819,12 +878,12 @@ class SDCardManager {
     }
 
     /**
-     * Traegt je Zeile nach, welche Spule zur Datei passt.
+     * Adds, per row, which spool matches the file.
      *
-     * EIN Aufruf fuer die ganze Liste — bei vierzehn Dateien waeren vierzehn
-     * Anfragen fuer einen Bildschirm. Der Abgleich selbst laeuft am Server
-     * (find_matching_spools), damit Liste, Planen und Sofortdruck dieselbe
-     * Meinung haben.
+     * ONE call for the whole list — with fourteen files that would be fourteen
+     * requests for a single screen. The matching itself runs on the server
+     * (find_matching_spools), so the list, scheduling and instant print share the
+     * same opinion.
      */
     _spulenEmpfehlungen(files) {
         if (!(window.spoolmanManager && window.spoolmanManager.connected)) return;
@@ -849,11 +908,11 @@ class SDCardManager {
                 document.querySelectorAll('.sd-spulwahl').forEach(el => {
                     const treffer = karte[el.dataset.datei];
                     if (!treffer) { el.remove(); return; }
-                    // Nur sagen, WELCHE Spule passt. „Keine passende Spule"
-                    // gehoert hier nicht hin: in der Uebersicht steht man vor
-                    // vierzehn Dateien, von denen man dreizehn gar nicht
-                    // drucken will — die Warnung kommt beim Planen und beim
-                    // Starten, wo sie etwas aendert.
+                    // Only say WHICH spool matches. "No matching spool"
+                    // doesn't belong here: in the overview you're looking at
+                    // fourteen files, of which you don't even want to print
+                    // thirteen — that warning belongs at scheduling and at
+                    // starting, where it actually changes something.
                     if (!treffer.spool_id) { el.remove(); return; }
                     el.textContent = treffer.count > 1
                         ? (texts.spool_match_row_many || '{n} passende Spulen')
@@ -863,7 +922,7 @@ class SDCardManager {
                     el.title = treffer.display || '';
                 });
             })
-            .catch(() => { /* ohne Spoolman bleibt die Zeile wie sie ist */ });
+            .catch(() => { /* without Spoolman the row stays as it is */ });
     }
 
     // ========================================
@@ -876,10 +935,10 @@ class SDCardManager {
             const config = await response.json();
             this._printDefaults = config.print_defaults || {};
 
-            // Klipper-Direkt: Timelapse-Default = AKTUELLER Moonraker-Zustand
-            // (das Plugin hat nur einen globalen Schalter — der Haken hier
-            // ÜBERSCHREIBT ihn beim Start; ohne diesen Abgleich kippte jeder
-            // Start mit leerem Haken das Mainsail-Setting auf aus).
+            // Klipper-Direct: timelapse default = CURRENT Moonraker state
+            // (the plugin only has one global switch — the checkbox here
+            // OVERWRITES it on startup; without this sync, every
+            // start with an unchecked box flipped the Mainsail setting to off).
             this._timelapseDefault = null;
             if (window.isKlipperMode && window.isKlipperMode()) {
                 try {
@@ -901,13 +960,13 @@ class SDCardManager {
     // ========================================
     handleSDRefresh() {
         const texts = window.texts || {};
-        // Prüfe ob Auto-Sync läuft
+        // Check whether auto-sync is running
         if (this.sdSyncInProgress) {
             skToast(texts.toast_wait_sync, 'info');
             return;
         }
 
-        // Sonst normaler Refresh
+        // Otherwise a normal refresh
         this.showSDFiles(true);
     }
 
@@ -919,7 +978,7 @@ class SDCardManager {
         const file = input.files[0];
         if (!file) return;
 
-        // Input zurücksetzen für erneute Verwendung
+        // Reset input for reuse
         input.value = '';
 
         const uploadStatus = document.createElement('div');
@@ -989,7 +1048,7 @@ class SDCardManager {
         }
         socket.on('upload_progress', onUploadProgress);
 
-        // Sanitized filename für Vergleich mit Backend (secure_filename ersetzt Leerzeichen durch _)
+        // Sanitized filename for comparison with backend (secure_filename replaces spaces with _)
         let sanitizedFilename = file.name;
 
         const formData = new FormData();
@@ -1002,7 +1061,7 @@ class SDCardManager {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Backend gibt den sanitized Dateinamen zurück
+                // Backend returns the sanitized filename
                 if (data.filename) sanitizedFilename = data.filename;
             }
         });
@@ -1015,24 +1074,24 @@ class SDCardManager {
         const texts = window.texts || {};
         const self = this;
 
-        // Klipper: schlanker Delete via unified Files-API
+        // Klipper: lean delete via unified Files-API
         if (window.isKlipperMode && window.isKlipperMode()) {
             const doDelete = () => window.printerAdapter.deleteFile(filename).then(r => {
                 if (r.ok) {
                     skToast((texts.toast_file_deleted || 'Datei gelöscht') + ': ' + filename, 'success');
-                    self.showSDFiles(true);  // Liste refreshen
+                    self.showSDFiles(true);  // Refresh the list
                 } else {
                     skToast(r.error || texts.toast_error_deleting || 'Fehler beim Löschen', 'error');
                 }
             });
             const msg = (texts.confirm_delete_file || 'Datei wirklich löschen') + '?\n' + filename;
-            if (window.showConfirmDialog) window.showConfirmDialog(msg, doDelete);
+            if (window.showConfirmDialog) window.showConfirmDialog({ text: msg, knopf: texts.confirm_ok, gefaehrlich: true }, doDelete);
             else if (window.skConfirm) window.skConfirm(msg, { danger: true })
                 .then(ja => { if (ja) doDelete(); });
             return;
         }
 
-        // Erst prüfen ob es geplante Drucke gibt
+        // First check whether there are scheduled prints
         apiCall(`/api/check_scheduled_for_file/${encodeURIComponent(filename)}`)
             .then(response => response.json())
             .then(checkData => {
@@ -1050,13 +1109,13 @@ class SDCardManager {
 
                 confirmMessage += `\n\n${texts.confirm_cannot_undo}`;
 
-                showConfirmDialog(confirmMessage, function() {
+                showConfirmDialog({ text: confirmMessage, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
                     self.doDeleteFile(filename, location, checkData);
                 });
             })
             .catch(error => {
                 console.error(texts.console_error_checking + ':', error);
-                showConfirmDialog(texts.confirm_delete_file_warning.replace('{filename}', filename), function() {
+                showConfirmDialog({ text: texts.confirm_delete_file_warning.replace('{filename}', filename), knopf: texts.confirm_ok, gefaehrlich: true }, function() {
                     self.doDeleteFile(filename, location, { count: 0 });
                 });
             });
@@ -1069,13 +1128,13 @@ class SDCardManager {
         const texts = window.texts || {};
         const self = this;
 
-                // Meldungen laufen ueber das Toast-System oben rechts wie
-                // ueberall sonst. Vorher stand hier ein eigener Kasten in der
-                // Bildschirmmitte — mitten im Dialog, mit fest deutschem Text.
+                // Messages go through the toast system top-right, like
+                // everywhere else. There used to be a dedicated box here in the
+                // middle of the screen — right in the dialog, with hardcoded German text.
                 skToast((texts.sd_deleting_file || 'Deleting {filename}…')
                     .replace('{filename}', filename), 'info');
 
-                // Wenn es geplante Drucke gibt, diese zuerst löschen
+                // If there are scheduled prints, delete those first
                 if (checkData.count > 0) {
                     apiCall('/api/delete_scheduled_for_file', {
                         method: 'DELETE',
@@ -1086,7 +1145,7 @@ class SDCardManager {
                     .then(deleteScheduledData => {
                         if (deleteScheduledData.success) {
                             console.log(`✅ ${deleteScheduledData.deleted} ${texts.scheduled_prints} gelöscht`);
-                            // Aktualisiere die Listen falls sichtbar
+                            // Refresh the lists if visible
                             if (typeof loadScheduledPrints === 'function') {
                                 loadScheduledPrints();
                             }
@@ -1095,11 +1154,11 @@ class SDCardManager {
                             }
                         }
 
-                        // Jetzt die Datei löschen
+                        // Now delete the file
                         deleteSdFile();
                     });
                 } else {
-                    // Keine geplanten Drucke, direkt löschen
+                    // No scheduled prints, delete directly
                     deleteSdFile();
                 }
 
@@ -1122,11 +1181,11 @@ class SDCardManager {
                                     .replace('{count}', checkData.count);
                             }
                             skToast(meldung, 'success');
-                            // MIT Force: dann sitzt die Ladeanzeige im
-                            // Aktualisieren-Knopf, genau wie beim Aktualisieren
-                            // von Hand. Ohne Force erschien stattdessen der
-                            // Spinner oben im Dialog — und die geloeschte Datei
-                            // haette aus dem Zwischenspeicher weiter dringestanden.
+                            // WITH force: the loading indicator then sits in
+                            // the refresh button, exactly like a manual
+                            // refresh. Without force, the spinner appeared instead
+                            // at the top of the dialog — and the deleted file
+                            // would have kept showing up from the cache.
                             self.showSDFiles(true);
                         } else {
                             skToast(data.error || texts.toast_error_deleting
@@ -1158,7 +1217,7 @@ class SDCardManager {
                     window.skToast(message);
 
                     if (data.completeness_percent < 80) {
-                        // Bei schlechter Qualität automatisch Full Status anfordern
+                        // On poor quality, automatically request a full status
                         requestFullStatus();
                     }
                 }
@@ -1169,7 +1228,7 @@ class SDCardManager {
     // closeSDModal
     // ========================================
     closeSDModal() {
-        // Upload-Status entfernen beim Schließen
+        // Remove upload status on close
         const uploadStatus = document.getElementById('upload-status');
         if (uploadStatus) {
             uploadStatus.remove();
@@ -1185,7 +1244,7 @@ class SDCardManager {
         // Prevent double-triggering
         if (nameEl.querySelector('.sd-rename-input')) return;
 
-        // Extension erkennen (compound extensions zuerst)
+        // Detect extension (compound extensions first)
         let ext = '';
         const lowerName = filename.toLowerCase();
         if (lowerName.endsWith('.gcode.3mf')) ext = filename.slice(-10);
@@ -1196,7 +1255,7 @@ class SDCardManager {
         const originalHTML = nameEl.innerHTML;
         const originalTitle = nameEl.title;
 
-        // Inline-Edit erstellen
+        // Create inline edit
         nameEl.innerHTML = '';
         nameEl.classList.add('sd-file-name--editing');
 
@@ -1223,7 +1282,7 @@ class SDCardManager {
 
         const self = this;
 
-        // Enter → speichern
+        // Enter → save
         input.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -1234,7 +1293,7 @@ class SDCardManager {
             }
         });
 
-        // Blur → speichern (mit Delay für Enter-Race)
+        // Blur → save (with delay for Enter race)
         input.addEventListener('blur', function() {
             setTimeout(() => {
                 if (nameEl.classList.contains('sd-file-name--editing')) {
@@ -1253,7 +1312,7 @@ class SDCardManager {
     _commitRename(nameEl, input, ext, oldFilename, originalHTML, originalTitle) {
         const newBaseName = input.value.trim();
 
-        // Leer oder unverändert → abbrechen
+        // Empty or unchanged → cancel
         if (!newBaseName || newBaseName + ext === oldFilename) {
             this._cancelRename(nameEl, originalHTML, originalTitle);
             return;
@@ -1261,7 +1320,7 @@ class SDCardManager {
 
         const newFilename = newBaseName + ext;
 
-        // Ungültige Zeichen prüfen
+        // Check for invalid characters
         if (/[\\\/\:\*\?\"\<\>\|]/.test(newBaseName)) {
             input.classList.add('sd-rename-input--error');
             setTimeout(() => input.classList.remove('sd-rename-input--error'), 1000);
@@ -1269,7 +1328,7 @@ class SDCardManager {
             return;
         }
 
-        // Loading-State
+        // Loading state
         nameEl.classList.remove('sd-file-name--editing');
         nameEl.classList.add('sd-file-name--renaming');
         nameEl.innerHTML = `<span class="sd-rename-loading">${newFilename}</span>`;
@@ -1295,21 +1354,21 @@ class SDCardManager {
             nameEl.classList.remove('sd-file-name--renaming');
 
             if (data.success) {
-                // Name-Element updaten
+                // Update name element
                 const safeNew = newFilename.replace(/'/g, "\\'");
                 nameEl.textContent = newFilename;
                 nameEl.title = newFilename;
                 nameEl.setAttribute('ondblclick', `startRenameFile(this, '${safeNew}')`);
 
-                // Card-Attribute updaten
+                // Update card attributes
                 const card = nameEl.closest('.sd-zeile') || nameEl.closest('.sd-file-card');
                 if (card) {
                     card.setAttribute('data-filename', newFilename);
                     const location = 'root';
 
-                    // Aktionen umschreiben. Seit dem Umbau 21aug26 traegt
-                    // Drucken .sd-btn-haupt und der Rest .sd-iknopf — nach
-                    // dem alten onclick zu suchen trifft beide Bauformen.
+                    // Rewrite actions. Since the 21aug26 rebuild,
+                    // print carries .sd-btn-haupt and the rest .sd-iknopf — searching
+                    // for the old onclick still matches both forms.
                     const knopf = (teil) => card.querySelector(`button[onclick^="${teil}"]`);
                     const printBtn = knopf('startPrintFromSD');
                     if (printBtn) {
@@ -1326,13 +1385,13 @@ class SDCardManager {
                         deleteBtn.setAttribute('onclick', `deleteFileFromSD('${safeNew}', '${location}')`);
                     }
 
-                    // Thumbnail updaten
+                    // Update thumbnail
                     const thumbImg = card.querySelector('img.sd-thumb');
                     if (thumbImg) {
                         thumbImg.src = `/api/sd_thumbnail/${encodeURIComponent(newFilename)}`;
                     }
 
-                    // data-file Attribute updaten
+                    // Update data-file attributes
                     card.querySelectorAll('[data-file]').forEach(el => {
                         if (el.getAttribute('data-file') === oldFilename) {
                             el.setAttribute('data-file', newFilename);
@@ -1403,15 +1462,15 @@ class SDCardManager {
     }
 
     // ========================================
-    // Auto-Close für Print-Options Dropdowns
+    // Auto-close for print-options dropdowns
     // ========================================
     _initAutoCloseDropdowns() {
         document.addEventListener('click', function(e) {
-            // Finde alle offenen Details
+            // Find all open details
             const openDetails = document.querySelectorAll('details[open]');
 
             openDetails.forEach(detail => {
-                // Wenn der Klick NICHT innerhalb des Details war, schließe es
+                // If the click was NOT inside the details element, close it
                 if (!detail.contains(e.target)) {
                     detail.removeAttribute('open');
                 }
@@ -1431,7 +1490,7 @@ class SDCardManager {
     }
 
     // ========================================
-    // Klipper-File-Browser (schlanke Variante)
+    // Klipper file browser (lean variant)
     // ========================================
     _showKlipperFiles() {
         document.getElementById('sdCardModal').style.display = 'block';
@@ -1444,7 +1503,7 @@ class SDCardManager {
         if (wrapper) wrapper.style.display = 'none';
         if (container) container.innerHTML = '';
 
-        // Spoolman-Spulen mit-cachen — derselbe Code wie der Bambu-Pfad
+        // Cache Spoolman spools too — same code as the Bambu path
         if (window.spoolmanManager && window.spoolmanManager.connected) {
             window.spoolmanSpoolsHtml = '';
             const mainSelector = document.getElementById('spool-selector');
@@ -1459,10 +1518,10 @@ class SDCardManager {
 
         const texts = window.texts || {};
 
-        // Backend liefert Klipper-Files im Bambu-kompatiblen Format
+        // Backend delivers Klipper files in a Bambu-compatible format
         // (`name`, `size`, `metadata`, `extended_meta`, `weight`, `slicer`,
-        // `sort_timestamp`, ...). → wir nutzen den gleichen displaySDFiles-
-        // Pfad UND die gleiche Sortier-Toolbar wie Bambu.
+        // `sort_timestamp`, ...). → we use the same displaySDFiles
+        // path AND the same sort toolbar as Bambu.
         if (!this.sdAbfrage) this.sdAbfrage = { page: 1, per_page: 25, sort: 'date' };
         this.sdAbfrage.page = 1;
         const _abf = () => ({
@@ -1485,20 +1544,20 @@ class SDCardManager {
 
             this.baueWerkzeugleiste();
 
-            // Der Adapter liefert denselben Kopf (total/page/pages) wie
-            // der Bambu-Server — gleicher Zeichenweg, gleiche Leiste.
+            // The adapter delivers the same header (total/page/pages) as
+            // the Bambu server — same render path, same pagination bar.
             this.zeigeSeite(r);
-            // Print-Option-Defaults laden (Timelapse = aktueller Moonraker-
-            // Zustand). Der Bambu-Pfad macht das in loadSDFiles().finally —
-            // dieser Klipper-Pfad hat das nie getan → Timelapse-Haken war
-            // im Direct-Modus IMMER leer (die eigentliche Wurzel des Bugs).
+            // Load print-option defaults (timelapse = current Moonraker
+            // state). The Bambu path does this in loadSDFiles().finally —
+            // this Klipper path never did → the timelapse checkbox was
+            // ALWAYS unchecked in direct mode (the actual root of the bug).
             this.loadPrintDefaults();
 
-            // Zwei-Schritt wie die History-Ansicht: sofort Cache rendern (oben),
-            // dann History im Hintergrund frisch ziehen und die neu/gedruckt-
-            // Badges aktualisieren — ohne Loading/Neu-Aufbau. Löst: gerade
-            // gedruckte Datei stand noch als "neu" drin, bis man erst die
-            // History-Ansicht geöffnet hatte.
+            // Two-step, like the history view: render the cache immediately (above),
+            // then pull fresh history in the background and update the new/printed
+            // badges — without a loading state or rebuild. Fixes: a file just
+            // printed still showed as "new" until you'd first opened the
+            // history view.
             window.printerAdapter.listFiles({ ..._abf(), fresh: true }).then(r2 => {
                 if (r2 && r2.ok && Array.isArray(r2.files)) {
                     this.zeigeSeite(r2);
@@ -1508,19 +1567,19 @@ class SDCardManager {
     }
 
     // _displayKlipperFiles / _enrichKlipperCards / _enrichOneKlipperCard
-    // sind ENTFERNT — Klipper laeuft jetzt ueber den gleichen Bambu-
-    // Render-Pfad (applySDFilters → displaySDFiles → createSDFileCardHTML)
-    // mit Metadata, die der Klipper-Files-Sync schon in die Files-Liste
-    // gebacken hat. Die alten Funktionen feuerten pro Card einen
-    // /api/printer/files/metadata-Call, was bei offline Host 16 mal
-    // "metadata lookup failed" im Log produziert hat.
+    // are REMOVED — Klipper now runs through the same Bambu
+    // render path (applySDFilters → displaySDFiles → createSDFileCardHTML)
+    // with metadata that the Klipper files sync has already baked
+    // into the file list. The old functions fired an
+    // /api/printer/files/metadata call per card, which produced 16
+    // "metadata lookup failed" lines in the log with the host offline.
 }
 
-// Klipper-spezifische Helper (Print-Start ohne AMS/Plate-Wizard,
-// Delete via unified Files-API). Bambu-Aequivalente sind
-// startPrintFromSD/deleteFileFromSD oben in der Klasse.
-// Bestätigung über das gestylte In-App-Modal (showConfirmDialog) statt nativem
-// confirm(); Fallback auf confirm() falls das Modul mal nicht geladen ist.
+// Klipper-specific helpers (print start without AMS/plate wizard,
+// delete via unified Files-API). Bambu equivalents are
+// startPrintFromSD/deleteFileFromSD above in the class.
+// Confirmation via the styled in-app modal (showConfirmDialog) instead of the native
+// confirm(); falls back to confirm() if that module isn't loaded.
 function _skConfirm(msg, onYes) {
     if (window.showConfirmDialog) window.showConfirmDialog(msg, onYes);
     else if (window.skConfirm) window.skConfirm(msg).then(ja => { if (ja) onYes(); });
@@ -1543,7 +1602,7 @@ window.klipperFileDelete = function (path) {
         const r = await window.printerAdapter.deleteFile(path);
         if (r.ok) {
             skToast((txt.toast_file_deleted || 'Datei gelöscht') + ': ' + path, 'success');
-            // Liste neu laden
+            // Reload the list
             if (window.sdCardManager) window.sdCardManager.showSDFiles(true);
         } else {
             skToast(r.error || txt.toast_error_deleting || 'Fehler beim Löschen', 'error');
@@ -1555,6 +1614,161 @@ window.klipperFileDelete = function (path) {
 // Create singleton instance
 // ========================================
 window.sdCardManager = new SDCardManager();
+
+// ========================================
+// Archive — files that stay here, but not on the printer
+// ========================================
+// The toggle above swaps the source of the list, nothing else: the
+// cards are the same, only the buttons change (see imArchiv).
+
+window.sdArchivAktiv = false;
+
+/** Label of the header button — on open and after every toggle. */
+window.sdArchivKnopfSetzen = function() {
+    const texts = window.texts || {};
+    const knopf = document.getElementById('sd-archiv-schalter');
+    if (!knopf) return;
+    const an = window.sdArchivAktiv === true;
+    knopf.classList.toggle('sd-header-btn--an', an);
+    knopf.title = texts.sd_archive_hint || '';
+    const label = document.getElementById('sd-archiv-schalter-text');
+    if (label) label.textContent = an
+        ? (texts.sd_archive_live || 'Live')
+        : (texts.sd_archive || 'Archiv');
+};
+
+window.sdArchivUmschalten = function() {
+    window.sdArchivAktiv = !window.sdArchivAktiv;
+    window.sdArchivKnopfSetzen();
+    if (window.sdArchivAktiv) window.sdArchivLaden();
+    else window.sdCardManager.showSDFiles();
+};
+
+window.sdArchivLaden = function() {
+    // Back to page one: what stood on page 3 of the live list says nothing
+    // about the archive.
+    const verwalter = window.sdCardManager;
+    verwalter.sdAbfrage = verwalter.sdAbfrage || { per_page: 25, sort: 'date' };
+    verwalter.sdAbfrage.page = 1;
+    return verwalter.ladeSeite();
+};
+
+/**
+ * Take the affected row out of the list, instead of reloading everything.
+ *
+ * Reloading the list triggers a sync with the printer. Anyone
+ * archiving several files in a row would trigger a sync per
+ * click — and that would promptly bring the just-archived file back, because
+ * it was still sitting on the printer (02sep26, 22 files doubled up). On top of that,
+ * the UI lagged behind every click.
+ *
+ * The row is gone anyway as soon as the server says "success" — so we
+ * take it out immediately and leave the printer alone.
+ */
+function sdZeileEntfernen(name) {
+    const liste = document.getElementById('sd-files-list');
+    if (!liste) return;
+    const zeile = liste.querySelector(`.sd-zeile[data-filename="${CSS.escape(name)}"]`);
+    if (zeile) {
+        const traeger = zeile.closest('.sd-file-item') || zeile;
+        traeger.remove();
+    }
+    const kopf = window.sdCardManager.sdKopf;
+    if (kopf && typeof kopf.total === 'number' && kopf.total > 0) {
+        kopf.total -= 1;
+        window.sdCardManager.zaehlerSchreiben();
+    }
+    // Also from the remembered list, so a lookup no longer
+    // finds the file where it no longer exists.
+    if (Array.isArray(window.lastSDFiles)) {
+        window.lastSDFiles = window.lastSDFiles.filter(f => f && f.name !== name);
+    }
+}
+
+function sdArchivRuf(pfad, name, erfolgstext) {
+    const texts = window.texts || {};
+    return apiCall(pfad, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ filename: name })
+    })
+        .then(r => r.json())
+        .then(daten => {
+            if (!daten || !daten.success) {
+                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                return false;
+            }
+            skToast(erfolgstext, 'success');
+            sdZeileEntfernen(name);
+            return true;
+        })
+        .catch(() => {
+            skToast(texts.connection_failed || 'Verbindungsfehler', 'error');
+            return false;
+        });
+}
+
+window.sdArchivAblegen = function(name, ort) {
+    const texts = window.texts || {};
+    return apiCall('/api/sd/archiv/ablegen', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ filename: name, location: ort || 'root' })
+    })
+        .then(r => r.json())
+        .then(daten => {
+            if (!daten || !daten.success) {
+                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                return;
+            }
+            // The printer loses the file on the next sync — even
+            // if it's currently off. That's worth saying, otherwise someone
+            // will wonder why it's still sitting there.
+            skToast(texts.sd_archive_done || 'Ins Archiv gelegt — verschwindet beim nächsten Abgleich vom Drucker', 'success');
+            sdZeileEntfernen(name);
+        })
+        .catch(() => skToast(texts.connection_failed || 'Verbindungsfehler', 'error'));
+};
+
+window.sdArchivZurueckholen = function(name) {
+    const texts = window.texts || {};
+    return sdArchivRuf('/api/sd/archiv/zurueckholen', name,
+        texts.sd_archive_restored || 'Zurückgeholt — wandert beim nächsten Abgleich auf den Drucker');
+};
+
+window.sdArchivLoeschen = function(name) {
+    const texts = window.texts || {};
+    const frage = (texts.sd_archive_delete_confirm
+        || 'Endgültig löschen? Aus dem Archiv gibt es kein Zurück.');
+    if (!confirm(frage)) return;
+    return sdArchivRuf('/api/sd/archiv/loeschen', name,
+        texts.file_deleted_ok || 'Datei gelöscht');
+};
+
+/** Print from the archive: restore, upload, start. */
+window.sdArchivHolenUndDrucken = async function(name, knopf) {
+    const texts = window.texts || {};
+    if (knopf) knopf.disabled = true;
+    try {
+        const antwort = await apiCall('/api/sd/archiv/zurueckholen', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ filename: name })
+        });
+        const daten = await antwort.json();
+        if (!daten || !daten.success) {
+            skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+            return;
+        }
+        // Back to the live view, then the normal path — that loads the
+        // file onto the printer itself if needed. `sdArchivUmschalten` flips
+        // the state, so it's called here exactly once.
+        if (window.sdArchivAktiv) window.sdArchivUmschalten();
+        startPrintFromSD(name, 'root', knopf);
+    } finally {
+        if (knopf) knopf.disabled = false;
+    }
+};
 
 // ========================================
 // Backwards compatibility — global function wrappers
@@ -1575,9 +1789,9 @@ window.startRenameFile = function(nameEl, filename) { window.sdCardManager.start
 window.sortSDFiles = function() { window.sdCardManager.applySDFilters(); };
 window.filterSDFiles = function() { window.sdCardManager.applySDFilters(); };
 
-// Suche entprellt: jeder Tastendruck fragt sonst den Server. 300 ms sind
-// kurz genug, dass es sofort wirkt, und lang genug, dass ein getipptes
-// Wort eine Anfrage ergibt statt sieben.
+// Search is debounced: otherwise every keystroke would hit the server. 300 ms is
+// short enough to feel instant, and long enough that a typed
+// word results in one request instead of seven.
 let _sdSuchUhr = null;
 window.searchSDFiles = function() {
     clearTimeout(_sdSuchUhr);
@@ -1590,18 +1804,18 @@ window.clearSDSearch = function() {
     window.sdCardManager.applySDFilters();
 };
 
-// Seitenwechsel aus der Blaetterleiste.
+// Page change from the pagination bar.
 window.sdSeiteWechseln = function(n) { window.sdCardManager.geheZuSeite(n); };
 
 /**
- * Datei nach Name (oder Pfad) nachschlagen.
+ * Look up a file by name (or path).
  *
- * Seit die Liste seitenweise kommt, steht in lastSDFiles nur noch die
- * sichtbare Seite. Andere Module (Druckvorbereitung, Planer, Druckstart)
- * schlagen darin die angeklickte Datei nach — das trifft zwar immer die
- * aktuelle Seite, aber nach einem Seitenwechsel waere ein Nachschlag auf
- * eine vorher gesehene Datei sonst leer. Darum zusaetzlich der Vorrat
- * aller bisher geladenen Seiten.
+ * Since the list is paginated, lastSDFiles only holds the
+ * visible page. Other modules (print preparation, scheduler, print start)
+ * look up the clicked file there — that always hits the
+ * current page, but after a page change, a lookup for
+ * a previously seen file would otherwise come up empty. Hence the additional stock
+ * of all pages loaded so far.
  */
 window.sdDateiFinden = function(name) {
     if (!name) return null;
@@ -1615,17 +1829,17 @@ window.sdDateiFinden = function(name) {
 window.createSDFileCardHTML = function(file, opts) { return window.sdCardManager.createSDFileCardHTML(file, opts); };
 
 /**
- * Spulenwahl direkt aus der Dateiliste. Vorher schloss der Chip die Liste
- * und sprang zur Material-Zone — man landete auf der Hauptseite und musste
- * sich zurueckklicken. Die Wahl gehoert dorthin, wo man gerade ist.
+ * Spool picker directly from the file list. The chip used to close the list
+ * and jump to the material zone — you'd land on the main page and have
+ * to click back. The picker belongs where you already are.
  */
 window.openSpoolmanFromSD = async function() {
     const texts = window.texts || {};
     const sm = window.spoolmanManager;
     if (!sm || !sm.connected) return;
 
-    // Frische Liste holen, falls der Cache leer ist (Dialog vor dem ersten
-    // Laden der Material-Zone geoeffnet).
+    // Fetch a fresh list if the cache is empty (dialog opened before the
+    // material zone has loaded for the first time).
     let spulen = sm.spools || [];
     if (!spulen.length) {
         try {
@@ -1701,13 +1915,13 @@ window.openSpoolmanFromSD = async function() {
         zu();
         if (!gewaehlt || gewaehlt === sm.activeSpoolId) return;
         await sm.activate(gewaehlt);
-        // Chip in der Werkzeugleiste sofort nachziehen — activate() kennt
-        // die Dateiliste nicht.
+        // Update the chip in the toolbar immediately — activate() doesn't know
+        // about the file list.
         if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
     };
 };
 
-/** Details und Spulen-Auswahl einer Dateizeile auf- und zuklappen. */
+/** Expand and collapse the details and spool picker of a file row. */
 window.sdZeileUmschalten = function(knopf) {
     const zeile = knopf.closest('.sd-zeile');
     if (zeile) zeile.classList.toggle('offen');

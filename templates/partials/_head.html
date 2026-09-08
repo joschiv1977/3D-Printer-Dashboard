@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="color-scheme" content="dark light">
-    <!-- DNS-PREFETCH für schnellere .local Auflösung -->
-    <link rel="dns-prefetch" href="//3d-printer.local">
+    <!--DNS-PREFETCH for faster .local resolution-->
 
-    <!-- Auch für andere mögliche Hostnamen -->
+    <!--Also for other possible hostnames-->
     <link rel="dns-prefetch" href="//printer.local">
     <link rel="dns-prefetch" href="//pi.local">
 
@@ -15,33 +14,33 @@
     <!-- Favicons & App Icons -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-    <!-- Shared Styles und Module -->
-    <!-- Ein CSS-Buendel statt 15 Einzeldateien: jede blockierte das
-         erste Bild und stand hinter dem TLS-Handschlag der naechsten
-         freien Verbindung (gemessen 20aug26). Reihenfolge = Kaskade,
-         gepflegt in services/asset_bundle.py (CSS_ORDER). -->
+    <!--Shared Styles and Modules-->
+    <!--One CSS bundle instead of 15 separate files: each one blocked
+         the first paint and waited behind the TLS handshake of the
+         next free connection. Order = cascade,
+         maintained in services/asset_bundle.py (CSS_ORDER).-->
     <link rel="stylesheet" href="/static/css/app-bundle.css">
 
-    <!-- Die Drucker-Meldung steht bewusst NEBEN dem Buendel: sie gehoert
-         auf jede Seite, und Konsole, Historie und die uebrigen haben kein
-         Buendel. Eine Datei fuer alle neun. -->
+    <!--The printer message deliberately sits OUTSIDE the bundle: it belongs
+         on every page, and the console, history and the rest do not have a
+         bundle. One file for all nine.-->
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
-    <!-- Sprachdateien laden.
-         Bewusst als normale Tags: ein document.write-Einbau (nur die
-         gebrauchte Sprache) war am 20aug26 messbar LANGSAMER — er legt den
-         Vorauslese-Scanner still, der Kopf brauchte 270 ms mehr, waehrend
-         das Parsen aller fuenf Dateien zusammen nur 3 ms kostet. -->
+    <!--Load language files.
+        Deliberately as plain tags: a document.write approach (only the
+        needed language) measured LOWER performance -- it stops the
+        preload scanner, adding 270ms to the head, while parsing all
+        five files together costs only 3ms. -->
     <script src="/static/lang/de.js?v={{ LANG_VERSION }}"></script>
     <script src="/static/lang/en.js?v={{ LANG_VERSION }}"></script>
     <script src="/static/lang/fr.js?v={{ LANG_VERSION }}"></script>
     <script src="/static/lang/es.js?v={{ LANG_VERSION }}"></script>
     <script src="/static/lang/it.js?v={{ LANG_VERSION }}"></script>
-    <!-- Auth Handler laden -->
+    <!--Load auth handler-->
     <script src="/static/auth-handler.js"></script>
 
-    <!-- Firebase FCM wird von preload.js injiziert (electron-app/firebase-init.js) -->
-    <!-- electron-push-receiver wird von preload.js injiziert (electron-app/push-receiver-init.js) -->
+    <!--Firebase FCM is injected by preload.js (electron-app/firebase-init.js)-->
+    <!--electron-push-receiver is injected by preload.js (electron-app/push-receiver-init.js)-->
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -53,7 +52,7 @@
 
     <link rel="stylesheet" href="/static/font-awesome.min.css">
 
-    <!-- Modulare CSS-Dateien (iOS Design System) -->
+    <!--Modular CSS files (iOS Design System)-->
 
     <!-- Camera stream loaded dynamically based on mode (mp4/mjpeg) -->
     <!-- PWA Meta Tags -->
@@ -66,7 +65,7 @@
     <meta name="application-name" content="3D Drucker">
     <script src="/static/socket.io.js"></script>
     <script src="/static/chart.umd.js"></script>
-    <!-- GridStack.js für Drag & Drop Dashboard (local) -->
+    <!--GridStack.js for drag & drop dashboard (local)-->
     <link rel="stylesheet" href="/static/gridstack.min.css">
     <script src="/static/gridstack-all.js"></script>
 </head>

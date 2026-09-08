@@ -1,5 +1,5 @@
-// Globaler Auth Handler für automatisches Token Management
-// SECURITY: Verwendet ausschließlich HttpOnly Cookies (kein localStorage für Tokens)
+// Global auth handler for automatic token management
+// SECURITY: Uses exclusively HttpOnly cookies (no localStorage for tokens)
 class AuthHandler {
     constructor() {
         this.refreshInterval = null;
@@ -7,19 +7,19 @@ class AuthHandler {
         this.isRefreshing = false;
 
         // === GET REQUEST DEDUPLICATION ===
-        // Kurz-lebiger Cache für GET-Requests. Beim Page-Startup feuern
-        // manche Endpoints (z.B. /api/status, /api/config) 2-4x parallel/kurz
-        // hintereinander von verschiedenen Init-Codepaths. Der Cache hält die
-        // fetch-Promise für STARTUP_DEDUP_TTL_MS und gibt bei weiteren Calls
-        // einen Clone zurück. Danach wird normal gefetched.
-        // Opt-out pro Call via { noDedup: true } in options.
+        // Short-lived cache for GET requests. On page startup some endpoints
+        // (e.g. /api/status, /api/config) fire 2-4x in parallel/in quick
+        // succession from different init code paths. The cache holds the
+        // fetch promise for STARTUP_DEDUP_TTL_MS and returns a clone on
+        // further calls. After that it fetches normally.
+        // Opt out per call via { noDedup: true } in options.
         this._pendingGets = new Map();  // url → Promise<Response>
         this.STARTUP_DEDUP_TTL_MS = 2000;
 
-        // Prüfe ob CSRF Token in sessionStorage fehlt (z.B. nach Tab-Neustart)
+        // Check whether the CSRF token is missing from sessionStorage (e.g. after a tab restart)
         this.ensureCsrfToken();
 
-        // Token alle 10 Minuten refreshen (vor den 480 Min Ablauf)
+        // Refresh the token every 10 minutes (before the 480-minute expiry)
         this.startTokenRefresh();
 
         // Activity tracking
@@ -27,8 +27,8 @@ class AuthHandler {
     }
 
     async ensureCsrfToken() {
-        // Wenn sessionStorage leer ist aber localStorage ein Token hat,
-        // könnte das Token serverseitig abgelaufen sein -> proaktiv refreshen
+        // If sessionStorage is empty but localStorage has a token,
+        // that token may have expired server-side -> refresh it proactively
         const sessionCsrf = sessionStorage.getItem('csrf_token');
         const localCsrf = localStorage.getItem('csrf_token');
 
@@ -36,39 +36,36 @@ class AuthHandler {
             console.log('🔄 CSRF token only in localStorage - refreshing proactively...');
             await this.refreshToken();
         } else if (!sessionCsrf && !localCsrf) {
-            // Kein Token vorhanden - versuche Refresh (falls Cookie noch gültig)
+            // No token present - try a refresh (in case the cookie is still valid)
             console.log('🔄 No CSRF token found - trying a refresh...');
             await this.refreshToken();
         }
     }
 
     /**
-     * Holt einen frischen CSRF-Token, ohne die Sitzung anzufassen.
+     * Fetches a fresh CSRF token without touching the session.
      *
-     * Nach einem Serverneustart kann der Browser noch einen Token halten,
-     * den der Server nicht mehr kennt — die erste schreibende Aktion lief
-     * deshalb ins
-     * 403 (20aug26 siebenmal im Log). Sie wurde zwar automatisch wiederholt
-     * und klappte dann, kostete aber je einen verworfenen Umlauf.
+     * After a server restart the browser can still hold a token the server no
+     * longer knows — so the first write action runs into a
+     * 403. It gets retried automatically and then succeeds, but each
+     * time costs one wasted round trip.
      *
-     * Bewusst NICHT refreshToken(): der rotiert den Refresh-Token und
-     * loescht alle CSRF-Token des Nutzers — zwei offene Tabs koennten sich
-     * damit gegenseitig abmelden.
+     * Deliberately NOT refreshToken(): that rotates the refresh token and
+     * deletes all of the user's CSRF tokens — two open tabs could log each
+     * other out that way.
      */
     async erneuereCsrfToken(sofort = false) {
-        // Hoechstens einmal pro Minute. Der Aufruf haengt am Socket-Connect,
-        // und der kann stuermen: am 20aug26 verband sich der Socket mehrmals
-        // pro SEKUNDE neu, jeder Connect holte einen Token — nach 60 Aufrufen
-        // griff die Anmelde-Sperre ("Too many attempts. Please wait 5
-        // minutes.") und die Oberflaeche stand.
+        // At most once a minute. The call hangs off the socket connect,
+        // which can storm — repeated reconnects each fetch a token, and
+        // enough calls trip the login rate limit ("Too many attempts. Please wait 5
+        // minutes.") and freeze the UI.
         //
-        // Fuer den eigentlichen Zweck reicht das voellig: nach einem
-        // Serverneustart genuegt EIN frischer Token. Alles Weitere faengt
-        // ohnehin die 403-Wiederholung in apiCall ab.
-        // Der Zeitstempel MUSS das Neuladen ueberleben: bei jedem Reload
-        // entsteht eine neue AuthHandler-Instanz, ein Feld am Objekt waere
-        // also sofort wieder leer — und genau Reloads waren der Ausloeser
-        // (Seite mehrfach neu geladen beim Testen).
+        // For the actual purpose that's completely enough: after a server
+        // restart, ONE fresh token suffices. Everything else is caught by the
+        // 403 retry in apiCall anyway.
+        // The timestamp MUST survive a reload: every reload creates a new
+        // AuthHandler instance, so a field on the object would immediately be
+        // empty again — and reloads are exactly what triggers repeated fetches.
         const jetzt = Date.now();
         const zuletzt = parseInt(localStorage.getItem('csrf_geholt') || '0', 10);
         if (!sofort && zuletzt && jetzt - zuletzt < 60000) return true;
@@ -96,9 +93,9 @@ class AuthHandler {
 
         console.log('🔄 PWA Session Recovery...');
 
-        // SECURITY: Prüfe ob Cookie vorhanden ist
-        // HttpOnly Cookies können nicht gelesen werden, aber Browser sendet sie automatisch
-        // Wir machen einfach einen Test-Request
+        // SECURITY: Check whether a cookie is present
+        // HttpOnly cookies cannot be read, but the browser sends them automatically
+        // We simply make a test request
         try {
             const response = await fetch('/api/auth/me', {
                 method: 'GET',
@@ -109,7 +106,7 @@ class AuthHandler {
                 console.log('✅ PWA Session restored (Cookie valid)');
                 return true;
             } else if (response.status === 401) {
-                // Versuche Refresh
+                // Try a refresh
                 console.log('🔄 PWA Cookie expired - attempting refresh...');
                 return await this.refreshToken();
             }
@@ -117,20 +114,20 @@ class AuthHandler {
             console.error('PWA session check failed:', e);
         }
 
-        // Fallback: Versuche Refresh
+        // Fallback: try a refresh
         console.log('🔄 No valid PWA session - attempting refresh...');
         return await this.refreshToken();
     }
 
     async refreshToken() {
-        // Verhindere mehrfache gleichzeitige Refreshes
+        // Prevent multiple concurrent refreshes
         if (this.isRefreshing) {
-            // Warte auf laufenden Refresh
+            // Wait for the ongoing refresh
             return new Promise((resolve) => {
                 const checkInterval = setInterval(() => {
                     if (!this.isRefreshing) {
                         clearInterval(checkInterval);
-                        // Prüfe ob Refresh erfolgreich war durch Test-Request
+                        // Check whether the refresh succeeded via a test request
                         fetch('/api/auth/me', { credentials: 'include' })
                             .then(r => resolve(r.ok))
                             .catch(() => resolve(false));
@@ -154,7 +151,7 @@ class AuthHandler {
             if (response.ok) {
                 const data = await response.json();
 
-                // CSRF Token speichern (ist nicht sensitive)
+                // Store the CSRF token (not sensitive)
                 if (data.csrf_token) {
                     sessionStorage.setItem('csrf_token', data.csrf_token);
                     localStorage.setItem('csrf_token', data.csrf_token);
@@ -163,7 +160,7 @@ class AuthHandler {
                 console.log('✅ Token refreshed successfully (via Cookie)');
                 return true;
             } else if (response.status === 401) {
-                // Refresh token abgelaufen -> zum Login
+                // Refresh token expired -> go to login
                 console.log('❌ Refresh token expired');
                 this.redirectToLogin();
                 return false;
@@ -171,7 +168,7 @@ class AuthHandler {
         } catch (error) {
             console.error('Token refresh error:', error);
 
-            // Bei Netzwerkfehler in PWA: Prüfe ob Cookie noch da ist
+            // On a network error in PWA: check whether the cookie is still there
             if (window.matchMedia('(display-mode: standalone)').matches) {
                 try {
                     const testResponse = await fetch('/api/auth/me', {
@@ -196,15 +193,15 @@ class AuthHandler {
         // Initial check
         this.checkAndRefreshToken();
 
-        // Check alle 10 Minuten
+        // Check every 10 minutes
         this.refreshInterval = setInterval(() => {
             this.checkAndRefreshToken();
         }, 10 * 60 * 1000);
     }
 
     async checkAndRefreshToken() {
-        // SECURITY: Wir können HttpOnly Cookies nicht lesen
-        // Mache stattdessen Test-Request um Status zu prüfen
+        // SECURITY: We can't read HttpOnly cookies
+        // Instead make a test request to check the status
         try {
             const response = await fetch('/api/auth/me', {
                 method: 'GET',
@@ -213,7 +210,7 @@ class AuthHandler {
             });
 
             if (response.status === 401) {
-                // Token abgelaufen oder ungültig
+                // Token expired or invalid
                 console.log('🔄 Token expired - attempting refresh...');
                 const refreshed = await this.refreshToken();
                 if (!refreshed) {
@@ -222,36 +219,37 @@ class AuthHandler {
             } else if (!response.ok) {
                 console.warn('Token check failed:', response.status);
             }
-            // Bei 200 OK: Alles gut, nichts zu tun
+            // On 200 OK: all good, nothing to do
         } catch (error) {
             console.error('Token check error:', error);
-            // Bei Netzwerkfehler: Nicht zum Login redirecten
+            // On a network error: don't redirect to login
         }
     }
 
     trackUserActivity() {
-        // Reset inactivity timer bei User-Aktivität
+        // Reset inactivity timer on user activity
         ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
             document.addEventListener(event, () => {
                 this.resetInactivityTimer();
             });
         });
 
-        // Initial timer starten
+        // Start the initial timer
         this.resetInactivityTimer();
     }
 
     resetInactivityTimer() {
         clearTimeout(this.activityTimeout);
 
-        // Nach 60 Minuten Inaktivität warnen
+        // Warn after 60 minutes of inactivity
         this.activityTimeout = setTimeout(() => {
             this.showInactivityWarning();
         }, 60 * 60 * 1000);
     }
 
     showInactivityWarning() {
-        const msg = 'Sie waren 60 Minuten inaktiv. Möchten Sie angemeldet bleiben?';
+        const msg = (window.texts || {}).session_idle_ask
+            || 'Du warst 60 Minuten inaktiv. Angemeldet bleiben?';
         const onResult = (stay) => {
             if (stay) { this.refreshToken(); this.resetInactivityTimer(); }
             else { this.logout(); }
@@ -261,7 +259,7 @@ class AuthHandler {
     }
 
     async logout() {
-        // ServiceWorker cleanup im Hintergrund (NICHT warten!)
+        // Service worker cleanup in the background (do NOT wait!)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.ready.then(reg => {
                 return reg.pushManager.getSubscription();
@@ -274,9 +272,9 @@ class AuthHandler {
             });
         }
 
-        // Sofort weitermachen mit Logout (nicht auf ServiceWorker warten!)
+        // Continue immediately with logout (don't wait on the service worker!)
         try {
-            // Logout API Call - Server löscht Cookies
+            // Logout API call - server deletes cookies
             await fetch('/api/auth/logout', {
                 method: 'POST',
                 credentials: 'include'
@@ -285,14 +283,14 @@ class AuthHandler {
             console.error('Logout API error:', error);
         }
 
-        // ALLE Auth-Daten entfernen (außer Token - die sind HttpOnly)
+        // Remove ALL auth data (except tokens - those are HttpOnly)
         localStorage.removeItem('username');
         localStorage.removeItem('role');
         localStorage.removeItem('csrf_token');
         sessionStorage.removeItem('csrf_token');
         sessionStorage.clear();
 
-        // Sofort zur Login-Seite
+        // Go straight to the login page
         this.redirectToLogin();
     }
 
@@ -305,22 +303,22 @@ class AuthHandler {
         const method = (options.method || 'GET').toUpperCase();
         const shouldDedup = method === 'GET' && !options.noDedup;
 
-        // GET-Dedup: Wenn bereits eine fetch-Promise für diese URL läuft
-        // (oder in den letzten 2 Sekunden lief), geben wir einen Clone zurück.
+        // GET dedup: if a fetch promise for this URL is already running
+        // (or ran in the last 2 seconds), we return a clone.
         if (shouldDedup && this._pendingGets.has(url)) {
             try {
                 const cached = await this._pendingGets.get(url);
                 return cached.clone();
             } catch (_) {
-                // Gecachter Request ist gefehlt → normal weitermachen (fällt durch)
+                // The cached request failed → continue normally (falls through)
             }
         }
 
         const fetchPromise = this._doApiCall(url, options);
 
         if (shouldDedup) {
-            // In Cache ablegen. Nach TTL wieder löschen, damit nachfolgende
-            // Calls frische Daten holen.
+            // Store it in the cache. Remove it again after the TTL so subsequent
+            // calls fetch fresh data.
             this._pendingGets.set(url, fetchPromise);
             fetchPromise
                 .catch(() => {})
@@ -331,8 +329,8 @@ class AuthHandler {
                         }
                     }, this.STARTUP_DEDUP_TTL_MS);
                 });
-            // Der erste Caller bekommt auch einen Clone, damit der "Original"-
-            // Response im Cache für spätere Poolers weiter klonbar bleibt.
+            // The first caller also gets a clone, so the "original"
+            // response stays cloneable in the cache for later callers.
             try {
                 const r = await fetchPromise;
                 return r.clone();
@@ -348,13 +346,13 @@ class AuthHandler {
         // Ensure headers object exists
         options.headers = options.headers || {};
 
-        // SECURITY: Wir verwenden KEINE Authorization Header mehr
-        // Token wird automatisch als HttpOnly Cookie mitgesendet
+        // SECURITY: We no longer use an Authorization header
+        // The token is sent automatically as an HttpOnly cookie
 
-        // CSRF Token für POST, PUT, DELETE
+        // CSRF token for POST, PUT, DELETE
         const csrfToken = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
 
-        // Device Token aus URL extrahieren (für Android/iOS WebView)
+        // Extract the device token from the URL (for Android/iOS WebView)
         const urlParams = new URLSearchParams(window.location.search);
         const deviceToken = urlParams.get('device_token');
 
@@ -362,12 +360,12 @@ class AuthHandler {
             options.headers['X-Device-Token'] = deviceToken;
         }
 
-        // Stabile Web-Device-ID für Notification-Read/Dismiss:
-        // Ohne diese würde der Server als Fallback die letzten 12 Zeichen
-        // des access_token-Cookies nehmen — der rotiert aber bei jedem
-        // Refresh, also wäre `is_dismissed_here` nach einer Rotation wieder
-        // false und dismissed Notifications blinken erneut als ungelesen auf.
-        // Einmal pro Browser generieren, in localStorage cachen, immer mitsenden.
+        // Stable web device ID for notification read/dismiss:
+        // without this, the server would fall back to the last 12 characters
+        // of the access_token cookie — but that rotates on every
+        // refresh, so `is_dismissed_here` would go back to false after a
+        // rotation, and dismissed notifications would flash as unread again.
+        // Generate once per browser, cache in localStorage, always send it.
         let webDeviceId = localStorage.getItem('web_device_id');
         if (!webDeviceId) {
             const rnd = (typeof crypto !== 'undefined' && crypto.randomUUID)
@@ -378,16 +376,13 @@ class AuthHandler {
         }
         options.headers['X-Device-Id'] = webDeviceId;
 
-        // CSRF Token für POST, PUT, DELETE (nur wenn kein Device Token vorhanden)
+        // CSRF token for POST, PUT, DELETE (only when there's no device token)
         const schreibend = !!options.method
             && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase());
         let token = csrfToken;
 
-        // Kein Token im Speicher? Dann erst einen holen, statt die Anfrage
-        // ohne Kopfzeile loszuschicken und am 403 zu scheitern. In der
-        // Electron-App war der sessionStorage nach einem Fensterwechsel leer,
-        // in localStorage stand ein Token von vor dem Serverneustart — die
-        // Geraeteliste der Steckdose kam deshalb nie an (21aug26).
+        // No token in memory? Then fetch one first, instead of sending the
+        // request without a header and failing at 403.
         if (!deviceToken && schreibend && !token) {
             await this.erneuereCsrfToken(true);
             token = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
@@ -399,25 +394,25 @@ class AuthHandler {
 
         let response = await fetch(url, {
             ...options,
-            credentials: 'include'  // WICHTIG: Sendet Cookies automatisch mit
+            credentials: 'include'  // IMPORTANT: sends cookies automatically
         });
 
-        // Bei 401 oder 403 (CSRF invalid) einmal Token refreshen und wiederholen
-        // 403 mit CSRF-Fehler = Token abgelaufen, Refresh liefert einen neuen
+        // On 401 or 403 (CSRF invalid), refresh the token once and retry
+        // 403 with a CSRF error = token expired, refresh provides a new one
         if ((response.status === 401 || response.status === 403) && !options._retry) {
-            // 403 heisst fast immer: CSRF-Token veraltet. Den zu erneuern ist
-            // billig und laesst die Sitzung in Ruhe; erst wenn das nichts
-            // bringt, den Refresh-Token rotieren.
+            // 403 almost always means: the CSRF token is stale. Renewing it is
+            // cheap and leaves the session alone; only rotate the refresh
+            // token if that doesn't help.
             let refreshed = false;
             if (response.status === 403 && schreibend && !deviceToken) {
                 refreshed = await this.erneuereCsrfToken(true);
             }
             if (!refreshed) refreshed = await this.refreshToken();
             if (refreshed) {
-                // Neuer Versuch mit refreshtem Cookie und neuem CSRF Token
+                // New attempt with the refreshed cookie and new CSRF token
                 const newCsrf = sessionStorage.getItem('csrf_token') || localStorage.getItem('csrf_token');
 
-                // Device Token wieder hinzufügen falls vorhanden
+                // Re-add the device token if present
                 if (deviceToken) {
                     options.headers['X-Device-Token'] = deviceToken;
                 }
@@ -438,16 +433,13 @@ class AuthHandler {
     }
 }
 
-// Global initialisieren
+// Initialize globally
 const authHandler = new AuthHandler();
 
-// Wrapper für einfache Verwendung
+// Wrapper for easy use
 window.apiCall = (url, options) => authHandler.apiCall(url, options);
 
-// Die Instanz selbst freigeben. Mehrere Stellen in socket-manager.js fragen
-// window.authHandler ab (PWA-Sitzungswiederherstellung, checkAndRefreshToken,
-// seit 20aug26 auch das Erneuern des CSRF-Tokens) — die Zuweisung fehlte
-// aber, alle Abfragen liefen also gegen undefined und die Zweige waren
-// stumm tot. Die Pruefungen dort sind mit && abgesichert, deshalb ist es
-// nie aufgefallen.
+// Expose the instance itself. Several places in socket-manager.js check
+// window.authHandler (PWA session recovery, checkAndRefreshToken, and
+// renewing the CSRF token).
 window.authHandler = authHandler;

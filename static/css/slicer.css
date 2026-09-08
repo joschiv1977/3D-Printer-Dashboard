@@ -1,13 +1,8 @@
 /* ==========================================================================
-   Slicer  (21aug26)
+   Slicer
    --------------------------------------------------------------------------
-   Vorher: lila Farbverlauf-Balken als Kopf und vier Blöcke untereinander —
-   Hochladen, Einstellungen, Slice-Knopf, Profile verwalten. Für die sechs
-   Auswahlfelder musste man unter eine 300px hohe Ablagefläche scrollen,
-   obwohl beides zusammengehört.
-
-   Jetzt: Modell links, Einstellungen rechts, Startleiste darunter. Der
-   Slicer ist ein Ablauf, und der ist jetzt zu sehen.
+   Model on the left, settings on the right, start bar below. The slicer
+   is a workflow, and now that workflow is visible.
    ========================================================================== */
 .container { --linie: rgba(0, 0, 0, 0.08); }
 [data-theme="dark"] .container,
@@ -49,10 +44,10 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
     font-size: 12px; font-weight: 640; letter-spacing: 0.04em;
     text-transform: uppercase; color: var(--text-secondary);
 }
-/* Während des Slicens sind die Einstellungen nicht mehr änderbar. */
+/* While slicing, the settings can no longer be changed. */
 .sl-karte--ruht { opacity: 0.5; pointer-events: none; }
 
-/* ---- Ablagefläche ---- */
+/* ---- Drop zone ---- */
 .sl-ablage {
     border: 2px dashed var(--border-color); border-radius: 10px;
     padding: 26px 16px; text-align: center; cursor: pointer;
@@ -63,7 +58,7 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 .sl-ablage b { display: block; font-size: 13.5px; font-weight: 620; }
 .sl-ablage span { font-size: 11.5px; color: var(--text-secondary); }
 
-/* ---- Gewählte Datei ---- */
+/* ---- Selected file ---- */
 .sl-datei { display: none; align-items: center; gap: 11px; }
 .sl-datei--an { display: flex; }
 .sl-datei-bild {
@@ -84,7 +79,7 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 }
 .sl-datei-weg:hover { color: var(--color-red); }
 
-/* ---- Ablauf beim Slicen ---- */
+/* ---- The slicing flow ---- */
 .sl-schritte-wrap { display: none; }
 .sl-schritte-wrap.active { display: block; }
 .sl-schritte { display: flex; flex-direction: column; }
@@ -117,7 +112,7 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 }
 .sl-bahn i { display: block; height: 100%; border-radius: 999px; background: var(--color-blue); transition: width 0.3s; }
 
-/* ---- Felder ---- */
+/* ---- Fields ---- */
 .sl-felder { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
 @media (max-width: 560px) { .sl-felder { grid-template-columns: 1fr; } }
 .sl-feld { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -128,7 +123,7 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
     font: inherit; font-size: 13px;
 }
 .sl-feld select:disabled { opacity: 0.55; cursor: not-allowed; }
-/* Fehlende Pflichtangabe: Rand statt eines wortlosen grauen Knopfes. */
+/* Missing required field: a border instead of a wordless gray button. */
 .sl-feld select.sl-fehlt { border-color: var(--color-orange); }
 .sl-hinweis {
     display: flex; gap: 7px; align-items: flex-start;
@@ -146,9 +141,9 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 .sl-start-t { flex: 1; min-width: 0; font-size: 12.5px; color: var(--text-secondary); }
 .sl-start-t b { display: block; font-size: 13.5px; font-weight: 640; color: var(--text-primary); }
 
-/* ---- Profile-Karte ----
-   Die Profile stehen jetzt unter dem Arbeitsablauf statt in einem Overlay:
-   der Platz ist da, und so sieht man den Stand ohne einen Klick. */
+/* ---- Profiles card ----
+   The profiles now sit below the workflow instead of in an overlay:
+   the space is there, and this way you see the state without a click. */
 .sl-profile { margin-top: 12px; }
 .sl-karte-luft { flex: 1; }
 .sl-p-akt { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -179,17 +174,16 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 .sl-schalter { display: flex; align-items: center; gap: 9px; font-size: 13px; cursor: pointer; }
 .sl-schalter input { width: 16px; height: 16px; accent-color: var(--color-blue); }
 
-/* Der weiße Kasten um alles ist überflüssig — die Karten tragen sich selbst
-   und stehen nicht mehr in einem zweiten Rahmen. */
+/* The white box around everything is redundant — the cards carry
+   themselves and no longer sit inside a second frame. */
 .container > .content {
     background: none; border: 0; box-shadow: none; padding: 0; border-radius: 0;
 }
-.container { max-width: 1080px; padding-top: 14px; padding-bottom: 90px; }
+.container { max-width: 1080px; padding-top: 14px; padding-bottom: var(--dock-freiraum, 94px); }
 
-/* ---- Ergebnis der Update-Prüfung ----
-   Vorher eine grüne Vollfläche mit Fließtext und Aufzählungspunkten. Drei
-   Zahlen sind eine Tabelle, und „49 neu von 63 auf GitHub" sagt mehr als
-   zwei getrennte Listen mit denselben drei Zeilen. */
+/* ---- Update check result ----
+   Three numbers are a table, and "49 new of 63 on GitHub" says more
+   than two separate lists with the same three rows. */
 .sl-ergebnis {
     border: 1px solid var(--border-color); border-left: 3px solid var(--strich);
     border-radius: 10px; padding: 11px 13px; margin-top: 11px;
@@ -221,10 +215,8 @@ body.dark-mode .container { --linie: rgba(255, 255, 255, 0.10); }
 }
 .sl-erg-legende { margin-left: auto; opacity: .8; }
 
-/* ---- Fortschritt beim Profil-Update ----
-   Vorher ein hellblauer Kasten mit fest verdrahteten Farben (im dunklen
-   Design unlesbar), einem lila Farbverlauf-Balken und der Prozentzahl darin.
-   Jetzt dieselbe Form wie das Ergebnis darunter. */
+/* ---- Profile update progress ----
+   Same shape as the result below it. */
 .sl-ergebnis--laeuft { --strich: var(--color-blue); }
 .sl-fortschritt { display: flex; flex-direction: column; }
 .sl-fort-kopf {

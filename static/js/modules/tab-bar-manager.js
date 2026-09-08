@@ -21,8 +21,8 @@ class TabBarManager {
         if (path.includes('bedmesh.html')) return 'bedmesh';
         if (path.includes('mainsail.html')) return 'mainsail';
         if (path.includes('users.html') || path.includes('/users')) return 'users';
-        // Seiten ohne eigenen Reiter (z.B. Benachrichtigungen) markierten
-        // sonst faelschlich "Home" als aktiv.
+        // Pages without a tab of their own (notifications, say) otherwise
+        // wrongly marked "home" as active.
         if (path.includes('notifications.html')) return '';
         return 'dashboard';
     }
@@ -31,21 +31,24 @@ class TabBarManager {
      * Generate tab bar HTML
      */
     generateHTML() {
-        // Reihenfolge wie Android (Direct-Modus): Home, Konsole, Bed Mesh, Historie,
-        // Wartung, Einstellungen. Slicer + Users sind im Direct-Modus ausgeblendet.
+        // The same order as Android (direct mode): home, console, bed mesh,
+        // history, maintenance, settings. Slicer and users are hidden in direct
+        // mode.
         const tabs = [
             { id: 'dashboard', icon: 'fa-solid fa-house', label: 'Home', href: '/', desktopOnly: false },
             { id: 'logs', icon: 'fa-solid fa-terminal', label: 'Konsole', href: '/static/logs.html', desktopOnly: true },
-            // Bed Mesh: nur im Klipper-Direct-Modus (per _applyDirectMode eingeblendet).
+            // Bed mesh: only in Klipper direct mode (shown by _applyDirectMode).
             { id: 'bedmesh', icon: 'fa-solid fa-mountain', label: 'Bed Mesh', href: '/static/bedmesh.html', desktopOnly: false, directOnly: true },
             { id: 'history', icon: 'fa-solid fa-clock-rotate-left', label: 'History', href: '/static/history.html', desktopOnly: false },
             { id: 'maintenance', icon: 'fa-solid fa-wrench', label: 'Wartung', href: '/static/maintenance.html', desktopOnly: true },
-            // Mainsail: nur im Klipper-Direct-Modus. Lädt die Drucker-Web-UI eingebettet
-            // in der App (Electron <webview>; im Browser Fallback "im Browser öffnen").
+            // Mainsail: only in Klipper direct mode. It loads the printer web UI
+            // embedded in the app (an Electron <webview>; in a browser the
+            // fallback is "open in the browser").
             { id: 'mainsail', icon: 'fa-solid fa-gauge-high', label: 'Mainsail', href: '/static/mainsail.html', desktopOnly: false, directOnly: true },
-            // Slicer: im Direct-Modus ausgeblendet (Slicing läuft dort nicht über dieses Backend).
+            // Slicer: hidden in direct mode (slicing does not run through this
+            // backend there).
             { id: 'slicer', icon: 'fa-solid fa-cube', label: 'Slicer', href: '/static/slicer.html', desktopOnly: false, hideInDirect: true },
-            // Users: im Direct-Modus ausgeblendet (kein Multi-User-Backend).
+            // Users: hidden in direct mode (there is no multi-user backend).
             { id: 'users', icon: 'fa-solid fa-user-group', label: 'Users', href: '/static/users.html', desktopOnly: false, hideInDirect: true },
             { id: 'settings', icon: 'fa-solid fa-gear', label: '', href: this.getSettingsHref(), desktopOnly: false }
         ];
@@ -67,7 +70,7 @@ class TabBarManager {
                            tab.id === 'logs' ? 'logs' :
                            tab.id === 'history' ? 'history' : '';
 
-            // direct-only Tabs starten versteckt; _applyDirectMode blendet sie ein.
+            // The direct-only tabs start hidden; _applyDirectMode shows them.
             const style = tab.directOnly ? ' style="display:none;"' : '';
             return `
                 <a class="${classes.join(' ')}" href="${tab.href}" data-tab-id="${tab.id}"${style} ${tab.id === 'settings' && this.currentPage === 'dashboard' ? `onclick="event.preventDefault(); openSettings();"` : ''}>
@@ -111,7 +114,7 @@ class TabBarManager {
             window.i18nManager.applyTranslations();
         }
 
-        // Klipper-Direct: Users raus, Bed Mesh rein (async, sobald Config da).
+        // Klipper-Direct: users out, bed mesh in (async, as soon as the config is there).
         this._applyDirectMode();
 
         // Mainsail-Tab bei offline ausgrauen.
@@ -119,25 +122,26 @@ class TabBarManager {
     }
 
     /**
-     * Mainsail-Tab deaktivieren wenn der Drucker offline ist (Mainsail ist dann
-     * eh nicht erreichbar) — AUSSER im host_mode "external", wo Mainsail auf
-     * dem always-on-Host liegt und durchgehend erreichbar bleibt. Wird bei jedem Status-Wechsel erneut aufgerufen
-     * (updatePrinterDependentCards). Ist der Online-Status (noch) unbekannt —
-     * z.B. auf Seiten ohne Socket — bleibt der Tab aktiv (die Mainsail-Seite
-     * fängt offline selbst ab).
+     * Disable the Mainsail tab while the printer is offline (Mainsail is
+     * unreachable then anyway) -- EXCEPT in host_mode "external", where
+     * Mainsail sits on the always-on host and stays reachable throughout.
+     * Called again on every state change (updatePrinterDependentCards). While
+     * the online state is (still) unknown -- on pages without a socket, for
+     * instance -- the tab stays enabled (the Mainsail page catches being
+     * offline itself).
      */
     updateMainsailState() {
         const el = document.querySelector('.tab-item[data-tab-id="mainsail"]');
         if (!el) return;
-        // Always-on-Host (host_mode=external): Mainsail laeuft auf dem Host,
-        // nicht im Drucker — es bleibt also auch bei ausgeschalteter Steckdose
-        // erreichbar. Tab dann NIE ausgrauen.
+        // An always-on host (host_mode=external): Mainsail runs on the host,
+        // not in the printer -- so it stays reachable even with the socket
+        // switched off. The tab is then NEVER greyed out.
         if (window.lastHostMode === 'external') {
             el.classList.remove('tab-disabled');
             return;
         }
-        // Ohne eingerichtete Steckdose entscheidet die Verbindung -- die
-        // Antwort steht in status-manager.js, hier wird sie nur gelesen.
+        // Without a socket set up, the connection decides -- the answer lives
+        // in status-manager.js, here it is only read.
         const online = (typeof window.druckerDa === 'boolean') ? window.druckerDa
             : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
         const hasInfo = window.lastMqttStatus !== undefined || window.lastKnownSwitchState !== undefined;
@@ -145,12 +149,13 @@ class TabBarManager {
     }
 
     /**
-     * Blendet im Klipper-Direct-Modus den Bed-Mesh-Tab ein und den Users-Tab
-     * aus. Die /api/config-Abfrage wird global gecacht, damit nicht jede Seite
-     * neu fragt. direct_mode kommt nur vom lokalen Adapter (Bambu-Backend: falsy).
+     * In Klipper direct mode this shows the bed mesh tab and hides the users
+     * tab. The /api/config query is cached globally, so not every page asks
+     * again. direct_mode comes only from the local adapter (from the Bambu
+     * backend it is falsy).
      */
     _applyDirectMode() {
-        // Dokumentweit: greift Tab-Bar UND Header-Button (.hide-in-direct).
+        // Document-wide: this covers the tab bar AND the header button (.hide-in-direct).
         window.__directCfgPromise = window.__directCfgPromise ||
             fetch('/api/config', { credentials: 'same-origin' }).then(r => r.json()).catch(() => ({}));
         window.__directCfgPromise.then(cfg => {

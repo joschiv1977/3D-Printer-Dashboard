@@ -26,7 +26,7 @@
                                onmouseout="this.style.transform='translateY(0)';
                                           this.style.border='1px solid transparent';
                                           this.style.boxShadow='0 1px 3px rgba(0,0,0,0.2)';"
-                               title="Spoolman Weboberfläche öffnen">
+                               title="Spoolman Weboberfläche öffnen" data-i18n-title="spoolman_open_web">
                                 <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.5-.6 1.5-1.3 0-.4-.2-.7-.4-1-.3-.3-.4-.6-.4-1 0-.7.6-1.2 1.3-1.2H16a5 5 0 0 0 5-5c0-4.1-4-8.5-9-8.5z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15" cy="8.5" r="1"/></svg>
                                 <span>Spoolman</span>
                             </a>
@@ -34,7 +34,7 @@
                           <span class="spoolman-status" id="spoolman-connection" style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:10px;">●</span>
                       </div>
                       <div id="spoolman-content" style="padding:15px; display:none;">
-                          <!-- Auswahl im eigenen Fenster, siehe _zones.html. -->
+                          <!--Selection happens in its own window, see _zones.html.-->
                           <button type="button" class="mz-spulknopf" onclick="window.openSpoolPicker()">
                               <span id="mz-spulknopf-punkt" class="mz-spulknopf__punkt"></span>
                               <span id="mz-spulknopf-text" data-i18n="spool_choose">Spule wählen</span>
@@ -43,8 +43,8 @@
                           <select id="spool-selector" onchange="activateSpool(this.value)" style="display:none;">
                               <option value="" id="spool-select-option"></option>
                           </select>
-                          <!-- Die Karte mit dem Filament waehlt selbst die Spule —
-                               tippen trifft die Flaeche, nicht nur den Knopf darueber. -->
+                          <!--The filament card itself opens the spool picker --
+                               tapping hits the whole area, not just the button on it.-->
                           <div id="active-spool-info" onclick="window.openSpoolPicker()"
                                role="button" tabindex="0"
                                style="margin-top:12px; padding:10px; cursor:pointer;

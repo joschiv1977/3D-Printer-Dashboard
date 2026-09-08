@@ -1,15 +1,14 @@
 /* ==========================================================================
-   Benachrichtigungen  (21aug26)
+   Notifications
    --------------------------------------------------------------------------
-   Vorher: Emoji im Titel, Emoji je Eintrag, jede Meldung in einem eigenen
-   Kasten mit farbigem Balken links. Jetzt dieselbe Bauform wie Historie und
-   Benutzer — eine Karte, Zeilen durch duenne Linien getrennt, Strichsymbole,
-   ungelesen als Punkt vor dem Titel statt als Rahmen.
+   Same construction as history and users — one card, rows separated by
+   thin lines, line icons, unread shown as a dot before the title instead
+   of a border.
    ========================================================================== */
 
 .nb-huelle { max-width: 860px; margin: 0 auto; padding: 16px 20px 90px; }
 
-/* --- Kopfzeile: gleiche Masse wie Historie, Wartung, Slicer, Benutzer --- */
+/* --- Header: same dimensions as history, maintenance, slicer, users --- */
 .nb-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 12px; flex-wrap: wrap; }
 .nb-kopf-titel {
     margin: 0; font-size: 17px; font-weight: 650;
@@ -33,7 +32,7 @@
 }
 .nb-btn:hover { border-color: var(--color-blue, #2196F3); }
 
-/* --- Filter: zwei Schalter mit Anzahl --- */
+/* --- Filter: two toggles with a count --- */
 .nb-filter { display: flex; gap: 7px; margin-bottom: 12px; }
 .nb-filter button {
     border: 1px solid var(--border-color); background: var(--bg-card-variant);
@@ -51,7 +50,7 @@ body.dark-mode .nb-filter button.an {
 }
 .nb-filter b { font-weight: 700; }
 
-/* --- Liste: eine Karte, Zeilen durch Linien getrennt --- */
+/* --- List: one card, rows separated by lines --- */
 .nb-liste {
     background: var(--bg-card); border: 1px solid var(--border-color);
     border-radius: 14px; overflow: hidden;
@@ -79,8 +78,8 @@ body.dark-mode .nb-filter button.an {
     display: flex; align-items: center; gap: 7px;
     font-size: 13.5px; font-weight: 640; color: var(--text-primary);
 }
-/* Ungelesen: ein Punkt vor dem Titel. Der Rahmen um die ganze Zeile
-   liess jede Meldung wie eine eigene Karte aussehen. */
+/* Unread: a dot before the title. A border around the whole row
+   made every notification look like its own card. */
 .nb-neu-punkt {
     width: 7px; height: 7px; border-radius: 50%; flex: none;
     background: var(--color-blue, #2196F3);

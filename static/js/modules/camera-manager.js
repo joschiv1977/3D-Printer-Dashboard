@@ -3,9 +3,9 @@
  * Handles all camera streaming modes (WebRTC, MJPEG, Snapshot Polling),
  * PiP, fullscreen, HQ mode, source toggling, and page visibility
  */
-// Symbole fuer den Play/Pause-Knopf ueber dem Bild — gleiche Machart wie im
-// Markup (24er-Raster, Strich in currentColor), damit der Wechsel nicht von
-// SVG auf ein Unicode-Zeichen springt.
+// Icons for the play/pause button over the image — same style as the
+// markup (24-unit grid, stroke in currentColor), so the switch doesn't
+// jump from SVG to a Unicode character.
 const KAMERA_PAUSE = '<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14"/></svg>';
 const KAMERA_START = '<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l12 8-12 8z"/></svg>';
 
@@ -55,14 +55,14 @@ class CameraManager {
         this._initCamera();
     }
 
-    // Play/Pause-Toggle (wie Android): pausiert/startet den Live-Stream manuell.
+    // Play/pause toggle (like Android): manually pauses/resumes the live stream.
     toggleCameraPlayPause() {
         const texts = window.texts || {};
         const icon = document.getElementById('camera-playpause-icon');
         const txt = document.getElementById('camera-playpause-text');
         this._manualPaused = !this._manualPaused;
         if (this._manualPaused) {
-            // Pausieren: alle Stream-Varianten stoppen.
+            // Pausing: stop all stream variants.
             window._cameraPaused = true;
             this._stopKlipperPoll();
             this.stopSnapshotPolling();
@@ -78,7 +78,7 @@ class CameraManager {
             if (icon) icon.innerHTML = KAMERA_START;
             if (txt) txt.textContent = texts.camera_resume || 'Start';
         } else {
-            // Fortsetzen.
+            // Resuming.
             window._cameraPaused = false;
             if (icon) icon.innerHTML = KAMERA_PAUSE;
             if (txt) txt.textContent = texts.camera_pause || 'Pause';
@@ -89,20 +89,19 @@ class CameraManager {
     handleCameraError() {
         // Don't retry when camera is intentionally off
         if (window._cameraOff) return;
-        // Klipper-Mode: der MJPEG-Reconnect in _startKlipperMjpeg kümmert sich
-        // selbst — NICHT auf den Bambu-Endpoint /api/camera umbiegen.
+        // Klipper mode: the MJPEG reconnect in _startKlipperMjpeg handles
+        // itself — do NOT redirect to the Bambu endpoint /api/camera.
         if (window.isKlipperMode && window.isKlipperMode()) return;
 
         console.log('❌ Camera stream error');
         if (this.streamRetryTimeout) return;
 
-        // Nur fuer den direkten MJPEG-Stream-Modus — im WebRTC- oder
-        // Snapshot-Betrieb wuerde der Retry die ffmpeg-Pipeline grundlos
-        // wiederbeleben.
+        // Only for direct MJPEG stream mode — in WebRTC or snapshot mode
+        // the retry would needlessly revive the ffmpeg pipeline.
         if (window._cameraMode === 'webrtc' || window._cameraOff || window._snapshotPolling) return;
         const img = document.getElementById('camera-stream');
         if (!img) return;
-        // Nicht restarten wenn PiP aktiv ist oder Tab im Hintergrund
+        // Don't restart when PiP is active or the tab is in the background
         if (img.dataset.pipPaused || document.hidden) return;
 
         this.streamRetryTimeout = setTimeout(() => {
@@ -116,15 +115,15 @@ class CameraManager {
     // ============= WebRTC/MJPEG Camera Mode (macOS H.264 VideoToolbox via go2rtc) =============
 
     /**
-     * Regelmaessig ein kleines Standbild wegschreiben.
+     * Periodically write out a small still image.
      *
-     * Es ueberlebt den Seitenwechsel (sessionStorage), aber nicht das
-     * Schliessen des Fensters — dieselbe Regel wie in Android: die Bruecke
-     * gilt fuer diese Sitzung, nicht fuer die Ewigkeit.
+     * It survives a page change (sessionStorage), but not closing the
+     * window — same rule as in Android: the bridge holds for this
+     * session, not forever.
      *
-     * 320 Bildpunkte breit, JPEG bei 0,6 — rund zehn Kilobyte. Alle zehn
-     * Sekunden eins reicht: es soll zeigen, was zuletzt zu sehen war, nicht
-     * den Strom ersetzen.
+     * 320 pixels wide, JPEG at 0.6 — about ten kilobytes. One every ten
+     * seconds is enough: it's meant to show what was last visible, not
+     * replace the stream.
      */
     merkeBilderVon(video) {
         if (window._bildMerker) clearInterval(window._bildMerker);
@@ -138,11 +137,11 @@ class CameraManager {
                 sessionStorage.setItem('kamera_letztes_bild',
                                        c.toDataURL('image/jpeg', 0.6));
             } catch (_) {
-                // Noch nichts gezeichnet, oder der Speicher ist voll — dann
-                // eben beim naechsten Mal.
+                // Nothing drawn yet, or storage is full — then just
+                // try again next time.
             }
         };
-        // Das erste, sobald wirklich etwas gezeichnet wurde.
+        // The first one, as soon as something has actually been drawn.
         if (video.requestVideoFrameCallback) {
             video.requestVideoFrameCallback(schreibe);
         } else {
@@ -158,11 +157,11 @@ class CameraManager {
             window._webrtcPC = null;
         }
 
-        // Retry-Counter auf window, damit er Reload-persistent in der
-        // Session bleibt. Nach N Fehlversuchen stoppt der Player
-        // automatisch — sonst bombardiert der Browser den Server alle
-        // 3s mit /api/camera/webrtc bis der Tab zu ist, auch wenn der
-        // Drucker offline ist und kein go2rtc laeuft.
+        // Retry counter on window, so it survives a reload for the
+        // session. After N failed attempts the player stops
+        // automatically — otherwise the browser bombards the server every
+        // 3s with /api/camera/webrtc until the tab is closed, even if the
+        // printer is offline and no go2rtc is running.
         window._webrtcFailCount = window._webrtcFailCount || 0;
         const MAX_WEBRTC_RETRIES = 5;
         if (window._webrtcFailCount >= MAX_WEBRTC_RETRIES) {
@@ -189,22 +188,22 @@ class CameraManager {
             el = video;
         }
 
-        // Die Bruecke gegen die schwarze Flaeche: das zuletzt gesehene Bild
-        // steht, bis der Strom wirklich zeichnet.
+        // The bridge against the black area: the last-seen image stays
+        // up until the stream is actually drawing.
         //
-        // Gemessen am 31aug26: vom Start bis zum ersten gezeichneten Bild
-        // 1,27 s im Web, 1,9 s in Android. Der groesste Teil davon ist
-        // unvermeidlich — WebRTC kann erst zeichnen, wenn ein Keyframe
-        // angekommen ist (hier 843 ms nach „verbunden"), und das schickt die
-        // Kamera nur alle paar Sekunden.
+        // Measured: from start to the first drawn frame is
+        // 1.27s on web, 1.9s on Android. Most of that is
+        // unavoidable — WebRTC can't draw until a keyframe has
+        // arrived (here 843ms after "connected"), and the camera only
+        // sends one every few seconds.
         //
-        // `poster` ist genau dafuer gemacht: das Bild steht, bis das Video
-        // etwas zu zeigen hat, und geht dann von selbst. Kein zweites
-        // Element, kein Umschalten.
+        // `poster` is made exactly for this: the image stays up until the
+        // video has something to show, then goes away by itself. No second
+        // element, no switching.
         //
-        // Bewusst NICHT ueber /api/camera/snapshot: der startet die
-        // ffmpeg-Pipeline auf dem Server, und die laeuft danach 45 s bei
-        // einem halben Kern weiter. Fuer ein Ueberbrueckungsbild zu teuer.
+        // Deliberately NOT via /api/camera/snapshot: that starts the
+        // ffmpeg pipeline on the server, and it then keeps running for 45s
+        // using half a core. Too expensive for a bridging image.
         try {
             const gemerkt = sessionStorage.getItem('kamera_letztes_bild');
             if (gemerkt) el.poster = gemerkt;
@@ -241,17 +240,16 @@ class CameraManager {
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
 
-            // Auf die ICE-Kandidaten warten.
+            // Wait for the ICE candidates.
             //
-            // Ohne STUN/TURN (iceServers: []) entstehen nur lokale Kandidaten,
-            // die in wenigen Millisekunden da sind. Trotzdem stand hier eine
-            // Rueckfallfrist von 2 Sekunden — und genau die lief regelmaessig
-            // ab, weil Chromium den Zustand "complete" verzoegert meldet. Das
-            // waren 2 der 3 Sekunden, die das Kamerabild auf sich warten liess
-            // (gemessen 20aug26).
+            // Without STUN/TURN (iceServers: []) only local candidates arise,
+            // and they're ready within a few milliseconds. Waiting for the
+            // "complete" state isn't safe though — Chromium reports it with a
+            // delay, which can cost a second or more of the camera image just
+            // sitting there waiting.
             //
-            // Jetzt: fertig, sobald der erste Kandidat da ist (plus kurze
-            // Nachfrist fuer weitere), spaetestens nach 600 ms.
+            // So instead: done as soon as the first candidate arrives (plus a
+            // short grace period for more), at the latest after 600 ms.
             await new Promise(function(resolve) {
                 if (pc.iceGatheringState === 'complete') return resolve();
                 let fertig = false;
@@ -260,7 +258,7 @@ class CameraManager {
                     if (pc.iceGatheringState === 'complete') ende();
                 };
                 pc.onicecandidate = function (e) {
-                    // null = Gathering beendet; sonst nach kurzer Nachfrist los.
+                    // null = gathering finished; otherwise go after a short grace period.
                     if (!e.candidate) ende();
                     else setTimeout(ende, 120);
                 };
@@ -274,11 +272,11 @@ class CameraManager {
                 headers: {'Content-Type': 'application/sdp'}
             });
 
-            // 425 „Too Early" = der Drucker faehrt noch hoch. Das ist kein
-            // Fehlschlag: wuerde er unten mitgezaehlt, verdoppelte sich die
-            // Wartezeit mit jedem Versuch, und das Bild kaeme Sekunden nach
-            // dem Drucker statt mit ihm — nach fuenf Versuchen gaebe der
-            // Player sogar ganz auf. Also in festem Takt weiter warten.
+            // 425 "Too Early" = the printer is still booting. That's not a
+            // failure: if it counted as one below, the wait time would double
+            // with each attempt, and the image would arrive seconds after
+            // the printer instead of with it — after five attempts the
+            // player would even give up entirely. So keep waiting at a fixed pace.
             if (resp.status === 425) {
                 pc.close();
                 if (pc === window._webrtcPC) window._webrtcPC = null;
@@ -295,15 +293,15 @@ class CameraManager {
             const answerSDP = await resp.text();
             await pc.setRemoteDescription({type: 'answer', sdp: answerSDP});
             console.log(`WebRTC stream connected (${Math.round(performance.now() - t0)} ms)`);
-            // Connection steht -> Counter zuruecksetzen fuer naechsten Disconnect
+            // Connection is up -> reset the counter for the next disconnect
             window._webrtcFailCount = 0;
         } catch (e) {
             console.error('WebRTC setup failed:', e);
             pc.close();
             if (pc === window._webrtcPC) window._webrtcPC = null;
             window._webrtcFailCount = (window._webrtcFailCount || 0) + 1;
-            // Retry mit exponentiellem Backoff, aber nur solange Max nicht
-            // erreicht (Check passiert oben am Anfang der Funktion).
+            // Retry with exponential backoff, but only until the max is
+            // reached (checked above at the start of the function).
             const backoffMs = Math.min(3000 * Math.pow(2, window._webrtcFailCount - 1), 30000);
             setTimeout(function() {
                 if (window._cameraMode === 'webrtc' && !window._cameraOff) {
@@ -313,7 +311,7 @@ class CameraManager {
         }
     }
 
-    /** Externer Reset-Hook, z.B. wenn der Drucker wieder an geht. */
+    /** External reset hook, e.g. when the printer powers back on. */
     resetWebRTCRetries() {
         window._webrtcFailCount = 0;
     }
@@ -332,10 +330,10 @@ class CameraManager {
     // Snapshot-Polling for MJPEG via Cloudflare (multipart/x-mixed-replace gets buffered)
     startSnapshotPolling() {
         if (window._snapshotPolling) return;
-        // Klipper-Mode hat kein /api/camera/snapshot — Stream ist direktes
-        // mjpeg ueber unseren Klipper-Proxy (siehe _initKlipperCamera).
-        // Aufrufer wie recheckCameraMode oder Tab-Visible-Recovery koennten
-        // hier rein — wir wechseln stattdessen sauber zum Klipper-Init.
+        // Klipper mode has no /api/camera/snapshot — the stream is direct
+        // mjpeg via our Klipper proxy (see _initKlipperCamera).
+        // Callers like recheckCameraMode or tab-visible recovery could end
+        // up here — we switch cleanly to the Klipper init instead.
         if (window.isKlipperMode && window.isKlipperMode()) {
             this._initKlipperCamera();
             return;
@@ -398,8 +396,8 @@ class CameraManager {
         }
     }
 
-    /** Nach MJPEG-Fallback einmal nachfragen, ob WebRTC inzwischen
-     *  bereitsteht (go2rtc-Kaltstart) — wenn ja, umschalten. */
+    /** After the MJPEG fallback, check once whether WebRTC has since
+     *  become ready (go2rtc cold start) — if so, switch over. */
     _scheduleWebrtcRecheck() {
         if (this._webrtcRecheck) return;
         this._webrtcRecheck = true;
@@ -426,16 +424,16 @@ class CameraManager {
                 await new Promise(r => setTimeout(r, 100));
             }
 
-            // Multi-Printer Phase 3: warten bis der printer-adapter geladen
-            // UND `loadPrinterInfo()` durchgelaufen ist. Sonst wuerde der
-            // Klipper-Mode falsch erkannt (Default ist 'bambu') und der
-            // CameraManager pingt /api/camera (Bambu-Pfad) → ERROR-Spam.
+            // Multi-printer phase 3: wait until the printer adapter is loaded
+            // AND `loadPrinterInfo()` has finished. Otherwise Klipper mode
+            // would be detected wrong (default is 'bambu') and the
+            // CameraManager would ping /api/camera (the Bambu path) -> error spam.
             //
-            // Die Betriebsart steht aber schon serverseitig im body-Attribut
-            // (data-active-printer) — der Modus-Abruf braucht den Adapter also
-            // nicht. Deshalb parallel: /api/camera/mode sofort anfragen und
-            // waehrenddessen auf den Adapter warten. Vorher lagen beide
-            // hintereinander und kosteten bis zu einer Sekunde Blindzeit.
+            // The operating mode is already known server-side via the body
+            // attribute (data-active-printer) though — so the mode lookup
+            // doesn't need the adapter. Hence in parallel: request
+            // /api/camera/mode immediately while waiting for the adapter.
+            // Doing these sequentially cost up to a second of dead time.
             const modusVorab = (window.isKlipperMode && window.isKlipperMode())
                 ? null
                 : apiCall('/api/camera/mode').then(r => r.json()).catch(() => null);
@@ -449,8 +447,8 @@ class CameraManager {
                 return this._initKlipperCamera();
             }
 
-            // Vorab-Anfrage nutzen (laeuft schon seit dem Adapter-Warten);
-            // nur wenn sie fehlschlug, nochmal fragen.
+            // Use the pre-fetched request (already running since the adapter wait);
+            // only ask again if it failed.
             const data = (await modusVorab)
                 || await apiCall('/api/camera/mode').then(r => r.json());
             console.log('Camera mode response:', data);
@@ -477,10 +475,10 @@ class CameraManager {
                 return;
             }
 
-            // MJPEG-Fallback (Snapshot-Polling) — z.B. wenn go2rtc beim
-            // App-Kaltstart noch nicht wach war. Danach einmal nachpruefen,
-            // ob WebRTC inzwischen geht, sonst haengt der Client dauerhaft
-            // im Polling und haelt serverseitig die ffmpeg-Pipeline wach.
+            // MJPEG fallback (snapshot polling) — e.g. if go2rtc wasn't
+            // awake yet at app cold start. Check once afterward whether
+            // WebRTC works by now, otherwise the client stays stuck
+            // polling forever and keeps the server-side ffmpeg pipeline alive.
             window._cameraMode = 'mjpeg';
             console.log('Camera mode: MJPEG (snapshot polling)');
             this.startSnapshotPolling();
@@ -492,13 +490,13 @@ class CameraManager {
         }
     }
 
-    // ============= Klipper-Camera =============
-    // Multi-Printer Phase 3: Klipper-Cams sind direkte mjpeg-URLs, der
-    // Browser kann das ohne Proxy/Polling. Bei mehreren Cams cyclet der
-    // existierende camera-source-toggle-btn durch alle.
+    // ============= Klipper camera =============
+    // Multi-printer phase 3: Klipper cams are direct mjpeg URLs, the
+    // browser can handle that without a proxy/polling. With multiple cams
+    // the existing camera-source-toggle-btn cycles through all of them.
     async _initKlipperCamera() {
-        if (this._manualPaused) return;   // manuell pausiert → nicht automatisch neu starten
-        this._stopKlipperPoll();   // altes Polling stoppen (Re-Init/Reconnect)
+        if (this._manualPaused) return;   // manually paused -> don't auto-restart
+        this._stopKlipperPoll();   // stop old polling (re-init/reconnect)
         try {
             const r = await apiCall('/api/camera/sources');
             const data = await r.json();
@@ -523,8 +521,8 @@ class CameraManager {
             window._cameraOff = false;
             this._setKlipperCamera(0);
 
-            // Toggle-Button anzeigen wenn >1 Cam — der initCameraSourceButton
-            // macht das nur fuer uStreamer. Hier separat triggern.
+            // Show the toggle button when there's >1 cam — initCameraSourceButton
+            // only does that for uStreamer. Trigger it separately here.
             if (sources.length > 1) {
                 const dashboardBtn = document.getElementById('camera-source-toggle-btn');
                 if (dashboardBtn) dashboardBtn.style.display = 'flex';
@@ -545,47 +543,47 @@ class CameraManager {
         const controlImg = document.getElementById('control-camera');
         const ph = document.getElementById('camera-placeholder');
 
-        // Bild-Ausrichtung aus Moonraker (server.webcams.list rotation/flip) als
-        // CSS-Transform — z.B. eMeet C960 ist 180° montiert (rotation:180).
+        // Image orientation from Moonraker (server.webcams.list rotation/flip) as
+        // a CSS transform — e.g. the eMeet C960 is mounted at 180° (rotation:180).
         const tf = [];
         if (s.rotation) tf.push('rotate(' + s.rotation + 'deg)');
         if (s.flip_horizontal) tf.push('scaleX(-1)');
         if (s.flip_vertical) tf.push('scaleY(-1)');
         const transform = tf.join(' ');
-        // baseTransform merken → der Zoom kombiniert sie mit scale() statt sie zu
-        // überschreiben (sonst kippt das Bild beim Zoom/Reset auf den Kopf).
+        // Remember baseTransform -> zoom combines it with scale() instead of
+        // overwriting it (otherwise the image flips upside down on zoom/reset).
         if (img) { img.style.display = 'block'; img.style.transform = transform; img.dataset.baseTransform = transform; }
         if (controlImg) { controlImg.style.transform = transform; controlImg.dataset.baseTransform = transform; }
         if (ph) ph.style.display = 'none';
 
-        // Source-Label aktualisieren — derselbe Span den Bambu nutzt.
+        // Update the source label — the same span Bambu uses.
         const lbl = document.getElementById('camera-source-text');
         if (lbl) lbl.textContent = s.label || s.id;
         const ctrlLbl = document.getElementById('control-camera-source');
         if (ctrlLbl) ctrlLbl.innerHTML = window.skIcon('kamera', 'hd-ic--xs') + ' ' + (s.label || s.id);
 
-        // Kontinuierliches MJPEG (?action=stream) über den Adapter-Proxy — wie
-        // Android lokal: ein offener Stream, der Browser dekodiert die Frames →
-        // flüssig (statt ruckeligem Snapshot-Polling). Der Proxy kappt Stalls nach
-        // 15s, der Reconnect unten verbindet dann neu.
+        // Continuous MJPEG (?action=stream) via the adapter proxy — like
+        // Android locally: one open stream, the browser decodes the frames ->
+        // smooth (instead of choppy snapshot polling). The proxy cuts off stalls
+        // after 15s, the reconnect below then connects again.
         this._startKlipperMjpeg(s);
     }
 
-    // Stoppt laufendes Polling/MJPEG (vor Source-Wechsel / Kamera aus).
+    // Stops running polling/MJPEG (before a source switch / camera off).
     _stopKlipperPoll() {
         const p = this._klipperPoll;
         if (!p) return;
         if (p.timer) clearTimeout(p.timer);
         if (p.loader) { p.loader.onload = null; p.loader.onerror = null; }
-        // MJPEG: onerror lösen + Stream schließen (src leeren), sonst läuft die
-        // Verbindung weiter und ein onerror würde fälschlich reconnecten.
+        // MJPEG: detach onerror + close the stream (clear src), otherwise the
+        // connection keeps running and an onerror would incorrectly reconnect.
         if (p.imgs) p.imgs.forEach((el) => { el.onerror = null; try { el.removeAttribute('src'); } catch (_) {} });
         this._klipperPoll = null;
     }
 
-    // Kontinuierliches MJPEG (Port-Pendant zu Androids processMJPEGStream): ein
-    // offener Stream pro <img> auf die Proxy-Stream-URL. Bei Stall/Fehler (Proxy
-    // kappt nach 15s) feuert onerror → Reconnect mit Cache-Bust.
+    // Continuous MJPEG (the port's counterpart to Android's processMJPEGStream): one
+    // open stream per <img> to the proxy stream URL. On a stall/error (the proxy
+    // cuts it off after 15s) onerror fires -> reconnect with a cache-buster.
     _startKlipperMjpeg(source) {
         this._stopKlipperPoll();
         const url = source.url;            // /api/camera/klipper/<id> → ?action=stream
@@ -609,10 +607,10 @@ class CameraManager {
         connect();
     }
 
-    // Reagiert auf die Drucker-Verbindung (Socket.IO mqtt_status). Klipper-Direct:
-    // Drucker AUS → Snapshot-Polling stoppen (sonst feuert der Image-Loader endlos
-    // 404s gegen die nicht erreichbare Kamera) und Platzhalter zeigen; Drucker AN →
-    // Kamera neu initialisieren (nur falls noch kein Poll läuft).
+    // Reacts to the printer connection (Socket.IO mqtt_status). Klipper direct:
+    // printer OFF -> stop snapshot polling (otherwise the image loader fires
+    // endless 404s against the unreachable camera) and show the placeholder;
+    // printer ON -> reinitialize the camera (only if no poll is already running).
     onPrinterConnectionChange(connected) {
         if (!(window.isKlipperMode && window.isKlipperMode())) return;
         if (connected) {
@@ -641,10 +639,10 @@ class CameraManager {
 
     // Re-check camera mode (e.g., after MQTT reconnect when printer turns on)
     async recheckCameraMode() {
-        // Im Klipper-Mode haben wir keinen `/api/camera/mode`-Detect (Bambu-
-        // spezifischer Endpoint, kann ERRORs erzeugen wenn kein Bambu-Stack).
-        // Stattdessen den Klipper-Init wiederholen — der zieht sources neu
-        // und setzt das `<img>` auf die richtige Cam.
+        // In Klipper mode we have no `/api/camera/mode` detection (a Bambu-
+        // specific endpoint that can throw errors without a Bambu stack).
+        // Repeat the Klipper init instead — it pulls sources again
+        // and sets the `<img>` to the right cam.
         if (window.isKlipperMode && window.isKlipperMode()) {
             return this._initKlipperCamera();
         }
@@ -661,18 +659,18 @@ class CameraManager {
             window._cameraOff = false;
             console.log('Camera back online, mode:', data.type);
 
-            // Der Drucker ist wieder da — die Fehlversuche von vorhin zaehlen
-            // nicht mehr. Ohne das schleppte sich der Zaehler aus dem letzten
-            // Aus-Zyklus mit, und nach ein paar Ein/Aus-Runden war das
-            // Maximum erreicht, ohne dass je wirklich etwas kaputt war.
-            // (`resetWebRTCRetries` gab es schon, gerufen hat es niemand.)
+            // The printer is back — the failed attempts from before no
+            // longer count. Without this, the counter would carry over from
+            // the last off cycle, and after a few on/off rounds the
+            // maximum would be hit even though nothing was ever actually broken.
+            // (`resetWebRTCRetries` already existed, nobody called it.)
             this.resetWebRTCRetries();
 
             if (data.type === 'webrtc') {
                 window._cameraMode = 'webrtc';
                 await this.startWebRTCStream();
             } else {
-                // MJPEG fallback — Snapshot-Polling
+                // MJPEG fallback — snapshot polling
                 window._cameraMode = 'mjpeg';
                 this.startSnapshotPolling();
             }
@@ -681,8 +679,8 @@ class CameraManager {
         }
     }
 
-    // ============= PAGE VISIBILITY - Stream pausieren wenn Tab/App im Hintergrund =============
-    // Wie iOS/Catalyst: Stream-Lifecycle unabhängig vom Socket verwalten
+    // ============= PAGE VISIBILITY - pause the stream when the tab/app is in the background =============
+    // Like iOS/Catalyst: manage the stream lifecycle independently of the socket
     _setupPageVisibility() {
         let streamWasActive = false;
         let controlStreamWasActive = false;
@@ -708,14 +706,14 @@ class CameraManager {
                 return;
             }
 
-            // MJPEG mode: im Hintergrund Stream/Polling pausieren, vorne fortsetzen.
+            // MJPEG mode: pause the stream/polling in the background, resume in the foreground.
             if (window._cameraMode === 'mjpeg') {
                 if (document.hidden) {
                     self.stopSnapshotPolling();
-                    self._stopKlipperPoll();   // Klipper-Dauer-MJPEG-Verbindung schließen
+                    self._stopKlipperPoll();   // close the persistent Klipper MJPEG connection
                     console.log('⏸️ Kamera pausiert (Tab im Hintergrund)');
                 } else {
-                    self.startSnapshotPolling();   // Klipper-Mode: leitet auf _initKlipperCamera um
+                    self.startSnapshotPolling();   // Klipper mode: redirects to _initKlipperCamera
                     console.log('▶️ Kamera fortgesetzt');
                 }
             }
@@ -744,7 +742,7 @@ class CameraManager {
                     window.cameraRefreshInterval = null;
                 }
             } else {
-                // Tab/App ist wieder im Vordergrund → Streams SOFORT fortsetzen
+                // Tab/app is back in the foreground -> resume streams IMMEDIATELY
                 if (streamWasActive) {
                     if (cameraEl && window._cameraMode === 'mjpeg' && cameraEl.dataset.originalSrc) {
                         const baseSrc = cameraEl.dataset.originalSrc;
@@ -752,7 +750,7 @@ class CameraManager {
                         streamWasActive = false;
                         console.log('▶️ Kamera-Stream fortgesetzt');
 
-                        // Error-Handler mit Retry
+                        // Error handler with retry
                         let retryCount = 0;
                         cameraEl.onerror = function() {
                             if (retryCount < 3) {
@@ -768,7 +766,7 @@ class CameraManager {
                 } else if (cameraEl && cameraEl.dataset.pipPaused &&
                            (!window.pipWindow || window.pipWindow.closed) &&
                            !window.electronPipActive) {
-                    // PiP wurde geschlossen während Fenster minimiert war → jetzt fortsetzen
+                    // PiP was closed while the window was minimized -> resume now
                     cameraEl.src = cameraEl.dataset.pipPaused + '?t=' + Date.now();
                     delete cameraEl.dataset.pipPaused;
                     console.log('▶️ Camera stream resumed (PiP was closed while minimised)');
@@ -795,43 +793,43 @@ class CameraManager {
         let reloadAttempts = 0;
         const maxReloads = 3;
 
-        // Kamera Reload mit Timeout
+        // Camera reload with timeout
         function checkCameraLoad() {
             const img = document.getElementById('camera-stream');
             const placeholder = document.getElementById('camera-placeholder');
 
             if (!img) return;
 
-            // Nach 2 Sekunden prüfen ob Kamera sichtbar ist
+            // Check after 2 seconds whether the camera is visible
             setTimeout(() => {
-                // Wenn Kamera nicht sichtbar ist (noch Placeholder)
+                // If the camera isn't visible (still showing the placeholder)
                 if (placeholder && placeholder.style.display !== 'none') {
                     reloadAttempts++;
                     console.log(texts.console_camera_not_loaded_attempt + ' ' + reloadAttempts);
 
                     if (window._cameraMode !== 'mjpeg' || window._cameraOff) return;
                     if (reloadAttempts <= maxReloads && !img.dataset.pipPaused) {
-                        // Neuer Versuch (nicht wenn PiP aktiv)
+                        // New attempt (not while PiP is active)
                         const newSrc = '/api/camera?t=' + Date.now();
                         img.src = newSrc;
 
-                        // Nächsten Check planen
+                        // Schedule the next check
                         checkCameraLoad();
                     } else {
                         console.log(texts.console_camera_could_not_load);
                     }
                 } else {
-                    // Kamera erfolgreich geladen
+                    // Camera loaded successfully
                     reloadAttempts = 0;
                     console.log(texts.console_camera_loaded);
                 }
             }, 2000);
         }
 
-        // Initial Check starten
+        // Start the initial check
         checkCameraLoad();
 
-        // Periodischer Refresh alle 5 Minuten (nicht wenn PiP aktiv)
+        // Periodic refresh every 5 minutes (not while PiP is active)
         setInterval(() => {
             if (window._cameraMode !== 'mjpeg' || window._cameraOff || window._snapshotPolling) return;
             const img = document.getElementById('camera-stream');
@@ -845,8 +843,8 @@ class CameraManager {
 
     // ============= Camera Source Toggle (Control Tab) =============
     async toggleControlCameraSource() {
-        // Klipper: cycle wie der Hauptbild-Cycler. Wir setzen die Cams in
-        // beide <img> (control-camera + camera-stream) gleichzeitig.
+        // Klipper: cycle like the main image cycler. We set the cams on
+        // both <img> elements (control-camera + camera-stream) at the same time.
         if (window.isKlipperMode && window.isKlipperMode()) {
             this._cycleKlipperCamera();
             const sources = this._klipperSources || [];
@@ -872,15 +870,15 @@ class CameraManager {
             const data = await response.json();
 
             if (data.success) {
-                // Update beide Kameras
+                // Update both cameras
                 const controlImg = document.getElementById('control-camera');
                 const mainImg = document.getElementById('camera-stream');
 
-                // CPU-optimierter Camera-Stream
-                const timestamp = Math.floor(Date.now() / 5000) * 5000; // Nur alle 5s neue URL
-                const newSrc = `/api/camera?v=${timestamp}&quality=medium`; // Niedrigere Qualität
+                // CPU-optimized camera stream
+                const timestamp = Math.floor(Date.now() / 5000) * 5000; // New URL only every 5s
+                const newSrc = `/api/camera?v=${timestamp}&quality=medium`; // Lower quality
 
-                // Image Loading mit Performance-Check
+                // Image loading with a performance check
                 const tempImg = new Image();
                 tempImg.onload = function() {
                     if (controlImg) controlImg.src = newSrc;
@@ -895,7 +893,7 @@ class CameraManager {
                 if (controlImg) controlImg.src = newSrc;
                 if (mainImg) mainImg.src = newSrc;
 
-                // Update beide Buttons
+                // Update both buttons
                 const texte = window.texts || {};
         const sourceText = data.source === 'external'
             ? (texte.camera_external || 'Externe Kamera')
@@ -905,7 +903,7 @@ class CameraManager {
                 document.getElementById('camera-source-text').textContent =
                     data.source === 'external' ? 'P1S Kamera' : 'Externe Kamera';
 
-                // Zeige Info wenn P1S Kamera automatisch neugestartet wurde
+                // Show info if the P1S camera was automatically restarted
                 if (data.auto_restarted) {
                     skToast(`P1S Kamera neugestartet: ${data.restart_reason}`, 'info');
                 }
@@ -917,15 +915,15 @@ class CameraManager {
 
     // ============= Camera UI Functions =============
     async toggleCameraSource() {
-        // Klipper-Mode: nicht den /api/camera/source-Bambu-Toggle anrufen,
-        // sondern durch die Klipper-Cams cyclen.
+        // Klipper mode: don't call the /api/camera/source Bambu toggle,
+        // cycle through the Klipper cams instead.
         if (window.isKlipperMode && window.isKlipperMode()) {
             this._cycleKlipperCamera();
             return;
         }
 
-        // Bambu: eine Quelle — Kick fuer eine eingefrorene Pipeline,
-        // danach Modus neu verhandeln (docs/kamera-architektur.md).
+        // Bambu: one source — a kick for a frozen pipeline,
+        // then renegotiate the mode (docs/kamera-architektur.md).
         const texts = window.texts || {};
         try {
             const response = await apiCall('/api/camera/source', { method: 'POST' });
@@ -939,9 +937,9 @@ class CameraManager {
         }
     }
 
-    /** Kamera-Vorschau im Steuerungs-Modal (#control-camera) — laut
-     *  Kontrakt: bei WebRTC denselben MediaStream als zweite Senke, bei
-     *  MJPEG Snapshot-Polling mit 1 fps, bei aus nichts. */
+    /** Camera preview in the control modal (#control-camera) — per the
+     *  contract: for WebRTC the same MediaStream as a second sink, for
+     *  MJPEG snapshot polling at 1 fps, for off nothing. */
     attachControlPreview() {
         this.detachControlPreview();
         let el = document.getElementById('control-camera');
@@ -968,8 +966,8 @@ class CameraManager {
             }
         }
 
-        // MJPEG: 1-fps-Snapshots — genug fuer die kleine Vorschau, und die
-        // Pipeline stirbt 45 s nach dem Schliessen von selbst.
+        // MJPEG: 1 fps snapshots — enough for the small preview, and the
+        // pipeline dies on its own 45s after closing.
         if (el.tagName === 'VIDEO') {
             const img = document.createElement('img');
             img.id = 'control-camera';
@@ -1030,8 +1028,8 @@ class CameraManager {
                       window.location.search.includes('app=ios');
 
         if (isIOS) {
-            // iOS kann kein PiP für img-Elemente, nur für video
-            // Als Workaround: Öffne Stream in neuem Fenster
+            // iOS can't do PiP for img elements, only for video
+            // As a workaround: open the stream in a new window
             const cameraImg = document.getElementById('camera-stream');
             if (cameraImg) {
                 const pipWindow = window.open('/pip', 'PiP_Camera', 'width=320,height=180');
@@ -1076,29 +1074,29 @@ class CameraManager {
             return;
         }
 
-        // Container für Vollbild erstellen
+        // Create the container for fullscreen
         const fullscreenContainer = document.createElement('div');
         fullscreenContainer.id = 'fullscreen-container';
 
         if (isIOS) {
-            // iOS: Fixed positioning ohne Fullscreen API
+            // iOS: fixed positioning without the Fullscreen API
             fullscreenContainer.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; z-index:99999; background:#000; display:flex; align-items:center; justify-content:center;';
         } else {
-            // Browser: Normal mit Fullscreen API
+            // Browser: normal, with the Fullscreen API
             fullscreenContainer.style.cssText = 'position:relative; width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center;';
         }
 
-        // Bild klonen für Vollbild
+        // Clone the image for fullscreen
         const fullscreenImg = elem.cloneNode(true);
         fullscreenImg.id = 'fullscreen-camera-stream';
         fullscreenImg.style.cssText = 'max-width:100%; max-height:100%; transition:transform 0.3s ease; transform-origin:center;';
-        // Kamera-Rotation/Flip erhalten — die cssText-Zuweisung oben hat die Transform
-        // gedroppt; sonst wäre das Vollbild auf dem Kopf und der Fullscreen-Zoom verlöre sie.
+        // Preserve the camera rotation/flip — the cssText assignment above dropped
+        // the transform; otherwise fullscreen would be upside down and the fullscreen zoom would lose it.
         const fsBase = elem.dataset.baseTransform || elem.style.transform || '';
         fullscreenImg.dataset.baseTransform = fsBase;
         if (fsBase) fullscreenImg.style.transform = fsBase;
 
-        // Zoom-Controls für Vollbild
+        // Zoom controls for fullscreen
         const zoomControls = document.createElement('div');
         zoomControls.innerHTML = `
             <div style="position:absolute; bottom:20px; left:20px; display:flex; gap:8px; z-index:1000;">
@@ -1113,7 +1111,7 @@ class CameraManager {
         fullscreenContainer.appendChild(zoomControls);
         document.body.appendChild(fullscreenContainer);
 
-        // Nur für Browser versuchen wir echtes Fullscreen
+        // Only for browsers do we attempt real fullscreen
         if (!isIOS) {
             if (fullscreenContainer.requestFullscreen) {
                 fullscreenContainer.requestFullscreen();
@@ -1122,7 +1120,7 @@ class CameraManager {
             }
         }
 
-        // Mausrad-Zoom
+        // Mouse-wheel zoom
         fullscreenImg.addEventListener('wheel', function(e) {
             e.preventDefault();
             const delta = e.deltaY < 0 ? 0.1 : -0.1;
@@ -1130,7 +1128,7 @@ class CameraManager {
         });
     }
 
-    // HQ Status beim Laden abrufen
+    // Fetch the HQ status on load
     async initHQStatus() {
         const texts = window.texts || {};
         try {
@@ -1153,10 +1151,10 @@ class CameraManager {
     }
 
     initCameraSourceButton() {
-        // Config aus Backend (via JINJA_CONFIG)
+        // Config from the backend (via JINJA_CONFIG)
         const ustreamerEnabled = window.JINJA_CONFIG.ustreamerEnabled;
 
-        // Buttons nur anzeigen, wenn µStreamer aktiviert ist
+        // Only show the buttons when µStreamer is enabled
         if (ustreamerEnabled) {
             const dashboardBtn = document.getElementById('camera-source-toggle-btn');
             const controlBtn = document.getElementById('control-camera-source-toggle-btn');
@@ -1181,7 +1179,7 @@ class CameraManager {
         if (!hqBtn || !hqText || !overlay || !img) return;
 
         try {
-            // Loading-Zustand anzeigen
+            // Show the loading state
             hqBtn.disabled = true;
             hqText.innerHTML = window.skIcon('sanduhr', 'hd-ic--xs');
             overlay.style.display = 'flex';
@@ -1201,7 +1199,7 @@ class CameraManager {
             if (data.success) {
                 this.isHQMode = !this.isHQMode;
 
-                // Button-Stil aktualisieren
+                // Update the button style
                 if (this.isHQMode) {
                     hqText.textContent = 'HD';
                     hqBtn.classList.add('active');
@@ -1237,19 +1235,19 @@ class CameraManager {
 
     // ============= PiP Stream Management =============
 
-    // Pausiert den Hauptstream und setzt pipPaused Flag
+    // Pauses the main stream and sets the pipPaused flag
     pauseMainStreamForPiP() {
-        // WebRTC: Passthrough kostet nichts — Hauptstream laeuft weiter,
-        // es gibt keine img-src zum Parken.
+        // WebRTC: passthrough costs nothing — the main stream keeps running,
+        // there's no img src to park.
         if (window._cameraMode === 'webrtc') return;
-        // Klipper-Direct: das Snapshot-Polling STOPPEN — sonst läuft der Hauptstream
-        // parallel zum PiP weiter (zwei Streams gegen die Kamera). Nur die img-src zu
-        // leeren reicht nicht, der Poll setzt sie sofort wieder.
+        // Klipper direct: STOP the snapshot polling — otherwise the main stream
+        // keeps running in parallel with PiP (two streams against the camera). Just
+        // clearing the img src isn't enough, the poll sets it right back.
         if (window.isKlipperMode && window.isKlipperMode()) {
             this._stopKlipperPoll();
             const mainImg = document.getElementById('camera-stream');
             if (mainImg) { mainImg.dataset.pipPaused = '1'; mainImg.style.display = 'none'; mainImg.removeAttribute('src'); }
-            // Hinweis im Hauptbild: Kamera läuft jetzt im PiP-Fenster (sonst nur schwarz).
+            // Note on the main image: the camera now runs in the PiP window (otherwise just black).
             const ph = document.getElementById('camera-placeholder');
             if (ph) {
                 ph.style.display = 'flex';
@@ -1264,14 +1262,14 @@ class CameraManager {
         if (mainImg && mainImg.src && mainImg.src.indexOf('/api/') !== -1) {
             mainImg.dataset.pipPaused = mainImg.src.split('?')[0];
             mainImg.src = '';
-            mainImg.onerror = null; // Error-Handler deaktivieren damit Stream nicht auto-restartet
+            mainImg.onerror = null; // Disable the error handler so the stream doesn't auto-restart
             console.log('⏸️ Kamera-Stream pausiert (PiP aktiv)');
         }
     }
 
-    // Stellt den Hauptstream wieder her wenn PiP geschlossen wird
+    // Restores the main stream when PiP is closed
     resumeMainStreamFromPiP() {
-        // Klipper-Direct: Snapshot-Polling wieder starten (Source + Transform).
+        // Klipper direct: restart snapshot polling (source + transform).
         if (window.isKlipperMode && window.isKlipperMode()) {
             const mainImg = document.getElementById('camera-stream');
             if (mainImg) delete mainImg.dataset.pipPaused;
@@ -1291,7 +1289,7 @@ class CameraManager {
     }
 
     openWindowPiP() {
-        // ===== ELECTRON: Natives frameless PiP-Fenster (wie Chrome PiP Extension) =====
+        // ===== ELECTRON: native frameless PiP window (like the Chrome PiP extension) =====
         if (window.electronAPI && window.electronAPI.pip) {
             const cameraUrl = window.location.origin + '/api/camera';
             window.electronAPI.pip.open(cameraUrl).then(result => {
@@ -1299,7 +1297,7 @@ class CameraManager {
                     window.electronPipActive = true;
                     this.pauseMainStreamForPiP();
                 } else {
-                    // Toggle: PiP wurde geschlossen
+                    // Toggle: PiP was closed
                     window.electronPipActive = false;
                     this.resumeMainStreamFromPiP();
                 }
@@ -1307,18 +1305,18 @@ class CameraManager {
             return;
         }
 
-        // ===== BROWSER: Fallback mit window.open =====
+        // ===== BROWSER: fallback with window.open =====
         if (window.pipWindow && !window.pipWindow.closed) {
             window.pipWindow.close();
             window.pipWindow = null;
             this.resumeMainStreamFromPiP();
         } else {
-            // /pip verhandelt selbst (WebRTC wenn moeglich, sonst Snapshots)
+            // /pip negotiates on its own (WebRTC if possible, otherwise snapshots)
             window.pipWindow = window.open('/pip', 'PiP_Camera', 'width=320,height=180,resizable=yes');
             if (window.pipWindow) {
                 this.pauseMainStreamForPiP();
 
-                // Wenn PiP-Fenster geschlossen wird → Stream wieder starten
+                // When the PiP window closes -> restart the stream
                 const self = this;
                 const checkPipClosed = setInterval(() => {
                     if (!window.pipWindow || window.pipWindow.closed) {

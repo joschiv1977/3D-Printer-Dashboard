@@ -1,12 +1,12 @@
 /* ==========================================================================
-   Spulenauswahl  (24aug26)
+   Spool picker
    --------------------------------------------------------------------------
-   Ein Fenster statt der Auswahlliste in der Material-Karte. Beim
-   Spulenwechsel sucht man nach FARBE und Restmenge — beides stand in der
-   Liste nur als Text am Zeilenende.
+   A window instead of the selection list in the material card. When
+   switching spools you look for COLOR and remaining amount — both used
+   to be just text at the end of the row in the list.
 
-   Das Rad ist der Kern: Aussenring in Filamentfarbe, so weit gefuellt wie
-   die Spule voll ist, Prozentzahl in der Mitte.
+   The wheel is the core: outer ring in the filament color, filled as
+   far as the spool is full, percentage in the middle.
    ========================================================================== */
 
 .spw-panel {
@@ -21,9 +21,9 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    /* .modal-panel liegt mit 95 % Deckkraft und Weichzeichner ueber dem
-       dunklen Schleier — das faerbt die Flaeche grau, waehrend die Karten
-       darauf deckend weiss sind. Hier deckend, wie im Entwurf. */
+    /* .modal-panel sits at 95% opacity with blur over the dark
+       veil — that tints the area gray, while the cards on top of it are
+       opaque white. Opaque here too, as in the design. */
     background: var(--bg-card) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -130,10 +130,10 @@
 /* ---- Raster ---- */
 .spw-raster {
     display: grid;
-    /* minmax(0, 1fr) statt 1fr: eine 1fr-Spalte schrumpft NICHT unter ihren
-       Inhalt. Lange Namen wie "PolyLite™ ASA Dark Green" schoben das Raster
-       damit ueber den Rand hinaus, die dritte Spalte war abgeschnitten und
-       unten stand ein Querbalken (24aug26 gesehen). */
+    /* minmax(0, 1fr) instead of 1fr: a 1fr column does NOT shrink below its
+       content. Long names like "PolyLite™ ASA Dark Green" pushed the grid
+       past the edge, the third column got cut off, and a horizontal
+       scrollbar appeared at the bottom. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     padding: 16px 18px;
@@ -152,7 +152,7 @@
     font-size: 13px;
 }
 
-/* ---- Eine Spule ---- */
+/* ---- One spool ---- */
 .spw-spule {
     position: relative;
     min-width: 0;
@@ -177,8 +177,8 @@
 .spw-spule--passt { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
 .spw-spule--aktiv { border-color: var(--accent-green); box-shadow: 0 0 0 1px var(--accent-green) inset; }
 .spw-spule--knapp { border-color: var(--accent-orange); }
-/* Die getroffene Wahl traegt den kraeftigsten Rand — sie sticht auch
-   neben „passt" und „aktiv" heraus. */
+/* The chosen selection carries the strongest border — it stands out
+   even next to "fits" and "active". */
 .spw-spule--wahl { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue) inset; }
 .spw-spule--leer { opacity: .45; cursor: not-allowed; }
 .spw-spule--leer:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
@@ -236,21 +236,20 @@
 }
 .spw-fuss span { display: inline-flex; align-items: center; gap: 4px; }
 
-/* Feuchte-Gedaechtnis: nur an Rollen, die wirklich im AMS lagen. Trocken
-   bleibt grau — sonst leuchtet die halbe Liste, ohne etwas zu sagen. */
+/* Humidity memory: only for spools that actually sat in the AMS. Dry
+   stays gray — otherwise half the list lights up without saying anything. */
 .spw-feucht {
     padding: 2px 7px; border-radius: 999px; font-weight: 600;
     background: rgba(128,128,128,0.12);
 }
 .spw-feucht--beobachten { background: rgba(245,158,11,0.18); color: #b45309; }
 .spw-feucht--trocknen { background: rgba(239,68,68,0.18); color: #dc2626; }
-/* Die Plakette ist anklickbar und oeffnet die Vorgeschichte. */
+/* The badge is clickable and opens the history. */
 .spw-feucht { cursor: pointer; gap: 4px; }
 .spw-feucht:hover { filter: brightness(0.95); }
 .spw-feucht .hd-ic:last-child { opacity: 0.55; margin-left: -1px; }
 
-/* Fenster mit der Vorgeschichte einer Rolle. Steckte vorher als Kurve
-   unter jeder Karte — auf elf Karten war das Tapete. */
+/* Window with a spool's history. */
 .spf-box { max-width: 540px; width: 100%; }
 .spf-kopf {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
@@ -312,9 +311,8 @@ body.dark-mode .spw-marke--knapp { color: #ffb74d; }
 body.dark-mode .modal-btn--gruen { color: #8bd18e !important; }
 .modal-btn--gruen:disabled { opacity: .5; cursor: not-allowed; }
 
-/* ---- Der Knopf in der Material-Karte, der das Fenster oeffnet ----
-   Er zeigt schon, WELCHE Spule aktiv ist: Farbpunkt plus Name. Die alte
-   Auswahlliste zeigte dasselbe, konnte aber nur eine Zeile Text. */
+/* ---- The button in the material card that opens the window ----
+   It already shows WHICH spool is active: color dot plus name. */
 .mz-spulknopf {
     display: flex;
     align-items: center;
@@ -351,3 +349,21 @@ body.dark-mode .modal-btn--gruen { color: #8bd18e !important; }
     border: 1px solid var(--border-color);
     background: rgba(128,128,128,0.25);
 }
+
+/* Notice for an AMS tray without a Spoolman assignment.
+   The server no longer guesses assignments, so this needs to be
+   shown. */
+.spw-hinweis:empty { display: none; }
+.spw-hinweis {
+    margin: 0 0 10px;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.spw-hinweis-zeile {
+    font-size: 12px; line-height: 1.4;
+    color: var(--text-secondary);
+    background: color-mix(in srgb, var(--accent-orange, #f59e0b) 10%, transparent);
+    border-left: 3px solid var(--accent-orange, #f59e0b);
+    border-radius: 0 6px 6px 0;
+    padding: 7px 10px;
+}
+.spw-hinweis-zeile b { color: var(--text-primary); font-weight: 600; }

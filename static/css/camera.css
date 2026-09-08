@@ -74,12 +74,12 @@
     object-fit: cover;
 }
 
-/* ========== LICHT IM KAMERABILD ==========
-   Oben links, getrennt von der Stream-Gruppe rechts: die steuert die
-   Ansicht, das Licht dagegen echte Hardware am Drucker.
-   Der Knopf traegt .control-btn, weil updateBothButtons('light-btn', …)
-   die Klasse beim Umschalten neu setzt — hier bekommt er dieselbe Optik
-   wie die Overlay-Knoepfe, ohne dass die Logik angefasst werden muss. */
+/* ========== LIGHT IN THE CAMERA IMAGE ==========
+   Top left, separate from the stream group on the right: that group
+   controls the view, while the light controls real hardware on the printer.
+   The button carries .control-btn, because updateBothButtons('light-btn', …)
+   resets that class on toggle — this way it gets the same look
+   as the overlay buttons, without touching the logic. */
 .camera-light {
     position: absolute;
     top: 10px;
@@ -87,10 +87,10 @@
     z-index: 4;
 }
 
-/* `body` davor, damit die Regel `body.dark-mode .control-btn.warning` aus
-   components.css nicht gewinnt — die faerbt den Knopf sonst orange, sobald
-   das Licht an ist, und er passt nicht mehr zu den Nachbarn.
-   Kein backdrop-filter: die Overlay-Knoepfe verzichten bewusst darauf. */
+/* `body` in front, so the rule `body.dark-mode .control-btn.warning` from
+   components.css doesn't win — otherwise it colors the button orange as
+   soon as the light is on, and it no longer matches its neighbors.
+   No backdrop-filter: the overlay buttons deliberately skip it. */
 body .camera-light .control-btn,
 body .camera-light .control-btn.warning {
     background: rgba(0, 0, 0, 0.5);
@@ -112,8 +112,8 @@ body .camera-light .control-btn.warning:hover {
     border-color: rgba(255, 255, 255, 0.2);
 }
 
-/* Licht an: nur ein warmer Rand, damit der Zustand erkennbar bleibt, ohne
-   die Flaeche anders einzufaerben als die Nachbarn. */
+/* Light on: just a warm border, so the state stays recognizable without
+   tinting the area differently than its neighbors. */
 body .camera-light .control-btn.warning {
     border-color: rgba(250, 204, 21, 0.85);
 }

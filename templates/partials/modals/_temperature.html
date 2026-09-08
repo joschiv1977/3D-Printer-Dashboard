@@ -5,13 +5,13 @@
                 <h2 class="sd-modal-title"><svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.76V5a2 2 0 1 0-4 0v9.76a4.5 4.5 0 1 0 4 0z"/></svg> <span id="temp-modal-title">Temperaturen</span></h2>
                 <div class="sd-header-actions">
 {% if active_printer_type == 'bambu' %}
-                    <!-- Kurzweg zum Laden und Entladen. Er steht im Kopf und
-                         nicht bei einer Duese: dort waere er erst nach einem
-                         Klick auf links oder rechts zu sehen, und wer laden
-                         will, will nicht vorher eine Seite aufklappen. Nur
-                         ein Verweis — die Knoepfe selbst bleiben im
-                         Filament-Reiter der Steuerung, eine Stelle mit einem
-                         Satz Regeln. -->
+                    <!--Shortcut to load and unload. It sits in the header and
+                         not next to a nozzle: there it would only be visible
+                         after clicking left or right, and anyone wanting to
+                         load does not want to expand a side first. Just a
+                         link -- the buttons themselves stay in the
+                         control's filament tab, one place with one set
+                         of rules.-->
                     <button class="sd-kopf-knopf" id="temp-filament-btn"
                             onclick="closeTempModal(); openPrinterControl('filament');">
                         <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="M8 11l4 4 4-4"/><path d="M4 21h16"/></svg>
@@ -23,11 +23,11 @@
             </div>
             <div class="sd-modal-body">
 {% if active_printer_type == 'bambu' %}
-                <!-- ============ Display-Stil (Bambu) wie das Lüfter-Fenster:
-                     Maschine mittig, Temperatur-Zonen außen mit Leader-Lines.
-                     Klick auf eine Zone klappt Stepper + Presets aus, Werte
-                     gehen SOFORT raus — kein Anwenden-Knopf. JS baut den
-                     Inhalt (temperature-modal.js). ============ -->
+                <!--============ Display style (Bambu), same as the fan window:
+                     machine centered, temperature zones around the outside with
+                     leader lines. Clicking a zone expands the stepper + presets,
+                     values go out IMMEDIATELY -- no apply button. JS builds the
+                     content (temperature-modal.js). ============-->
                 <div id="dt-stage"></div>
 {% else %}
                 <!-- Nozzle Temperature -->
@@ -54,8 +54,8 @@
                     </div>
                 </div>
 
-                <!-- Zweite Duese (nur Doppelduese). Anzeige beider Seiten;
-                     gesetzt wird oben die AKTIVE — M104 kennt keine Seitenwahl. -->
+                <!--Second nozzle (dual nozzle only). Shows both sides;
+                     the ACTIVE one is set above -- M104 does not support side selection.-->
                 <div class="temp-zone" id="temp-zone-nozzles" style="display:none;">
                     <div class="temp-zone-header">
                         <span class="temp-zone-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h6l-1 5 2 3v3H3v-3l2-3z"/><path d="M14 3h6l-1 5 2 3v3h-8v-3l2-3z"/><path d="M7 17v4M17 17v4"/></svg> <span id="temp-nozzles-label">Düsen</span></span>
@@ -95,7 +95,7 @@
                     </div>
                 </div>
 
-                <!-- Kammer (nur mit beheizter Kammer) -->
+                <!--Chamber (only with a heated chamber)-->
                 <div class="temp-zone" id="temp-zone-chamber" style="display:none;">
                     <div class="temp-zone-header">
                         <span class="temp-zone-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg> <span id="temp-chamber-label">Kammer</span></span>
@@ -118,7 +118,7 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons (Klipper: Anwenden-Modell) -->
+                <!--Action Buttons (Klipper: apply model)-->
                 <div class="temp-actions">
                     <button class="temp-btn temp-btn--cancel" onclick="closeTempModal()">
                         <span id="temp-cancel-btn">Abbrechen</span>

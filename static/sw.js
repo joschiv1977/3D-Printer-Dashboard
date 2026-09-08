@@ -2,7 +2,7 @@ const CACHE_NAME = 'printer-app-v6';
 const STATIC_CACHE = 'static-v6';
 const API_CACHE = 'api-cache-v6';
 
-// Dateien zum Vorab-Cachen
+// The files to pre-cache
 const STATIC_FILES = [
     '/static/auth-handler.js',
     '/static/icon-192x192.png',
@@ -30,7 +30,7 @@ self.addEventListener('activate', (event) => {
     console.log('[SW] Activating Service Worker');
 
     event.waitUntil(
-        // Lösche alte Caches
+        // Delete the old caches
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.map(cacheName => {
@@ -48,11 +48,11 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch Event mit Auth-Check
+// The fetch event, with an auth check
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Skip für externe Requests
+    // Skipped for external requests
     if (url.origin !== location.origin) {
         return;
     }
@@ -63,10 +63,10 @@ self.addEventListener('fetch', (event) => {
             fetch(event.request.clone()).then(response => {
                 // Bei 401 - Unauthorized
                 if (response.status === 401) {
-                    // Lösche Auth-relevante Caches
+                    // Delete the auth-related caches
                     caches.delete(API_CACHE);
 
-                    // Sende Message an alle Clients
+                    // Send a message to every client
                     clients.matchAll().then(clients => {
                         clients.forEach(client => {
                             client.postMessage({
@@ -79,7 +79,7 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 }
 
-                // Cache erfolgreiche API Responses (nur GET)
+                // Cache successful API responses (GET only)
                 if (event.request.method === 'GET' && response.status === 200) {
                     const responseClone = response.clone();
                     caches.open(API_CACHE).then(cache => {
@@ -89,7 +89,7 @@ self.addEventListener('fetch', (event) => {
 
                 return response;
             }).catch(() => {
-                // Offline - versuche aus Cache
+                // Offline - try the cache
                 return caches.match(event.request).then(cachedResponse => {
                     if (cachedResponse) {
                         return cachedResponse;
@@ -108,16 +108,16 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static Files - Cache First (ABER NICHT HTML!)
+    // Static files - cache first (BUT NOT HTML!)
     if (url.pathname.startsWith('/static/')) {
-        // HTML-Dateien IMMER frisch vom Server laden (Network First).
-        // cache:'no-store' zwingt am HTTP-Cache vorbei — ohne das bediente
-        // sich der SW-fetch am Browser-Cache und lieferte trotz Reload
-        // alte Seiten aus (20aug26, history.html).
+        // ALWAYS load HTML files fresh from the server (network first).
+        // cache:'no-store' forces past the HTTP cache -- without it the SW
+        // fetch helped itself from the browser cache and served old pages
+        // despite a reload.
         if (url.pathname.endsWith('.html')) {
             event.respondWith(
                 fetch(event.request, { cache: 'no-store' }).then(fetchResponse => {
-                    // Cache nur erfolgreiche Responses als Fallback
+                    // Cache only successful responses, as the fallback
                     if (fetchResponse.status === 200) {
                         const responseClone = fetchResponse.clone();
                         caches.open(STATIC_CACHE).then(cache => {
@@ -126,13 +126,16 @@ self.addEventListener('fetch', (event) => {
                     }
                     return fetchResponse;
                 }).catch(() => {
-                    // Offline - versuche aus Cache
+                    // Offline - try the cache
                     return caches.match(event.request).then(cachedResponse => {
                         if (cachedResponse) {
                             return cachedResponse;
                         }
-                        // Fallback: gültige Error-Response (nie null/undefined!)
-                        return new Response('Seite nicht verfügbar (offline)', {
+                        // Fallback: a valid error response (never null/undefined!)
+                        return new Response('Page unavailable (offline)', {   // bewusst englisch:
+                            // a service worker runs without the language
+                            // files, and this is the body of a 503 answer,
+                            // not a control.
                             status: 503,
                             headers: { 'Content-Type': 'text/html' }
                         });
@@ -142,12 +145,12 @@ self.addEventListener('fetch', (event) => {
             return;
         }
 
-        // Andere Static Files (JS, CSS, Bilder) - Network First.
-        // Cache-first lieferte einmal geladene Dateien FUER IMMER aus —
-        // ohne Versionswechsel, ohne Nachpruefung. Safari/WebViews umgehen
-        // den Service Worker auch beim harten Neuladen nicht, Aenderungen
-        // kamen dort nie an. Der Server steht im LAN, der Netz-Umweg ist
-        // billig; der Cache bleibt als Offline-Rueckfall.
+        // Other static files (JS, CSS, images) - network first.
+        // Cache-first served a file FOR EVER once it had been loaded -- with no
+        // version change and no re-check. Safari and WebViews do not bypass the
+        // service worker even on a hard reload, so changes never arrived there.
+        // The server sits on the LAN, the trip over the network is cheap; the
+        // cache stays as the offline fallback.
         event.respondWith(
             fetch(event.request).then(fetchResponse => {
                 if (fetchResponse.status === 200) {
@@ -177,11 +180,11 @@ self.addEventListener('fetch', (event) => {
     }
 });
 
-// Push Event mit Validierung
+// The push event, with validation
 self.addEventListener('push', (event) => {
     console.log('[SW] Push received:', event);
 
-    // Ignoriere Push ohne Daten
+    // Ignore a push without data
     if (!event.data) {
         console.error('[SW] push without data - ignored');
         return;
@@ -248,7 +251,7 @@ self.addEventListener('push', (event) => {
                     console.warn('[SW] Unknown notification type:', data.notification_type);
             }
 
-            // Füge Bild hinzu wenn vorhanden
+            // Add the image when there is one
             if (data.image) {
                 notificationData.image = data.image;
             }
@@ -294,7 +297,7 @@ self.addEventListener('notificationclick', (event) => {
             type: 'window',
             includeUncontrolled: true
         }).then(clientList => {
-            // Suche existierendes Fenster
+            // Look for an existing window
             for (const client of clientList) {
                 if (client.url.includes(self.location.origin) && 'focus' in client) {
                     // Sende Message an Client
@@ -307,19 +310,19 @@ self.addEventListener('notificationclick', (event) => {
                 }
             }
 
-            // Kein Fenster gefunden - öffne neues
+            // No window found - open a new one
             return clients.openWindow(new URL(targetUrl, self.location.origin).href);
         })
     );
 });
 
-// Message Handler für Auth Status
+// The message handler for the auth status
 self.addEventListener('message', (event) => {
     console.log('[SW] Message received:', event.data);
 
     if (event.data.type === 'AUTH_STATUS') {
         if (!event.data.authenticated) {
-            // User ausgeloggt - lösche Push Subscription
+            // The user logged out - delete the push subscription
             self.registration.pushManager.getSubscription().then(subscription => {
                 if (subscription) {
                     subscription.unsubscribe().then(() => {
@@ -328,12 +331,12 @@ self.addEventListener('message', (event) => {
                 }
             });
 
-            // Lösche Auth-Caches
+            // Delete the auth caches
             caches.delete(API_CACHE);
         }
     }
 
-    // Skip Waiting wenn Update verfügbar
+    // Skip waiting when an update is available
     if (event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
     }
@@ -341,7 +344,7 @@ self.addEventListener('message', (event) => {
 
 // Periodische Cleanup
 setInterval(() => {
-    // Lösche alte Cache Einträge
+    // Delete the old cache entries
     caches.open(API_CACHE).then(cache => {
         cache.keys().then(requests => {
             requests.forEach(request => {
@@ -350,7 +353,7 @@ setInterval(() => {
                         const cacheTime = response.headers.get('sw-cache-time');
                         if (cacheTime) {
                             const age = Date.now() - parseInt(cacheTime);
-                            // Lösche Cache älter als 1 Stunde
+                            // Delete cache entries older than 1 hour
                             if (age > 3600000) {
                                 cache.delete(request);
                             }

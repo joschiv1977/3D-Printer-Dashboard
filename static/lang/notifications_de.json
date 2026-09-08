@@ -122,7 +122,7 @@
         "body": "'{filename}' ist fast fertig!"
       },
       "progress": {
-        "title": "Test Progress",
+        "title": "Test-Fortschritt",
         "body": "Test {progress}%"
       }
     },
@@ -159,11 +159,23 @@
     "calibration_cancelled": {
       "title": "🔧 Kalibrierung abgebrochen",
       "body": "{name} wurde abgebrochen."
+    },
+    "scheduled_print_started": {
+      "title": "⏰ Geplanter Druck gestartet",
+      "body": "'{filename}' wird gedruckt."
+    },
+    "scheduled_print_failed": {
+      "title": "❌ Geplanter Druck fehlgeschlagen",
+      "body": "'{filename}' — {reason}"
+    },
+    "update_available": {
+      "title": "⬆️ Neue Fassung {version}",
+      "body": "Für {produkt} liegt {version} bereit. Einspielen in den Einstellungen."
     }
   },
   "status": {
     "ready": "Bereit",
-    "printing": "Druckt:",
+    "printing": "Druckt",
     "preparing": "Vorbereitung...",
     "starting_print": "Startet Druck...",
     "print_completed": "Druck abgeschlossen",
@@ -280,7 +292,16 @@
     "printing_failed": "❌ Druck fehlgeschlagen ({duration_minutes} min, Layer {layers_done}/{total_layers})",
     "dry_started": "🌡️ Filament-Trocknung gestartet ({material} {temp}°C, {hours}h)",
     "dry_stopped": "⏹️ Filament-Trocknung gestoppt ({material})",
-    "dry_complete": "✅ Filament-Trocknung abgeschlossen ({material})"
+    "dry_complete": "✅ Filament-Trocknung abgeschlossen ({material})",
+    "hms_error": "⚠️ HMS {code}: {text}",
+    "hms_info": "ℹ️ {text}",
+    "hms_more_errors": "📌 {errors} neue Fehler",
+    "hms_more_infos": "ℹ️ {infos} neue Hinweise",
+    "hms_more_mixed": "📌 {errors} neue Fehler, {infos} neue Hinweise",
+    "speed_change": "⚡ Geschwindigkeit: {level}",
+    "ams_tray_change": "🔄 {from} → {to} bei Schicht {layer}",
+    "spool_changed": "🧵 Spule gewechselt — {grams} g auf die alte Rolle gebucht",
+    "spoolman_tracked": "🧵 {grams} g Filament gebucht (manuell gestoppt)"
   },
   "stages": {
     "0": "Druckt",
@@ -296,7 +317,7 @@
     "10": "Erste Schicht prüfen",
     "11": "Druckplatte identifizieren",
     "12": "Micro Lidar kalibrieren",
-    "13": "Toolhead homing",
+    "13": "Homing Druckkopf",
     "14": "Düsenspitze reinigen",
     "15": "Extruder-Temperatur prüfen",
     "16": "Pausiert vom Benutzer",
@@ -371,6 +392,10 @@
       "no_filament_left": "Filament [{filament_index}] ({spool_name}): Leer! Benötigt {required_weight}g",
       "insufficient_filament": "Filament [{filament_index}] ({spool_name}): {available_weight}g verfügbar, {required_weight}g benötigt (fehlen {shortage}g)",
       "critical_error_scheduling": "Druck kann nicht geplant werden - kritische Filament-Fehler vorhanden"
+    },
+    "mismatch": {
+      "title": "Filament passt nicht",
+      "body": "{file} braucht {wanted} — im Fach liegt {loaded}."
     }
   },
   "maintenance": {
@@ -395,5 +420,15 @@
       "title": "📅 Wartung geplant",
       "body": "{task_name} - in {days} Tag(en)"
     }
+  },
+  "speed_levels": {
+    "1": "Leise",
+    "2": "Standard",
+    "3": "Sport",
+    "4": "Verrückt"
+  },
+  "scheduled": {
+    "reason_klipper_boot": "Klipper-Controller nach dem Start nicht erreichbar",
+    "reason_mqtt": "MQTT-Verbindung nach {cycles} Strom-Zyklen nicht möglich"
   }
 }

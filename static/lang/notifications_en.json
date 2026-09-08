@@ -159,11 +159,23 @@
     "calibration_cancelled": {
       "title": "🔧 Calibration cancelled",
       "body": "{name} was cancelled."
+    },
+    "scheduled_print_started": {
+      "title": "⏰ Scheduled print started",
+      "body": "'{filename}' is printing."
+    },
+    "scheduled_print_failed": {
+      "title": "❌ Scheduled print failed",
+      "body": "'{filename}' — {reason}"
+    },
+    "update_available": {
+      "title": "⬆️ New version {version}",
+      "body": "{version} is ready for {produkt}. Install it in the settings."
     }
   },
   "status": {
     "ready": "Ready",
-    "printing": "Printing:",
+    "printing": "Printing",
     "preparing": "Preparing...",
     "starting_print": "Starting Print...",
     "print_completed": "Print Completed",
@@ -280,7 +292,16 @@
     "printing_failed": "❌ Print failed ({duration_minutes} min, layer {layers_done}/{total_layers})",
     "dry_started": "🌡️ Filament drying started ({material} {temp}°C, {hours}h)",
     "dry_stopped": "⏹️ Filament drying stopped ({material})",
-    "dry_complete": "✅ Filament drying complete ({material})"
+    "dry_complete": "✅ Filament drying complete ({material})",
+    "hms_error": "⚠️ HMS {code}: {text}",
+    "hms_info": "ℹ️ {text}",
+    "hms_more_errors": "📌 {errors} new errors",
+    "hms_more_infos": "ℹ️ {infos} new notices",
+    "hms_more_mixed": "📌 {errors} new errors, {infos} new notices",
+    "speed_change": "⚡ Speed: {level}",
+    "ams_tray_change": "🔄 {from} → {to} at layer {layer}",
+    "spool_changed": "🧵 Spool changed — {grams} g booked to the old one",
+    "spoolman_tracked": "🧵 {grams} g filament booked (stopped manually)"
   },
   "stages": {
     "0": "Printing",
@@ -371,6 +392,10 @@
       "no_filament_left": "Filament [{filament_index}] ({spool_name}): Empty! Requires {required_weight}g",
       "insufficient_filament": "Filament [{filament_index}] ({spool_name}): {available_weight}g available, {required_weight}g required (missing {shortage}g)",
       "critical_error_scheduling": "Cannot schedule print - critical filament errors present"
+    },
+    "mismatch": {
+      "title": "Filament doesn't match",
+      "body": "{file} needs {wanted} — the tray holds {loaded}."
     }
   },
   "maintenance": {
@@ -395,5 +420,15 @@
       "title": "📅 Maintenance planned",
       "body": "{task_name} - in {days} day(s)"
     }
+  },
+  "speed_levels": {
+    "1": "Silent",
+    "2": "Standard",
+    "3": "Sport",
+    "4": "Ludicrous"
+  },
+  "scheduled": {
+    "reason_klipper_boot": "Klipper controller not reachable after boot",
+    "reason_mqtt": "No MQTT connection after {cycles} power cycles"
   }
 }

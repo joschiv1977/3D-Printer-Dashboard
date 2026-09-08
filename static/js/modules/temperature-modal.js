@@ -15,13 +15,20 @@ class TemperatureModalManager {
         const texts = window.texts || {};
         document.getElementById('tempModal').style.display = 'block';
 
-        // Bambu: Display-Stil wie das Luefter-Fenster (dfx-Stage), eigener
-        // Renderer mit Sofort-Senden. Klipper behaelt Slider + Anwenden.
+        // Bambu: the display style of the fan window (dfx stage), with a
+        // renderer of its own that sends straight away. Klipper keeps the
+        // slider plus apply.
         if (!(window.isKlipperMode && window.isKlipperMode())
                 && document.getElementById('dt-stage')) {
             this._zone = zone || null;
             document.getElementById('temp-modal-title').textContent =
                 texts.temp_control_title || 'Temperaturen';
+            // And the filament labels. The block of text further down sets
+            // them too -- only it is never reached here, because this branch
+            // returns first. The result was a German "Laden/Entladen" in the
+            // middle of an English interface.
+            const filLabel = document.getElementById('temp-filament-label');
+            if (filLabel) filLabel.textContent = texts.mz_filament_shortcut || 'Laden/Entladen';
             this._pending = {};   // {schluessel: {wert, timer}}
             this._sig = null;     // Stage frisch bauen (Zonen-Aufklapp-Zustand)
             this.renderBambu();
@@ -29,9 +36,9 @@ class TemperatureModalManager {
             this._tick = setInterval(() => this.renderBambu(), 2000);
             return;
         }
-        // Merken, welche Zone gewuenscht ist — die Sichtbarkeit wird unten
-        // NACH der Faehigkeits-Pruefung angewandt (Kammer/Doppelduese haengen
-        // von capabilities ab und wuerden sonst wieder umgeschaltet).
+        // Remember which zone was asked for -- the visibility is applied
+        // below, AFTER the capability check (chamber and dual nozzle depend on
+        // the capabilities and would otherwise be switched back).
         this._zone = zone || null;
 
         // Texte setzen
@@ -55,7 +62,7 @@ class TemperatureModalManager {
         document.getElementById('temp-nozzle-left-label').textContent = texts.temp_nozzle_left || 'Links';
         document.getElementById('temp-nozzle-right-label').textContent = texts.temp_nozzle_right || 'Rechts';
 
-        // Aktuelle Temperaturen aus lastPrintData holen
+        // Take the current temperatures from lastPrintData
         if (window.lastPrintData) {
             this.lastNozzleTemp = window.lastPrintData.nozzle_temp || 0;
             this.lastBedTemp = window.lastPrintData.bed_temp || 0;
@@ -63,19 +70,19 @@ class TemperatureModalManager {
             this.lastBedTarget = window.lastPrintData.bed_target || 0;
         }
 
-        // Kammer und zweite Duese haengen an dem, was der Drucker meldet —
-        // nicht am Modellnamen. capabilities kommt vom Server (siehe
-        // services/printer_capabilities.py).
-        // Denselben Zustand nutzen wie der Geraete-Tab (printer-control.js):
-        // window.activePrinter.state traegt capabilities und den device-Block.
-        // Klipper fuellt window.activePrinter.state per Socket. Im
-        // Bambu-Betrieb bleibt das leer — dort pflegt printerControl den
-        // /api/status-Zustand (flach, inkl. capabilities). Ohne diesen
-        // Rueckgriff blieben Kammer und Doppelduese am X2D unsichtbar.
+        // The chamber and the second nozzle depend on what the printer
+        // reports, not on the model name. capabilities comes from the server
+        // (see services/printer_capabilities.py).
+        // The same state as the device tab (printer-control.js):
+        // window.activePrinter.state carries the capabilities and the device
+        // block. Klipper fills window.activePrinter.state over the socket. In
+        // Bambu mode it stays empty -- there printerControl keeps the
+        // /api/status state (flat, capabilities included). Without this
+        // fallback the chamber and the dual nozzle stayed invisible on the X2D.
         const status = (window.activePrinter && window.activePrinter.state)
             || (window.printerControlManager && window.printerControlManager.lastState) || {};
         const caps = status.capabilities || {};
-        // Bambu liefert die Werte flach, Klipper unter .device.
+        // Bambu delivers the values flat, Klipper under .device.
         const device = status.device || status;
 
         const chamberZone = document.getElementById('temp-zone-chamber');
@@ -95,7 +102,7 @@ class TemperatureModalManager {
             nozzleZone.style.display = '';
             const ist = device.nozzle_temps || {};
             const soll = device.nozzle_targets || {};
-            // 1 ist LINKS, 0 ist RECHTS — nicht umgekehrt.
+            // 1 is LEFT, 0 is RIGHT -- not the other way round.
             const zeige = (seite, key) => {
                 document.getElementById(`temp-nozzle-${seite}`).textContent =
                     ist[key] != null ? Math.round(ist[key]) : '--';
@@ -105,8 +112,9 @@ class TemperatureModalManager {
             zeige('left', '1');
             zeige('right', '0');
 
-            // Der Regler oben setzt immer die aktive Duese: M104 kennt keine
-            // Seitenwahl, weder bei uns noch in der Home-Assistant-Integration.
+            // The slider at the top always sets the active nozzle: M104 has no
+            // side selection, neither here nor in the Home Assistant
+            // integration.
             const aktiv = device.active_nozzle === 1
                 ? (texts.temp_nozzle_left || 'Links')
                 : (texts.temp_nozzle_right || 'Rechts');
@@ -116,9 +124,9 @@ class TemperatureModalManager {
             nozzleZone.style.display = 'none';
         }
 
-        // Einzel-Zonen-Aufruf (Plakette in der Grafik / Karte der
-        // Uebersicht): nur die angeklickte Zone zeigen. Der Temp-Knopf
-        // oeffnet weiterhin ohne zone → alles sichtbar.
+        // A single-zone call (a badge in the graphic, or a card on the
+        // overview): show only the zone that was clicked. The temperature
+        // button still opens without a zone -> everything visible.
         const zeige = (id, on) => {
             const e = document.getElementById(id);
             if (e) e.style.display = on ? '' : 'none';
@@ -133,11 +141,11 @@ class TemperatureModalManager {
             zeige('temp-zone-bed', true);
         }
 
-        // Aktuelle Werte anzeigen
+        // Show the current values
         document.getElementById('temp-nozzle-current').textContent = Math.round(this.lastNozzleTemp);
         document.getElementById('temp-bed-current').textContent = Math.round(this.lastBedTemp);
 
-        // Slider auf Zieltemperatur setzen (oder 0 wenn kein Ziel)
+        // Set the slider to the target temperature (or 0 when there is none)
         document.getElementById('temp-nozzle-slider').value = this.lastNozzleTarget;
         document.getElementById('temp-nozzle-input').value = this.lastNozzleTarget;
         document.getElementById('temp-bed-slider').value = this.lastBedTarget;
@@ -150,8 +158,9 @@ class TemperatureModalManager {
     }
 
     // =========================================================
-    // Bambu: Display-Stil wie das Luefter-Fenster — Maschine mittig,
-    // Zonen aussen mit Leader-Lines, Klick klappt Stepper + Presets aus.
+    // Bambu: the display style of the fan window -- the machine in the middle,
+    // the zones outside with leader lines, a click unfolds the stepper and the
+    // presets.
     // =========================================================
 
     static PRESETS = {
@@ -174,13 +183,13 @@ class TemperatureModalManager {
         return (window.printerControlManager && window.printerControlManager.lastState) || {};
     }
 
-    /** Sollwert einer Zone senden (nozzle-Seite via nozzle_id). */
+    /** Send the target of one zone (the nozzle side through nozzle_id). */
     _sende(schluessel, wert) {
         const w = Math.max(0, Math.round(wert));
         if (schluessel === 'bed') window.printerAdapter.setTemp('bed', w);
         else if (schluessel === 'chamber') window.printerAdapter.setTemp('chamber', w);
         else window.printerAdapter.setTemp('extruder', w, parseInt(schluessel, 10));
-        // Optimistik: Soll sofort anzeigen, Status bestaetigt spaeter.
+        // Optimistic: show the target straight away, the status confirms later.
         this._pending[schluessel] = { wert: w, bis: Date.now() + 8000 };
         this.renderBambu();
     }
@@ -191,7 +200,7 @@ class TemperatureModalManager {
         return 320;
     }
 
-    /** Stepper: sammelt kurz, sendet dann — vermeidet MQTT-Spam. */
+    /** The stepper: collects briefly, then sends -- this avoids MQTT spam. */
     dtStep(seite, delta) {
         const schluessel = String(seite);
         const aktuell = (this._pending[schluessel] && this._pending[schluessel].wert != null)
@@ -220,12 +229,13 @@ class TemperatureModalManager {
         return Math.round(v || st.nozzle_target || 0);
     }
 
-    // Bauteil-Positionen im x2d.png (Prozent) — Ziel der Leader-Lines.
+    // The positions of the parts in x2d.png (per cent) -- where the leader
+    // lines point.
     static ANKER = {
         nozzleL: '42,31', nozzleR: '48,30', bed: '42,62', chamber: '54,74',
     };
 
-    /** Ein Zonen-Eintrag im Luefter-Stil: Kopf › Wert › Detail (Stepper+Chips). */
+    /** One zone entry in the fan style: head › value › detail (stepper + chips). */
     _eintrag(def) {
         const box = document.createElement('div');
         box.className = 'dfx-fan dfx-fan--' + def.seite;
@@ -260,7 +270,7 @@ class TemperatureModalManager {
         detail.className = 'dtx-detail';
         detail.style.display = 'none';
 
-        // Zwei ruhige Segmentleisten statt Einzel-Buttons: Stepper + Presets.
+        // Two quiet segmented bars instead of single buttons: stepper + presets.
         const step = document.createElement('div');
         step.className = 'dtx-seg';
         [[-10, '−10'], [-1, '−1'], [1, '+1'], [10, '+10']].forEach(([d, label]) => {
@@ -288,7 +298,7 @@ class TemperatureModalManager {
         return box;
     }
 
-    /** Stage einmal bauen (wie das Luefter-Fenster) — Werte kommen separat. */
+    /** Build the stage once (like the fan window) -- the values arrive separately. */
     _baueStage(dual, hatKammer) {
         const wrap = document.getElementById('dt-stage');
         if (!wrap) return;
@@ -307,8 +317,9 @@ class TemperatureModalManager {
         const rechts = document.createElement('div');
         rechts.className = 'dfx-col dfx-col--r';
 
-        // Anordnung wie am Display: links Duese links + Heizbett,
-        // rechts Duese rechts + Kammer. 1 ist LINKS, 0 ist RECHTS.
+        // Laid out like the display: on the left the left nozzle and the heated
+        // bed, on the right the right nozzle and the chamber. 1 is LEFT,
+        // 0 is RIGHT.
         const A = TemperatureModalManager.ANKER;
         let defs = [];
         if (dual) {
@@ -319,8 +330,8 @@ class TemperatureModalManager {
         }
         defs.push({ key: 'bed', label: texts.temp_bed_full || 'Heizbett', seite: 'l', art: 'bed', anker: A.bed });
         if (hatKammer) defs.push({ key: 'chamber', label: texts.temp_chamber || 'Kammer', seite: 'r', art: 'chamber', anker: A.chamber });
-        // Zonen-Aufruf (Karte/Plakette): NUR die angeklickte Zone zeigen —
-        // bei 'nozzle' beide Duesen, sonst genau den einen Eintrag.
+        // A zone call (card or badge): show ONLY the zone that was clicked --
+        // for 'nozzle' both nozzles, otherwise exactly the one entry.
         if (this._zone) {
             defs = defs.filter(this._zone === 'nozzle'
                 ? d => d.art === 'nozzle'
@@ -333,9 +344,9 @@ class TemperatureModalManager {
         stage.appendChild(rechts);
         wrap.appendChild(stage);
 
-        // Hinweis passend zum sichtbaren Inhalt: Vollansicht nennt alle
-        // Zonen, die Düsen-Ansicht nur die Düse. Bett/Kammer kommen schon
-        // aufgeklappt — dort steht stattdessen die Erklärung wie am Display.
+        // The hint matches what is visible: the full view names every zone,
+        // the nozzle view only the nozzle. Bed and chamber arrive already
+        // unfolded -- there the explanation from the display stands instead.
         let hintText = null;
         if (!this._zone) {
             hintText = texts.temp_hint_click
@@ -360,8 +371,8 @@ class TemperatureModalManager {
         }
         if (window.dfxWatchStage) window.dfxWatchStage(stage);
 
-        // Zonen-Aufruf (Plakette/Karte): die angefragte Zone kommt
-        // gleich aufgeklappt — sichtbar bleiben alle.
+        // A zone call (badge or card): the requested zone arrives already
+        // unfolded -- all of them stay visible.
         const zielKey = this._zone === 'bed' ? 'bed'
             : this._zone === 'chamber' ? 'chamber'
             : this._zone === 'nozzle' ? (dual ? String(st.active_nozzle != null ? st.active_nozzle : 0) : defs[0].key)
@@ -401,8 +412,9 @@ class TemperatureModalManager {
             const sollV = soll(key);
             k.val.innerHTML = Math.round(ist || 0) + '° <small>/ ' + sollV + '°</small>';
 
-            // Presets zweizeilig: Material oben, Gradzahl klein darunter —
-            // einzeilig quetschte 'PETG 250' randlos an die Trennlinien.
+            // The presets take two lines: the material on top, the degrees
+            // small below it -- on one line 'PETG 250' was squeezed right up
+            // against the dividers.
             const presets = TemperatureModalManager.PRESETS[k.art];
             const eintraege = [[texts.temp_off || 'Aus', 0]].concat(
                 presets.map(([n, v]) => [n ? (n + '<small>' + v + '°</small>') : String(v), v]));

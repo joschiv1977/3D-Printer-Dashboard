@@ -12,9 +12,9 @@ video {
     object-fit: contain;
     background: #000;
 }
-/* Bis das erste Bild da ist, stand hier nur Schwarz. Beim ersten Aufruf
-   nach dem Einschalten waehlt go2rtc den Drucker erst in diesem Moment —
-   das dauert und sah nach "kaputt" aus (27aug26). */
+/* Until the first frame arrives there was only black here. On the first call
+   after switching on, go2rtc dials the printer only at that moment -- that
+   takes a while and looked "broken". */
 #warte {
     position: absolute; inset: 0;
     display: flex; align-items: center; justify-content: center; gap: 9px;
@@ -52,29 +52,54 @@ video {
     const zoom = params.get('zoom') === '1';
     const video = document.getElementById('v');
 
-    // Diese Seite laedt static/lang/*.js nicht (sie haengt in einem
-    // WKWebView und soll nichts nachladen) — deshalb die eine Zeile hier,
-    // wie es custom-notification.html in der Electron-App auch macht.
+    // This page does not load static/lang/*.js (it hangs in a WKWebView and
+    // should fetch nothing) -- hence the one line here, the way
+    // custom-notification.html does it in the Electron app.
     const TEXTE = {
         de: 'Verbinde mit der Kamera …', en: 'Connecting to the camera …',
         es: 'Conectando con la cámara …', fr: 'Connexion à la caméra …',
         it: 'Connessione alla telecamera …',
     };
+    // The reasons it does NOT work. These three stood hard-coded in German
+    // while the waiting line beside them was translated.
+    const GRUENDE = {
+        kein_webrtc: {
+            de: 'Dieser Browser kennt kein WebRTC (RTCPeerConnection fehlt)',
+            en: 'This browser has no WebRTC (RTCPeerConnection missing)',
+            es: 'Este navegador no admite WebRTC (falta RTCPeerConnection)',
+            fr: "Ce navigateur ne connaît pas WebRTC (RTCPeerConnection manquant)",
+            it: 'Questo browser non conosce WebRTC (manca RTCPeerConnection)',
+        },
+        ice: {
+            de: 'ICE fehlgeschlagen — kein Medienweg zu go2rtc',
+            en: 'ICE failed — no media path to go2rtc',
+            es: 'ICE falló: no hay ruta de medios a go2rtc',
+            fr: 'Échec ICE — aucun chemin média vers go2rtc',
+            it: 'ICE non riuscito — nessun percorso media verso go2rtc',
+        },
+        kein_bild: {
+            de: 'Verbunden, aber kein Bild — Medienweg blockiert?',
+            en: 'Connected, but no picture — media path blocked?',
+            es: 'Conectado, pero sin imagen: ¿ruta de medios bloqueada?',
+            fr: 'Connecté, mais pas d’image — chemin média bloqué ?',
+            it: 'Connesso, ma nessuna immagine — percorso media bloccato?',
+        },
+    };
+    const grund = (name) => (GRUENDE[name] || {})[sprache] || (GRUENDE[name] || {}).de || name;
     const sprache = (params.get('lang') || 'de').slice(0, 2);
     const warte = document.getElementById('warte');
     document.getElementById('warte-text').textContent =
         TEXTE[sprache] || TEXTE.de;
 
-    // Weg, sobald wirklich Bild da ist — nicht schon beim Verbinden.
+    // Gone as soon as a picture really is there -- not already on connecting.
     video.addEventListener('playing', function() { warte.classList.add('weg'); });
     video.addEventListener('loadeddata', function() { warte.classList.add('weg'); });
     function wiederZeigen() { warte.classList.remove('weg'); }
 
-    // Der Grund gehoert auf den Schirm, nicht in eine Konsole, die im
-    // WKWebView niemand sieht. Ohne das steht dort nur "Verbinde …" —
-    // egal ob das Zertifikat abgelehnt wurde, die Signalisierung 503
-    // meldet oder einfach kein Medienweg zustande kommt (27aug26 eine
-    // Stunde im Kreis gesucht).
+    // The reason belongs on the screen, not in a console nobody sees inside
+    // a WKWebView. Without it only "connecting …" stands there -- whether the
+    // certificate was rejected, the signalling reports 503, or simply no media
+    // path comes about.
     const grundZeile = document.getElementById('warte-grund');
     let versuche = 0;
     function sagWarum(text) {
@@ -92,9 +117,9 @@ video {
     let pc = null;
     let stopped = false;
 
-    // Alles, was AUSSERHALB des try unten schiefgeht, verschwand bisher
-    // spurlos — im WKWebView gibt es keine Konsole zum Nachsehen. Beides
-    // hier abfangen und auf den Schirm schreiben.
+    // Anything going wrong OUTSIDE the try below used to vanish without a
+    // trace -- a WKWebView has no console to look in. Catch both here and
+    // write them on the screen.
     window.addEventListener('error', function (e) {
         sagWarum('Skriptfehler: ' + (e.message || 'unbekannt'));
     });
@@ -106,11 +131,11 @@ video {
         if (stopped) return;
         if (pc) { pc.close(); pc = null; }
 
-        // Gibt es WebRTC in diesem Motor ueberhaupt? Der Konstruktor stand
-        // vorher vor dem try — schlug er fehl, brach das Skript ab und die
-        // Seite blieb ohne ein Wort auf "Verbinde" stehen.
+        // Does this engine have WebRTC at all? The constructor used to stand
+        // before the try -- when it failed the script broke off and the page
+        // stayed on "connecting" without a word.
         if (typeof RTCPeerConnection !== 'function') {
-            sagWarum('Dieser Browser kennt kein WebRTC (RTCPeerConnection fehlt)');
+            sagWarum(grund('kein_webrtc'));
             return;
         }
         try {
@@ -127,7 +152,7 @@ video {
 
         pc.oniceconnectionstatechange = function() {
             if (pc && pc.iceConnectionState === 'failed') {
-                sagWarum('ICE fehlgeschlagen — kein Medienweg zu go2rtc');
+                sagWarum(grund('ice'));
             }
         };
 
@@ -169,13 +194,13 @@ video {
             await pc.setRemoteDescription({type: 'answer', sdp: answer});
             console.log('WebRTC connected');
 
-            // Angebot angenommen, aber nach zehn Sekunden immer noch kein
-            // Bild? Dann steht die Signalisierung und es fehlt der
-            // Medienweg — genau der Fall, den ICE-ueber-TCP in WebKit
-            // erzeugt. Auch das gehoert auf den Schirm.
+            // Offer accepted but still no picture after ten seconds? Then the
+            // signalling stands and the media path is missing -- exactly the
+            // case ICE over TCP produces in WebKit. That belongs on the screen
+            // too.
             setTimeout(function () {
                 if (!stopped && video.readyState < 2) {
-                    sagWarum('Verbunden, aber kein Bild — Medienweg blockiert?');
+                    sagWarum(grund('kein_bild'));
                 }
             }, 10000);
         } catch (e) {
@@ -187,7 +212,7 @@ video {
         }
     }
 
-    // Sauberer Cleanup beim Seitenwechsel (verhindert grüne Frames + Overlay)
+    // A clean teardown on a page change (prevents green frames and the overlay)
     function cleanup() {
         stopped = true;
         if (pc) {
@@ -203,7 +228,7 @@ video {
     window.addEventListener('pagehide', cleanup);
     window.addEventListener('beforeunload', cleanup);
 
-    // Globale Cleanup-Funktion für Aufruf aus der App via evaluateJavaScript
+    // A global teardown function, called from the app via evaluateJavaScript
     window.cleanupWebRTC = cleanup;
 
     start();

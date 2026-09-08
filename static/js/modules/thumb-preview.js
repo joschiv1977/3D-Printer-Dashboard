@@ -1,17 +1,17 @@
 /**
- * Thumbnail-Vorschau: Maus ueber ein Thumbnail -> grosse Ansicht daneben.
+ * The thumbnail preview: mouse over a thumbnail -> a large view beside it.
  *
- * Arbeitet mit Ereignis-Delegation am document, damit auch Thumbnails
- * abgedeckt sind, die erst spaeter nachgeladen werden (Verlaufsliste,
- * SD-Karte, Plattenauswahl). Kein Aufruf pro Anzeigestelle noetig.
+ * It works through event delegation on the document, so thumbnails that are
+ * only loaded later are covered too (the history list, the SD card, the plate
+ * picker). No call is needed per place that shows one.
  */
 (function () {
     'use strict';
 
-    // Alle Thumbnail-Bilder der Oberflaeche.
-    // Die Live-Kachel auf dem Dashboard bleibt bewusst aussen vor: dort wird
-    // das Bild ohnehin schon gross angezeigt, die Vorschau waere kaum
-    // groesser als das Original.
+    // Every thumbnail image in the interface.
+    // The live tile on the dashboard is deliberately left out: the image is
+    // already shown large there, and the preview would be barely bigger than
+    // the original.
     const SELECTOR = [
         '.hist-thumb',                // Verlaufsliste
         '.hist-detail-thumb',         // Verlaufs-Detail
@@ -27,8 +27,8 @@
     let boxImg = null;
     let activeSource = null;
 
-    // Geraete ohne echten Zeiger (Touch) haben kein Hover — dort wuerde die
-    // Vorschau beim Tippen aufblitzen und stehen bleiben.
+    // Devices without a real pointer (touch) have no hover -- there the preview
+    // would flash up on a tap and stay.
     function hasHover() {
         return window.matchMedia && window.matchMedia('(hover: hover)').matches;
     }
@@ -47,13 +47,14 @@
         const w = box.offsetWidth;
         const h = box.offsetHeight;
 
-        // Bevorzugt rechts neben das Thumbnail, sonst links, sonst angelegt.
+        // Preferably to the right of the thumbnail, otherwise to the left,
+        // otherwise flush against it.
         let left = r.right + GAP;
         if (left + w > window.innerWidth - MARGIN) left = r.left - GAP - w;
         if (left < MARGIN) left = Math.min(
             Math.max(MARGIN, r.left), window.innerWidth - w - MARGIN);
 
-        // Mittig zur Bildhoehe, aber vollstaendig im Fenster.
+        // Centred on the image height, but fully inside the window.
         let top = r.top + r.height / 2 - h / 2;
         top = Math.min(Math.max(MARGIN, top), window.innerHeight - h - MARGIN);
 
@@ -75,8 +76,8 @@
         boxImg.style.maxWidth = (MAX_SIDE - 16) + 'px';
         boxImg.style.maxHeight = (MAX_SIDE - 16) + 'px';
 
-        // Erst positionieren, wenn die Groesse feststeht — sonst springt die
-        // Vorschau beim ersten Anzeigen.
+        // Position it only once the size is known -- otherwise the preview
+        // jumps the first time it is shown.
         const place = () => {
             if (activeSource !== source) return;
             position(source);
@@ -112,7 +113,7 @@
         hide();
     });
 
-    // Beim Scrollen oder Groessenaendern wandert das Thumbnail weg.
+    // On scrolling or resizing the thumbnail moves away.
     window.addEventListener('scroll', hide, true);
     window.addEventListener('resize', hide);
 })();
