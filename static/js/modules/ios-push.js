@@ -150,12 +150,12 @@ class IOSPushManager {
                         background:var(--bg-card); border-radius:12px; padding:15px;
                         box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999;
                         animation: slideUp 0.3s ease-out;">
-                <h3 style="margin:0 0 10px 0;">Als App installieren</h3>
+                <h3 style="margin:0 0 10px 0;">${(window.texts||{}).ios_install_title || 'Als App installieren'}</h3>
                 <p style="margin:0 0 10px 0; color:var(--text-secondary);">
-                    Für Push-Benachrichtigungen auf iOS:
+                    ${(window.texts||{}).ios_install_intro || 'Für Push-Benachrichtigungen auf iOS:'}
                 </p>
                 <ol style="margin:0 0 10px 0; padding-left:20px;">
-                    <li>Tippe auf das Teilen-Symbol</li>
+                    <li>${(window.texts||{}).ios_tap_share || 'Tippe auf das Teilen-Symbol'}</li>
                     <li>${(window.texts||{}).ios_add_home || 'Wähle „Zum Home-Bildschirm"'}</li>
                     <li>${(window.texts||{}).ios_tap_add || 'Tippe auf „Hinzufügen"'}</li>
                 </ol>

@@ -42,7 +42,7 @@
         <div class="nb-kopf">
             <h1 class="nb-kopf-titel">
                 <svg class="nb-ic nb-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-                <span data-i18n="nb_titel">Benachrichtigungen</span>
+                <span data-i18n="nb_title">Benachrichtigungen</span>
             </h1>
             <span class="nb-kopf-luft"></span>
             <button class="nb-btn" onclick="loadNotifications()">
@@ -53,10 +53,10 @@
 
         <div class="nb-filter">
             <button id="filter-all" class="an" onclick="setFilter('all')">
-                <span data-i18n="nb_filter_alle">Alle</span> <b id="zahl-alle"></b>
+                <span data-i18n="nb_filter_all">Alle</span> <b id="zahl-alle"></b>
             </button>
             <button id="filter-unread" onclick="setFilter('unread')">
-                <span data-i18n="nb_filter_ungelesen">Ungelesen</span> <b id="zahl-neu"></b>
+                <span data-i18n="nb_filter_unread">Ungelesen</span> <b id="zahl-neu"></b>
             </button>
         </div>
 
@@ -68,7 +68,7 @@
         let currentFilter = 'all';
 
         function t(key, rueckfall) {
-            return (window.texts && window.texts[key]) || rueckfall;
+            return window.getText(key, rueckfall);
         }
 
         async function loadNotifications() {
@@ -78,7 +78,7 @@
                 });
                 if (!resp.ok) {
                     document.getElementById('notif-list').innerHTML =
-                        '<div class="nb-leer">' + escapeHtml(t('nb_fehler', 'Fehler beim Laden')) + '</div>';
+                        '<div class="nb-leer">' + escapeHtml(t('nb_error', 'Fehler beim Laden')) + '</div>';
                     return;
                 }
                 const data = await resp.json();
@@ -86,7 +86,7 @@
                 render();
             } catch (e) {
                 document.getElementById('notif-list').innerHTML =
-                    '<div class="nb-leer">' + escapeHtml(t('nb_fehler', 'Fehler beim Laden')) + '</div>';
+                    '<div class="nb-leer">' + escapeHtml(t('nb_error', 'Fehler beim Laden')) + '</div>';
             }
         }
 

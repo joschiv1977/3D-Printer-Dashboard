@@ -112,7 +112,7 @@
     <div class="se-kopf">
         <h1 data-i18n="setup_title">Ersteinrichtung</h1>
         <div class="se-rechts">
-            <button type="button" class="es-knopf" title="Hell / Dunkel / Automatisch"
+            <button type="button" class="es-knopf" data-i18n-title="theme_toggle_title" title="Hell / Dunkel / Automatisch"
                     onclick="window.themeManager && window.themeManager.toggleTheme()">
                 <span id="theme-icon"></span>
             </button>
@@ -467,9 +467,9 @@
                         </div>
                         <div class="es-zeile-wert">
                             <select id="meross-region" class="es-auswahl">
-                                <option value="eu">Europa</option>
-                                <option value="us">USA</option>
-                                <option value="ap">Asien-Pazifik</option>
+                                <option value="eu" data-i18n="region_eu">Europa</option>
+                                <option value="us" data-i18n="region_us">USA</option>
+                                <option value="ap" data-i18n="region_ap">Asien-Pazifik</option>
                             </select>
                         </div>
                     </div>
@@ -538,19 +538,32 @@ function texteSetzen() {
         const wert = texte[el.getAttribute('data-i18n')];
         if (wert) el.textContent = wert;
     });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+        const wert = texte[el.getAttribute('data-i18n-title')];
+        if (wert) el.setAttribute('title', wert);
+    });
+    if (texte.setup_title) document.title = texte.setup_title;
 }
 
 (function ladeSprache() {
     const s = document.createElement('script');
     s.src = '/static/lang/' + sprache + '.js';
     s.onload = function () {
-        texte = window['translations_' + sprache]
-             || window.translations_en || window.translations_de || {};
+        // lang/*.js declare `const translations_xx`: a global binding,
+        // but not a property of window.
+        const alle = {
+            de: typeof translations_de !== 'undefined' ? translations_de : null,
+            en: typeof translations_en !== 'undefined' ? translations_en : null,
+            es: typeof translations_es !== 'undefined' ? translations_es : null,
+            fr: typeof translations_fr !== 'undefined' ? translations_fr : null,
+            it: typeof translations_it !== 'undefined' ? translations_it : null,
+        };
+        texte = alle[sprache] || {};
         texteSetzen();
     };
     // If the file fails to load, the German defaults baked into the HTML
     // stay in place -- better than a blank page.
-    s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
+    s.onerror = function () { console.warn('Language file could not be loaded:', sprache); };
     document.head.appendChild(s);
 })();
 
@@ -591,7 +604,7 @@ function arbeitet(knopf, ja, ruhetext) {
 function kopfMitCsrf() {
     const marke = localStorage.getItem('csrf_token');
     if (!marke) throw new Error(t('setup_err_csrf', 'Nicht angemeldet — bitte neu laden.'));
-    return { 'Content-Type': 'application/json', 'X-CSRF-Token': marke };
+    return { 'Content-Type': 'application/json', 'X-CSRF-Token': marke, 'X-App-Language': sprache };
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -682,7 +695,7 @@ async function passwortSetzen(e) {
         // and threw the user back to this step on every reload -- with an
         // initial password that no longer applied.
         const w = await fetch('/api/setup/first-login', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            method: 'POST', headers: { 'Content-Type': 'application/json', 'X-App-Language': sprache },
             credentials: 'include',
             body: JSON.stringify({ old_password: alt, password: neu })
         });
@@ -742,7 +755,7 @@ async function setupSucheLaden() {
             headers: kopfMitCsrf(), credentials: 'include'
         });
         const d = await a.json();
-        ziel.innerHTML = setupSucheHtml(d.drucker || []);
+        ziel.innerHTML = setupSucheHtml(d.printers || []);
     } catch (err) {
         ziel.innerHTML = '';
     }
@@ -770,8 +783,8 @@ function setupSucheHtml(liste) {
     return liste.map(function (d, i) {
         return '<div class="es-zeile">'
              + '<div class="es-zeile-name"><b>'
-             + setupEsc(d.name || d.seriennummer) + ' · ' + setupEsc(d.ip) + '</b>'
-             + '<span>' + setupEsc(d.seriennummer) + '</span></div>'
+             + setupEsc(d.name || d.serial) + ' · ' + setupEsc(d.ip) + '</b>'
+             + '<span>' + setupEsc(d.serial) + '</span></div>'
              + '<div class="es-zeile-wert">'
              + '<button type="button" class="es-knopf" onclick="setupUebernehmen(' + i + ')">'
              + setupEsc(t('setup_discovery_apply', 'Übernehmen'))
@@ -796,13 +809,13 @@ function setupUebernehmen(index) {
     };
     setzen('bambu-name', d.name);
     setzen('bambu-ip', d.ip);
-    setzen('bambu-serie', d.seriennummer);
+    setzen('bambu-serie', d.serial);
     const modell = document.getElementById('bambu-modell');
-    if (modell && d.modell_id) {
+    if (modell && d.model_id) {
         const passend = Array.prototype.some.call(modell.options, function (o) {
-            return o.value === d.modell_id;
+            return o.value === d.model_id;
         });
-        if (passend) modell.value = d.modell_id;
+        if (passend) modell.value = d.model_id;
     }
 }
 
@@ -1018,9 +1031,9 @@ function entwurfLoeschen() {
 // ─────────────────────────────────────────────────────────────────────
 const ABSCHLUSS_TEXTE = {
     profile: ['setup_fin_profile', 'Slicer-Profile'],
-    wartung: ['setup_fin_wartung', 'Wartungsplan'],
-    drucker: ['setup_fin_drucker', 'Drucker erreichbar'],
-    kamera:  ['setup_fin_kamera',  'Kamera vorbereiten'],
+    wartung: ['setup_fin_maintenance', 'Wartungsplan'],
+    drucker: ['setup_fin_printer', 'Drucker erreichbar'],
+    kamera:  ['setup_fin_camera',  'Kamera vorbereiten'],
 };
 const ABSCHLUSS_ZEICHEN = { offen: '·', laeuft: '…', fertig: '✓', warnung: '!' };
 
@@ -1030,8 +1043,8 @@ function abschlussZeichnen(aufgaben) {
     ziel.innerHTML = (aufgaben || []).map(function (a) {
         const paar = ABSCHLUSS_TEXTE[a.name] || [null, a.name];
         const name = paar[0] ? t(paar[0], paar[1]) : paar[1];
-        const zeichen = ABSCHLUSS_ZEICHEN[a.zustand] || '·';
-        return '<div class="es-zeile abschluss-zeile abschluss--' + a.zustand + '">'
+        const zeichen = ABSCHLUSS_ZEICHEN[a.state] || '·';
+        return '<div class="es-zeile abschluss-zeile abschluss--' + a.state + '">'
              + '<div class="es-zeile-name">' + zeichen + ' ' + name + '</div>'
              + '<div class="es-zeile-wert">' + (a.detail || '') + '</div>'
              + '</div>';
@@ -1054,12 +1067,31 @@ async function abschlussStarten() {
 }
 
 function abschlussVerfolgen(knopf, ruhe) {
+    // The status endpoint carries the same guard as every other setup route,
+    // and that one wants the CSRF header even on a GET. Without it this poll
+    // answered 403 every single second -- and the `catch` below turned that
+    // into silence: the tasks finished on the server, the page never learned
+    // it, and the setup stood at "this will take a moment" for good.
+    let fehlversuche = 0;
     const uhr = setInterval(async function () {
         let d = {};
         try {
-            const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
+            const a = await fetch('/api/setup/finalize/status', {
+                credentials: 'include', headers: kopfMitCsrf()
+            });
+            if (!a.ok) throw new Error('HTTP ' + a.status);
             d = await a.json();
-        } catch (e) { return; }   // network hiccup -- retried next time
+            fehlversuche = 0;
+        } catch (e) {
+            // A hiccup is worth retrying; a wall is worth saying out loud.
+            // Ten seconds of the same answer is a wall.
+            if (++fehlversuche < 10) return;
+            clearInterval(uhr);
+            melde(t('setup_err_status', 'Der Stand des Abschlusses ist nicht '
+                    + 'abrufbar') + ' (' + e.message + ')', 'fehl');
+            if (knopf) arbeitet(knopf, false, ruhe);
+            return;
+        }
         abschlussZeichnen(d.aufgaben);
         if (d.fertig) {
             clearInterval(uhr);
@@ -1107,7 +1139,9 @@ function abschlussVerfolgen(knopf, ruhe) {
     // the running process instead of starting it a second time.
     if (schritt === 5) {
         try {
-            const a = await fetch('/api/setup/finalize/status', { credentials: 'include' });
+            const a = await fetch('/api/setup/finalize/status', {
+                credentials: 'include', headers: kopfMitCsrf()
+            });
             const d = await a.json();
             if (d.aufgaben && d.aufgaben.length) abschlussZeichnen(d.aufgaben);
             if (d.laeuft) {

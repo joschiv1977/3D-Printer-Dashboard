@@ -1418,11 +1418,7 @@ class AppInitManager {
                 // Redirect to history page
                 window.location.href = '/static/history.html';
             } else if (hash === '#logs') {
-                setTimeout(() => {
-                    if (typeof openLogViewer === 'function') {
-                        openLogViewer();
-                    }
-                }, 100);
+                window.location.href = '/static/logs.html';
             } else if (hash === '#settings') {
                 setTimeout(() => {
                     if (typeof openSettings === 'function') {

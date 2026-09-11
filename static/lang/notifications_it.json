@@ -30,7 +30,7 @@
     },
     "filament_change_phase1": {
       "title": "🎨 Cambia filamento",
-      "body": "Cambio #{change_count}: {spool_info}"
+      "body": "Cambio #{change_count}{spool_info}"
     },
     "filament_change_phase2": {
       "title": "✅ Filamento caricato?",
@@ -38,7 +38,7 @@
     },
     "filament_change_retry": {
       "title": "🔁 Ricarica filamento",
-      "body": "Ultimo tentativo non accettato — riprova: {spool_info}"
+      "body": "Ultimo tentativo non accettato — riprova{spool_info}"
     },
     "milestone_25": {
       "title": "📊 25% raggiunto",
@@ -171,7 +171,9 @@
     "update_available": {
       "title": "⬆️ Nuova versione {version}",
       "body": "{version} è pronta per {produkt}. Installala nelle impostazioni."
-    }
+    },
+    "filament_change_spool_pair": ": Bobina {source} → bobina {target}",
+    "filament_change_filament_pair": ": Filamento {source} → filamento {target}"
   },
   "status": {
     "ready": "Pronto",
@@ -215,26 +217,26 @@
     "0300-8013": "Cambio filamento richiesto per stampa multicolore - si prega di cambiare manualmente",
     "0300-8004": "Filamento esaurito - si prega di caricare un nuovo filamento",
     "fallback": "Errore HMS {code}",
-    "ohne_text": "Messaggio della stampante senza testo registrato — {modul}, {stufe}. Codice {code}",
-    "stufe": {
-      "fatal": "grave",
-      "ernst": "serio",
-      "normal": "normale",
-      "Hinweis": "avviso",
-      "unbekannt": "gravità sconosciuta"
-    },
     "filament": {
-      "kammer_zu_heiss": "La camera è troppo calda: il filamento potrebbe ammorbidirsi nel tubo. Temperatura: {temp} °C.",
-      "ams_zu_heiss": "L'AMS è troppo caldo: il filamento potrebbe ammorbidirsi. Temperatura: {temp} °C."
+      "chamber_too_hot": "La camera è troppo calda: il filamento potrebbe ammorbidirsi nel tubo. Temperatura: {temp} °C.",
+      "ams_too_hot": "L'AMS è troppo caldo: il filamento potrebbe ammorbidirsi. Temperatura: {temp} °C."
     },
-    "speicher": {
-      "speicher_knapp": "Poco spazio per i timelapse su {ort}: {frei} liberi, bastano per circa {anzahl} registrazioni.",
-      "speicher_ort_intern": "la memoria interna",
-      "speicher_ort_extern": "la chiavetta USB"
+    "no_text": "Messaggio della stampante senza testo registrato — {module}, {severity}. Codice {code}",
+    "severity": {
+      "fatal": "grave",
+      "serious": "serio",
+      "common": "normale",
+      "info": "avviso",
+      "unknown": "gravità sconosciuta"
     },
-    "spule": {
-      "zuruecksetzen_links": "Il filamento è fuori. Azzerare la bobina sinistra?",
-      "zuruecksetzen_rechts": "Il filamento è fuori. Azzerare la bobina destra?"
+    "storage": {
+      "low": "Poco spazio per i timelapse su {place}: {free} liberi, bastano per circa {count} registrazioni.",
+      "place_internal": "la memoria interna",
+      "place_external": "la chiavetta USB"
+    },
+    "spool": {
+      "reset_left": "Il filamento è fuori. Azzerare la bobina sinistra?",
+      "reset_right": "Il filamento è fuori. Azzerare la bobina destra?"
     }
   },
   "hms_notification_titles": {
@@ -430,5 +432,113 @@
   "scheduled": {
     "reason_klipper_boot": "Controller Klipper non raggiungibile dopo l’avvio",
     "reason_mqtt": "Nessuna connessione MQTT dopo {cycles} cicli di alimentazione"
+  },
+  "sensors": {
+    "nozzle": "Ugello",
+    "bed": "Piatto",
+    "chamber": "Camera",
+    "host": "Host",
+    "part_fan": "Ventola pezzo",
+    "hotend_fan": "Ventola hotend",
+    "aux_fan": "Ventola ausiliaria"
+  },
+  "api": {
+    "drying_disabled": "L'essiccazione del filamento è disattivata",
+    "drying_enclosed_only": "Essiccazione del filamento solo su stampanti chiuse (P1S, X1 Carbon, X1E). La tua stampante: {printer}",
+    "drying_material_unknown": "Materiale {material} non trovato",
+    "drying_already_running": "L'essiccazione è già in corso",
+    "printer_printing": "La stampante sta stampando",
+    "homing_failed": "Homing non riuscito",
+    "positioning_failed": "Posizionamento non riuscito",
+    "temperature_failed": "Impostazione della temperatura non riuscita",
+    "drying_none_active": "Nessuna essiccazione in corso",
+    "no_file_received": "Nessun file ricevuto.",
+    "file_too_big": "Il file è troppo grande.",
+    "test_ok": "Test riuscito",
+    "mqtt_not_connected": "MQTT non connesso",
+    "pushall_sent": "Richiesta pushall inviata",
+    "test_print_running": "È già in corso una stampa di prova",
+    "test_print_none": "Nessuna stampa di prova in corso",
+    "notifications_unavailable": "Notifiche non disponibili",
+    "test_running": "Un test è già in corso",
+    "test_started": "Test avviato: {filename}",
+    "test_none": "Nessun test in corso",
+    "test_stopped": "Test interrotto",
+    "api_key_invalid": "Non autorizzato: chiave API mancante o errata",
+    "ams_slot_required": "Servono ams_id e slot",
+    "meross_not_configured": "Meross non è configurato",
+    "baselines_initialized": "Valori di base impostati per {count} attività",
+    "developer_mode_ok": "✅ La modalità sviluppatore funziona: dati completi!",
+    "developer_mode_incomplete": "⚠️ Modalità sviluppatore attiva, ma dati incompleti",
+    "developer_mode_no_data": "⚠️ Nessun dato ricevuto: solo accesso in lettura",
+    "no_file": "Nessun file",
+    "only_3mf_gcode": "Sono ammessi solo file .3mf e .gcode",
+    "file_too_large": "File troppo grande (max {max_mb} MB)",
+    "no_filename": "Nessun nome file",
+    "move_no_model": "Nessun modello di stampante impostato: parcheggio e centratura sono bloccati.",
+    "move_no_park_position": "Nessuna posizione di riposo salvata per {printer}.",
+    "filament_no_model": "Nessun modello di stampante impostato: il cambio filamento richiede le posizioni di spurgo e pulizia del modello.",
+    "token_or_device_required": "Serve il token o l'ID del dispositivo",
+    "status_requested": "Richiesta di stato inviata",
+    "no_serial": "Nessun numero di serie configurato",
+    "power_off_test_started": "Timer di prova avviato (2 min)",
+    "invalid_filename": "Nome file non valido",
+    "save_failed": "Salvataggio non riuscito",
+    "upload_failed": "Caricamento non riuscito",
+    "password_required": "Serve una password",
+    "password_min_length": "La password deve avere almeno {length} caratteri",
+    "password_needs_uppercase": "La password deve contenere lettere maiuscole",
+    "password_needs_lowercase": "La password deve contenere lettere minuscole",
+    "password_needs_digit": "La password deve contenere numeri",
+    "password_needs_special": "La password deve contenere caratteri speciali",
+    "setup_already_done": "La configurazione iniziale è già stata fatta. Accedi normalmente e cambia la password nelle impostazioni.",
+    "current_password_required": "Serve la password attuale",
+    "current_password_wrong": "La password attuale non è corretta",
+    "password_set": "Password impostata",
+    "klipper_fields_required": "Servono identificativo, nome e indirizzo Moonraker",
+    "klipper_id_format": "Identificativo: solo a-z, 0-9, _ e -, senza iniziare con - o _",
+    "moonraker_url_scheme": "L'indirizzo Moonraker richiede http:// o https://",
+    "spoolman_disabled": "Spoolman non è attivato",
+    "spool_not_found": "Bobina non trovata",
+    "spool_activate_failed": "Impossibile attivare la bobina",
+    "update_failed": "Aggiornamento non riuscito",
+    "spool_create_failed": "Impossibile creare la bobina",
+    "local_network_ok": "Test della rete locale riuscito",
+    "log_file_missing": "File di log non trovato",
+    "username_password_required": "Servono il nuovo nome utente e la password attuale",
+    "username_changed": "Nome utente cambiato. Accedi di nuovo.",
+    "language_required": "Serve la lingua",
+    "language_invalid": "Lingua non valida o utente non trovato",
+    "language_changed": "Lingua cambiata",
+    "deep_cleanup_done": "Pulizia approfondita completata",
+    "session_deleted": "Sessione {id}… eliminata",
+    "token_deleted": "Token orfano {id}… eliminato",
+    "user_deleted": "Utente {username} eliminato",
+    "field_required": "Serve {field}",
+    "field_invalid": "Formato non valido per {field}",
+    "ams_slot_numbers": "ams_id e slot_id devono essere numeri",
+    "unknown_mode": "Modalità sconosciuta: {mode}",
+    "cache_cleared": "Cache svuotata",
+    "unknown_command": "Comando sconosciuto",
+    "percent_missing": "manca percent",
+    "fan_control_unsupported": "Questa stampante non può controllare le ventole",
+    "unknown_model": "Modello sconosciuto: {model}",
+    "file_param_missing": "manca file",
+    "makerworld_maintenance": "MakerWorld è in manutenzione — tornerà presto",
+    "makerworld_unreachable": "MakerWorld non raggiungibile: {error}",
+    "makerworld_sign_in": "MakerWorld ha rifiutato — accedi prima all'account Bambu",
+    "makerworld_captcha": "MakerWorld chiede un captcha — troppi download in poco tempo. Si risolve da solo dopo un po'; i modelli già scaricati funzionano ancora.",
+    "makerworld_status": "MakerWorld ha risposto {code}",
+    "makerworld_not_json": "MakerWorld ha risposto qualcosa che non è JSON",
+    "makerworld_not_signed_in": "Non connesso all'account Bambu — Impostazioni → Cloud",
+    "makerworld_no_download_url": "MakerWorld non ha fornito alcun indirizzo di download",
+    "makerworld_download_status": "Il download ha risposto {code}",
+    "makerworld_file_too_large": "Il file è inaspettatamente grande — interrotto",
+    "makerworld_download_failed": "Il download non è riuscito: {error}",
+    "makerworld_bad_paging": "offset e limit devono essere numeri",
+    "makerworld_instance_missing": "Manca il numero del profilo (instance_id)",
+    "makerworld_no_slicer": "Bambu Studio non trovato — nessuno slicer disponibile",
+    "makerworld_no_mirror": "La copia della scheda SD non è disponibile",
+    "makerworld_upload_failed": "Slicing eseguito, ma il file non è arrivato alla stampante"
   }
 }

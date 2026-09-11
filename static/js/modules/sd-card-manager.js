@@ -190,7 +190,7 @@ class SDCardManager {
                         document.getElementById('sd-loading').style.display = 'none';
                         this._syncKopfAus();
 
-                        skToast(data.message || (window.texts||{}).ftps_busy || 'FTPS ist beschäftigt — bitte warten', 'warning');
+                        skToast(window.serverText(data) || (window.texts||{}).ftps_busy || 'FTPS ist beschäftigt — bitte warten', 'warning');
 
                         // Still show cached files if available —
                         // the server also sends page, page count and
@@ -285,7 +285,7 @@ class SDCardManager {
         const abgleich = document.getElementById('sd-refresh-btn');
         if (abgleich && !abgleich.classList.contains('sd-refresh--laeuft')) {
             abgleich.disabled = aus;
-            abgleich.title = aus ? grund : (texts.sd_refresh || '');
+            abgleich.title = aus ? grund : (texts.refresh || '');
             abgleich.style.opacity = aus ? '0.45' : '';
         }
 
@@ -431,8 +431,8 @@ class SDCardManager {
         const gesamt = this.sdKopf?.total ?? 0;
         const gefiltert = !!(this.sdAbfrage?.search || this.sdAbfrage?.only_new);
         const muster = gefiltert
-            ? (gesamt === 1 ? texts.sd_ein_treffer : texts.sd_treffer)
-            : (gesamt === 1 ? texts.sd_datei_gesamt : texts.sd_dateien_gesamt);
+            ? (gesamt === 1 ? texts.sd_one_match : texts.sd_treffer)
+            : (gesamt === 1 ? texts.sd_file_total : texts.sd_files_total);
         el.textContent = (muster || '{count}').replace('{count}', gesamt);
     }
 
@@ -466,13 +466,13 @@ class SDCardManager {
         dazu(k.pages);
         nummern.sort((a, b) => a - b);
 
-        const stand = (texts.sd_seite_von || 'Seite {page} von {pages}')
+        const stand = (texts.sd_page_of || 'Seite {page} von {pages}')
             .replace('{page}', `<b>${k.page}</b>`)
             .replace('{pages}', `<b>${k.pages}</b>`);
-        const gesamtText = ((k.total === 1 ? texts.sd_datei_gesamt : texts.sd_dateien_gesamt) || '{count}')
+        const gesamtText = ((k.total === 1 ? texts.sd_file_total : texts.sd_files_total) || '{count}')
             .replace('{count}', k.total);
 
-        let knoepfe = `<button ${k.page <= 1 ? 'disabled' : ''} title="${texts.sd_seite_zurueck || ''}"
+        let knoepfe = `<button ${k.page <= 1 ? 'disabled' : ''} title="${texts.sd_page_back || ''}"
                 onclick="sdSeiteWechseln(${k.page - 1})">&lsaquo;</button>`;
         let vorher = 0;
         for (const n of nummern) {
@@ -481,7 +481,7 @@ class SDCardManager {
                 onclick="sdSeiteWechseln(${n})">${n}</button>`;
             vorher = n;
         }
-        knoepfe += `<button ${k.page >= k.pages ? 'disabled' : ''} title="${texts.sd_seite_vor || ''}"
+        knoepfe += `<button ${k.page >= k.pages ? 'disabled' : ''} title="${texts.sd_page_next || ''}"
                 onclick="sdSeiteWechseln(${k.page + 1})">&rsaquo;</button>`;
 
         leiste.innerHTML = `
@@ -584,11 +584,11 @@ class SDCardManager {
         // A plain Studio or MakerWorld project carries no
         // print job: the archive is missing every `Metadata/plate_N.gcode`,
         // and that's exactly what the print command points at. The server checks this and sets
-        // `nicht_geschnitten` ONLY on a clear no — without a readable copy
+        // `not_sliced` ONLY on a clear no — without a readable copy
         // the field stays absent and everything behaves as before.
-        const ungeschnitten = file.nicht_geschnitten === true;
+        const ungeschnitten = file.not_sliced === true;
         const isPrintable = !isCorrupt && !ungeschnitten
-            && (file.name.endsWith('.3mf') || file.name.endsWith('.gcode'));
+            && window.isPrintFile(file.name);
         const printState = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
         const printActive = ['RUNNING', 'PAUSE', 'PREPARE'].includes(printState);
         // With the printer off, the list stays readable, but printing
@@ -673,8 +673,8 @@ class SDCardManager {
         // file can exist on both — when deleting you need to know
         // which one is meant. The internal storage wasn't visible at all until 29aug26,
         // because FTPS only shows the stick.
-        if (file.speicher) {
-            const intern = file.speicher === 'intern';
+        if (file.storage) {
+            const intern = file.storage === 'intern';
             marken.push(`<span class="sd-marke sd-marke--speicher">` +
                 e(intern ? (texts.storage_internal || 'Intern')
                          : (texts.storage_usb || 'USB-Stick')) + '</span>');
@@ -684,7 +684,7 @@ class SDCardManager {
         // It used to sit in EVERY card, spanning the full width.
         // In the archive, the same card has different buttons: restore instead
         // of archive, and the trash icon deletes for good.
-        const imArchiv = file.archiviert === true || file.location === 'archiv';
+        const imArchiv = file.archived === true || file.location === 'archiv';
         const zeigeSpule = mode === 'full'
             && window.spoolmanManager && window.spoolmanManager.connected;
 
@@ -746,7 +746,7 @@ class SDCardManager {
                 </div>
 
                 <div class="sd-zeile-text">
-                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.speicher !== 'intern' ? ` ondblclick="startRenameFile(this, '${safeFilename}')"` : ''}>${e(file.name)}</div>
+                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.storage !== 'intern' ? ` ondblclick="startRenameFile(this, '${safeFilename}')"` : ''}>${e(file.name)}</div>
                     <div class="sd-zeile-fakten">${fakten.map(f => `<span>${f}</span>`).join('')}</div>
                     <div class="sd-zeile-marken">
                         ${marken.join('')}
@@ -1144,7 +1144,7 @@ class SDCardManager {
                     .then(response => response.json())
                     .then(deleteScheduledData => {
                         if (deleteScheduledData.success) {
-                            console.log(`✅ ${deleteScheduledData.deleted} ${texts.scheduled_prints} gelöscht`);
+                            console.log(`✅ ${deleteScheduledData.deleted} scheduled print(s) deleted`);
                             // Refresh the lists if visible
                             if (typeof loadScheduledPrints === 'function') {
                                 loadScheduledPrints();
@@ -1695,7 +1695,7 @@ function sdArchivRuf(pfad, name, erfolgstext) {
         .then(r => r.json())
         .then(daten => {
             if (!daten || !daten.success) {
-                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
                 return false;
             }
             skToast(erfolgstext, 'success');
@@ -1718,7 +1718,7 @@ window.sdArchivAblegen = function(name, ort) {
         .then(r => r.json())
         .then(daten => {
             if (!daten || !daten.success) {
-                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
                 return;
             }
             // The printer loses the file on the next sync — even
@@ -1757,7 +1757,7 @@ window.sdArchivHolenUndDrucken = async function(name, knopf) {
         });
         const daten = await antwort.json();
         if (!daten || !daten.success) {
-            skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+            skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
             return;
         }
         // Back to the live view, then the normal path — that loads the

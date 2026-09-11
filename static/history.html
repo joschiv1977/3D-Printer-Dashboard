@@ -61,6 +61,7 @@
     <script src="/static/js/modules/confirm-dialog.js"></script>
     <script src="/static/js/modules/analytics.js"></script>
     <script src="/static/js/modules/ams-humidity.js?v=1"></script>
+    <script src="/static/js/modules/filenames.js"></script>
     <script src="/static/js/modules/analytics-dashboard.js?v=2"></script>
 
     <div class="hist-container">
@@ -1024,7 +1025,7 @@
                 // slot. Doesn't come from the print data but from its own
                 // measurement series — hence a separate fetch.
                 fetchFeuchte: async (tage) => {
-                    const r = await apiCall('/api/filament/feuchte?tage=' + (tage || 30));
+                    const r = await apiCall('/api/filament/humidity?days=' + (tage || 30));
                     return r && r.ok ? await r.json() : null;
                 },
                 // Opening a print from within statistics: first switch back
@@ -2011,10 +2012,9 @@
         // (or a raw key) -> we translate client-side via texts.klipper_evt_*.
         function formatEventDetail(details) {
             if (!details) return '';
-            // IMPORTANT: the local `texts` (filled via i18nManager.getAllTexts()),
-            // NOT window.texts (which is not set here) -- otherwise the
-            // klipper_evt_* templates are missing and the bare key stands.
-            const t = (typeof texts !== 'undefined' && texts) ? texts : (window.texts || {});
+            // The page's own `texts` (filled via i18nManager.getAllTexts()):
+            // the klipper_evt_* templates live there.
+            const t = (typeof texts !== 'undefined' && texts) || {};
             const resolveKey = (key, vars) => {
                 const name = 'klipper_evt_' + key.replace(/^events\./, '').replace(/^stages\./, '');
                 let text = t[name];
@@ -2573,7 +2573,7 @@
                     <div class="hist-day-stat">
                         <div class="hist-day-stat-icon"><svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg></div>
                         <div class="hist-day-stat-value" style="color:var(--accent-purple, #9c27b0);">${stats.totalFilament >= 1000 ? `${(stats.totalFilament / 1000).toFixed(1)}kg` : `${stats.totalFilament.toFixed(1)}g`}</div>
-                        <div class="hist-day-stat-label">Filament</div>
+                        <div class="hist-day-stat-label">${texts.filament || 'Filament'}</div>
                     </div>
                 </div>
 
@@ -2933,16 +2933,16 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
 
             overlay.innerHTML = `
                 <div style="background:var(--bg-primary);border-radius:10px;padding:20px;max-width:460px;width:90%;max-height:80vh;overflow:auto;">
-                    <h3 style="margin:0 0 12px 0;">Spule bestaetigen</h3>
+                    <h3 style="margin:0 0 12px 0;">${getText('hist_confirm_spool', 'Spule bestätigen')}</h3>
                     <p style="margin:0 0 6px 0;color:var(--text-secondary);">${getText('hist_file_needs', 'Die Datei braucht:')}</p>
                     <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-secondary);border-radius:6px;margin-bottom:14px;">
                         <div style="width:20px;height:20px;border-radius:50%;background:${wantedColor};border:1px solid var(--border-color);"></div>
                         <div><strong>${wanted.name || '—'}</strong>${wanted.material ? ' <span style="color:var(--text-secondary)">(' + wanted.material + ')</span>' : ''}</div>
                     </div>
-                    ${options.length === 0 ? '<p style="color:#ffb0b0;">Keine passende Spule gefunden.</p>' : rows}
+                    ${options.length === 0 ? '<p style="color:#ffb0b0;">' + getText('hist_no_matching_spool', 'Keine passende Spule gefunden.') + '</p>' : rows}
                     <div style="display:flex;gap:8px;margin-top:14px;">
-                        <button id="mm-cancel" style="flex:1;padding:10px;background:var(--bg-secondary);border:none;border-radius:6px;cursor:pointer;">Abbrechen</button>
-                        <button id="mm-ok" style="flex:1;padding:10px;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;" disabled>Drucken</button>
+                        <button id="mm-cancel" style="flex:1;padding:10px;background:var(--bg-secondary);border:none;border-radius:6px;cursor:pointer;">${getText('cancel', 'Abbrechen')}</button>
+                        <button id="mm-ok" style="flex:1;padding:10px;background:var(--accent-green);color:white;border:none;border-radius:6px;cursor:pointer;font-weight:600;" disabled>${getText('print', 'Drucken')}</button>
                     </div>
                 </div>`;
             document.body.appendChild(overlay);

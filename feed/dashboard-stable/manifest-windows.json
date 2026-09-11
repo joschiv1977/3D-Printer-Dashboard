@@ -3,23 +3,23 @@
     "product": "dashboard",
     "channel": "stable",
     "platform": "windows",
-    "version": "2.2.20",
+    "version": "2.3.0",
     "files": [
       {
-        "name": "Dashboard-Setup-2.2.20.exe",
-        "sha256": "52f61ea61e93f2db9af99d54075095d95726b6b0a8cf2e41dbf9e47a989ff2e0",
-        "size": 104789141,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-Setup-2.2.20.exe"
+        "name": "Dashboard-Setup-2.3.0.exe",
+        "sha256": "81c3415f6eace733c0f5a8f48fd34ffa425552fd6deb538b2505eebf2173f9a0",
+        "size": 104831743,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.0/Dashboard-Setup-2.3.0.exe"
       },
       {
-        "name": "Dashboard-Setup-2.2.20.exe.blockmap",
-        "sha256": "db7c9f65fd3ddb68b24298e8cfbbd19f8b48bd0469646eb3cf135eebad47c7e0",
-        "size": 110437,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.2.20/Dashboard-Setup-2.2.20.exe.blockmap"
+        "name": "Dashboard-Setup-2.3.0.exe.blockmap",
+        "sha256": "0c5989584c8d3b0010e382e9aace63602813196988c409b5154713e27bd992f0",
+        "size": 111076,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.0/Dashboard-Setup-2.3.0.exe.blockmap"
       }
     ],
     "notes": null,
-    "issued": 1788879590
+    "issued": 1789145186
   },
-  "signature": "pnBEvDCkdFRStbY2OcJizQ80mNBM/BJouPxQ4CYjNMv5WxIEwWTCa5AIpn5eB1nNNikZcPcaaMZFpkEelYlvBQ=="
+  "signature": "EPXQLjRNa83JLFZ/a/jQ+AngK371Rq1m8Y3x1GtHT7D3IpqC9TbGjFd+vmsuqd80wmFEwMn5DHqsF3lVEI7JAA=="
 }

@@ -30,7 +30,7 @@
     },
     "filament_change_phase1": {
       "title": "🎨 Filament wechseln",
-      "body": "Wechsel #{change_count}: {spool_info}"
+      "body": "Wechsel #{change_count}{spool_info}"
     },
     "filament_change_phase2": {
       "title": "✅ Filament geladen?",
@@ -38,7 +38,7 @@
     },
     "filament_change_retry": {
       "title": "🔁 Filament erneut laden",
-      "body": "Letzter Versuch wurde nicht akzeptiert — bitte nochmal: {spool_info}"
+      "body": "Letzter Versuch wurde nicht akzeptiert — bitte nochmal{spool_info}"
     },
     "milestone_25": {
       "title": "📊 25% erreicht",
@@ -171,7 +171,9 @@
     "update_available": {
       "title": "⬆️ Neue Fassung {version}",
       "body": "Für {produkt} liegt {version} bereit. Einspielen in den Einstellungen."
-    }
+    },
+    "filament_change_spool_pair": ": Spule {source} → Spule {target}",
+    "filament_change_filament_pair": ": Filament {source} → Filament {target}"
   },
   "status": {
     "ready": "Bereit",
@@ -215,26 +217,26 @@
     "0300-8013": "Filament-Wechsel für Multi-Color Druck erforderlich - bitte manuell wechseln",
     "0300-8004": "Filament leer - bitte neues Filament laden",
     "fallback": "HMS Fehler {code}",
-    "ohne_text": "Meldung des Druckers ohne hinterlegten Text — {modul}, {stufe}. Code {code}",
-    "stufe": {
-      "fatal": "schwerwiegend",
-      "ernst": "ernst",
-      "normal": "normal",
-      "Hinweis": "Hinweis",
-      "unbekannt": "Einstufung unbekannt"
-    },
     "filament": {
-      "kammer_zu_heiss": "Die Kammer ist zu heiß — das Filament könnte im Schlauch weich werden. Kammertemperatur: {temp} °C.",
-      "ams_zu_heiss": "Das AMS ist zu heiß — das Filament könnte weich werden. Temperatur: {temp} °C."
+      "chamber_too_hot": "Die Kammer ist zu heiß — das Filament könnte im Schlauch weich werden. Kammertemperatur: {temp} °C.",
+      "ams_too_hot": "Das AMS ist zu heiß — das Filament könnte weich werden. Temperatur: {temp} °C."
     },
-    "speicher": {
-      "speicher_knapp": "Wenig Platz für Timelapse auf {ort}: noch {frei} frei, das reicht für etwa {anzahl} Aufnahmen.",
-      "speicher_ort_intern": "dem internen Speicher",
-      "speicher_ort_extern": "dem USB-Stick"
+    "no_text": "Meldung des Druckers ohne hinterlegten Text — {module}, {severity}. Code {code}",
+    "severity": {
+      "fatal": "schwerwiegend",
+      "serious": "ernst",
+      "common": "normal",
+      "info": "Hinweis",
+      "unknown": "Einstufung unbekannt"
     },
-    "spule": {
-      "zuruecksetzen_links": "Filament ist draußen. Soll die linke Spule zurückgesetzt werden?",
-      "zuruecksetzen_rechts": "Filament ist draußen. Soll die rechte Spule zurückgesetzt werden?"
+    "storage": {
+      "low": "Wenig Platz für Timelapse auf {place}: noch {free} frei, das reicht für etwa {count} Aufnahmen.",
+      "place_internal": "dem internen Speicher",
+      "place_external": "dem USB-Stick"
+    },
+    "spool": {
+      "reset_left": "Filament ist draußen. Soll die linke Spule zurückgesetzt werden?",
+      "reset_right": "Filament ist draußen. Soll die rechte Spule zurückgesetzt werden?"
     }
   },
   "hms_notification_titles": {
@@ -430,5 +432,113 @@
   "scheduled": {
     "reason_klipper_boot": "Klipper-Controller nach dem Start nicht erreichbar",
     "reason_mqtt": "MQTT-Verbindung nach {cycles} Strom-Zyklen nicht möglich"
+  },
+  "sensors": {
+    "nozzle": "Düse",
+    "bed": "Bett",
+    "chamber": "Kammer",
+    "host": "Host",
+    "part_fan": "Teile-Lüfter",
+    "hotend_fan": "Hotend-Lüfter",
+    "aux_fan": "Aux-Lüfter"
+  },
+  "api": {
+    "drying_disabled": "Filament-Trocknung ist deaktiviert",
+    "drying_enclosed_only": "Filament-Trocknung nur für geschlossene Drucker (P1S, X1 Carbon, X1E). Dein Drucker: {printer}",
+    "drying_material_unknown": "Material {material} nicht gefunden",
+    "drying_already_running": "Trocknung läuft bereits",
+    "printer_printing": "Drucker druckt gerade",
+    "homing_failed": "Homing fehlgeschlagen",
+    "positioning_failed": "Positionieren fehlgeschlagen",
+    "temperature_failed": "Temperatur setzen fehlgeschlagen",
+    "drying_none_active": "Keine Trocknung aktiv",
+    "no_file_received": "Keine Datei erhalten.",
+    "file_too_big": "Die Datei ist zu groß.",
+    "test_ok": "Test erfolgreich",
+    "mqtt_not_connected": "MQTT nicht verbunden",
+    "pushall_sent": "Pushall-Anfrage gesendet",
+    "test_print_running": "Es läuft schon ein Probedruck",
+    "test_print_none": "Kein Probedruck läuft",
+    "notifications_unavailable": "Benachrichtigungen nicht verfügbar",
+    "test_running": "Test läuft bereits",
+    "test_started": "Test gestartet: {filename}",
+    "test_none": "Kein Test läuft",
+    "test_stopped": "Test gestoppt",
+    "api_key_invalid": "Nicht berechtigt – API-Key fehlt oder ist falsch",
+    "ams_slot_required": "ams_id und slot sind nötig",
+    "meross_not_configured": "Meross ist nicht eingerichtet",
+    "baselines_initialized": "Ausgangswerte für {count} Aufgaben gesetzt",
+    "developer_mode_ok": "✅ Developer Mode funktioniert – vollständige Daten!",
+    "developer_mode_incomplete": "⚠️ Developer Mode aktiv, aber Daten unvollständig",
+    "developer_mode_no_data": "⚠️ Keine Daten empfangen – nur Lesezugriff",
+    "no_file": "Keine Datei",
+    "only_3mf_gcode": "Nur .3mf- und .gcode-Dateien erlaubt",
+    "file_too_large": "Datei zu groß (max. {max_mb} MB)",
+    "no_filename": "Kein Dateiname",
+    "move_no_model": "Kein Drucker-Modell gesetzt — Parken und Zentrieren sind gesperrt.",
+    "move_no_park_position": "Für {printer} ist keine Ruheposition hinterlegt.",
+    "filament_no_model": "Kein Drucker-Modell gesetzt — der Filament-Wechsel braucht die Purge- und Wisch-Positionen des Modells.",
+    "token_or_device_required": "Token oder Geräte-ID erforderlich",
+    "status_requested": "Status-Anfrage gesendet",
+    "no_serial": "Keine Seriennummer eingerichtet",
+    "power_off_test_started": "Test-Timer gestartet (2 Min.)",
+    "invalid_filename": "Ungültiger Dateiname",
+    "save_failed": "Speichern fehlgeschlagen",
+    "upload_failed": "Upload fehlgeschlagen",
+    "password_required": "Passwort erforderlich",
+    "password_min_length": "Passwort muss mindestens {length} Zeichen lang sein",
+    "password_needs_uppercase": "Passwort muss Großbuchstaben enthalten",
+    "password_needs_lowercase": "Passwort muss Kleinbuchstaben enthalten",
+    "password_needs_digit": "Passwort muss Zahlen enthalten",
+    "password_needs_special": "Passwort muss Sonderzeichen enthalten",
+    "setup_already_done": "Die Ersteinrichtung ist schon abgeschlossen. Bitte normal anmelden und das Passwort in den Einstellungen ändern.",
+    "current_password_required": "Aktuelles Passwort erforderlich",
+    "current_password_wrong": "Aktuelles Passwort stimmt nicht",
+    "password_set": "Passwort gesetzt",
+    "klipper_fields_required": "Kennung, Name und Moonraker-Adresse sind nötig",
+    "klipper_id_format": "Kennung: nur a-z, 0-9, _ und -, nicht mit - oder _ beginnend",
+    "moonraker_url_scheme": "Die Moonraker-Adresse braucht http:// oder https://",
+    "spoolman_disabled": "Spoolman ist nicht aktiviert",
+    "spool_not_found": "Spule nicht gefunden",
+    "spool_activate_failed": "Spule konnte nicht aktiviert werden",
+    "update_failed": "Aktualisieren fehlgeschlagen",
+    "spool_create_failed": "Spule konnte nicht angelegt werden",
+    "local_network_ok": "Test im lokalen Netz erfolgreich",
+    "log_file_missing": "Log-Datei nicht gefunden",
+    "username_password_required": "Neuer Benutzername und aktuelles Passwort erforderlich",
+    "username_changed": "Benutzername geändert. Bitte melde dich neu an.",
+    "language_required": "Sprache erforderlich",
+    "language_invalid": "Ungültige Sprache oder Benutzer nicht gefunden",
+    "language_changed": "Sprache geändert",
+    "deep_cleanup_done": "Tiefenreinigung abgeschlossen",
+    "session_deleted": "Sitzung {id}… gelöscht",
+    "token_deleted": "Verwaistes Token {id}… gelöscht",
+    "user_deleted": "Benutzer {username} gelöscht",
+    "field_required": "{field} ist erforderlich",
+    "field_invalid": "Ungültiges Format für {field}",
+    "ams_slot_numbers": "ams_id und slot_id müssen Zahlen sein",
+    "unknown_mode": "Unbekannter Modus: {mode}",
+    "cache_cleared": "Cache geleert",
+    "unknown_command": "Unbekannter Befehl",
+    "percent_missing": "percent fehlt",
+    "fan_control_unsupported": "Dieser Drucker kann die Lüfter nicht steuern",
+    "unknown_model": "Unbekanntes Modell: {model}",
+    "file_param_missing": "file fehlt",
+    "makerworld_maintenance": "MakerWorld wird gerade gewartet — es ist bald wieder da",
+    "makerworld_unreachable": "MakerWorld nicht erreichbar: {error}",
+    "makerworld_sign_in": "MakerWorld hat abgelehnt — bitte zuerst beim Bambu-Konto anmelden",
+    "makerworld_captcha": "MakerWorld verlangt ein Captcha — zu viele Downloads in kurzer Zeit. Das löst sich nach einer Weile von selbst; bereits geholte Modelle gehen weiter.",
+    "makerworld_status": "MakerWorld antwortete {code}",
+    "makerworld_not_json": "MakerWorld hat etwas geantwortet, das kein JSON ist",
+    "makerworld_not_signed_in": "Nicht beim Bambu-Konto angemeldet — Einstellungen → Cloud",
+    "makerworld_no_download_url": "MakerWorld hat keine Download-Adresse geliefert",
+    "makerworld_download_status": "Der Download antwortete {code}",
+    "makerworld_file_too_large": "Die Datei ist unerwartet groß — abgebrochen",
+    "makerworld_download_failed": "Der Download ist fehlgeschlagen: {error}",
+    "makerworld_bad_paging": "offset und limit müssen Zahlen sein",
+    "makerworld_instance_missing": "Die Profilnummer (instance_id) fehlt",
+    "makerworld_no_slicer": "Bambu Studio nicht gefunden — kein Slicer verfügbar",
+    "makerworld_no_mirror": "Der Spiegel der SD-Karte ist nicht verfügbar",
+    "makerworld_upload_failed": "Geschnitten, aber die Datei kam nicht beim Drucker an"
   }
 }

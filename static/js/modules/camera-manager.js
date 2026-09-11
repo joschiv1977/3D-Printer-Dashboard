@@ -107,7 +107,7 @@ class CameraManager {
         this.streamRetryTimeout = setTimeout(() => {
             const newSrc = '/api/camera?t=' + Date.now();
             img.src = newSrc;
-            console.log('🔄 Versuche Stream neu zu laden...');
+            console.log('🔄 Trying to reload the stream...');
             this.streamRetryTimeout = null;
         }, 2000);
     }
@@ -408,7 +408,7 @@ class CameraManager {
                 const r = await apiCall('/api/camera/mode');
                 const d = await r.json();
                 if (d.type === 'webrtc') {
-                    console.log('WebRTC inzwischen verfügbar — wechsle von MJPEG');
+                    console.log('WebRTC available now — switching from MJPEG');
                     this.stopSnapshotPolling();
                     window._cameraMode = 'webrtc';
                     await this.startWebRTCStream();
@@ -711,10 +711,10 @@ class CameraManager {
                 if (document.hidden) {
                     self.stopSnapshotPolling();
                     self._stopKlipperPoll();   // close the persistent Klipper MJPEG connection
-                    console.log('⏸️ Kamera pausiert (Tab im Hintergrund)');
+                    console.log('⏸️ Camera paused (tab in the background)');
                 } else {
                     self.startSnapshotPolling();   // Klipper mode: redirects to _initKlipperCamera
-                    console.log('▶️ Kamera fortgesetzt');
+                    console.log('▶️ Camera resumed');
                 }
             }
 
@@ -731,7 +731,7 @@ class CameraManager {
                     controlImg.dataset.originalSrc = controlImg.src.split('?')[0];
                     controlImg.src = '';
                     controlImg.onerror = null;
-                    console.log('⏸️ Control-Kamera pausiert (Tab im Hintergrund)');
+                    console.log('⏸️ Control camera paused (tab in the background)');
                 }
                 if (self.streamRetryTimeout) {
                     clearTimeout(self.streamRetryTimeout);
@@ -748,7 +748,7 @@ class CameraManager {
                         const baseSrc = cameraEl.dataset.originalSrc;
                         cameraEl.src = baseSrc + '?t=' + Date.now();
                         streamWasActive = false;
-                        console.log('▶️ Kamera-Stream fortgesetzt');
+                        console.log('▶️ Camera stream resumed');
 
                         // Error handler with retry
                         let retryCount = 0;
@@ -776,7 +776,7 @@ class CameraManager {
                     const baseSrc = controlImg.dataset.originalSrc;
                     controlImg.src = baseSrc + '?t=' + Date.now();
                     controlStreamWasActive = false;
-                    console.log('▶️ Control-Kamera fortgesetzt');
+                    console.log('▶️ Control camera resumed');
                 }
             }
         });
@@ -901,11 +901,13 @@ class CameraManager {
 
                 document.getElementById('control-camera-source').textContent = sourceText;
                 document.getElementById('camera-source-text').textContent =
-                    data.source === 'external' ? 'P1S Kamera' : 'Externe Kamera';
+                    data.source === 'external' ? (texte.camera_builtin || 'Eingebaute Kamera') : (texte.camera_external || 'Externe Kamera');
 
                 // Show info if the P1S camera was automatically restarted
                 if (data.auto_restarted) {
-                    skToast(`P1S Kamera neugestartet: ${data.restart_reason}`, 'info');
+                    skToast((texte.camera_restarted_toast || '{name} neu gestartet: {reason}')
+                        .replace('{name}', texte.camera_builtin || 'Eingebaute Kamera')
+                        .replace('{reason}', data.restart_reason), 'info');
                 }
             }
         } catch (error) {
@@ -1263,7 +1265,7 @@ class CameraManager {
             mainImg.dataset.pipPaused = mainImg.src.split('?')[0];
             mainImg.src = '';
             mainImg.onerror = null; // Disable the error handler so the stream doesn't auto-restart
-            console.log('⏸️ Kamera-Stream pausiert (PiP aktiv)');
+            console.log('⏸️ Camera stream paused (PiP active)');
         }
     }
 
@@ -1277,14 +1279,14 @@ class CameraManager {
             if (ph && ph.dataset.pip) { ph.style.display = 'none'; delete ph.dataset.pip; }
             if (this._klipperSources && this._klipperSources.length) this._setKlipperCamera(this._klipperSourceIdx || 0);
             else this._initKlipperCamera();
-            console.log('▶️ Klipper-Snapshot-Polling fortgesetzt (PiP geschlossen)');
+            console.log('▶️ Klipper snapshot polling resumed (PiP closed)');
             return;
         }
         const img = document.getElementById('camera-stream');
         if (img && img.dataset.pipPaused) {
             img.src = img.dataset.pipPaused + '?t=' + Date.now();
             delete img.dataset.pipPaused;
-            console.log('▶️ Kamera-Stream fortgesetzt (PiP geschlossen)');
+            console.log('▶️ Camera stream resumed (PiP closed)');
         }
     }
 

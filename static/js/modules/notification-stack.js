@@ -55,7 +55,7 @@
         if (griff || !stapel) return;
         griff = document.createElement('div');
         griff.className = 'mld-griff';
-        griff.title = (window.texts && window.texts.mld_schieben) || 'Verschieben';
+        griff.title = (window.texts && window.texts.msg_move) || 'Verschieben';
         let start = null;
         griff.addEventListener('pointerdown', function (e) {
             start = { x: e.clientX - schubX, y: e.clientY - schubY };
@@ -195,14 +195,14 @@
         if (rest > 0 && !aufgeklappt) {
             const s = document.createElement('div');
             s.className = 'mld mld--info mld-sammel active mld-an';
-            const text = (window.texts && window.texts.mld_weitere) || '+{n} weitere Meldungen';
+            const text = (window.texts && window.texts.msg_more) || '+{n} weitere Meldungen';
             s.innerHTML =
                 '<span class="mld-ic"><svg viewBox="0 0 24 24" aria-hidden="true">' +
                 '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg></span>' +
                 '<div class="mld-t"><div class="mld-titel">' +
                 String(text).replace('{n}', rest) + '</div>' +
                 '<div class="mld-mehr">' +
-                ((window.texts && window.texts.mld_alle_zeigen) || 'Alle anzeigen') +
+                ((window.texts && window.texts.msg_show_all) || 'Alle anzeigen') +
                 '</div></div>';
             s.addEventListener('click', () => { aufgeklappt = true; anstossen(); });
             // Before the states: those always stay at the very end.
@@ -367,7 +367,7 @@
         // What this is about (HMS code) — entferneSache uses it to recognize the copy.
         if (meldung.sache) knoten.dataset.sache = String(meldung.sache);
 
-        const zu = (window.texts && window.texts.mld_schliessen) || 'Ausblenden';
+        const zu = (window.texts && window.texts.msg_close) || 'Ausblenden';
         knoten.innerHTML =
             '<span class="mld-ic"><svg viewBox="0 0 24 24" aria-hidden="true">' +
             SYMBOL[klasse] + '</svg></span>' +
@@ -594,7 +594,7 @@
             // home page nothing appeared, on every other page it did).
             if (window.__dismissedNotificationIds
                 && window.__dismissedNotificationIds.has(n.kennung)) {
-                console.log('⏭️ Meldungsstapel: uebersprungen, hier schon weggeklickt:', n.kennung);
+                console.log('⏭️ Message stack: skipped, already dismissed here:', n.kennung);
                 continue;
             }
             const zusatz = n.extra || {};
@@ -602,7 +602,7 @@
                 '.mld:not(.mld-geht)[data-kennung="'
                 + String(n.kennung).replace(/"/g, '\\"') + '"]');
             if (schonDa) {
-                console.log('⏭️ Meldungsstapel: steht schon im Stapel:', n.kennung,
+                console.log('⏭️ Message stack: already in the stack:', n.kennung,
                             'sichtbar=' + schonDa.classList.contains('mld-an'),
                             'aktiv=' + schonDa.classList.contains('active'));
                 continue;
@@ -616,10 +616,10 @@
                 aktion: konfliktAktion(n.art, zusatz),
             });
             if (knoten) zurueck++;
-            else console.log('⏭️ Meldungsstapel: zeige() hat nichts gebaut:', n.kennung, n.art);
+            else console.log('⏭️ Message stack: zeige() built nothing:', n.kennung, n.art);
         }
         if (zurueck) {
-            console.log(`📥 Meldungsstapel: ${zurueck} offene Meldung(en) wieder eingelegt`);
+            console.log(`📥 Message stack: ${zurueck} open message(s) put back`);
         }
         return zurueck;
     }
@@ -639,8 +639,8 @@
             if (window.electronAPI && window.electronAPI.notificationsOpen) {
                 const liste = await window.electronAPI.notificationsOpen();
                 if (Array.isArray(liste) && liste.length) {
-                    console.log(`📴 Server nicht erreichbar — ${liste.length} Meldung(en) `
-                                + 'aus dem Zwischenspeicher');
+                    console.log(`📴 Server unreachable — ${liste.length} message(s) `
+                                + 'from the cache');
                     return liste;
                 }
             }

@@ -1,4 +1,22 @@
 /**
+ * Every request to this server says which language the page shows: texts the
+ * server writes into its answer (an error in a toast) come back in it.
+ */
+(function () {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+        const url = typeof input === 'string' ? input : (input && input.url) || '';
+        const sameServer = url.startsWith('/api/') || url.startsWith(location.origin + '/api/');
+        if (!sameServer) return originalFetch(input, init);
+        let lang = 'de';
+        try { lang = localStorage.getItem('language') || 'de'; } catch (e) { /* no storage: German, the page's default */ }
+        const headers = new Headers((init && init.headers) || (typeof input !== 'string' && input.headers) || {});
+        if (!headers.has('X-App-Language')) headers.set('X-App-Language', lang);
+        return originalFetch(input, Object.assign({}, init, { headers }));
+    };
+})();
+
+/**
  * The i18n manager - handles the internationalisation for the whole app.
  * Shared by every page.
  */
@@ -75,6 +93,15 @@ class I18nManager {
             const t = this.getText(el.getAttribute('data-i18n-title'));
             if (t) el.setAttribute('title', t);
         });
+        // Screen-reader labels and image alternatives, the same pattern.
+        document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+            const t = this.getText(el.getAttribute('data-i18n-aria-label'));
+            if (t) el.setAttribute('aria-label', t);
+        });
+        document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+            const t = this.getText(el.getAttribute('data-i18n-alt'));
+            if (t) el.setAttribute('alt', t);
+        });
     }
 
     /**
@@ -116,4 +143,20 @@ window.getText = (key, fallback = '') => {
         return window.i18nManager.getText(key, fallback);
     }
     return fallback;
+};
+
+/**
+ * A status text the server sent. With `message_key` it is translated here and
+ * `message_args` fill {0}, {1} ...; without one, `message` is shown as it is --
+ * the server only sends language-neutral text then ("3 ⬇️ / 0 ⬆️").
+ */
+window.serverText = function (data) {
+    if (!data) return '';
+    if (!data.message_key) return data.message || '';
+    const text = (window.texts || {})[data.message_key];
+    if (!text) {
+        console.warn(`serverText: no translation for ${data.message_key} -- showing the server's text`);
+        return data.message || '';
+    }
+    return (data.message_args || []).reduce((s, arg, i) => s.split(`{${i}}`).join(String(arg)), text);
 };

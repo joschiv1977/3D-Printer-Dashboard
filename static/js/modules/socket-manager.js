@@ -359,7 +359,7 @@ class SocketManager {
                     && typeof window.sdCardManager._syncStand === 'function') {
                 window.sdCardManager._syncStand(data.percent || 0, window.texts || {});
             }
-            // NEW: also update the loading area on manual sync
+            // Also update the loading area on manual sync
             if (data.manual_sync) {
                 const loadingDiv = document.getElementById('sd-loading');
                 if (loadingDiv && loadingDiv.style.display !== 'none') {
@@ -372,47 +372,12 @@ class SocketManager {
                                     ${Math.round(data.percent || 0)}%
                                 </div>
                             </div>
-                            <p style="color: var(--text-secondary); text-align: center; margin: 0; font-size: 13px;">
-                                ${data.message || 'Lade Dateien...'}
-                            </p>
+                            <p style="color: var(--text-secondary); text-align: center; margin: 0; font-size: 13px;"></p>
                         </div>
                     `;
-                }
-            }
-            const progressDiv = document.getElementById('sync-progress');
-            const statusText = document.getElementById('sync-status');
-            const progressBar = document.getElementById('sync-progress-bar');
-            const detailsText = document.getElementById('sync-details');
-
-            if (progressDiv) {
-                progressDiv.style.display = 'block';
-
-                if (data.status === 'scanning') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '10%';
-                } else if (data.status === 'downloading') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = data.percent + '%';
-
-                    // Show details
-                    if (data.message.includes('/')) {
-                        detailsText.textContent = data.message;
-                    }
-                } else if (data.status === 'cleaning') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '95%';
-                } else if (data.status === 'complete') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '100%';
-                    progressBar.style.background = 'var(--accent-green)';
-
-                    // Show files after 2 seconds
-                    setTimeout(() => {
-                        showSDFiles();
-                    }, 2000);
-                } else if (data.status === 'error') {
-                    statusText.textContent = data.message;
-                    progressBar.style.background = 'var(--accent-red)';
+                    // The message can carry a file name -- text, not markup.
+                    loadingDiv.querySelector('p').textContent =
+                        window.serverText(data) || (window.texts || {}).loading_files;
                 }
             }
         });
@@ -431,10 +396,11 @@ class SocketManager {
                     refreshBtn.style.cursor = 'not-allowed';
                     // Show only a generic hint, the percentage belongs in the progress bar
                     const operation = data.operation || '';
-                    let btnText = 'FTPS aktiv...';
-                    if (operation === 'upload') btnText = texts.uploading || 'Upload läuft...';
-                    else if (operation === 'download') btnText = 'Download läuft...';
-                    else if (operation === 'sync') btnText = 'Sync läuft...';
+                    const tx = window.texts || {};
+                    let btnText = tx.ftps_active;
+                    if (operation === 'upload') btnText = tx.uploading;
+                    else if (operation === 'download') btnText = tx.download_running;
+                    else if (operation === 'sync') btnText = tx.sync_running;
                     refreshBtn.innerHTML = window.skIcon('sanduhr') + `<span>${btnText}</span>`;
                 } else {
                     refreshBtn.disabled = false;
@@ -769,7 +735,7 @@ class SocketManager {
                 // Counted is what actually left the screen here — not
                 // what the server considers done. At startup the
                 // stack is empty, and no number belongs here then.
-                if (weg) console.log(`🔄 ${weg} Meldung(en) waren anderswo schon erledigt`);
+                if (weg) console.log(`🔄 ${weg} message(s) were already handled elsewhere`);
                 // Restoring is done by the stack module — it lives on EVERY
                 // page, this connector only on the start page.
                 if (window.NotificationStack && window.NotificationStack.holeOffene) {
@@ -1092,7 +1058,7 @@ class SocketManager {
     /** Progress bar and percentage */
     _zeigeFortschritt(data, previousState) {
         const texts = window.texts || {};
-        // ========== Progress Bar + Percentage (HelixScreen-Layout) ==========
+        // ========== Progress Bar + Percentage (print card layout) ==========
         const progressPercentage = document.getElementById('progress-percentage');
         if (progressPercentage) progressPercentage.textContent = Math.round(data.progress) + '%';
 
@@ -1682,7 +1648,7 @@ class SocketManager {
                 });
             }
 
-            // Status pill (HelixScreen): compact "Status: <State>" WITHOUT stage suffix.
+            // Status pill: compact "Status: <State>" WITHOUT stage suffix.
             // ONE source = data.status_text (key, always set by the producer) →
             // translated, no trailing colon/dots appended. status_running is gone
             // (it was the "Running"-vs-"Printing" bug source). STATUS_CONTRACT §7.
@@ -2106,7 +2072,7 @@ class SocketManager {
     _setupBeforeUnloadHandler() {
         // Browser-close detection - cleanly close the WebSocket
         window.addEventListener('beforeunload', function(event) {
-            console.log('🔌 Browser schließt - WebSocket cleanup');
+            console.log('🔌 Browser closing - WebSocket cleanup');
             if (window.socket && window.socket.connected) {
                 window.socket.removeAllListeners();
                 window.socket.disconnect();

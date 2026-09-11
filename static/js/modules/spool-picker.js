@@ -30,7 +30,7 @@
     };
 
     let zustand = {
-        spulen: [],
+        spools: [],
         treffer: [],       // IDs, die zur aktuellen Datei passen
         datei: null,       // Dateiname, wenn aus dem Planen/Drucken geoeffnet
         wanted: null,      // {material, color} der Datei
@@ -95,7 +95,7 @@
             hersteller: (fil.vendor && fil.vendor.name) || '',
             name: fil.name || t('unknown', 'Unbekannt'),
             material: fil.material || '',
-            farbe: fil.color_hex ? ('#' + String(fil.color_hex).replace('#', '').slice(0, 6)) : '#8a8a8a',
+            color: fil.color_hex ? ('#' + String(fil.color_hex).replace('#', '').slice(0, 6)) : '#8a8a8a',
         };
     }
 
@@ -140,7 +140,7 @@
         return `
             <button type="button" class="${klassen.join(' ')}" data-id="${spool.id}"${leer ? ' disabled' : ''}>
                 ${marke}
-                <span class="spw-rad" style="--fuell:${prozent}; --farbe:${esc(a.farbe)};"><span>${prozent}%</span></span>
+                <span class="spw-rad" style="--fuell:${prozent}; --farbe:${esc(a.color)};"><span>${prozent}%</span></span>
                 <span class="spw-text">
                     <span class="spw-hersteller">${esc(a.hersteller)}</span>
                     <span class="spw-name">${esc(a.name)}</span>
@@ -170,7 +170,7 @@
         try {
             const daten = await window.amsHumidity.hole(400);
             if (!daten) return;
-            feuchteSchwelle = daten.schwelle;
+            feuchteSchwelle = daten.threshold;
             feuchteStand = daten;
             // Several rows can point at the same Spoolman number: one per
             // spell in the tray, and a spool often lies in there more than
@@ -183,16 +183,16 @@
             // Now the row with the most recent measurement wins; on a tie the
             // one still open.
             const juengste = e => {
-                const v = e.verlauf || [];
-                return v.length ? String(v[v.length - 1].zeit || '') : '';
+                const v = e.history || [];
+                return v.length ? String(v[v.length - 1].time || '') : '';
             };
             feuchteJeSpule = new Map();
-            for (const e of (daten.verlauf_spulen || [])) {
+            for (const e of (daten.history_spools || [])) {
                 if (e.spool_id == null) continue;
                 const bisher = feuchteJeSpule.get(e.spool_id);
                 if (!bisher) { feuchteJeSpule.set(e.spool_id, e); continue; }
                 const a = juengste(e), b = juengste(bisher);
-                if (a > b || (a === b && e.bis == null && bisher.bis != null)) {
+                if (a > b || (a === b && e.inside && !bisher.inside)) {
                     feuchteJeSpule.set(e.spool_id, e);
                 }
             }
@@ -204,15 +204,15 @@
         const e = feuchteJeSpule.get(spoolId);
         if (!e) return '';
         let text;
-        if (e.urteil === 'trocken') {
-            text = t('feuchte_urteil_trocken', 'trocken');
-        } else if (e.tage_ueber >= 1) {
-            text = t('feuchte_kurz_tage', '{n} d über {s} %')
-                .replace('{n}', e.tage_ueber.toFixed(e.tage_ueber < 10 ? 1 : 0))
+        if (e.verdict === 'trocken') {
+            text = t('humidity_verdict_dry', 'trocken');
+        } else if (e.days_above >= 1) {
+            text = t('humidity_short_days', '{n} d über {s} %')
+                .replace('{n}', e.days_above.toFixed(e.days_above < 10 ? 1 : 0))
                 .replace('{s}', feuchteSchwelle);
         } else {
-            text = t('feuchte_kurz_stunden', '{n} h über {s} %')
-                .replace('{n}', Math.max(1, Math.round(e.stunden_ueber)))
+            text = t('humidity_short_hours', '{n} h über {s} %')
+                .replace('{n}', Math.max(1, Math.round(e.hours_above)))
                 .replace('{s}', feuchteSchwelle);
         }
         // Clickable rather than just labelled: the history belongs in a window
@@ -220,9 +220,9 @@
         // across eleven cards.
         // NOT a <button>: the card is one already, and a button inside a
         // button is invalid HTML -- the browser breaks the card open there.
-        const titel = t('feuchte_open', 'Feuchteverlauf zeigen');
-        return `<span class="spw-feucht spw-feucht--${esc(e.urteil)}" role="button"`
-             + ` tabindex="0" data-feuchte="${spoolId}" title="${esc(titel)}">`
+        const titel = t('humidity_open', 'Feuchteverlauf zeigen');
+        return `<span class="spw-feucht spw-feucht--${esc(e.verdict)}" role="button"`
+             + ` tabindex="0" data-humidity="${spoolId}" title="${esc(titel)}">`
              + ikon('wasser') + esc(text) + ikon('chevronRechts') + '</span>';
     }
 
@@ -230,24 +230,24 @@
     function zeigeFeuchte(spoolId) {
         const e = feuchteJeSpule.get(spoolId);
         if (!e || !window.amsHumidity) return;
-        const spule = zustand.spulen.find(x => x.id === spoolId) || {};
+        const spule = zustand.spools.find(x => x.id === spoolId) || {};
         const fil = spule.filament || {};
         const name = [((fil.vendor || {}).name || ''), fil.name || ''].filter(Boolean).join(' ')
-            || (e.typ || '');
-        const zeit = window.amsHumidity.spanne(e.verlauf);
-        const kurve = window.amsHumidity.kurve(e.verlauf, feuchteSchwelle, 480, 96);
+            || (e.type || '');
+        const zeit = window.amsHumidity.spanne(e.history);
+        const kurve = window.amsHumidity.kurve(e.history, feuchteSchwelle, 480, 96);
         const worte = {
-            trocken: t('feuchte_urteil_trocken', 'trocken'),
-            beobachten: t('feuchte_urteil_beobachten', 'im Blick behalten'),
-            trocknen: t('feuchte_urteil_trocknen', 'trocknen'),
+            trocken: t('humidity_verdict_dry', 'trocken'),
+            beobachten: t('humidity_verdict_watch', 'im Blick behalten'),
+            trocknen: t('humidity_verdict_needs_drying', 'trocknen'),
         };
-        const ueber = e.tage_ueber >= 1
-            ? t('feuchte_kurz_tage', '{n} d über {s} %')
-                .replace('{n}', e.tage_ueber.toFixed(e.tage_ueber < 10 ? 1 : 0))
+        const ueber = e.days_above >= 1
+            ? t('humidity_short_days', '{n} d über {s} %')
+                .replace('{n}', e.days_above.toFixed(e.days_above < 10 ? 1 : 0))
                 .replace('{s}', feuchteSchwelle)
-            : (e.stunden_ueber > 0
-                ? t('feuchte_kurz_stunden', '{n} h über {s} %')
-                    .replace('{n}', Math.max(1, Math.round(e.stunden_ueber)))
+            : (e.hours_above > 0
+                ? t('humidity_short_hours', '{n} h über {s} %')
+                    .replace('{n}', Math.max(1, Math.round(e.hours_above)))
                     .replace('{s}', feuchteSchwelle)
                 : '–');
         const wert = (kopf, w) => `<div class="spf-wert"><div class="spf-wert-kopf">${esc(kopf)}</div>`
@@ -262,18 +262,18 @@
             <div class="tray-edit-box spf-box">
                 <h4>${esc(name)}</h4>
                 <div class="spf-kopf">
-                    <span class="spf-urteil spf-urteil--${esc(e.urteil)}">${esc(worte[e.urteil] || e.urteil)}</span>
+                    <span class="spf-urteil spf-urteil--${esc(e.verdict)}">${esc(worte[e.verdict] || e.verdict)}</span>
                     ${zeit.text ? `<span class="spf-spanne">${esc(zeit.text)}</span>` : ''}
-                    <span class="spf-grenze">${esc(t('feuchte_schwelle', 'Grenze {s} %')
+                    <span class="spf-grenze">${esc(t('humidity_threshold', 'Grenze {s} %')
                         .replace('{s}', feuchteSchwelle))}</span>
                 </div>
-                ${kurve || `<div class="fk-frisch">${esc(t('feuchte_zu_kurz',
+                ${kurve || `<div class="fk-frisch">${esc(t('humidity_too_short',
                     'Noch zu wenig aufgezeichnet für einen Verlauf.'))}</div>`}
                 <div class="spf-werte">
-                    ${wert(t('feuchte_jetzt', 'Jetzt'), e.jetzt + ' %')}
-                    ${wert(t('feuchte_max', 'Spitze'), e.max + ' %')}
-                    ${wert(t('feuchte_ueber', 'Über der Grenze'), ueber)}
-                    ${wert(t('feuchte_liegezeit', 'Im AMS'), Math.round(e.stunden) + ' h')}
+                    ${wert(t('humidity_now', 'Jetzt'), e.now + ' %')}
+                    ${wert(t('humidity_max', 'Spitze'), e.max + ' %')}
+                    ${wert(t('humidity_above', 'Über der Grenze'), ueber)}
+                    ${wert(t('humidity_dwell', 'Im AMS'), Math.round(e.hours) + ' h')}
                 </div>
                 <div class="tray-edit-actions">
                     <button class="tray-edit-cancel" id="spf-zu">${esc(t('settings_close', 'Schließen'))}</button>
@@ -289,7 +289,7 @@
 
     function gefiltert() {
         const suche = zustand.suche.trim().toLowerCase();
-        let liste = zustand.spulen.filter(spool => {
+        let liste = zustand.spools.filter(spool => {
             const a = anzeigeName(spool);
             if (zustand.material && familie(a.material) !== zustand.material) return false;
             if (!suche) return true;
@@ -321,18 +321,18 @@
 
     function materialChips() {
         const zaehler = {};
-        zustand.spulen.forEach(s => {
+        zustand.spools.forEach(s => {
             const f = familie(anzeigeName(s).material);
             if (!f) return;
-            zaehler[f] = zaehler[f] || { n: 0, farbe: anzeigeName(s).farbe };
+            zaehler[f] = zaehler[f] || { n: 0, color: anzeigeName(s).color };
             zaehler[f].n++;
         });
         const chips = [`<button type="button" class="spw-chip${zustand.material ? '' : ' spw-chip--an'}"
-                          data-material="">${esc(t('all', 'Alle'))} <b>${zustand.spulen.length}</b></button>`];
+                          data-material="">${esc(t('all', 'Alle'))} <b>${zustand.spools.length}</b></button>`];
         Object.keys(zaehler).sort().forEach(f => {
             chips.push(`<button type="button" class="spw-chip${zustand.material === f ? ' spw-chip--an' : ''}"
                           data-material="${esc(f)}">
-                          <i class="spw-chip-punkt" style="background:${esc(zaehler[f].farbe)}"></i>
+                          <i class="spw-chip-punkt" style="background:${esc(zaehler[f].color)}"></i>
                           ${esc(f.toUpperCase())} <b>${zaehler[f].n}</b></button>`);
         });
         return chips.join('');
@@ -363,16 +363,16 @@
 
     /** Trays in the AMS with no Spoolman spool assigned. */
     function ohneZuordnungHtml() {
-        const offen = (feuchteStand.spulen || []).filter(s => s.spool_id == null);
+        const offen = (feuchteStand.spools || []).filter(s => s.spool_id == null);
         if (!offen.length) return '';
         return offen.map(s => {
-            const vorschlag = (s.vorschlaege || [])[0];
+            const vorschlag = (s.suggestions || [])[0];
             return '<div class="spw-hinweis-zeile">'
-                 + esc(t('feuchte_ohne_zuordnung',
+                 + esc(t('humidity_unassigned',
                          'Fach {n} im AMS ist keiner Spule zugeordnet.')
                        .replace('{n}', (s.slot ?? 0) + 1))
                  + (vorschlag
-                    ? ' <b>' + esc(t('feuchte_vorschlag', 'Vorschlag: {name}')
+                    ? ' <b>' + esc(t('humidity_suggestion', 'Vorschlag: {name}')
                                    .replace('{name}', vorschlag.name || '')) + '</b>'
                     : '')
                  + '</div>';
@@ -414,7 +414,7 @@
         }
 
         zustand = Object.assign(zustand, {
-            spulen: sm.spools || [],
+            spools: sm.spools || [],
             treffer: [],
             datei: opts.datei || null,
             wanted: null,
@@ -459,7 +459,7 @@
     function uebernehmen() {
         const id = zustand.gewaehlt;
         if (id == null) return;
-        const spule = zustand.spulen.find(s => s.id === id);
+        const spule = zustand.spools.find(s => s.id === id);
         if (zustand.onWahl) {
             zustand.onWahl(spule);
         } else if (window.activateSpool) {
@@ -473,12 +473,12 @@
     // ======================================================================
 
     document.addEventListener('click', (e) => {
-        const feucht = e.target.closest && e.target.closest('[data-feuchte]');
+        const feucht = e.target.closest && e.target.closest('[data-humidity]');
         if (feucht) {
             // Do not select the card -- the click was meant for the badge.
             e.preventDefault();
             e.stopPropagation();
-            zeigeFeuchte(parseInt(feucht.dataset.feuchte, 10));
+            zeigeFeuchte(parseInt(feucht.dataset.humidity, 10));
             return;
         }
         const karte = e.target.closest && e.target.closest('.spw-spule');

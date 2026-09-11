@@ -79,7 +79,7 @@
 
         const wrap = document.getElementById('ms-wrap');
         const overlay = document.getElementById('ms-overlay');
-        const T = (k, fb) => (window.texts && window.texts[k]) || fb;
+        const T = (k, fb) => window.getText(k, fb);
         // <webview> exists only in the Electron app; a fallback in a normal browser.
         const isElectron = /electron/i.test(navigator.userAgent);
 

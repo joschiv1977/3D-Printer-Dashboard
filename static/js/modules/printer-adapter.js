@@ -262,7 +262,7 @@
         const remainingMin = Math.round((s.remaining_seconds || 0) / 60);
         const elapsedMin = Math.round((s.elapsed_seconds || 0) / 60);
 
-        // HelixScreen pattern: Klipper reports state=printing already during
+        // Klipper reports state=printing already during
         // the START_PRINT macro (heat-soak/QGL/mesh/purge). We override gcode_state
         // to PREPARE as long as the macro reports `preparation_done=false`.
         // When the variable is missing (slicer prints without START_PRINT), we
@@ -286,10 +286,10 @@
             total_layers: s.layer_total || 0,
             remaining_time: remainingMin,
             print_time: elapsedMin,
-            // Raw seconds for the HelixScreen print card "1h 52m elapsed".
+            // Raw seconds for the print card's "1h 52m elapsed".
             // IMPORTANT: total_duration_seconds (from print start, including heat-soak/
             // QGL/mesh) — NOT print_duration_seconds (extrusion only).
-            // HelixScreen shows total_duration, which matches user expectation.
+            // The card shows total_duration, which matches what the user expects.
             elapsed_seconds: s.total_duration_seconds
                 || s.elapsed_seconds
                 || s.print_duration_seconds
@@ -314,11 +314,6 @@
             // (Decision A). Just pass it through here, don't re-derive it.
             stage_code: s.stage_code || '',
             stage_custom: s.stage_custom || '',
-            nozzle_temp: s.nozzle_temp,
-            nozzle_target: s.nozzle_target,
-            bed_temp: s.bed_temp,
-            bed_target: s.bed_target,
-            chamber_temp: s.chamber_temp,
             // Extended live values (KlipperScreen parity)
             z_position: s.z_position,
             speed_factor_percent: s.speed_factor_percent,
@@ -328,7 +323,7 @@
             total_duration_seconds: s.total_duration_seconds,
             z_offset_mm: s.z_offset_mm,
             display_message: s.display_message,
-            // HelixScreen parity: fan values + objects + heating status pills.
+            // Print card: fan values + objects + heating status pills.
             // The Klipper backend pushes them in the SocketIO klipper_state event,
             // we map them through 1:1.
             part_fan_percent: s.part_fan_percent != null

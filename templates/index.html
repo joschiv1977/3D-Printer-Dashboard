@@ -110,11 +110,7 @@
             return fetch(url, options).then(response => {
                 if (response.status === 401 || response.status === 403) {
                     console.error('🔒 Authentication failed (401/403) - Token invalid');
-                    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.authFailed) {
-                        window.webkit.messageHandlers.authFailed.postMessage({});
-                    } else {
-                        window.location.href = '/login';
-                    }
+                    window.location.href = '/login';
                 }
                 return response;
             });

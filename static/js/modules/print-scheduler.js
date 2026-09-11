@@ -531,7 +531,7 @@ class PrintSchedulerManager {
             console.error(texts.console_error_scheduling + ':', error);
             const errorDiv = document.getElementById('schedule-error');
             const errorText = document.getElementById('schedule-error-text');
-            errorText.textContent = `Fehler beim Planen: ${error.message || error}`;
+            errorText.textContent = (texts.sched_error_planning || 'Fehler beim Planen: {error}').replace('{error}', error.message || error);
             errorDiv.style.display = 'block';
         });
     }
@@ -1014,7 +1014,7 @@ class PrintSchedulerManager {
                 console.error('Error scheduling with force:', error);
                 const errorDiv = document.getElementById('schedule-error');
                 const errorText = document.getElementById('schedule-error-text');
-                errorText.textContent = `Fehler: ${error.message || error}`;
+                errorText.textContent = `${texts.error || 'Fehler'}: ${error.message || error}`;
                 errorDiv.style.display = 'block';
             });
         });
@@ -1065,7 +1065,7 @@ class PrintSchedulerManager {
                 console.error('Error scheduling with force:', error);
                 const errorDiv = document.getElementById('schedule-error');
                 const errorText = document.getElementById('schedule-error-text');
-                errorText.textContent = `Fehler: ${error.message || error}`;
+                errorText.textContent = `${texts.error || 'Fehler'}: ${error.message || error}`;
                 errorDiv.style.display = 'block';
             });
         });
@@ -1290,8 +1290,7 @@ class PrintSchedulerManager {
 
         const datum = new Date(print.scheduled_time);
         const vorbei = datum < new Date();
-        const name = (window.cleanPrintName ? window.cleanPrintName(print.filename)
-                                            : print.filename.replace(/\.(gcode\.)?3mf$/, ''));
+        const name = window.cleanPrintName(print.filename);
 
         // Preview: the same source as the SD list.
         const bild = (datei && datei.has_thumbnail !== false)
@@ -1863,7 +1862,7 @@ window.schedulePrintFromArchive = async function (filename) {
         });
         const daten = await antwort.json();
         if (!daten || !daten.success) {
-            skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+            skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
             return;
         }
         skToast(texts.sched_archive_restored
@@ -1873,7 +1872,7 @@ window.schedulePrintFromArchive = async function (filename) {
         window.printScheduler.archivAktiv = false;
         schedulePrintFromScheduleManager(filename, 'root');
     } catch (fehler) {
-        skToast(texts.toast_error || 'Fehler', 'error');
+        skToast(texts.error || 'Fehler', 'error');
         console.error('Archiv/Planen:', fehler);
     }
 };

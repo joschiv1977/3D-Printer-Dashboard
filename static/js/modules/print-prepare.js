@@ -38,7 +38,7 @@
     function setzeStartKnopf(daten) {
         const knopf = document.getElementById('prep-start');
         if (!knopf) return;
-        knopf.textContent = daten && daten.spulenauswahl_noetig
+        knopf.textContent = daten && daten.spool_choice_needed
             ? t('print_prepare_continue', 'Weiter')
             : t('print', 'Drucken');
     }
@@ -183,17 +183,17 @@
     function feuchteHinweis() {
         const daten = feuchteStand;
         if (!daten) return null;
-        const nass = (daten.spulen || []).filter(sp => sp.urteil === 'trocknen');
+        const nass = (daten.spools || []).filter(sp => sp.verdict === 'trocknen');
         if (!nass.length) return null;
         // The longest time sitting sets the tone — it's the reason given.
-        nass.sort((a, b) => b.tage_ueber - a.tage_ueber);
+        nass.sort((a, b) => b.days_above - a.days_above);
         const s = nass[0];
         return {
             text: t('dry_spool_wet', 'Fach {slot} ({typ}) lag {n} Tage über {s} % Feuchte.')
                 .replace('{slot}', s.slot + 1)
-                .replace('{typ}', s.typ || '?')
-                .replace('{n}', s.tage_ueber.toFixed(s.tage_ueber < 10 ? 1 : 0))
-                .replace('{s}', daten.schwelle),
+                .replace('{typ}', s.type || '?')
+                .replace('{n}', s.days_above.toFixed(s.days_above < 10 ? 1 : 0))
+                .replace('{s}', daten.threshold),
         };
     }
 

@@ -161,7 +161,7 @@
 
                     <div class="maint-form-group">
                         <label for="task-name" data-i18n="maintenance_name">Name *</label>
-                        <input type="text" id="task-name" class="maint-form-input" placeholder="z.B. X/Y-Achsen Reinigung" required>
+                        <input type="text" id="task-name" class="maint-form-input" data-i18n-placeholder="maint_ph_name" placeholder="z.B. X/Y-Achsen Reinigung" required>
                     </div>
 
                     <div class="maint-form-group">
@@ -219,7 +219,7 @@
 
                     <div class="maint-form-group">
                         <label for="task-description" data-i18n="maintenance_description">Beschreibung</label>
-                        <textarea id="task-description" class="maint-form-textarea" placeholder="z.B. Linearstangen reinigen und schmieren..."></textarea>
+                        <textarea id="task-description" class="maint-form-textarea" data-i18n-placeholder="maint_ph_description" placeholder="z.B. Linearstangen reinigen und schmieren..."></textarea>
                     </div>
 
                     <div class="maint-form-group">
@@ -240,7 +240,7 @@
 
                     <div class="maint-form-group">
                         <label for="task-notes" data-i18n="maintenance_notes">Hinweise</label>
-                        <textarea id="task-notes" class="maint-form-textarea" placeholder="Zusätzliche Hinweise zur Durchführung..."></textarea>
+                        <textarea id="task-notes" class="maint-form-textarea" data-i18n-placeholder="maint_ph_notes" placeholder="Zusätzliche Hinweise zur Durchführung..."></textarea>
                     </div>
                 </form>
             </div>
@@ -275,7 +275,7 @@
 
                 <div class="maint-form-group" style="margin-top: 16px;">
                     <label for="complete-notes" data-i18n="maintenance_completion_notes">Notizen zur durchgeführten Wartung</label>
-                    <textarea id="complete-notes" class="maint-form-textarea" data-i18n="maintenance_completion_placeholder" placeholder="Was wurde gemacht? Gab es Probleme oder Besonderheiten?"></textarea>
+                    <textarea id="complete-notes" class="maint-form-textarea" data-i18n-placeholder="maintenance_completion_placeholder" placeholder="Was wurde gemacht? Gab es Probleme oder Besonderheiten?"></textarea>
                 </div>
             </div>
             <div class="maint-modal-footer">
@@ -489,6 +489,19 @@
             if (hourGroup) hourGroup.label = getText('maintenance_interval_hours', 'Druckstunden').replace(' {value}', '').replace('Alle ', '');
             if (printGroup) printGroup.label = getText('maintenance_interval_prints', 'Drucke').replace(' {value}', '').replace('Alle ', '');
             if (rollGroup) rollGroup.label = getText('maintenance_interval_rolls', 'Rollen').replace(' {value}', '').replace('Alle ', '');
+            // The options: a number and a unit, and the unit is the language.
+            const optText = {
+                days: n => n === '365' ? getText('maint_opt_year', '365 Tage (1 Jahr)')
+                                        : getText('maint_opt_days', '{n} Tage').replace('{n}', n),
+                hours: n => n === '720' ? getText('maint_opt_hours_90d', '720 Druckstunden (~90 Tage)')
+                                         : getText('maint_opt_hours', '{n} Druckstunden').replace('{n}', n),
+                prints: n => getText('maint_opt_prints', '{n} Drucke').replace('{n}', n),
+                filament_rolls: n => getText('maint_opt_rolls', '{n} Rollen').replace('{n}', n),
+            };
+            document.querySelectorAll('#task-interval option').forEach(o => {
+                const [unit, n] = (o.value || '').split(':');
+                if (optText[unit] && n) o.textContent = optText[unit](n);
+            });
         }
 
         async function loadPrinterSelector() {
@@ -879,7 +892,7 @@
                 const printers = await response.json();
 
                 const select = document.getElementById('task-printer-id');
-                select.innerHTML = '<option value="">Drucker wählen...</option>';
+                select.innerHTML = '<option value="">' + getText('maint_choose_printer', 'Drucker wählen …') + '</option>';
 
                 printers.forEach(printer => {
                     const option = document.createElement('option');
@@ -1048,7 +1061,7 @@
             if (task.checklist && task.checklist.length > 0) {
                 checklistContainer.innerHTML = `
                     <div class="maint-form-group">
-                        <label>Checkliste</label>
+                        <label>${getText('maint_checklist', 'Checkliste')}</label>
                         <ul class="maint-checklist">
                             ${task.checklist.map((item, idx) => `
                                 <li>
@@ -1087,7 +1100,7 @@
                 );
 
                 if (response.ok) {
-                    showSuccess('Wartung als erledigt markiert');
+                    showSuccess(getText('maint_marked_done', 'Wartung als erledigt markiert'));
                     closeCompleteModal();
                     await loadTasks();
                 } else {
@@ -1095,7 +1108,7 @@
                 }
             } catch (error) {
                 console.error('Error completing task:', error);
-                showError('Fehler beim Abschließen');
+                showError(getText('maint_complete_failed', 'Fehler beim Abschließen'));
             }
         }
 

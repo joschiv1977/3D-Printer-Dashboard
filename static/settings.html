@@ -1284,7 +1284,7 @@
                                 <button class="es-knopf" onclick="cloudCode(true)" data-i18n="settings_cloud_resend">Neu senden</button>
                             </div>
                         </div>
-                        <div id="cloud-angemeldet" style="display:none;">
+                        <div id="cloud-signed-in" style="display:none;">
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
                                     <b id="cloud-konto"></b>
@@ -1383,7 +1383,7 @@
     </button>
 </div>
 <div class="printer-gallery-container" id="modell-auswahl" style="display:none;">
-                                <label class="printer-gallery-label" style="display:none">Modell</label>
+                                <label class="printer-gallery-label" style="display:none" data-i18n="printer_model">Modell</label>
                                 <div class="printer-gallery-wrapper">
                                     <!--Cards are built by initPrinterGallery() from
                                         /api/printer/models.-->
@@ -1497,7 +1497,7 @@
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name"><label for="pd_api_key">Moonraker API-Key (optional)</label></div>
-                            <div class="es-zeile-wert"><input type="text" id="pd_api_key" class="es-breit" placeholder="leer = LAN ohne Auth"></div>
+                            <div class="es-zeile-wert"><input type="text" id="pd_api_key" class="es-breit" data-i18n-placeholder="set_pd_api_key_ph" placeholder="leer = LAN ohne Auth"></div>
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name">
@@ -2053,7 +2053,7 @@
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name"><label for="meross_email" id="label-meross-email" data-i18n="settings_meross_account">Konto</label></div>
-                            <div class="es-zeile-wert"><input type="email" id="meross_email" class="es-breit" placeholder="konto@example.com"></div>
+                            <div class="es-zeile-wert"><input type="email" id="meross_email" class="es-breit" placeholder="name@example.com"></div>
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name"><label for="meross_password" id="label-meross-password" data-i18n="settings_password">Passwort</label></div>
@@ -2076,7 +2076,7 @@
                                 <label for="meross_device" id="label-meross-device" data-i18n="settings_meross_device">Gerätename</label>
                                 <span id="meross-device-hint" data-i18n="settings_meross_device_hint">Nur nötig, wenn oben keine Steckdose gewählt ist</span>
                             </div>
-                            <div class="es-zeile-wert"><input type="text" id="meross_device" class="es-breit" placeholder="Drucker"></div>
+                            <div class="es-zeile-wert"><input type="text" id="meross_device" class="es-breit" data-i18n-placeholder="printer" placeholder="Drucker"></div>
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name">
@@ -2085,9 +2085,9 @@
                             </div>
                             <div class="es-zeile-wert">
                                 <select id="meross_region" class="es-auswahl">
-                                    <option value="eu">Europa</option>
-                                    <option value="us">USA</option>
-                                    <option value="ap">Asien-Pazifik</option>
+                                    <option value="eu" data-i18n="region_eu">Europa</option>
+                                    <option value="us" data-i18n="region_us">USA</option>
+                                    <option value="ap" data-i18n="region_ap">Asien-Pazifik</option>
                                 </select>
                             </div>
                         </div>
@@ -2136,10 +2136,10 @@
                             <span class="es-rechts">
                                 <button id="meldungen-reiter-verlauf" class="es-knopf es-knopf--haupt"
                                         onclick="zeigeMeldungsReiter('verlauf')"
-                                        data-i18n="settings_meldungen_verlauf">Verlauf</button>
+                                        data-i18n="settings_notif_history">Verlauf</button>
                                 <button id="meldungen-reiter-geraete" class="es-knopf"
-                                        onclick="zeigeMeldungsReiter('geraete')"
-                                        data-i18n="settings_meldungen_geraete">Geräte</button>
+                                        onclick="zeigeMeldungsReiter('devices')"
+                                        data-i18n="settings_notif_devices">Geräte</button>
                             </span>
                         </div>
 
@@ -2148,7 +2148,7 @@
                         <div id="meldungen-inhalt-verlauf">
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
-                                    <span data-i18n="settings_meldungen_verlauf_hint">Was angekommen ist — auf allen Geräten</span>
+                                    <span data-i18n="settings_notif_history_hint">Was angekommen ist — auf allen Geräten</span>
                                 </div>
                                 <div class="es-zeile-wert">
                                     <button id="notif-filter-all" class="es-knopf es-knopf--haupt" onclick="setNotifFilter('all')" data-i18n="notifications_filter_all">Alle</button>
@@ -2170,7 +2170,7 @@
                         <div id="meldungen-inhalt-geraete" style="display:none;">
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
-                                    <span data-i18n="settings_geraete_meldungen_hint">Was ausgeschaltet ist, schickt der Server gar nicht erst</span>
+                                    <span data-i18n="settings_devices_notif_hint">Was ausgeschaltet ist, schickt der Server gar nicht erst</span>
                                 </div>
                                 <div class="es-zeile-wert">
                                     <button class="es-knopf" onclick="ladeGeraeteMeldungen()">
@@ -2346,7 +2346,7 @@
                                 </div>
                             </div>
                             <button class="es-knopf es-knopf--haupt" id="lang-save-btn" style="margin-top:10px" data-i18n="settings_language_save">Sprache speichern</button>
-                            <span class="section-title" style="display:none">Sprache</span>
+                            <span class="section-title" style="display:none" data-i18n="settings_language">Sprache</span>
                         </div>
 
                         <!--Only visible in the Electron desktop app (tray/menu bar)-->
@@ -2706,7 +2706,7 @@
                                 <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                 <span id="card-license-title" data-i18n="settings_license">Lizenz</span>
                                 <span class="es-rechts">
-                                    <span id="license-status-label" style="display:none">Status</span>
+                                    <span id="license-status-label" style="display:none" data-i18n="status">Status</span>
                                     <span id="license-status-badge" class="es-marke">…</span>
                                 </span>
                             </div>
@@ -2978,7 +2978,8 @@
         //
         // Printers broadcast unsolicited SSDP announcements (port 2021, not
         // 1900) with serial number, model, name, and current address. The
-        // server listens; this only shows what it has heard.
+        // server listens for a few seconds when asked (then gives the port
+        // back to Bambu Studio); this shows what it heard.
         //
         // Nothing is applied automatically: which address is used is the
         // user's decision. The one exception lives in the server and isn't
@@ -2991,7 +2992,7 @@
             try {
                 const r = await apiCall('/api/drucker/suche');
                 const j = await r.json();
-                ziel.innerHTML = druckerSucheHtml(j.drucker || []);
+                ziel.innerHTML = druckerSucheHtml(j.printers || []);
             } catch (e) {
                 ziel.innerHTML = '';
             }
@@ -3005,8 +3006,8 @@
                      + '</span></div></div>';
             }
             return liste.map(function (d) {
-                const name = d.name || d.seriennummer;
-                const marke = d.ist_eingerichtet
+                const name = d.name || d.serial;
+                const marke = d.is_configured
                     ? ' <b>(' + dsEsc(getText('settings_discovery_current', 'eingerichtet')) + ')</b>'
                     : '';
                 // The configured printer showing up under a DIFFERENT
@@ -3018,16 +3019,16 @@
                       + '</span>'
                     : '<span class="es-wert--matt">'
                       + dsEsc(getText('settings_discovery_seen', 'vor {n} s gemeldet')
-                            .replace('{n}', Math.round(d.vor_sekunden)))
+                            .replace('{n}', Math.round(d.seconds_ago)))
                       + '</span>';
                 return '<div class="es-zeile">'
                      + '<div class="es-zeile-name"><b>' + dsEsc(name) + ' · '
-                     + dsEsc(d.modell) + ' · ' + dsEsc(d.ip) + '</b>' + marke
+                     + dsEsc(d.model) + ' · ' + dsEsc(d.ip) + '</b>' + marke
                      + abweichung + '</div>'
                      + '<div class="es-zeile-wert"><button class="es-knopf'
                      + (d.adresse_weicht_ab ? ' es-knopf--haupt' : '') + '" '
                      + 'onclick="druckerUebernehmen(' + JSON.stringify(d.ip).replace(/"/g, '&quot;')
-                     + ',' + JSON.stringify(d.seriennummer).replace(/"/g, '&quot;') + ')" '
+                     + ',' + JSON.stringify(d.serial).replace(/"/g, '&quot;') + ')" '
                      + 'data-i18n="settings_discovery_apply">'
                      + dsEsc(getText('settings_discovery_apply', 'Übernehmen'))
                      + '</button></div></div>';
@@ -3196,17 +3197,17 @@
                 const q = document.getElementById('ed-quelle');
                 if (q) {
                     // Off the printer, or the last state we saw? The server
-                    // says so in device_report.stand and hands over when it
+                    // says so in device_report.liveness and hands over when it
                     // wrote those values — better a dated state than an empty
                     // window whenever the printer is off.
-                    const stand = ((d || {}).device_report || {}).stand || {};
+                    const stand = ((d || {}).device_report || {}).liveness || {};
                     const live = stand.live !== undefined
                         ? !!stand.live : !!(d && d.mqtt_connected !== false);
                     edLive = live;
                     q.className = 'ed-quelle' + (live ? '' : ' ed-quelle--alt');
                     q.textContent = live
                         ? edText('settings_at_printer_live', 'vom Drucker gelesen')
-                        : edStandText(stand.gesehen);
+                        : edStandText(stand.seen_at);
                 }
             } catch (_) {
                 edStand = edStand || {};
@@ -3254,11 +3255,11 @@
             const modul = Object.keys(erk).find(k => erk[k] && erk[k].module === schluessel);
             if (modul) return erk[modul].on;
             if (erk[schluessel]) return erk[schluessel].on;
-            if (schluessel === 'aufnahme_beim_druck') {
+            if (schluessel === 'record_on_print') {
                 const k = (edStand || {}).camera || {};
                 if (k.ipcam_record) return k.ipcam_record === 'enable';
             }
-            if (schluessel === 'videoaufloesung') {
+            if (schluessel === 'video_resolution') {
                 const k = (edStand || {}).camera || {};
                 if (k.resolution) return k.resolution;
             }
@@ -3309,7 +3310,7 @@
             return '<div class="es-zeile">' +
                 // Image column only when there is one — otherwise an empty
                 // column would stay and indent every row.
-                (z.bild ? '<img class="es-geraet-bild" src="' + z.bild + '" alt="">' : '') +
+                (z.image ? '<img class="es-geraet-bild" src="' + z.image + '" alt="">' : '') +
                 '<div class="es-zeile-name"><b>' + z.name + '</b>' +
                 (z.hinweis ? '<span>' + z.hinweis + '</span>' : '') + '</div>' +
                 '<div class="es-zeile-wert">' + (z.bedienung || '') + '</div></div>';
@@ -3398,27 +3399,27 @@
                     bedienung: edSchalterHtml(an, "edAmsLesen('" + feld + "', this.checked)"),
                 });
             };
-            trio('rfid_beim_einlegen', edText('settings_ed_rfid_insert', 'RFID beim Einlegen lesen'),
+            trio('rfid_on_insert', edText('settings_ed_rfid_insert', 'RFID beim Einlegen lesen'),
                  edText('settings_ed_rfid_insert_hint', 'Neue Rolle wird sofort erkannt'), 'tray_read');
-            trio('rfid_beim_start', edText('settings_ed_rfid_start', 'RFID beim Einschalten lesen'),
+            trio('rfid_on_startup', edText('settings_ed_rfid_start', 'RFID beim Einschalten lesen'),
                  edText('settings_ed_rfid_start_hint', 'Dreht beim Start alle Rollen durch'), 'startup_read');
-            trio('restmenge_messen', edText('settings_ed_remain', 'Restmenge messen'),
+            trio('measure_remaining', edText('settings_ed_remain', 'Restmenge messen'),
                  edText('settings_ed_remain_hint', 'Schätzt, wie viel noch auf der Rolle ist'), 'remain');
-            if (einst.auto_nachschub) {
-                const an = edWert('auto_nachschub', einst.auto_nachschub.on);
+            if (einst.auto_refill) {
+                const an = edWert('auto_refill', einst.auto_refill.on);
                 zeilen.push({
                     name: edText('settings_ed_refill', 'Auto-Nachschub'),
                     hinweis: edText('settings_ed_refill_hint', 'Gleiche Rolle übernimmt, wenn eine leer läuft'),
-                    bedienung: edSchalterHtml(an, "edDruckOption('auto_switch_filament', this.checked, 'auto_nachschub')"),
+                    bedienung: edSchalterHtml(an, "edDruckOption('auto_switch_filament', this.checked, 'auto_refill')"),
                 });
             }
-            if (einst.luftdruck_ams) {
-                const e = einst.luftdruck_ams, an = edWert('luftdruck_ams', e.on);
+            if (einst.ams_air_pressure) {
+                const e = einst.ams_air_pressure, an = edWert('ams_air_pressure', e.on);
                 zeilen.push({
                     name: edText('settings_ed_airprint_ams', 'Luftdruck-Erkennung (AMS)'),
                     hinweis: edText('settings_ed_airprint_ams_hint', 'Merkt, wenn nichts mehr gefördert wird'),
                     kannNicht: e.supported === false,
-                    bedienung: edSchalterHtml(an, "edDruckOption('air_print_detect', this.checked, 'luftdruck_ams')",
+                    bedienung: edSchalterHtml(an, "edDruckOption('air_print_detect', this.checked, 'ams_air_pressure')",
                                               e.supported === false),
                 });
             }
@@ -3461,7 +3462,7 @@
                 // in place in case other models support it.
                 const knopf = '';
                 return {
-                    name: (f.material || '?') + ' · ' + (f.duese || '?'),
+                    name: (f.material || '?') + ' · ' + (f.nozzle || '?'),
                     hinweis: name + (f.profile && f.profile.length
                         ? ' · ' + f.profile.length + ' ' +
                           edText('settings_pa_stored', 'gespeichert') : ''),
@@ -3515,7 +3516,7 @@
                 const erg = await antwort.json();
                 window.skToast && window.skToast(
                     erg.success ? edText('settings_pa_started', 'Kalibrierung läuft')
-                                : (erg.grund || erg.error ||
+                                : (erg.reason || erg.error ||
                                    edText('settings_pa_failed', 'Fehlgeschlagen')),
                     erg.success ? 'success' : 'error');
             } catch (e) {
@@ -3557,9 +3558,9 @@
                 const gesp = await antwort.json();
                 window.skToast && window.skToast(
                     gesp.success
-                        ? (gesp.aktiviert ? edText('settings_pa_saved', 'Gespeichert und aktiv')
+                        ? (gesp.enabled ? edText('settings_pa_saved', 'Gespeichert und aktiv')
                                           : edText('settings_pa_saved_only', 'Gespeichert'))
-                        : (gesp.grund || edText('settings_pa_failed', 'Fehlgeschlagen')),
+                        : (gesp.reason || edText('settings_pa_failed', 'Fehlgeschlagen')),
                     gesp.success ? 'success' : 'error');
                 if (gesp.success) { edPaStand = null; edPaLaden(); }
             } catch (e2) {
@@ -3579,8 +3580,8 @@
 
         function edGeraet(einst) {
             const sicher = [], geraet = [];
-            if (einst.tuer_erkennung) {
-                const e = einst.tuer_erkennung, w = edWert('tuer_erkennung', e.value);
+            if (einst.door_detect) {
+                const e = einst.door_detect, w = edWert('door_detect', e.value);
                 sicher.push({
                     name: edText('settings_ed_door', 'Türerkennung'),
                     hinweis: edText('settings_ed_door_hint', 'Was passiert, wenn die Tür aufgeht'),
@@ -3592,8 +3593,8 @@
                         'edTuer(this.value)', e.supported === false),
                 });
             }
-            if (einst.dauerheiz_schutz) {
-                const e = einst.dauerheiz_schutz, an = edWert('dauerheiz_schutz', e.on);
+            if (einst.idle_heating_protect) {
+                const e = einst.idle_heating_protect, an = edWert('idle_heating_protect', e.on);
                 sicher.push({
                     name: edText('settings_ed_idle_heat', 'Dauerheiz-Schutz'),
                     hinweis: edText('settings_ed_idle_heat_hint', 'Heizung aus nach 5 Minuten Leerlauf'),
@@ -3601,8 +3602,8 @@
                     bedienung: edSchalterHtml(an, 'edDauerheiz(this.checked)', e.supported === false),
                 });
             }
-            if (einst.luft_reinigen) {
-                const e = einst.luft_reinigen, w = edWert('luft_reinigen', e.value);
+            if (einst.air_purification) {
+                const e = einst.air_purification, w = edWert('air_purification', e.value);
                 sicher.push({
                     name: edText('settings_ed_purify', 'Luft reinigen nach Druckende'),
                     hinweis: edText('settings_ed_purify_hint', 'Braucht den Abluftlüfter'),
@@ -3611,13 +3612,13 @@
                         [0, 'settings_ed_purify_off', 'aus'],
                         [1, 'settings_ed_purify_in', 'innen filtern'],
                         [2, 'settings_ed_purify_out', 'nach außen']],
-                        "edDruckOptionZahl('air_purification', this.value, 'luft_reinigen')",
+                        "edDruckOptionZahl('air_purification', this.value, 'air_purification')",
                         e.supported === false),
                 });
             }
-            [['ton', 'settings_ed_sound', 'Ton', 'settings_ed_sound_hint', 'Start, Ende, Fehler', 'sound_enable'],
-             ['verhedderung', 'settings_ed_tangle', 'Filament-Verhedderung', 'settings_ed_tangle_hint', 'Rolle hat sich verheddert', 'filament_tangle_detect'],
-             ['duesen_klumpen', 'settings_ed_blob', 'Düsen-Klumpen (Sensor)', 'settings_ed_blob_hint', 'Klumpen am Hotend, ohne Kamera', 'nozzle_blob_detect']
+            [['sound', 'settings_ed_sound', 'Ton', 'settings_ed_sound_hint', 'Start, Ende, Fehler', 'sound_enable'],
+             ['tangle', 'settings_ed_tangle', 'Filament-Verhedderung', 'settings_ed_tangle_hint', 'Rolle hat sich verheddert', 'filament_tangle_detect'],
+             ['nozzle_blob', 'settings_ed_blob', 'Düsen-Klumpen (Sensor)', 'settings_ed_blob_hint', 'Klumpen am Hotend, ohne Kamera', 'nozzle_blob_detect']
             ].forEach(([k, nk, ne, hk, he, feld]) => {
                 const e = einst[k];
                 if (!e) return;
@@ -3633,15 +3634,15 @@
             // is only the fallback for firmware that does not send it.
             const kamera = ((edStand || {}).camera) || {};
             const aufl = kamera.resolution ||
-                (einst.videoaufloesung ? (einst.videoaufloesung.value ? '1080p' : '720p') : '');
+                (einst.video_resolution ? (einst.video_resolution.value ? '1080p' : '720p') : '');
             // One row, like on the printer's screen: video off or on, and
             // then in the one resolution the X2D has. It reports no list of
             // supported resolutions, so a picker would invent choices — the
             // value stands next to the switch instead.
-            if (aufl || kamera.ipcam_record || einst.aufnahme_beim_druck) {
-                const an = edWert('aufnahme_beim_druck', kamera.ipcam_record
+            if (aufl || kamera.ipcam_record || einst.record_on_print) {
+                const an = edWert('record_on_print', kamera.ipcam_record
                     ? kamera.ipcam_record === 'enable'
-                    : (einst.aufnahme_beim_druck || {}).on);
+                    : (einst.record_on_print || {}).on);
                 geraet.push({
                     name: edText('settings_ed_video', 'Video'),
                     hinweis: edText('settings_ed_video_hint', 'Aufnahme während des Drucks — Grundlage für den Zeitraffer'),
@@ -3649,8 +3650,8 @@
                         edSchalterHtml(an, 'edAufnahme(this.checked)'),
                 });
             }
-            if (einst.schnappschuss) {
-                const e = einst.schnappschuss, an = edWert('schnappschuss', e.on);
+            if (einst.snapshot) {
+                const e = einst.snapshot, an = edWert('snapshot', e.on);
                 geraet.push({
                     name: edText('settings_ed_snapshot', 'Schnappschüsse'),
                     hinweis: edText('settings_ed_snapshot_hint', 'Bilder für die Fehlersuche'),
@@ -3743,8 +3744,8 @@
             const rep = (edStand || {}).device_report || {};
             const fw = rep.firmware || {};
             const zeilen = [];
-            if (einst.dateien_auf_usb) {
-                const an = edWert('dateien_auf_usb', einst.dateien_auf_usb.on);
+            if (einst.files_on_usb) {
+                const an = edWert('files_on_usb', einst.files_on_usb.on);
                 zeilen.push({
                     name: edText('settings_ed_cache', 'Gesendete Dateien auf dem Stick ablegen'),
                     hinweis: edText('settings_ed_cache_hint', 'Betrifft Drucke, die von außen kommen'),
@@ -3813,13 +3814,13 @@
         // that per module in upgrade_state.new_ver_list; the AMS unit sits
         // there under its module key ("n3s/128"), not under its name.
         function edNeueFassung(fw, modulname, amsId) {
-            const liste = (fw || {}).neu_je_modul || {};
+            const liste = (fw || {}).update_per_module || {};
             if (modulname && liste[modulname]) return liste[modulname];
             if (amsId != null) {
                 const treffer = Object.keys(liste)
                     .find(k => k.endsWith('/' + amsId));
                 if (treffer) return liste[treffer];
-                if ((fw || {}).ams_neu) return fw.ams_neu;
+                if ((fw || {}).ams_update) return fw.ams_update;
             }
             return '';
         }
@@ -3850,13 +3851,13 @@
             const zeilen = [];
 
             // The printer itself comes first, as in Bambu Studio.
-            const drucker = (rep || {}).drucker || {};
-            if (drucker.modell || fw.aktuell) {
+            const drucker = (rep || {}).printer || {};
+            if (drucker.model || fw.current) {
                 zeilen.push(edGeraetZeile(
-                    drucker.bild ? '/static/images/printers/' + drucker.bild + '.png' : '',
-                    drucker.modell || edText('settings_ed_firmware', 'Firmware'),
-                    drucker.seriennummer || '',
-                    fw.aktuell, fw.neu));
+                    drucker.image ? '/static/images/printers/' + drucker.image + '.png' : '',
+                    drucker.model || edText('settings_ed_firmware', 'Firmware'),
+                    drucker.serial || '',
+                    fw.current, fw.update));
             }
 
             // AMS: the image follows the number of slots — one is the HT,
@@ -3877,23 +3878,23 @@
                     a.sw, edNeueFassung(fw, null, a.id)));
             });
 
-            (fw.geraete || []).forEach(g => {
-                const bild = edGeraeteBild(g.art, g.hardware);
+            (fw.devices || []).forEach(g => {
+                const bild = edGeraeteBild(g.kind, g.hardware);
                 zeilen.push(edGeraetZeile(
                     bild ? '/static/img/geraete/' + bild + '.png' : '',
                     // The name comes from the device itself ("Bambu Lab
                     // External Exhaust Fan") — not translated, that is how
                     // the printer's own screen shows it.
-                    g.produkt || g.name,
-                    [g.hardware, g.seriennummer].filter(Boolean).join(' · '),
-                    g.software, g.neu || edNeueFassung(fw, g.name)));
+                    g.product || g.name,
+                    [g.hardware, g.serial].filter(Boolean).join(' · '),
+                    g.software, g.update || edNeueFassung(fw, g.name)));
             });
 
             // If an update is ready, it can also be started here. Two
             // cases: if the printer asks for matching versions, that must
             // be confirmed first — otherwise, the update itself.
             const stand = (edStand || {});
-            const wartet = (fw.geraete || []).some(g => g.neu) || !!fw.neu;
+            const wartet = (fw.devices || []).some(g => g.update) || !!fw.update;
             const konsistenz = !!stand.upgrade_consistency_request;
             if (wartet || konsistenz) {
                 zeilen.push({
@@ -4032,13 +4033,13 @@
         function edAmsLesen(feld, an) {
             const e = ((edStand || {}).device_report || {}).printer_settings || {};
             const koerper = {
-                startup_read: !!(e.rfid_beim_start || {}).on,
-                tray_read: !!(e.rfid_beim_einlegen || {}).on,
-                remain: !!(e.restmenge_messen || {}).on,
+                startup_read: !!(e.rfid_on_startup || {}).on,
+                tray_read: !!(e.rfid_on_insert || {}).on,
+                remain: !!(e.measure_remaining || {}).on,
             };
             koerper[feld] = !!an;
-            const schluessel = { startup_read: 'rfid_beim_start', tray_read: 'rfid_beim_einlegen',
-                                 remain: 'restmenge_messen' }[feld];
+            const schluessel = { startup_read: 'rfid_on_startup', tray_read: 'rfid_on_insert',
+                                 remain: 'measure_remaining' }[feld];
             edAktion('set_ams_user_setting', koerper, schluessel, !!an);
         }
 
@@ -4053,23 +4054,23 @@
 
         function edTuer(wert) {
             edAktion('set_door_check', { mode: parseInt(wert, 10) },
-                     'tuer_erkennung', parseInt(wert, 10));
+                     'door_detect', parseInt(wert, 10));
         }
 
         function edDauerheiz(an) {
-            edAktion('set_idle_heating_protect', { on: !!an }, 'dauerheiz_schutz', !!an);
+            edAktion('set_idle_heating_protect', { on: !!an }, 'idle_heating_protect', !!an);
         }
 
         function edAufloesung(wert) {
-            edAktion('set_camera_resolution', { resolution: wert }, 'videoaufloesung', wert);
+            edAktion('set_camera_resolution', { resolution: wert }, 'video_resolution', wert);
         }
 
         function edSchnappschuss(an) {
-            edAktion('set_snapshot', { on: !!an }, 'schnappschuss', !!an);
+            edAktion('set_snapshot', { on: !!an }, 'snapshot', !!an);
         }
 
         function edAufnahme(an) {
-            edAktion('set_camera_record', { on: !!an }, 'aufnahme_beim_druck', !!an);
+            edAktion('set_camera_record', { on: !!an }, 'record_on_print', !!an);
         }
 
         async function edColdPull(fehlerUebergehen) {
@@ -4104,9 +4105,9 @@
             try {
                 const r = await apiCall('/api/cloud/status');
                 const d = await r.json();
-                const an = !!d.angemeldet;
+                const an = !!d.signed_in;
                 document.getElementById('cloud-formular').style.display = an ? 'none' : '';
-                document.getElementById('cloud-angemeldet').style.display = an ? '' : 'none';
+                document.getElementById('cloud-signed-in').style.display = an ? '' : 'none';
                 document.getElementById('cloud-code-zeile').style.display = 'none';
                 const stand = document.getElementById('cloud-stand');
                 stand.className = 'ed-quelle' + (an ? '' : ' ed-quelle--alt');
@@ -4117,7 +4118,7 @@
                     document.getElementById('cloud-konto').textContent = d.email || '';
                     const wahl = document.getElementById('cloud-mode');
                     if (wahl && d.mode) wahl.value = d.mode;
-                    cloudSignStand(!!d.hat_signaturschluessel);
+                    cloudSignStand(!!d.has_signing_key);
                     const tp = document.getElementById('cloud-transport');
                     if (tp) {
                         const ueberCloud = d.transport === 'cloud';
@@ -4156,7 +4157,7 @@
             ['cloud-sign-key','cloud-sign-appcert','cloud-sign-crl'].forEach(id => {
                 const el = document.getElementById(id); if (el) el.value = '';
             });
-            cloudSignStand(d.hat_signaturschluessel);
+            cloudSignStand(d.has_signing_key);
             showToast(getText('settings_cloud_sign_saved', 'Gespeichert'), 'info');
         }
 
@@ -4226,7 +4227,7 @@
         }
 
         function edDruckAblage(an) {
-            edAktion('set_print_cache', { on: !!an }, 'dateien_auf_usb', !!an);
+            edAktion('set_print_cache', { on: !!an }, 'files_on_usb', !!an);
         }
 
         async function edKalibrieren(schritt) {
@@ -4308,26 +4309,16 @@
             }
 
             theme = theme || 'auto';
-            const isAndroidApp = window.isAndroidApp || false;
-            const androidSystemDarkMode = window.androidSystemDarkMode || false;
 
             if (theme === 'dark') {
                 document.body.classList.add('dark-mode');
             } else if (theme === 'light') {
                 document.body.classList.remove('dark-mode');
             } else if (theme === 'auto') {
-                if (isAndroidApp) {
-                    if (androidSystemDarkMode) {
-                        document.body.classList.add('dark-mode');
-                    } else {
-                        document.body.classList.remove('dark-mode');
-                    }
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.body.classList.add('dark-mode');
                 } else {
-                    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                        document.body.classList.add('dark-mode');
-                    } else {
-                        document.body.classList.remove('dark-mode');
-                    }
+                    document.body.classList.remove('dark-mode');
                 }
             }
         }
@@ -4411,9 +4402,9 @@
                 .catch(err => {
                     // No list means no made-up cards — the selection stays
                     // empty and says so.
-                    console.error('Modell-Liste nicht ladbar:', err);
+                    console.error('Model list could not be loaded:', err);
                     gallery.innerHTML = '<div class="printer-card-specs">'
-                        + getText('settings_models_unavailable', getText('set_models_unavailable', 'Modell-Liste nicht verfügbar'))
+                        + getText('set_models_unavailable', 'Modell-Liste nicht verfügbar')
                         + '</div>';
                 });
             return galerieBereit;
@@ -4623,31 +4614,36 @@
                 dryingStatus.className = 'overview-status ' + (dryingEnabled ? 'enabled' : 'disabled');
 
                 const materialCount = config.filament_drying.materials ? Object.keys(config.filament_drying.materials).length : 0;
-                document.getElementById('overview-drying-materials').textContent = materialCount + ' configured';
+                document.getElementById('overview-drying-materials').textContent =
+                    getText('overview_materials_count', '{n} configured').replace('{n}', materialCount);
             }
 
             // CORS Origins Count
             if (config.cors && config.cors.allowed_origins) {
                 const corsCount = config.cors.allowed_origins.length;
-                document.getElementById('overview-cors-count').textContent = corsCount + ' origin' + (corsCount !== 1 ? 's' : '');
+                document.getElementById('overview-cors-count').textContent = corsCount === 1
+                    ? getText('overview_origin_one', '1 origin')
+                    : getText('overview_origins', '{n} origins').replace('{n}', corsCount);
             } else {
-                document.getElementById('overview-cors-count').textContent = 'Auto-detect';
+                document.getElementById('overview-cors-count').textContent = getText('overview_auto_detect', 'Auto-detect');
             }
 
             // SSH User
             if (config.ssh) {
-                document.getElementById('overview-ssh-user').textContent = config.ssh.user || 'Not configured';
+                document.getElementById('overview-ssh-user').textContent = config.ssh.user || getText('overview_not_configured', 'Not configured');
             } else {
-                document.getElementById('overview-ssh-user').textContent = 'Not configured';
+                document.getElementById('overview-ssh-user').textContent = getText('overview_not_configured', 'Not configured');
             }
 
             // Camera Size
             if (config.ui) {
                 const cameraSize = config.ui.default_camera_size || 2;
-                const sizeNames = { 1: 'Small (1x)', 2: 'Medium (2x)', 3: 'Large (3x)' };
-                document.getElementById('overview-camera-size').textContent = sizeNames[cameraSize] || 'Medium (2x)';
+                const sizeNames = { 1: getText('overview_cam_small', 'Small (1x)'),
+                                    2: getText('overview_cam_medium', 'Medium (2x)'),
+                                    3: getText('overview_cam_large', 'Large (3x)') };
+                document.getElementById('overview-camera-size').textContent = sizeNames[cameraSize] || sizeNames[2];
             } else {
-                document.getElementById('overview-camera-size').textContent = 'Medium (2x)';
+                document.getElementById('overview-camera-size').textContent = getText('overview_cam_medium', 'Medium (2x)');
             }
         }
 
@@ -5156,11 +5152,11 @@
             knopf.disabled = true;
             knopf.textContent = texts.settings_backup_running || 'Wird erstellt …';
             try {
-                const antwort = await fetch('/api/sicherung/erstellen', {
+                const antwort = await fetch('/api/backup/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ passwort: pw })
+                    body: JSON.stringify({ password: pw })
                 });
                 if (!antwort.ok) {
                     showError((await antwort.json().catch(() => ({}))).error
@@ -5181,8 +5177,8 @@
                 a.remove();
                 URL.revokeObjectURL(url);
 
-                const geheim = antwort.headers.get('X-Sicherung-Geheim') || '0';
-                const verschl = antwort.headers.get('X-Sicherung-Verschluesselt') === '1';
+                const geheim = antwort.headers.get('X-Backup-Secrets') || '0';
+                const verschl = antwort.headers.get('X-Backup-Encrypted') === '1';
                 let text = texts.settings_backup_done || 'Sicherung erstellt';
                 if (geheim !== '0' && !verschl) {
                     text += ' — ' + (texts.settings_backup_pw_hint || '');
@@ -5211,19 +5207,19 @@
             knopf.disabled = true;
             try {
                 const paket = new FormData();
-                paket.append('datei', feld.files[0]);
-                paket.append('passwort',
+                paket.append('file', feld.files[0]);
+                paket.append('password',
                     document.getElementById('sicherung-passwort-ein').value || '');
-                const antwort = await fetch('/api/sicherung/einspielen', {
+                const antwort = await fetch('/api/backup/restore', {
                     method: 'POST', credentials: 'same-origin', body: paket
                 });
                 const e = await antwort.json();
                 if (!e.ok) {
-                    showError(e.fehler || texts.set_error || 'Fehler');
+                    showError(e.error || texts.set_error || 'Fehler');
                     return;
                 }
                 showSuccess(texts.settings_backup_staged || 'Sicherung liegt bereit');
-                if (e.hinweis) window.skToast && window.skToast(e.hinweis, 'info');
+                if (e.hint) window.skToast && window.skToast(e.hint, 'info');
                 feld.value = '';
                 document.getElementById('sicherung-passwort-ein').value = '';
                 await sicherungStand();
@@ -5237,18 +5233,18 @@
 
         async function sicherungStand() {
             try {
-                const antwort = await fetch('/api/sicherung/stand',
+                const antwort = await fetch('/api/backup/state',
                                             { credentials: 'same-origin' });
                 if (!antwort.ok) return;
-                const { steht_aus } = await antwort.json();
+                const { pending } = await antwort.json();
                 const zeile = document.getElementById('sicherung-aussteht');
                 if (!zeile) return;
-                zeile.style.display = steht_aus ? '' : 'none';
-                if (steht_aus) {
+                zeile.style.display = pending ? '' : 'none';
+                if (pending) {
                     const d = document.getElementById('sicherung-aussteht-details');
-                    if (d) d.textContent = [steht_aus.aus_app && 'v' + steht_aus.aus_app,
-                                            steht_aus.aus_plattform,
-                                            steht_aus.bereit_seit]
+                    if (d) d.textContent = [pending.from_app && 'v' + pending.from_app,
+                                            pending.from_platform,
+                                            pending.ready_since]
                                            .filter(Boolean).join(' · ');
                 }
             } catch (_) { /* a missing status display isn't an error */ }
@@ -5256,7 +5252,7 @@
 
         async function sicherungVerwerfen() {
             try {
-                await fetch('/api/sicherung/stand',
+                await fetch('/api/backup/state',
                             { method: 'DELETE', credentials: 'same-origin' });
                 await sicherungStand();
             } catch (e) {
@@ -5307,7 +5303,7 @@
             extracting:          ['update_extracting', 'wird entpackt …'],
             ready:               ['update_ready', 'bereit'],
             installing:          ['update_installing', 'wird eingespielt …'],
-            current:             ['update_current', 'aktuell'],
+            current:             ['update_current', 'current'],
             available:           ['update_available', 'verfügbar'],
             waiting_for_printer: ['update_waiting', 'wartet auf den Drucker'],
             installed:           ['update_installed', 'eingespielt'],
@@ -5474,7 +5470,7 @@
                 const teile = [];
                 if (stand.installed)
                     teile.push(`${uText('update_installed_version', 'Installiert:')} ${stand.installed}`);
-                const wann = geprueftUm(stand.geprueft);
+                const wann = geprueftUm(stand.checked);
                 if (wann) teile.push(wann);
                 text.textContent = teile.join(' · ') || '—';
             }
@@ -5521,7 +5517,7 @@
                 // answer.
                 sucheUpdate();
             } catch (fehler) {
-                skToast(getText('toast_error', 'Fehler'), 'error');
+                skToast(getText('error', 'Fehler'), 'error');
                 console.error('update.source:', fehler);
             } finally {
                 if (feld) feld.disabled = false;
@@ -5547,7 +5543,7 @@
                 // showing the answer from the old one.
                 sucheUpdate();
             } catch (fehler) {
-                skToast(getText('toast_error', 'Fehler'), 'error');
+                skToast(getText('error', 'Fehler'), 'error');
                 console.error('update.channel:', fehler);
             } finally {
                 if (feld) feld.disabled = false;
@@ -5749,27 +5745,27 @@
                         ? getText('settings_connected', 'Verbunden')
                         : getText('settings_disconnected', 'Getrennt');
                     document.getElementById('mqtt-initialized-status').innerHTML = mqtt.fully_initialized
-                        ? '<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Yes</span>'
-                        : '<span style="color: var(--accent-orange);">⏳ No</span>';
+                        ? '<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> ' + getText('set_yes', 'Ja') + '</span>'
+                        : '<span style="color: var(--accent-orange);">⏳ ' + getText('set_no', 'Nein') + '</span>';
                     document.getElementById('mqtt-disconnect-code').textContent = mqtt.last_disconnect_code || '-';
                     document.getElementById('mqtt-reconnect-attempts').textContent = mqtt.reconnect_attempts || '0';
                     document.getElementById('mqtt-reconnect-progress').innerHTML = mqtt.reconnect_in_progress
-                        ? '<span style="color: var(--accent-orange);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg> Yes</span>'
-                        : '<span style="color: var(--text-secondary);">No</span>';
+                        ? '<span style="color: var(--accent-orange);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg> ' + getText('set_yes', 'Ja') + '</span>'
+                        : '<span style="color: var(--text-secondary);">' + getText('set_no', 'Nein') + '</span>';
                 }
 
                 // Meross Status
                 if (data.checks.meross) {
                     const meross = data.checks.meross;
                     document.getElementById('meross-enabled-status').innerHTML = meross.enabled
-                        ? '<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> Yes</span>'
-                        : '<span style="color: var(--text-secondary);">No</span>';
+                        ? '<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> ' + getText('set_yes', 'Ja') + '</span>'
+                        : '<span style="color: var(--text-secondary);">' + getText('set_no', 'Nein') + '</span>';
                     document.getElementById('meross-connected-status').innerHTML = meross.connected
-                        ? `<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> ${meross.device_name || 'Yes'}</span>`
-                        : '<span style="color: var(--accent-red);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg> No</span>';
+                        ? `<span style="color: var(--accent-green);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg> ${meross.device_name || getText('set_yes', 'Ja')}</span>`
+                        : '<span style="color: var(--accent-red);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg> ' + getText('set_no', 'Nein') + '</span>';
                     document.getElementById('meross-offline-status').innerHTML = meross.device_offline
-                        ? '<span style="color: var(--accent-red);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg> Yes</span>'
-                        : '<span style="color: var(--accent-green);">No</span>';
+                        ? '<span style="color: var(--accent-red);"><svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg> ' + getText('set_yes', 'Ja') + '</span>'
+                        : '<span style="color: var(--accent-green);">' + getText('set_no', 'Nein') + '</span>';
                     document.getElementById('meross-failures').textContent = meross.consecutive_failures || '0';
                 }
 
@@ -5787,7 +5783,7 @@
                             </div>`;
                         }).join('');
                     } else {
-                        threadsList.innerHTML = '<span style="color: var(--text-secondary);">No threads found</span>';
+                        threadsList.innerHTML = '<span style="color: var(--text-secondary);">' + getText('no_threads_found', 'Keine Threads gefunden') + '</span>';
                     }
                 }
 
@@ -5808,7 +5804,7 @@
 
             } catch (error) {
                 console.error('Health check error:', error);
-                document.getElementById('health-overall-status').textContent = 'Failed to load health status';
+                document.getElementById('health-overall-status').textContent = getText('health_load_failed', 'Status nicht ladbar');
                 document.getElementById('health-overall-status').style.background = 'rgba(220, 53, 69, 0.15)';
                 document.getElementById('health-overall-status').style.color = 'var(--accent-red)';
             }
@@ -5895,7 +5891,7 @@
                 }
             } catch (error) {
                 console.error('FCM Test error:', error);
-                showError('FCM Test fehlgeschlagen: ' + error.message);
+                showError(getText('fcm_test_failed', 'FCM-Test fehlgeschlagen: {error}').replace('{error}', error.message));
             }
         }
 
@@ -6087,7 +6083,8 @@
             container.innerHTML = '';
 
             if (corsOriginsArray.length === 0) {
-                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px; padding: 8px;">No origins configured (auto-detection active)</div>';
+                container.innerHTML = '<div style="color: var(--text-secondary); font-size: 12px; padding: 8px;">'
+                    + getText('settings_cors_none', 'No origins configured (auto-detection active)') + '</div>';
                 return;
             }
 
@@ -6115,7 +6112,7 @@
             }
 
             if (corsOriginsArray.includes(origin)) {
-                window.skToast('Origin already exists');
+                window.skToast(getText('cors_origin_exists', 'Ursprung ist schon eingetragen'));
                 return;
             }
 
@@ -6320,7 +6317,7 @@
                     leer.className = 'es-zeile';
                     leer.innerHTML = '<div class="es-zeile-name"></div>';
                     leer.firstChild.textContent =
-                        getText('settings_geraete_keine', 'Noch kein Gerät angemeldet');
+                        getText('settings_devices_none', 'Noch kein Gerät angemeldet');
                     liste.appendChild(leer);
                     return;
                 }
@@ -6331,7 +6328,7 @@
                 fehler.className = 'es-zeile';
                 fehler.innerHTML = '<div class="es-zeile-name"></div>';
                 fehler.firstChild.textContent =
-                    getText('settings_geraete_fehler', 'Geräte konnten nicht geladen werden');
+                    getText('settings_devices_error', 'Geräte konnten nicht geladen werden');
                 liste.appendChild(fehler);
             }
         }
@@ -6412,7 +6409,7 @@
                 // look as if it had.
                 kasten.checked = !an;
                 if (typeof window.skToast === 'function') {
-                    window.skToast(getText('settings_geraete_speichern_fehler',
+                    window.skToast(getText('settings_devices_save_error',
                         'Der Schalter konnte nicht gespeichert werden'), 'error');
                 }
             }
@@ -6420,13 +6417,13 @@
 
         /** Which of the two tabs in "Benachrichtigungen" is showing. */
         function zeigeMeldungsReiter(welcher) {
-            ['verlauf', 'geraete'].forEach(function (name) {
+            ['verlauf', 'devices'].forEach(function (name) {
                 const inhalt = document.getElementById('meldungen-inhalt-' + name);
                 const knopf = document.getElementById('meldungen-reiter-' + name);
                 if (inhalt) inhalt.style.display = (name === welcher) ? '' : 'none';
                 if (knopf) knopf.classList.toggle('es-knopf--haupt', name === welcher);
             });
-            if (welcher === 'geraete') ladeGeraeteMeldungen();
+            if (welcher === 'devices') ladeGeraeteMeldungen();
         }
 
         function initDeskNotifySettings() {
@@ -6588,23 +6585,6 @@
             // Load settings and license info
             loadSettings();
             loadLicenseInfo();
-
-            const urlParams = new URLSearchParams(window.location.search);
-
-            if (urlParams.get('app') === 'android') {
-                const backButton = document.getElementById('back-btn');
-                if (backButton) {
-                    backButton.href = "javascript:void(0);";
-                    backButton.onclick = function(event) {
-                        event.preventDefault();
-                        if (window.Android && typeof window.Android.goBackToDashboard === 'function') {
-                            window.Android.goBackToDashboard();
-                        } else {
-                            window.location.href = '/?app=android';
-                        }
-                    };
-                }
-            }
         });
 
         // Periodic license status checking
@@ -6653,11 +6633,11 @@
             window.settingsSocket = socket;
 
             socket.on('connect', function() {
-                console.log('✅ Settings: WebSocket verbunden');
+                console.log('✅ Settings: WebSocket connected');
             });
 
             socket.on('disconnect', function() {
-                console.log('❌ Settings: WebSocket getrennt');
+                console.log('❌ Settings: WebSocket disconnected');
             });
 
             // The update state, pushed.
@@ -6675,7 +6655,7 @@
 
             // Notification listener for HMS test etc.
             socket.on('notification', function(data) {
-                console.log('📬 Settings: Notification empfangen:', data);
+                console.log('📬 Settings: notification received:', data);
 
                 // Show a toast notification
                 const isError = data.type === 'hms_error' || data.type === 'error' || data.type === 'print_failed';
@@ -6724,17 +6704,18 @@
                 showError(getText('set_electron_only', 'Nur in der Desktop-App verfügbar'));
                 return;
             }
-            if (!await window.skConfirm('FCM-Queue zurücksetzen?\n\nLöscht die push-receiver-Credentials dieser Electron-Installation. Beim Neustart wird eine neue GCM-Identität erzeugt — alte bei Google gestaute Pushes werden nicht mehr zugestellt.\n\nDie App startet danach automatisch neu.')) return;
+            if (!await window.skConfirm(getText('fcm_reset_confirm', 'FCM-Queue zurücksetzen?\n\nLöscht die push-receiver-Credentials dieser Electron-Installation. Beim Neustart wird eine neue GCM-Identität erzeugt — alte bei Google gestaute Pushes werden nicht mehr zugestellt.\n\nDie App startet danach automatisch neu.'))) return;
             try {
                 const res = await window.electronAPI.resetFcmQueue();
                 if (res && res.success) {
                     // The app restarts in a moment -- show a short note
                     showSuccess(getText('set_fcm_reset', 'Warteschlange wird zurückgesetzt, die App startet neu …'));
                 } else {
-                    showError('Reset fehlgeschlagen: ' + (res && res.error || 'unbekannt'));
+                    showError(getText('fcm_reset_failed', 'Zurücksetzen fehlgeschlagen: {error}')
+                        .replace('{error}', (res && res.error) || getText('unknown', 'Unbekannt')));
                 }
             } catch (e) {
-                showError('Reset-Aufruf fehlgeschlagen: ' + e.message);
+                showError(getText('fcm_reset_call_failed', 'Zurücksetzen nicht aufrufbar: {error}').replace('{error}', e.message));
             }
         }
 
@@ -6772,10 +6753,15 @@
         // Load Device Tokens
         async function loadDeviceTokens() {
             try {
-                const response = await apiCall('/api/auth/devices');
+                // Dieselbe Quelle wie die Benutzer-Seite. Vorher fragte die
+                // hier /api/auth/devices (immer nur der eigene Benutzer) und
+                // die dort /api/auth/sessions (als Admin alle) -- daher drei
+                // Eintraege gegen vier, ohne dass eine der beiden Listen
+                // falsch gewesen waere.
+                const response = await apiCall('/api/auth/logins');
                 if (!response.ok) throw new Error('Failed to load device tokens');
 
-                const devices = await response.json();
+                const devices = (await response.json()).filter(a => a.kind === 'device');
                 const container = document.getElementById('device-tokens-list');
                 const section = document.getElementById('device-tokens-section');
                 const count = document.getElementById('device-token-count');
@@ -6794,35 +6780,39 @@
                                 <div style="display: flex; align-items: flex-start; flex: 1;">
                                     <div class="token-icon">${device.device_type === 'ios' ? `<svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></svg>` : `<svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V5M9 3h6"/><circle cx="9" cy="14" r="1"/><circle cx="15" cy="14" r="1"/></svg>`}</div>
                                     <div class="token-info">
-                                        <div class="token-label">Device Name</div>
-                                        <div class="token-value" style="font-size: 15px; font-family: inherit;">${device.device_name || 'Unknown'}</div>
+                                        <div class="token-label">${getText('sec_device_name', 'Gerätename')}</div>
+                                        <div class="token-value" style="font-size: 15px; font-family: inherit;">${device.device_name || getText('unknown', 'Unbekannt')}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="token-details">
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Platform:</span>
-                                    <span class="platform-badge platform-${device.device_type}">${device.device_type.toUpperCase()}</span>
+                                    <span class="token-detail-label">${getText('platform', 'Plattform')}:</span>
+                                    <span class="platform-badge platform-${device.device_type}">${(device.device_type || 'unknown').toUpperCase()}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Model:</span>
-                                    <span class="token-detail-value">${device.device_model || 'Unknown'}</span>
+                                    <span class="token-detail-label">${getText('sec_model', 'Modell')}:</span>
+                                    <span class="token-detail-value">${device.device_model || getText('unknown', 'Unbekannt')}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Device ID:</span>
-                                    <span class="token-detail-value" style="font-family: monospace; font-size: 11px;">${device.device_id.substring(0, 20)}...</span>
+                                    <span class="token-detail-label">${getText('sec_user', 'Benutzer')}:</span>
+                                    <span class="token-detail-value">${device.username || '—'}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Erstellt:</span>
+                                    <span class="token-detail-label">${getText('sec_device_id', 'Geräte-ID')}:</span>
+                                    <span class="token-detail-value" style="font-family: monospace; font-size: 11px;">${(device.device_id || '').substring(0, 20)}...</span>
+                                </div>
+                                <div class="token-detail-row">
+                                    <span class="token-detail-label">${getText('created', 'Erstellt')}:</span>
                                     <span class="token-detail-value">${formatTokenDate(device.created)}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Zuletzt verwendet:</span>
+                                    <span class="token-detail-label">${getText('last_used', 'Zuletzt verwendet')}:</span>
                                     <span class="token-detail-value">${formatTokenDate(device.last_used)}</span>
                                 </div>
                             </div>
-                            <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteDeviceToken('${device.device_id}')">
-                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Gerät entfernen
+                            <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteDeviceToken('${device.login_id}')">
+                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_remove_device', 'Gerät entfernen')}
                             </button>
                         `;
                         container.appendChild(card);
@@ -6872,34 +6862,34 @@
                                 <div style="display: flex; align-items: flex-start; flex: 1;">
                                     <div class="token-icon"><svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></div>
                                     <div class="token-info">
-                                        <div class="token-label">Browser Session</div>
-                                        <div class="token-value" style="font-size: 15px; font-family: inherit;">${session.device_name || 'Unknown Browser'}</div>
+                                        <div class="token-label">${getText('sec_browser_session', 'Browser-Sitzung')}</div>
+                                        <div class="token-value" style="font-size: 15px; font-family: inherit;">${session.device_name || getText('sec_unknown_browser', 'Unbekannter Browser')}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="token-details">
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">User:</span>
+                                    <span class="token-detail-label">${getText('user', 'Benutzer')}:</span>
                                     <span class="token-detail-value">${session.username}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Status:</span>
+                                    <span class="token-detail-label">${getText('status', 'Status')}:</span>
                                     <span class="status-badge status-${session.status}">${config.icon} ${config.text}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Session ID:</span>
+                                    <span class="token-detail-label">${getText('sec_session_id', 'Sitzungs-ID')}:</span>
                                     <span class="token-detail-value" style="font-family: monospace; font-size: 11px;">${session.session_id.substring(0, 20)}...</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Erstellt:</span>
-                                    <span class="token-detail-value">${formatTokenDate(session.created)} ${session.age_days !== null ? `(${session.age_days}d alt)` : ''}</span>
+                                    <span class="token-detail-label">${getText('created', 'Erstellt')}:</span>
+                                    <span class="token-detail-value">${formatTokenDate(session.created)} ${session.age_days !== null ? `(${getText('sec_age_days', '{n} T. alt').replace('{n}', session.age_days)})` : ''}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Zuletzt verwendet:</span>
-                                    <span class="token-detail-value">${formatTokenDate(session.last_used)} ${session.inactive_minutes !== null && session.inactive_minutes > 0 ? `(vor ${session.inactive_minutes} Min)` : ''}</span>
+                                    <span class="token-detail-label">${getText('last_used', 'Zuletzt verwendet')}:</span>
+                                    <span class="token-detail-value">${formatTokenDate(session.last_used)} ${session.inactive_minutes !== null && session.inactive_minutes > 0 ? `(${getText('sec_inactive_min', 'vor {n} Min.').replace('{n}', session.inactive_minutes)})` : ''}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Tokens:</span>
+                                    <span class="token-detail-label">${getText('tokens', 'Tokens')}:</span>
                                     <span class="token-detail-value">
                                         ${session.has_refresh_token ? `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/></svg>` : `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`} Refresh
                                         ${session.has_access_token ? `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/></svg>` : `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`} Access
@@ -6907,14 +6897,14 @@
                                 </div>
                             </div>
                             <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteWebSession('${session.session_id}')">
-                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Session löschen
+                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_delete_session', 'Sitzung löschen')}
                             </button>
                         `;
                         container.appendChild(card);
                     });
                 } else {
                     section.style.display = 'block';
-                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg class="es-ic es-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></div><p>Keine Web-Sessions gefunden</p></div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><svg class="es-ic es-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></div><p>' + getText('sec_no_web_sessions', 'Keine Web-Sitzungen gefunden') + '</p></div>';
                 }
             } catch (error) {
                 console.error('Error loading web sessions:', error);
@@ -6948,27 +6938,27 @@
                                 <div style="display: flex; align-items: flex-start; flex: 1;">
                                     <div class="token-icon"><svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v5M12 17.5v.5"/><path d="M10.3 4.3 2.6 18a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0z"/></svg></div>
                                     <div class="token-info">
-                                        <div class="token-label">Orphaned Refresh Token</div>
+                                        <div class="token-label">${getText('sec_orphaned_token', 'Verwaistes Refresh-Token')}</div>
                                         <div class="token-value" style="font-family: monospace; font-size: 12px;">${token.jti}</div>
                                     </div>
                                 </div>
                             </div>
                             <div class="token-details">
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">User:</span>
+                                    <span class="token-detail-label">${getText('user', 'Benutzer')}:</span>
                                     <span class="token-detail-value">${token.username}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">Session:</span>
+                                    <span class="token-detail-label">${getText('sec_session', 'Sitzung')}:</span>
                                     <span class="token-detail-value">${token.has_session ? `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>` : `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`}</span>
                                 </div>
                                 <div class="token-detail-row">
-                                    <span class="token-detail-label">In User List:</span>
+                                    <span class="token-detail-label">${getText('sec_in_user_list', 'In der Benutzerliste')}:</span>
                                     <span class="token-detail-value">${token.in_user_list ? `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>` : `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`}</span>
                                 </div>
                             </div>
                             <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteOrphanedToken('${token.jti}')">
-                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Token löschen
+                                <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_delete_token', 'Token löschen')}
                             </button>
                         `;
                         container.appendChild(card);
@@ -7046,35 +7036,35 @@
                             <div style="display: flex; align-items: flex-start; flex: 1;">
                                 <div class="token-icon">${icon}</div>
                                 <div class="token-info">
-                                    <div class="token-label">FCM Push Token</div>
+                                    <div class="token-label">${getText('sec_fcm_token', 'FCM-Push-Token')}</div>
                                     <div class="token-value">${token.token}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="token-details">
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Platform:</span>
+                                <span class="token-detail-label">${getText('platform', 'Plattform')}:</span>
                                 <span class="platform-badge platform-${token.platform}">${token.platform.toUpperCase()}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Device:</span>
-                                <span class="token-detail-value">${token.device_name || 'Unknown'}</span>
+                                <span class="token-detail-label">${getText('sec_device', 'Gerät')}:</span>
+                                <span class="token-detail-value">${token.device_name || getText('unknown', 'Unbekannt')}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Model:</span>
-                                <span class="token-detail-value">${token.device_model || 'Unknown Device'}</span>
+                                <span class="token-detail-label">${getText('sec_model', 'Modell')}:</span>
+                                <span class="token-detail-value">${token.device_model || getText('unknown', 'Unbekannt')}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">HMS Sound:</span>
+                                <span class="token-detail-label">${getText('sec_hms_sound', 'HMS-Ton')}:</span>
                                 <span class="token-detail-value">${token.hms_sound ? `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>` : `<svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Registriert:</span>
+                                <span class="token-detail-label">${getText('sec_registered', 'Registriert')}:</span>
                                 <span class="token-detail-value">${formatDate(token.registered_at)}</span>
                             </div>
                         </div>
                         <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteFCMToken('${token.full_token}')">
-                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Token löschen
+                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_delete_token', 'Token löschen')}
                         </button>
                     `;
                     container.appendChild(card);
@@ -7112,24 +7102,24 @@
                         </div>
                         <div class="token-details">
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Device:</span>
+                                <span class="token-detail-label">${getText('sec_device', 'Gerät')}:</span>
                                 <span class="token-detail-value">${token.device_name}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Model:</span>
+                                <span class="token-detail-label">${getText('sec_model', 'Modell')}:</span>
                                 <span class="token-detail-value">${token.device_model}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Environment:</span>
+                                <span class="token-detail-label">${getText('sec_environment', 'Umgebung')}:</span>
                                 <span class="token-detail-value">${token.environment}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Registriert:</span>
+                                <span class="token-detail-label">${getText('sec_registered', 'Registriert')}:</span>
                                 <span class="token-detail-value">${formatTokenDate(token.registered_at)}</span>
                             </div>
                         </div>
                         <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteLiveActivityToken('${token.full_token}')">
-                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Token löschen
+                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_delete_token', 'Token löschen')}
                         </button>
                     `;
                     container.appendChild(card);
@@ -7167,24 +7157,24 @@
                         </div>
                         <div class="token-details">
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Device:</span>
+                                <span class="token-detail-label">${getText('sec_device', 'Gerät')}:</span>
                                 <span class="token-detail-value">${token.device_name}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Model:</span>
+                                <span class="token-detail-label">${getText('sec_model', 'Modell')}:</span>
                                 <span class="token-detail-value">${token.device_model}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Environment:</span>
+                                <span class="token-detail-label">${getText('sec_environment', 'Umgebung')}:</span>
                                 <span class="token-detail-value">${token.environment}</span>
                             </div>
                             <div class="token-detail-row">
-                                <span class="token-detail-label">Registriert:</span>
+                                <span class="token-detail-label">${getText('sec_registered', 'Registriert')}:</span>
                                 <span class="token-detail-value">${formatTokenDate(token.registered_at)}</span>
                             </div>
                         </div>
                         <button class="btn btn-danger" style="width: 100%; margin-top: 12px;" onclick="deleteLiveActivityStartToken('${token.full_token}')">
-                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> Token löschen
+                            <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg> ${getText('sec_delete_token', 'Token löschen')}
                         </button>
                     `;
                     container.appendChild(card);
@@ -7196,11 +7186,14 @@
         }
 
         // Delete Functions
-        async function deleteDeviceToken(deviceId) {
+        // Eine ANMELDUNG beenden, nicht "das Geraet loeschen". Auf einem
+        // Rechner koennen zwei Leute angemeldet sein; wer den einen abmeldet,
+        // wirft den anderen nicht mit hinaus.
+        async function deleteDeviceToken(loginId) {
             if (!await window.skConfirm(getText('sec_ask_device', 'Möchtest du dieses Gerät wirklich entfernen?'))) return;
 
             try {
-                const response = await apiCall(`/api/auth/device/${deviceId}`, { method: 'DELETE' });
+                const response = await apiCall(`/api/auth/login/${loginId}`, { method: 'DELETE' });
                 if (response.ok) {
                     showSuccess(getText('sec_device_gone', 'Gerät entfernt'));
                     await loadAllTokens();
@@ -7323,7 +7316,7 @@
 
         // ============ DASHBOARD RESET FUNCTION ============
         async function resetDashboardLayoutFromSettings() {
-            if (await window.skConfirm('Möchtest du das Dashboard-Layout wirklich auf die Standardeinstellungen zurücksetzen?\n\nAlle deine Dashboard-Anpassungen (Kartenpositionen und -größen) gehen verloren.')) {
+            if (await window.skConfirm(getText('dashboard_reset_confirm', 'Möchtest du das Dashboard-Layout wirklich auf die Standardeinstellungen zurücksetzen?\n\nAlle deine Dashboard-Anpassungen (Kartenpositionen und -größen) gehen verloren.'))) {
                 // Delete the layout settings from localStorage (the correct hyphenated key)
                 localStorage.removeItem('dashboard-layout');
 
@@ -7648,14 +7641,14 @@
                 const call = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
                 const resp = await call('/api/notifications/recent?limit=100');
                 if (!resp.ok) {
-                    list.innerHTML = '<div class="nb-leer">' + getText('nb_fehler', 'Fehler beim Laden') + '</div>';
+                    list.innerHTML = '<div class="nb-leer">' + getText('nb_error', 'Fehler beim Laden') + '</div>';
                     return;
                 }
                 const data = await resp.json();
                 window.__notifAll = data.notifications || [];
                 renderNotifications();
             } catch (e) {
-                list.innerHTML = '<div class="nb-leer">' + getText('nb_fehler', 'Fehler beim Laden') + '</div>';
+                list.innerHTML = '<div class="nb-leer">' + getText('nb_error', 'Fehler beim Laden') + '</div>';
             }
         }
 
@@ -7812,7 +7805,7 @@
             var CAM_ASPECTS = ['16:9', '4:3', '1:1', '3:2', '21:9'];
             var CAM_ROTATIONS = [0, 90, 180, 270];
             var camEditing = null, camRotation = 0;
-            function tx(k, fb) { return (window.texts && window.texts[k]) || fb; }
+            function tx(k, fb) { return getText(k, fb); }
 
             // Language dropdown (global, because the markup has an inline onclick) -- ported from users.html.
             window.toggleLangDropdown = function () {
@@ -7992,10 +7985,9 @@
                 // the backend can, not from which mode we are in.
                 wendeFaehigkeitenAn(cfg);
                 if (cfg.direct_mode !== true) return;
-                // i18n helper: window.texts with a fallback. The printer,
-                // camera and Meross direct texts are NOT in the index nav loop,
-                // hence here.
-                var t = function (k, fb) { return (window.texts && window.texts[k]) || fb; };
+                // The printer, camera and Meross direct texts are not in the
+                // page's static markup, so they are set here.
+                var t = function (k, fb) { return getText(k, fb); };
                 // 2) Camera as on Android: out with the Bambu uStreamer cards,
                 //    in with the Moonraker camera list with on/off and edit.
                 hideClosest('camera_enabled', '.es-karte');
@@ -8113,7 +8105,7 @@
                     pdBtn._wired = true;
                     pdBtn.addEventListener('click', function () {
                         var msg = document.getElementById('pd_save_msg');
-                        if (msg) { msg.style.color = ''; msg.textContent = 'Speichere …'; }
+                        if (msg) { msg.style.color = ''; msg.textContent = getText('saving_ellipsis', 'Speichere …'); }
                         fetch('/api/config', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },

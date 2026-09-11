@@ -640,7 +640,7 @@ class PrinterControlManager {
                     .then(r => r.json())
                     .then(d => {
                         this._filamentDb = ((d && d.profiles) || []).map(p =>
-                            [p.idx, p.name, p.typ || '?',
+                            [p.idx, p.name, p.type || '?',
                              parseInt(p.min, 10) || 190, parseInt(p.max, 10) || 240]);
                         // Drying presets come from the same response.
                         // The table in filament-db.js remains as a fallback
@@ -1122,7 +1122,7 @@ class PrinterControlManager {
      *
      * The printer reports the current source as a GLOBAL number: 0-3 for
      * AMS 0, 4-7 for AMS 1, from 128 the HT units, 254/255 the external
-     * spools. Same computation as in the server (`_spulen_ids`), which is
+     * spools. Same computation as in the server (`_spool_ids`), which is
      * checked against print_filaments.ams_tray_id.
      */
     _istAktivesFach(amsId, trayId) {
@@ -1138,7 +1138,7 @@ class PrinterControlManager {
         for (const u of einheiten) {
             if (u.id !== amsId) continue;
             for (const t of (u.trays || [])) {
-                if (t.id === trayId && t.geladen != null) return !!t.geladen;
+                if (t.id === trayId && t.loaded != null) return !!t.loaded;
             }
         }
         // Fallback. It never once matched here: the printer reports only
@@ -1183,7 +1183,7 @@ class PrinterControlManager {
         window.amsHumidity.hole(14).then(daten => {
             if (!daten || !wrap.isConnected) return;
             const zuordnung = new Map(
-                (daten.spulen || []).map(s => [s.ams_id + ':' + s.slot, s]));
+                (daten.spools || []).map(s => [s.ams_id + ':' + s.slot, s]));
             (units || []).forEach(u => (u.trays || []).forEach(t => {
                 // Via the id on the element, not via ordering.
                 const feld = wrap.querySelector(
@@ -1192,7 +1192,7 @@ class PrinterControlManager {
                 // the reliable answer, the missing type only the old
                 // workaround -- which still applies where the printer
                 // doesn't send the bitmask.
-                if (!feld || t.vorhanden === false || !t.type) return;
+                if (!feld || t.present === false || !t.type) return;
                 const eintrag = zuordnung.get(u.id + ':' + (t.id || 0));
                 // No entry at all does NOT mean "no mapping", but
                 // "nothing recorded yet". `spulen()` only returns a
@@ -1204,11 +1204,11 @@ class PrinterControlManager {
                 if (!eintrag) return;
                 if (eintrag.spool_id != null) return;
                 feld.classList.add('mz-slot--offen');
-                const vorschlag = (eintrag && (eintrag.vorschlaege || [])[0]) || null;
-                feld.title = (texts.feuchte_ohne_zuordnung
+                const vorschlag = (eintrag && (eintrag.suggestions || [])[0]) || null;
+                feld.title = (texts.humidity_unassigned
                     || 'Fach {n} im AMS ist keiner Spule zugeordnet.')
                     .replace('{n}', (t.id || 0) + 1)
-                    + (vorschlag ? ' ' + (texts.feuchte_vorschlag || 'Vorschlag: {name}')
+                    + (vorschlag ? ' ' + (texts.humidity_suggestion || 'Vorschlag: {name}')
                         .replace('{name}', vorschlag.name || '') : '');
                 this._meldeOhneZuordnung(u.id, t.id || 0, feld.title);
             }));
@@ -1236,7 +1236,7 @@ class PrinterControlManager {
         // dwell time even when the printer reports the slot empty -- the
         // spool is sitting in there but not fed in. In that case, these
         // three values wouldn't be retrievable from the slot.
-        window.apiCall('/api/filament/feuchte/zuordnung', {
+        window.apiCall('/api/filament/humidity/assign', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1275,7 +1275,7 @@ class PrinterControlManager {
         window.amsHumidity.hole(14).then(daten => {
             if (!daten || !overlay.isConnected) return;
             const e = window.amsHumidity.einheit(daten, unit.id);
-            const kurve = e ? window.amsHumidity.kurve(e.verlauf, daten.schwelle) : '';
+            const kurve = e ? window.amsHumidity.kurve(e.history, daten.threshold) : '';
             const faecher = (unit.trays || []).filter(t => t.type).map(t => {
                 const spule = window.amsHumidity.fuerFach(daten, unit.id, t.id);
                 if (!spule) return '';
@@ -1283,31 +1283,31 @@ class PrinterControlManager {
                      + '<span class="mz-slot-col" style="background:'
                      + farbe(t.color) + '"></span>'
                      + '<span class="fk-fach-name">' + esc(t.type || '?') + '</span>'
-                     + window.amsHumidity.merkzeile(spule, daten.schwelle)
+                     + window.amsHumidity.merkzeile(spule, daten.threshold)
                      + '</div>';
             }).join('');
-            const zeit = window.amsHumidity.spanne(e && e.verlauf);
+            const zeit = window.amsHumidity.spanne(e && e.history);
             // Less than half an hour of readings isn't a history, it's just
             // a straight line. Better to say honestly that the recording just
             // started than to fake a curve.
             const frisch = !kurve || zeit.ms < 1800000;
             if (frisch && !faecher) {
-                if (!(e && e.verlauf && e.verlauf.length)) return;
+                if (!(e && e.history && e.history.length)) return;
                 ziel.innerHTML =
-                    '<div class="fk-kopf">' + esc(texts.feuchte_titel || 'Feuchte')
+                    '<div class="fk-kopf">' + esc(texts.humidity_title || 'Feuchte')
                     + '<span class="fk-schwelle-text">' + esc(
-                        (texts.feuchte_schwelle || 'Grenze {s} %').replace('{s}', daten.schwelle))
+                        (texts.humidity_threshold || 'Grenze {s} %').replace('{s}', daten.threshold))
                     + '</span></div>'
                     + '<div class="fk-frisch">' + esc(
-                        (texts.feuchte_frisch || 'Aufzeichnung läuft seit {zeit}')
-                            .replace('{zeit}', uhrzeit(e.verlauf[0].zeit))) + '</div>';
+                        (texts.humidity_fresh || 'Aufzeichnung läuft seit {zeit}')
+                            .replace('{zeit}', uhrzeit(e.history[0].time))) + '</div>';
                 return;
             }
             ziel.innerHTML =
-                '<div class="fk-kopf">' + esc(texts.feuchte_titel || 'Feuchte')
+                '<div class="fk-kopf">' + esc(texts.humidity_title || 'Feuchte')
                 + (zeit.text ? '<span class="fk-spanne">' + esc(zeit.text) + '</span>' : '')
                 + '<span class="fk-schwelle-text">' + esc(
-                    (texts.feuchte_schwelle || 'Grenze {s} %').replace('{s}', daten.schwelle))
+                    (texts.humidity_threshold || 'Grenze {s} %').replace('{s}', daten.threshold))
                 + '</span></div>' + kurve + faecher;
         }).catch(() => {});
     }
@@ -1342,11 +1342,11 @@ class PrinterControlManager {
         const knopf = document.getElementById('cali-start');
         if (knopf) knopf.textContent = texts.cali_start || 'Kalibrierung starten';
         const titel = document.getElementById('dev-cali-title');
-        if (titel) titel.textContent = texts.cali_schritte_titel || 'Schritte';
+        if (titel) titel.textContent = texts.cali_steps_title || 'Schritte';
         const reiter = document.getElementById('ctrl-tab-cali-label');
         if (reiter) reiter.textContent = texts.cali_title || 'Kalibrierung';
         const hinweis = document.getElementById('cali-hinweis');
-        if (hinweis) hinweis.textContent = texts.cali_hinweis
+        if (hinweis) hinweis.textContent = texts.cali_hint
             || 'Dauert je nach Auswahl mehrere Minuten. Währenddessen ist kein Druck möglich.';
         this.zeichneKalibrierLaeufe(c);
     }
@@ -1365,15 +1365,15 @@ class PrinterControlManager {
         if (!ziel) return;
         const c = caps || {};
         const titel = document.getElementById('cali-laeufe-titel');
-        if (titel) titel.textContent = texts.cali_laeufe_titel || 'Einzelne Läufe';
+        if (titel) titel.textContent = texts.cali_runs_title || 'Einzelne Läufe';
         const hinweis = document.getElementById('cali-lauf-hinweis');
-        if (hinweis) hinweis.textContent = texts.cali_lauf_hinweis || '';
+        if (hinweis) hinweis.textContent = texts.cali_run_hint || '';
 
         // An offset between two nozzles is a non-issue with a single nozzle.
         const laeufe = [
-            ['nozzle_offset_precise', texts.cali_lauf_nozzle_offset_precise
+            ['nozzle_offset_precise', texts.cali_run_nozzle_offset_precise
                 || 'Hochpräziser Düsenversatz', !!c.dual_nozzle],
-            ['motion_precision', texts.cali_lauf_motion_precision
+            ['motion_precision', texts.cali_run_motion_precision
                 || 'Bewegungsgenauigkeit (Vision Encoder)', true],
         ];
         const esc = x => String(x == null ? '' : x).replace(/[&<>"]/g,
@@ -1389,17 +1389,17 @@ class PrinterControlManager {
     startCalibrationRun(name) {
         const texts = window.texts || {};
         if (!name) return;
-        const frage = texts.cali_lauf_confirm || texts.cali_confirm
+        const frage = texts.cali_run_confirm || texts.cali_confirm
             || 'Diesen Lauf jetzt starten? Der Drucker fährt dabei und heizt.';
         const los = () => {
             window.printerAdapter.action('start_calibration_run', { name })
                 .then(r => {
                     if (r.ok) {
-                        skToast(texts.cali_gestartet || 'Kalibrierung gestartet', 'info');
+                        skToast(texts.cali_started || 'Kalibrierung gestartet', 'info');
                         setTimeout(() => this.zeichneKalibrierLauf(), 1500);
                     } else {
                         // The server names the reason as a key -- e.g.
-                        // guard_braucht_pla when no PLA is loaded.
+                        // guard_needs_pla when no PLA is loaded.
                         skToast(this.fehlerText(r.error, texts.connection_error), 'error');
                     }
                 })
@@ -1421,7 +1421,7 @@ class PrinterControlManager {
         const ziel = document.getElementById('cali-lauf');
         if (!ziel) return;
         const titel = document.getElementById('cali-lauf-titel');
-        if (titel) titel.textContent = texts.cali_lauf_titel || 'Ablauf';
+        if (titel) titel.textContent = texts.cali_run_title || 'Ablauf';
 
         // Two sources, same field names: the socket (`lastPrintData`)
         // updates faster during a print, /api/status (`lastState`)
@@ -1448,13 +1448,13 @@ class PrinterControlManager {
         if (knopf) {
             knopf.disabled = gesperrt;
             knopf.textContent = gesperrt && system
-                ? (texts.cali_laeuft || 'Kalibrierung läuft')
+                ? (texts.cali_running || 'Kalibrierung läuft')
                 : (texts.cali_start || 'Kalibrierung starten');
         }
 
         if (!laeuft || !system) {
             ziel.innerHTML = `<div class="ext-sub">${
-                (texts.cali_kein_lauf || 'Gerade läuft keine Kalibrierung.')}</div>`;
+                (texts.cali_no_run || 'Gerade läuft keine Kalibrierung.')}</div>`;
             return;
         }
         const esc = x => String(x == null ? '' : x).replace(/[&<>"]/g,
@@ -1493,7 +1493,7 @@ class PrinterControlManager {
         const gewaehlt = Array.from(document.querySelectorAll('.cali-box:checked'))
             .map(b => b.value);
         if (!gewaehlt.length) {
-            skToast(texts.cali_keine_wahl || 'Kein Schritt gewählt', 'warning');
+            skToast(texts.cali_no_choice || 'Kein Schritt gewählt', 'warning');
             return;
         }
         // The head moves and the bed heats -- ask before doing that.
@@ -1503,7 +1503,7 @@ class PrinterControlManager {
             window.printerAdapter.action('start_calibration', { schritte: gewaehlt })
                 .then(r => {
                     if (r.ok) {
-                        skToast(texts.cali_gestartet || 'Kalibrierung gestartet', 'info');
+                        skToast(texts.cali_started || 'Kalibrierung gestartet', 'info');
                         setTimeout(() => this.zeichneKalibrierLauf(), 1500);
                     }
                     else skToast(this.fehlerText(r.error, texts.connection_error), 'error');
@@ -1575,8 +1575,8 @@ class PrinterControlManager {
             this.switchControlTab('movement');
         }
 
-        // iOS app fullscreen - when we have the IDs
-        if (window.isIOSApp || window.isSafari) {
+        // Safari (and the home-screen app): the modal fills the screen
+        if (window.isSafari) {
             const modalContent = document.getElementById('printerControlModalContent');
             if (modalContent) {
                 modalContent.style.position = 'fixed';
@@ -1903,7 +1903,7 @@ class PrinterControlManager {
             // Only clear on an explicit `false`: `null` means
             // "the printer doesn't say", and then it keeps the old
             // behavior instead of hiding a full spool.
-            const leer = t.vorhanden === false;
+            const leer = t.present === false;
             const rest = (!leer && t.remain != null && t.remain > 0) ? t.remain + '%' : '';
             const name = leer
                 ? (seite ? seite + ' · ' : '') + (texts.ams_empty || 'leer')
@@ -2065,7 +2065,7 @@ class PrinterControlManager {
                 // the SLOT.
                 const aktiv = quellenPaare.length
                     ? quellenPaare.includes(u.id + ':' + (t.id || 0))
-                    : (t.geladen != null ? t.geladen : aktivTray === global);
+                    : (t.loaded != null ? t.loaded : aktivTray === global);
                 html += slot(t, aktiv, "amsEditTray(" + u.id + "," + (t.id || 0) + ")",
                              null, { ams: u.id, slot: t.id || 0 });
             });
@@ -2549,39 +2549,12 @@ class PrinterControlManager {
             if (r.ok) {
                 skToast(texts.toast_homing_started + '...', 'info');
                 setTimeout(() => {
-                    homingDone = true;
                     const warning = document.getElementById('homing-warning');
                     if (warning) warning.style.display = 'none';
                     skToast(texts.toast_homing_completed, 'success');
                 }, 3000);
             } else {
                 skToast(this.fehlerText(r.error, texts.error), 'error');
-            }
-        });
-        return;  // alter Pfad unten unreachable, bleibt als no-op
-        // legacy fallback path:
-        apiCall('/api/mqtt/home', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({axis: 'all'})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                skToast(texts.toast_homing_started + '...', 'info');
-
-                // Wait 3 seconds until homing is done
-                setTimeout(() => {
-                    homingDone = true;
-
-                    // Hide the warning
-                    const warning = document.getElementById('homing-warning');
-                    if (warning) {
-                        warning.style.display = 'none';
-                    }
-
-                    skToast(texts.toast_homing_completed, 'success');
-                }, 3000);
             }
         });
     }

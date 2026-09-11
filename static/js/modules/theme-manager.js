@@ -61,7 +61,9 @@ class ThemeManager {
     updateIcons() {
         const symbol = this.theme === 'auto' ? 'halbmond' : (this.theme === 'dark' ? 'mond' : 'sonne');
         const iconText = (typeof window.skIcon === 'function') ? window.skIcon(symbol) : '';
-        const labelText = this.theme === 'auto' ? 'Auto (System)' : (this.theme === 'dark' ? 'Dark Mode' : 'Light Mode');
+        const tx = window.texts || {};
+        const labelText = this.theme === 'auto' ? (tx.theme_auto || 'Automatisch (System)')
+            : (this.theme === 'dark' ? (tx.theme_dark || 'Dunkel') : (tx.theme_light || 'Hell'));
 
         const headerIcon = document.getElementById('theme-icon');
         const sidebarIcon = document.getElementById('theme-icon-sidebar'); // Legacy
@@ -71,7 +73,7 @@ class ThemeManager {
         if (headerIcon) headerIcon.innerHTML = iconText;
         if (sidebarIcon) sidebarIcon.innerHTML = iconText;
         if (settingsIcon) settingsIcon.innerHTML = iconText;
-        if (settingsLabel) settingsLabel.textContent = `Aktuell: ${labelText}`;
+        if (settingsLabel) settingsLabel.textContent = (tx.theme_current || 'Aktuell: {theme}').replace('{theme}', labelText);
 
         // Update meta theme-color for PWA
         const darkMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');

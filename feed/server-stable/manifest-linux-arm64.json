@@ -3,17 +3,17 @@
     "product": "server",
     "channel": "stable",
     "platform": "linux-arm64",
-    "version": "2.2.20",
+    "version": "2.3.0",
     "files": [
       {
-        "name": "3D-Printer-Server-2.2.20-linux-arm64.tar.gz",
-        "sha256": "259bff46102ef8f948c21d58be080127bf4e3f052a2423d1d788345bfb06064d",
-        "size": 18821812,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.2.20/3D-Printer-Server-2.2.20-linux-arm64.tar.gz"
+        "name": "3D-Printer-Server-2.3.0-linux-arm64.tar.gz",
+        "sha256": "c26828f9681bf8b6cfb2c7fb00c4fdc9b898e8b7a10e3bd00f93edd176bb257e",
+        "size": 19014799,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.0/3D-Printer-Server-2.3.0-linux-arm64.tar.gz"
       }
     ],
     "notes": null,
-    "issued": 1788880214
+    "issued": 1789145797
   },
-  "signature": "L0PkTPAdCdkv4qNjTOjVGlT3F/sEa+6btB51xbM7Cuebe9cdu7bWQHW5bGktUfrLRe0Om1ZRe9T+nkY7y7TeCA=="
+  "signature": "ZrQ2nrgAx2D8uIGHSddHwmfwzo78ouSZpVp41uoCpX9aVIPeEmU/u+ig0by6bYAywIH6m7pfYLx+EjewEzqcCQ=="
 }

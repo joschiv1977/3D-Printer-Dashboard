@@ -53,7 +53,7 @@
             const l = info && info.bed_limits;
             if (l && l.x && l.y) {
                 bed = { x: +l.x, y: +l.y, z: +(l.z || 0),
-                        duesen: l.duesen_reichweite || null };
+                        duesen: l.nozzle_range || null };
             }
         } catch (e) {
             console.debug('movement-map: bed size not readable', e);
@@ -117,14 +117,14 @@
     function xBereich() {
         const breite = (bed && bed.x) || 0;
         const dn = bed && bed.duesen;
-        if (!dn || !Array.isArray(dn.links) || !Array.isArray(dn.rechts)) {
+        if (!dn || !Array.isArray(dn.left) || !Array.isArray(dn.right)) {
             return { von: 0, bis: breite, duese: null };
         }
         const aktiv = state().active_nozzle;
-        if (aktiv === 1) return { von: dn.links[0], bis: Math.min(dn.links[1], breite), duese: 'links' };
-        if (aktiv === 0) return { von: dn.rechts[0], bis: Math.min(dn.rechts[1], breite), duese: 'rechts' };
-        return { von: Math.max(dn.links[0], dn.rechts[0]),
-                 bis: Math.min(dn.links[1], dn.rechts[1], breite), duese: null };
+        if (aktiv === 1) return { von: dn.left[0], bis: Math.min(dn.left[1], breite), duese: 'left' };
+        if (aktiv === 0) return { von: dn.right[0], bis: Math.min(dn.right[1], breite), duese: 'right' };
+        return { von: Math.max(dn.left[0], dn.right[0]),
+                 bis: Math.min(dn.left[1], dn.right[1], breite), duese: null };
     }
 
     /** Where the head really is -- or null when the printer never says. */
@@ -188,7 +188,7 @@
         // come from the printer profile, taken from Studio's own machine
         // profile (extruder_printable_area) -- no guessed width.
         const dn = bed.duesen;
-        if (dn && Array.isArray(dn.links) && Array.isArray(dn.rechts)) {
+        if (dn && Array.isArray(dn.left) && Array.isArray(dn.right)) {
             const streifen = (von, bis, text) => {
                 if (!(bis > von)) return;
                 const x = PAD + (von / bed.x) * SIDE;
@@ -202,8 +202,8 @@
                 zeile.textContent = text;
                 svg.appendChild(zeile);
             };
-            streifen(dn.links[0], dn.rechts[0], t('move_left_nozzle_only', 'Nur linke Düse'));
-            streifen(dn.links[1], dn.rechts[1], t('move_right_nozzle_only', 'Nur rechte Düse'));
+            streifen(dn.left[0], dn.right[0], t('move_left_nozzle_only', 'Nur linke Düse'));
+            streifen(dn.left[1], dn.right[1], t('move_right_nozzle_only', 'Nur rechte Düse'));
         }
 
         svg.appendChild(el('rect', { x: PAD, y: PAD, width: SIDE, height: SIDE,
@@ -384,9 +384,9 @@
         }
         const bereich = xBereich();
         if (x < bereich.von || x > bereich.bis) {
-            const text = bereich.duese === 'rechts'
+            const text = bereich.duese === 'right'
                 ? t('move_out_of_reach_right', 'Dort kommt die rechte Düse nicht hin')
-                : bereich.duese === 'links'
+                : bereich.duese === 'left'
                     ? t('move_out_of_reach_left', 'Dort kommt die linke Düse nicht hin')
                     : t('move_out_of_reach', 'Dort kommt die aktive Düse nicht hin');
             if (window.skToast) window.skToast(text, 'warning');

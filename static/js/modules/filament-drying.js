@@ -97,7 +97,7 @@ class FilamentDryingManager {
                 // Does the printer dry by itself? Then our homing and
                 // parking falls away — it does that in its own routine.
                 this.nativ = !!data.nativ;
-                this.letzteTrocknung = data.letzte_trocknung || null;
+                this.letzteTrocknung = data.last_drying || null;
                 const homingZeile = document.getElementById('skip-homing-checkbox')
                     ?.closest('.tr-schalter-zeile');
                 if (homingZeile) homingZeile.hidden = this.nativ;
@@ -270,7 +270,7 @@ class FilamentDryingManager {
 
             if (result.success) {
                 const currentLang = window.currentLang || 'de';
-                const positioningText = skipHoming ? (window.currentLang === 'de' ? ' (ohne Homing)' : ' (without homing)') : '';
+                const positioningText = skipHoming ? ` (${(window.texts || {}).drying_without_homing || 'ohne Homing'})` : '';
                 // On the native path the preparation runs first — and we say
                 // so. "Drying started" would be a lie, it only begins after
                 // that.

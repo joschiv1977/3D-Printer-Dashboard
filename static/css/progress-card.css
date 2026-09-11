@@ -115,12 +115,12 @@ body:not(.dark-mode) .progress-card {
 }
 
 /* ============================================
- * HelixScreen-inspired Layout (Sovol 356C)
+ * Klipper layout (Sovol 356C)
  * Left column: Thumbnail + Metadata-Overlay
  * Right column: Temp/Speed/Fans/Buttons
  * ============================================ */
 
-.progress-card--helix {
+.progress-card--klipper {
     padding: 12px !important;
 }
 
@@ -291,7 +291,7 @@ body:not(.dark-mode) .progress-card__overlay {
     min-width: 0;
 }
 
-.helix-temp-card {
+.pc-temp-card {
     background: rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
@@ -301,12 +301,12 @@ body:not(.dark-mode) .progress-card__overlay {
     gap: 6px;
 }
 
-body.dark-mode .helix-temp-card {
+body.dark-mode .pc-temp-card {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-.helix-temp-row {
+.pc-temp-row {
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;
@@ -314,23 +314,23 @@ body.dark-mode .helix-temp-card {
     font-size: 13px;
 }
 
-.helix-temp-label {
+.pc-temp-label {
     color: var(--text-secondary);
     font-weight: 500;
 }
 
-.helix-temp-value {
+.pc-temp-value {
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
     font-weight: 600;
 }
 
-.helix-temp-sep {
+.pc-temp-sep {
     color: var(--text-placeholder);
     margin: 0 2px;
 }
 
-.helix-status-pill {
+.pc-status-pill {
     font-size: 10px;
     padding: 2px 8px;
     border-radius: 999px;
@@ -342,16 +342,16 @@ body.dark-mode .helix-temp-card {
     white-space: nowrap;
 }
 
-.helix-status-pill.is-ready    { background: rgba(34, 197, 94, 0.18); color: #16a34a; }
-.helix-status-pill.is-heating  { background: rgba(249, 115, 22, 0.18); color: #ea580c; }
-.helix-status-pill.is-cooling  { background: rgba(56, 189, 248, 0.18); color: #0284c7; }
-.helix-status-pill.is-off      { background: rgba(128, 128, 128, 0.12); color: var(--text-placeholder); }
+.pc-status-pill.is-ready    { background: rgba(34, 197, 94, 0.18); color: #16a34a; }
+.pc-status-pill.is-heating  { background: rgba(249, 115, 22, 0.18); color: #ea580c; }
+.pc-status-pill.is-cooling  { background: rgba(56, 189, 248, 0.18); color: #0284c7; }
+.pc-status-pill.is-off      { background: rgba(128, 128, 128, 0.12); color: var(--text-placeholder); }
 
-body.dark-mode .helix-status-pill.is-ready    { color: #22c55e; }
-body.dark-mode .helix-status-pill.is-heating  { color: #f97316; }
-body.dark-mode .helix-status-pill.is-cooling  { color: #38bdf8; }
+body.dark-mode .pc-status-pill.is-ready    { color: #22c55e; }
+body.dark-mode .pc-status-pill.is-heating  { color: #f97316; }
+body.dark-mode .pc-status-pill.is-cooling  { color: #38bdf8; }
 
-.helix-inline-row {
+.pc-inline-row {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -362,43 +362,43 @@ body.dark-mode .helix-status-pill.is-cooling  { color: #38bdf8; }
     color: var(--text-secondary);
 }
 
-.helix-inline-icon {
+.pc-inline-icon {
     font-size: 14px;
     opacity: 0.85;
 }
 
-.helix-inline-value {
+.pc-inline-value {
     color: var(--text-primary);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
 }
 
-.helix-inline-sep {
+.pc-inline-sep {
     color: var(--text-placeholder);
     margin: 0 2px;
 }
 
-.helix-fan-row {
+.pc-fan-row {
     background: rgba(56, 189, 248, 0.06);
     border-radius: 8px;
     padding: 6px 12px;
 }
 
-.helix-fan-cell {
+.pc-fan-cell {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     color: var(--text-secondary);
 }
 
-.helix-fan-icon {
+.pc-fan-icon {
     color: #0284c7;
     font-size: 14px;
 }
 
-body.dark-mode .helix-fan-icon { color: #38bdf8; }
+body.dark-mode .pc-fan-icon { color: #38bdf8; }
 
-.helix-extras-row {
+.pc-extras-row {
     color: var(--text-secondary);
     font-size: 12px;
 }
@@ -417,7 +417,7 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
  * Bed-Mesh-Heatmap (Klipper-only)
  * Compact 2D top-down heatmap under Z-Extras
  * ============================================ */
-.helix-bed-mesh {
+.pc-bed-mesh {
     margin: 4px 12px 0;
     padding: 8px 10px;
     background: rgba(0, 0, 0, 0.04);
@@ -426,25 +426,25 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
     flex-direction: column;
     gap: 6px;
 }
-body.dark-mode .helix-bed-mesh {
+body.dark-mode .pc-bed-mesh {
     background: rgba(255, 255, 255, 0.04);
 }
-.helix-bed-mesh__header {
+.pc-bed-mesh__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
     color: var(--text-secondary);
 }
-.helix-bed-mesh__title {
+.pc-bed-mesh__title {
     font-weight: 500;
 }
-.helix-bed-mesh__range {
+.pc-bed-mesh__range {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     color: var(--text-primary);
 }
-.helix-bed-mesh__grid {
+.pc-bed-mesh__grid {
     width: 100%;
     aspect-ratio: 200 / 140;  /* matches the SVG's viewBox */
     max-height: 200px;
@@ -452,7 +452,7 @@ body.dark-mode .helix-bed-mesh {
     background: rgba(0, 0, 0, 0.20);
     display: block;
 }
-body.dark-mode .helix-bed-mesh__grid {
+body.dark-mode .pc-bed-mesh__grid {
     background: rgba(0, 0, 0, 0.40);
 }
 
@@ -518,7 +518,7 @@ body.dark-mode .helix-bed-mesh__grid {
 .pv-badge.pv-active { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
 
 /* Bambu shows the graphic; the old text lines are dropped there */
-body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
+body[data-active-printer="bambu"] .pc-temp-card--rows { display: none; }
 
 /* ============================================================
  * Control overview (X2D display style) in the control modal
@@ -890,8 +890,8 @@ body[data-active-printer="klipper"] #material-zone-card-grid {
 }
 
 /* Print card: speed/flow and fan rows in chip style */
-body[data-active-printer="bambu"] .helix-inline-row,
-body[data-active-printer="bambu"] .helix-fan-row {
+body[data-active-printer="bambu"] .pc-inline-row,
+body[data-active-printer="bambu"] .pc-fan-row {
     background: rgba(128, 128, 128, 0.08);
     border: 1px solid rgba(128, 128, 128, 0.13);
     border-radius: 999px;
@@ -1105,7 +1105,7 @@ body[data-active-printer="bambu"] .progress-card__cols {
 body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
 .pcb-chip-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .pcb-chip-sep { opacity: 0.45; }
-.pcb-chip .helix-fan-cell { display: inline-flex; gap: 4px; align-items: center; }
+.pcb-chip .pc-fan-cell { display: inline-flex; gap: 4px; align-items: center; }
 
 .pcb-bar {
     height: 7px;

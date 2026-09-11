@@ -43,7 +43,7 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
             </span>
             <div class="mld-t">
-                <div class="mld-titel" id="power-off-banner-title">Auto Power-Off in <span id="power-off-banner-countdown">--:--</span></div>
+                <div class="mld-titel" id="power-off-banner-title"><span data-i18n="power_off_in">Auto Power-Off in</span> <span id="power-off-banner-countdown">--:--</span></div>
                 <div class="mld-detail" id="power-off-banner-reason">--</div>
                 <div class="mld-akt">
                     <button onclick="cancelPowerOffTimerFromBanner()" class="power-off-cancel-btn"
@@ -71,7 +71,7 @@
                 <div class="mld-titel" id="precondition-banner-title" data-i18n="precondition_title">Thermische Vorkonditionierung</div>
                 <div class="mld-detail"><span data-i18n="precondition_detail">Optimiert die erste Schicht</span> · <span id="precondition-banner-countdown">--:--</span></div>
             </div>
-            <button class="mld-zu" onclick="window.preconditioning && window.preconditioning.wegklicken()" aria-label="Ausblenden">&times;</button>
+            <button class="mld-zu" onclick="window.preconditioning && window.preconditioning.wegklicken()" data-i18n-aria-label="hide" aria-label="Ausblenden">&times;</button>
         </div>
 
         <!--Power-loss recovery -- Klipper-Direct only: the companion has the

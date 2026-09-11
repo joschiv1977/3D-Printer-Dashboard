@@ -137,7 +137,7 @@
 
         <div class="card" id="bm-info" style="display:none;">
             <div class="section-title" data-i18n="bedmesh_current" style="margin-bottom:10px;">Aktuelles Mesh</div>
-            <div class="bm-info-row"><span class="bm-label">Name</span><span class="bm-value" id="bm-name">—</span></div>
+            <div class="bm-info-row"><span class="bm-label" data-i18n="bedmesh_profile_name">Name</span><span class="bm-value" id="bm-name">—</span></div>
             <div class="bm-info-row"><span class="bm-label" data-i18n="bedmesh_size">Größe</span><span class="bm-value" id="bm-size">—</span></div>
             <div class="bm-info-row"><span class="bm-label" id="bm-max-label">Max</span><span class="bm-value" id="bm-max">—</span></div>
             <div class="bm-info-row"><span class="bm-label" id="bm-min-label">Min</span><span class="bm-value" id="bm-min">—</span></div>
@@ -324,12 +324,12 @@
                         }, 4000);
                         setTimeout(function () { clearInterval(iv); }, 21 * 60 * 1000);
                     })
-                    .catch(function () { toast((window.texts || {}).set_error || 'Fehler'); applyCalibrating(false); });
+                    .catch(function () { toast(getText('set_error', 'Fehler')); applyCalibrating(false); });
             });
             document.getElementById('bm-clear-btn').addEventListener('click', function () {
                 fetch('/api/bedmesh/clear', { method: 'POST', credentials: 'same-origin' })
                     .then(function () { setTimeout(loadMesh, 600); })
-                    .catch(function () { toast((window.texts || {}).set_error || 'Fehler'); });
+                    .catch(function () { toast(getText('set_error', 'Fehler')); });
             });
             loadMesh();
             // While one is on the page, keep the mesh current (after a calibration).

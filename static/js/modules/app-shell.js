@@ -118,7 +118,7 @@ class AppShell {
 
         } catch (error) {
             console.error('Error loading page:', error);
-            this.showError('Fehler beim Laden der Seite. Bitte versuche es erneut.');
+            this.showError((window.texts || {}).page_load_failed || 'Fehler beim Laden der Seite. Bitte versuche es erneut.');
             this.hideLoading();
         }
     }
@@ -248,7 +248,7 @@ class AppShell {
                 <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
                     <div style="text-align: center;">
                         <div style="margin-bottom: 20px;">${window.skIcon ? window.skIcon('sanduhr', 'hd-ic--xl') : ''}</div>
-                        <div style="font-size: 18px; color: var(--text-secondary);">Laden...</div>
+                        <div style="font-size: 18px; color: var(--text-secondary);">${(window.texts || {}).loading || 'Laden …'}</div>
                     </div>
                 </div>
             `;

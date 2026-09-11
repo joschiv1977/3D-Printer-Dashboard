@@ -469,7 +469,7 @@ class SpoolmanManager {
             let spoolmanUrl = config.spoolman?.external_url || config.spoolman?.url;
 
             if (!spoolmanUrl) {
-                skToast('Spoolman URL nicht konfiguriert', 'warning');
+                skToast((window.texts || {}).spoolman_url_missing || 'Spoolman-URL nicht eingerichtet', 'warning');
                 return;
             }
 

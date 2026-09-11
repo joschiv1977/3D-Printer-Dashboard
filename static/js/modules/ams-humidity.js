@@ -4,7 +4,7 @@
  * The instantaneous value is in the status and shown everywhere. The question
  * before a print, though, is how long a spool LAY damp -- for that the server
  * delivers the history per unit and a verdict per tray under
- * /api/filament/feuchte. This module fetches that once, keeps it briefly and
+ * /api/filament/humidity. This module fetches that once, keeps it briefly and
  * draws the curve and the summary line from it.
  */
 (function () {
@@ -25,7 +25,7 @@
         laufend = (async () => {
             try {
                 const antwort = await window.apiCall(
-                    '/api/filament/feuchte?tage=' + (tage || 14));
+                    '/api/filament/humidity?days=' + (tage || 14));
                 const daten = await antwort.json();
                 if (daten && daten.success) { stand = daten; geholt = Date.now(); }
                 return stand;
@@ -40,19 +40,19 @@
     function vergiss() { stand = null; geholt = 0; }
 
     function fuerFach(daten, amsId, slot) {
-        return ((daten && daten.spulen) || []).find(
+        return ((daten && daten.spools) || []).find(
             s => s.ams_id === amsId && s.slot === slot) || null;
     }
 
     function einheit(daten, amsId) {
-        return ((daten && daten.einheiten) || []).find(e => e.id === amsId) || null;
+        return ((daten && daten.units) || []).find(e => e.id === amsId) || null;
     }
 
     /** How much time the series really covers -- as text. */
     function spanne(verlauf) {
-        const p = (verlauf || []).filter(x => x.feuchte != null);
+        const p = (verlauf || []).filter(x => x.humidity != null);
         if (p.length < 2) return { ms: 0, text: '' };
-        const zeit = x => new Date(String(x.zeit).replace(' ', 'T')).getTime();
+        const zeit = x => new Date(String(x.time).replace(' ', 'T')).getTime();
         const t0 = zeit(p[0]), t1 = zeit(p[p.length - 1]);
         const ms = Math.max(t1 - t0, 0);
         const stunden = ms / 3600000;
@@ -63,10 +63,10 @@
         // read "the last 1 hours". Singular forms for five languages would be
         // ten more strings for a case that does not arise.
         const text = stunden >= 48
-            ? t('feuchte_spanne_tage', 'letzte {n} Tage').replace('{n}', Math.round(stunden / 24))
+            ? t('humidity_span_days', 'letzte {n} Tage').replace('{n}', Math.round(stunden / 24))
             : (stunden >= 2
-                ? t('feuchte_spanne_stunden', 'letzte {n} Stunden').replace('{n}', Math.round(stunden))
-                : t('feuchte_spanne_minuten', 'letzte {n} Minuten').replace('{n}', Math.max(2, Math.round(ms / 60000))));
+                ? t('humidity_span_hours', 'letzte {n} Stunden').replace('{n}', Math.round(stunden))
+                : t('humidity_span_minutes', 'letzte {n} Minuten').replace('{n}', Math.max(2, Math.round(ms / 60000))));
         return { ms, text, von: t0, bis: t1 };
     }
 
@@ -77,12 +77,12 @@
         const stuecke = [];
         let lauf = [];
         punkte.forEach((p, i) => {
-            if (i && p.luecke) { stuecke.push(lauf); lauf = []; }
+            if (i && p.gap) { stuecke.push(lauf); lauf = []; }
             lauf.push(p);
         });
         stuecke.push(lauf);
         return stuecke.filter(st => st.length > 1).map(st =>
-            st.map((p, i) => (i ? 'L' : 'M') + x(p).toFixed(1) + ' ' + y(p.feuchte).toFixed(1)).join(' ')
+            st.map((p, i) => (i ? 'L' : 'M') + x(p).toFixed(1) + ' ' + y(p.humidity).toFixed(1)).join(' ')
             + ` L${x(st[st.length - 1]).toFixed(1)} ${h} L${x(st[0]).toFixed(1)} ${h} Z`).join(' ');
     }
 
@@ -95,10 +95,10 @@
      * one leaves red mountains.
      */
     function kurve(verlauf, schwelle, breite, hoehe) {
-        const punkte = (verlauf || []).filter(p => p.feuchte != null);
+        const punkte = (verlauf || []).filter(p => p.humidity != null);
         if (punkte.length < 2) return '';
         const b = breite || 260, h = hoehe || 46;
-        const zeit = p => new Date(String(p.zeit).replace(' ', 'T')).getTime();
+        const zeit = p => new Date(String(p.time).replace(' ', 'T')).getTime();
         const t0 = zeit(punkte[0]), t1 = zeit(punkte[punkte.length - 1]);
         const dauer = Math.max(t1 - t0, 1);
         // A fixed scale of 10-60%: an axis that grows with the data would make
@@ -110,18 +110,18 @@
         // `luecke` starts a new stroke: between two periods the spool sat on
         // the shelf and nothing was measured. A continuous line would be made
         // up there.
-        const d = punkte.map((p, i) => ((i && !p.luecke) ? 'L' : 'M') + x(p).toFixed(1)
-            + ' ' + y(p.feuchte).toFixed(1)).join(' ');
+        const d = punkte.map((p, i) => ((i && !p.gap) ? 'L' : 'M') + x(p).toFixed(1)
+            + ' ' + y(p.humidity).toFixed(1)).join(' ');
         const ys = y(schwelle).toFixed(1);
         const nr = 'fkc' + (++lfdNr);
-        const nass = punkte.some(p => p.feuchte >= schwelle);
+        const nass = punkte.some(p => p.humidity >= schwelle);
         // The measurements travel inside the element: on hover the pointer
         // finds the nearest one and shows time, humidity and temperature.
         // Without that the curve would be a shape without numbers.
         const daten = punkte.map(p => [
-            new Date(String(p.zeit).replace(' ', 'T')).getTime(),
-            Math.round(p.feuchte * 10) / 10,
-            p.temperatur == null ? null : Math.round(p.temperatur * 10) / 10,
+            new Date(String(p.time).replace(' ', 'T')).getTime(),
+            Math.round(p.humidity * 10) / 10,
+            p.temperature == null ? null : Math.round(p.temperature * 10) / 10,
         ]);
         return `<svg class="fk-kurve" viewBox="0 0 ${b} ${h}" preserveAspectRatio="none"
                      role="img" aria-hidden="true"
@@ -137,23 +137,23 @@
     function merkzeile(spule, schwelle) {
         if (!spule) return '';
         const worte = {
-            trocken: t('feuchte_urteil_trocken', 'trocken'),
-            beobachten: t('feuchte_urteil_beobachten', 'im Blick behalten'),
-            trocknen: t('feuchte_urteil_trocknen', 'trocknen'),
+            trocken: t('humidity_verdict_dry', 'trocken'),
+            beobachten: t('humidity_verdict_watch', 'im Blick behalten'),
+            trocknen: t('humidity_verdict_needs_drying', 'trocknen'),
         };
         const teile = [];
-        if (spule.tage_ueber >= 1) {
-            teile.push(t('feuchte_tage_ueber', '{n} Tage über {s} %')
-                .replace('{n}', spule.tage_ueber.toFixed(spule.tage_ueber < 10 ? 1 : 0))
+        if (spule.days_above >= 1) {
+            teile.push(t('humidity_days_above', '{n} Tage über {s} %')
+                .replace('{n}', spule.days_above.toFixed(spule.days_above < 10 ? 1 : 0))
                 .replace('{s}', schwelle));
-        } else if (spule.stunden_ueber > 0) {
-            teile.push(t('feuchte_stunden_ueber', '{n} h über {s} %')
-                .replace('{n}', Math.round(spule.stunden_ueber))
+        } else if (spule.hours_above > 0) {
+            teile.push(t('humidity_hours_above', '{n} h über {s} %')
+                .replace('{n}', Math.round(spule.hours_above))
                 .replace('{s}', schwelle));
         }
-        teile.push(t('feuchte_spitze', 'Spitze {n} %').replace('{n}', spule.max));
-        return `<span class="fk-urteil fk-urteil--${esc(spule.urteil)}">`
-             + esc(worte[spule.urteil] || spule.urteil) + '</span>'
+        teile.push(t('humidity_peak', 'Spitze {n} %').replace('{n}', spule.max));
+        return `<span class="fk-urteil fk-urteil--${esc(spule.verdict)}">`
+             + esc(worte[spule.verdict] || spule.verdict) + '</span>'
              + `<span class="fk-detail">${esc(teile.join(' · '))}</span>`;
     }
 

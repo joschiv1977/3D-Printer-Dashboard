@@ -2223,12 +2223,12 @@ body:not(.dark-mode) .progress-card {
 }
 
 /* ============================================
- * HelixScreen-inspired Layout (Sovol 356C)
+ * Klipper layout (Sovol 356C)
  * Left column: Thumbnail + Metadata-Overlay
  * Right column: Temp/Speed/Fans/Buttons
  * ============================================ */
 
-.progress-card--helix {
+.progress-card--klipper {
     padding: 12px !important;
 }
 
@@ -2399,7 +2399,7 @@ body:not(.dark-mode) .progress-card__overlay {
     min-width: 0;
 }
 
-.helix-temp-card {
+.pc-temp-card {
     background: rgba(0, 0, 0, 0.04);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 10px;
@@ -2409,12 +2409,12 @@ body:not(.dark-mode) .progress-card__overlay {
     gap: 6px;
 }
 
-body.dark-mode .helix-temp-card {
+body.dark-mode .pc-temp-card {
     background: rgba(255, 255, 255, 0.04);
     border-color: rgba(255, 255, 255, 0.08);
 }
 
-.helix-temp-row {
+.pc-temp-row {
     display: grid;
     grid-template-columns: 1fr auto auto;
     align-items: center;
@@ -2422,23 +2422,23 @@ body.dark-mode .helix-temp-card {
     font-size: 13px;
 }
 
-.helix-temp-label {
+.pc-temp-label {
     color: var(--text-secondary);
     font-weight: 500;
 }
 
-.helix-temp-value {
+.pc-temp-value {
     color: var(--text-primary);
     font-variant-numeric: tabular-nums;
     font-weight: 600;
 }
 
-.helix-temp-sep {
+.pc-temp-sep {
     color: var(--text-placeholder);
     margin: 0 2px;
 }
 
-.helix-status-pill {
+.pc-status-pill {
     font-size: 10px;
     padding: 2px 8px;
     border-radius: 999px;
@@ -2450,16 +2450,16 @@ body.dark-mode .helix-temp-card {
     white-space: nowrap;
 }
 
-.helix-status-pill.is-ready    { background: rgba(34, 197, 94, 0.18); color: #16a34a; }
-.helix-status-pill.is-heating  { background: rgba(249, 115, 22, 0.18); color: #ea580c; }
-.helix-status-pill.is-cooling  { background: rgba(56, 189, 248, 0.18); color: #0284c7; }
-.helix-status-pill.is-off      { background: rgba(128, 128, 128, 0.12); color: var(--text-placeholder); }
+.pc-status-pill.is-ready    { background: rgba(34, 197, 94, 0.18); color: #16a34a; }
+.pc-status-pill.is-heating  { background: rgba(249, 115, 22, 0.18); color: #ea580c; }
+.pc-status-pill.is-cooling  { background: rgba(56, 189, 248, 0.18); color: #0284c7; }
+.pc-status-pill.is-off      { background: rgba(128, 128, 128, 0.12); color: var(--text-placeholder); }
 
-body.dark-mode .helix-status-pill.is-ready    { color: #22c55e; }
-body.dark-mode .helix-status-pill.is-heating  { color: #f97316; }
-body.dark-mode .helix-status-pill.is-cooling  { color: #38bdf8; }
+body.dark-mode .pc-status-pill.is-ready    { color: #22c55e; }
+body.dark-mode .pc-status-pill.is-heating  { color: #f97316; }
+body.dark-mode .pc-status-pill.is-cooling  { color: #38bdf8; }
 
-.helix-inline-row {
+.pc-inline-row {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -2470,43 +2470,43 @@ body.dark-mode .helix-status-pill.is-cooling  { color: #38bdf8; }
     color: var(--text-secondary);
 }
 
-.helix-inline-icon {
+.pc-inline-icon {
     font-size: 14px;
     opacity: 0.85;
 }
 
-.helix-inline-value {
+.pc-inline-value {
     color: var(--text-primary);
     font-weight: 600;
     font-variant-numeric: tabular-nums;
 }
 
-.helix-inline-sep {
+.pc-inline-sep {
     color: var(--text-placeholder);
     margin: 0 2px;
 }
 
-.helix-fan-row {
+.pc-fan-row {
     background: rgba(56, 189, 248, 0.06);
     border-radius: 8px;
     padding: 6px 12px;
 }
 
-.helix-fan-cell {
+.pc-fan-cell {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     color: var(--text-secondary);
 }
 
-.helix-fan-icon {
+.pc-fan-icon {
     color: #0284c7;
     font-size: 14px;
 }
 
-body.dark-mode .helix-fan-icon { color: #38bdf8; }
+body.dark-mode .pc-fan-icon { color: #38bdf8; }
 
-.helix-extras-row {
+.pc-extras-row {
     color: var(--text-secondary);
     font-size: 12px;
 }
@@ -2525,7 +2525,7 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
  * Bed-Mesh-Heatmap (Klipper-only)
  * Compact 2D top-down heatmap under Z-Extras
  * ============================================ */
-.helix-bed-mesh {
+.pc-bed-mesh {
     margin: 4px 12px 0;
     padding: 8px 10px;
     background: rgba(0, 0, 0, 0.04);
@@ -2534,25 +2534,25 @@ body.dark-mode .helix-fan-icon { color: #38bdf8; }
     flex-direction: column;
     gap: 6px;
 }
-body.dark-mode .helix-bed-mesh {
+body.dark-mode .pc-bed-mesh {
     background: rgba(255, 255, 255, 0.04);
 }
-.helix-bed-mesh__header {
+.pc-bed-mesh__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
     color: var(--text-secondary);
 }
-.helix-bed-mesh__title {
+.pc-bed-mesh__title {
     font-weight: 500;
 }
-.helix-bed-mesh__range {
+.pc-bed-mesh__range {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     color: var(--text-primary);
 }
-.helix-bed-mesh__grid {
+.pc-bed-mesh__grid {
     width: 100%;
     aspect-ratio: 200 / 140;  /* matches the SVG's viewBox */
     max-height: 200px;
@@ -2560,7 +2560,7 @@ body.dark-mode .helix-bed-mesh {
     background: rgba(0, 0, 0, 0.20);
     display: block;
 }
-body.dark-mode .helix-bed-mesh__grid {
+body.dark-mode .pc-bed-mesh__grid {
     background: rgba(0, 0, 0, 0.40);
 }
 
@@ -2626,7 +2626,7 @@ body.dark-mode .helix-bed-mesh__grid {
 .pv-badge.pv-active { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35); }
 
 /* Bambu shows the graphic; the old text lines are dropped there */
-body[data-active-printer="bambu"] .helix-temp-card--rows { display: none; }
+body[data-active-printer="bambu"] .pc-temp-card--rows { display: none; }
 
 /* ============================================================
  * Control overview (X2D display style) in the control modal
@@ -2998,8 +2998,8 @@ body[data-active-printer="klipper"] #material-zone-card-grid {
 }
 
 /* Print card: speed/flow and fan rows in chip style */
-body[data-active-printer="bambu"] .helix-inline-row,
-body[data-active-printer="bambu"] .helix-fan-row {
+body[data-active-printer="bambu"] .pc-inline-row,
+body[data-active-printer="bambu"] .pc-fan-row {
     background: rgba(128, 128, 128, 0.08);
     border: 1px solid rgba(128, 128, 128, 0.13);
     border-radius: 999px;
@@ -3213,7 +3213,7 @@ body[data-active-printer="bambu"] .progress-card__cols {
 body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
 .pcb-chip-val { font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .pcb-chip-sep { opacity: 0.45; }
-.pcb-chip .helix-fan-cell { display: inline-flex; gap: 4px; align-items: center; }
+.pcb-chip .pc-fan-cell { display: inline-flex; gap: 4px; align-items: center; }
 
 .pcb-bar {
     height: 7px;
@@ -4541,6 +4541,16 @@ body.dark-mode .sd-popover {
 
 .prep-switch input:checked + span { background: var(--accent-blue); }
 .prep-switch input:checked + span::after { transform: translateX(18px); }
+
+/* Both plate lists go through this: the print-prepare modal and the schedule
+   dialog. The modal used to carry the grid as an inline style on its id, so
+   the dialog -- which builds the container by class -- had no grid at all and
+   every tile grew to the full width of the panel. */
+.prep-plates {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+    gap: 10px;
+}
 
 .prep-plate {
     background: var(--bg-secondary);
@@ -6233,6 +6243,16 @@ body.dark-mode .temp-btn--apply:hover {
     border-bottom-color: var(--accent-blue);
 }
 
+/* Locked while the printer is off. Dimmed rather than hidden: the tab is
+   still part of the machine, it just has nothing to offer right now, and a
+   row that changes length every time the power drops is worse than a grey
+   entry. */
+.ctrl-tab--aus {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+.ctrl-tab--aus:hover { background: none; color: var(--text-secondary); }
+
 body.dark-mode .ctrl-tab:hover {
     background: rgba(33, 150, 243, 0.08);
 }
@@ -6651,17 +6671,85 @@ body.dark-mode .ctrl-custom-temp-set:hover {
     max-width: 100%;
     cursor: crosshair;
 }
+/* The plate, drawn the way Studio shows it from above. Dark in both themes:
+   it IS dark, and a light rectangle would only be a white hole in the panel. */
+.bed-platte { fill: #26282e; }
+.bed-lasche { fill: #26282e; }
+
+/* The frame around the printable area. */
 .bed-area {
-    fill: rgba(128, 128, 128, 0.08);
-    stroke: rgba(128, 128, 128, 0.30);
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.22);
 }
+/* 10 mm barely there, 50 mm readable -- close and you see structure, at a
+   glance you see the fifties. */
 .bed-grid {
-    stroke: rgba(128, 128, 128, 0.16);
+    stroke: rgba(255, 255, 255, 0.055);
     stroke-width: 1;
+}
+.bed-grid--stark { stroke: rgba(255, 255, 255, 0.16); }
+
+/* The strip only one nozzle reaches. Lighter than the plate, not coloured:
+   it is not a warning, it is a property of the machine. */
+.bed-nur-eine { fill: rgba(255, 255, 255, 0.07); }
+.bed-nur-eine-text {
+    fill: rgba(255, 255, 255, 0.42);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* Simon Says. The fields are barely there while quiet and clearly lit when
+   they are the answer -- the plate has to stay a plate, not become a board. */
+.bed-feld {
+    fill: rgba(255, 255, 255, 0.05);
+    stroke: rgba(255, 255, 255, 0.22);
+}
+.bed-feld--an {
+    fill: rgba(29, 158, 117, 0.45);
+    stroke: #1d9e75;
+}
+
+/* The label bar on the plate's front edge -- light, like the printed one. */
+.bed-leiste { fill: rgba(255, 255, 255, 0.72); }
+.bed-leiste-text {
+    fill: #3a3d44;
+    font-size: 6.4px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.bed-plattenname {
+    fill: rgba(255, 255, 255, 0.32);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.6px;
 }
 .bed-empty {
     fill: var(--text-secondary);
     font-size: 12px;
+}
+
+/* Unreferenced axes: the map is covered rather than merely refusing clicks.
+   A target in millimetres is meaningless before homing -- the printer counts
+   from wherever it stands -- so the surface must not invite the click in the
+   first place. */
+.bed-sperre {
+    fill: rgba(20, 24, 34, 0.86);
+    stroke: rgba(240, 160, 60, 0.55);
+    stroke-dasharray: 5 4;
+}
+.bed-sperre-text {
+    fill: #f0b46a;
+    font-size: 12px;
+    font-weight: 600;
+}
+.bed-map--gesperrt { cursor: not-allowed; }
+
+input[type="range"].z-slider--gesperrt {
+    cursor: not-allowed;
+    filter: grayscale(1);
+    opacity: 0.45;
 }
 
 /* The mark says one of two things, and has to look like it: a commanded
@@ -6704,18 +6792,54 @@ body.dark-mode .ctrl-custom-temp-set:hover {
 .side-bed { stroke: #1d9e75; stroke-width: 4; stroke-linecap: round; }
 
 /* Vertical, because the axis it drives is vertical -- a horizontal slider
-   for Z reads backwards next to the side view. */
-.z-slider {
+   for Z reads backwards next to the side view.
+   
+   The selector names the element on purpose. base.css styles EVERY range as
+   a flat 8px bar with a blue round thumb, and `input[type="range"]` (0,1,1)
+   beats a bare class (0,1,0) whatever the load order -- so a plain `.z-slider`
+   lost its height and its orientation, and the thumb ended up outside the
+   panel. */
+input[type="range"].z-slider {
     accent-color: #1d9e75;
+    background: rgba(128, 128, 128, 0.18);
+    border-radius: 5px;
     cursor: pointer;
-    /* Chrome dropped slider-vertical for writing-mode; keep the old
-       property so older engines still stand the track upright. */
+    /* No direction:rtl -- 0 belongs at the top and the maximum at the bottom,
+       the way the side view draws it: Z counts from the nozzle downwards, so
+       pushing the handle down drops the bed. With rtl the two ran against
+       each other. */
+    /* Two mechanisms on purpose: Chrome 121 removed slider-vertical and
+       orients by writing-mode, older engines only know the property. */
     -webkit-appearance: slider-vertical;
     appearance: slider-vertical;
-    direction: rtl;
     writing-mode: vertical-lr;
+    /* Same 240 as the side view beside it, so bed line and handle share a
+       scale. min-height keeps it standing if a parent ever shrinks it. */
     height: 240px;
+    min-height: 240px;
     width: 24px;
+}
+
+/* base.css paints the thumb in the blue accent; next to the green bed line
+   that reads as a second, unrelated control. */
+input[type="range"].z-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px;
+    height: 22px;
+    background: #1d9e75;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"].z-slider::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: #1d9e75;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 .jog-zcol { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 190px; }

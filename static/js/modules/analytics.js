@@ -54,6 +54,17 @@
       ? Math.max(0, num(p.cost_eur) - num(p.power_kwh) * pwr)
       : num(p.filament_grams) / 1000 * filPrice(p, def);
 
+  // A system run (calibration, drying preparation) is not a print: it can
+  // succeed or fail like one, but it is no print. Without a status filter the
+  // statistics are about prints -- a calibration used to count as a
+  // successful print and, having no material, turned up in the materials as
+  // "print without saved filament". The "system" filter shows the runs alone.
+  function statusMatches(p, status) {
+    if (status === 'system') return !!p.is_system_run;
+    if (p.is_system_run) return false;
+    return status == null || p.status === status;
+  }
+
   function filterPrints(all, filter) {
     let cutoffDay = null;
     const days = rangeDays(filter.range);
@@ -61,12 +72,7 @@
     return all.filter(p =>
       (cutoffDay == null || dayKey(p) >= cutoffDay) &&
       (filter.material == null || materialCategory(p.filament_material || p.filament_type) === filter.material) &&
-      // A system run is not a status: a calibration can succeed or fail just
-      // like a print. "Successful" therefore means prints, not the calibration
-      // that went well a moment ago.
-      (filter.status == null
-        || (filter.status === 'system' ? !!p.is_system_run
-                                       : (p.status === filter.status && !p.is_system_run)))
+      statusMatches(p, filter.status)
     );
   }
 
@@ -179,7 +185,7 @@
     const weekCut = ymd(new Date(Date.now() - 6 * 86400000));
     const msAll = all.filter(p =>
       (filter.material == null || materialCategory(p.filament_material || p.filament_type) === filter.material) &&
-      (filter.status == null || p.status === filter.status));
+      statusMatches(p, filter.status));
 
     const matMap = new Map();
     prints.forEach(p => {

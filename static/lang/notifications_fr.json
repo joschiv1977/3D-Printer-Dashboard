@@ -30,7 +30,7 @@
     },
     "filament_change_phase1": {
       "title": "🎨 Changer le filament",
-      "body": "Changement #{change_count} : {spool_info}"
+      "body": "Changement #{change_count}{spool_info}"
     },
     "filament_change_phase2": {
       "title": "✅ Filament chargé ?",
@@ -38,7 +38,7 @@
     },
     "filament_change_retry": {
       "title": "🔁 Recharger le filament",
-      "body": "Dernier essai refusé — veuillez réessayer : {spool_info}"
+      "body": "Dernier essai refusé — veuillez réessayer{spool_info}"
     },
     "milestone_25": {
       "title": "📊 25% atteints",
@@ -171,7 +171,9 @@
     "update_available": {
       "title": "⬆️ Nouvelle version {version}",
       "body": "{version} est prête pour {produkt}. À installer dans les réglages."
-    }
+    },
+    "filament_change_spool_pair": " : Bobine {source} → bobine {target}",
+    "filament_change_filament_pair": " : Filament {source} → filament {target}"
   },
   "status": {
     "ready": "Prêt",
@@ -215,26 +217,26 @@
     "0300-8013": "Changement filament requis pour impression multi-couleurs - veuillez changer manuellement",
     "0300-8004": "Filament épuisé - veuillez charger un nouveau filament",
     "fallback": "Erreur HMS {code}",
-    "ohne_text": "Message de l'imprimante sans texte enregistré — {modul}, {stufe}. Code {code}",
-    "stufe": {
-      "fatal": "critique",
-      "ernst": "sérieux",
-      "normal": "normal",
-      "Hinweis": "information",
-      "unbekannt": "gravité inconnue"
-    },
     "filament": {
-      "kammer_zu_heiss": "La chambre est trop chaude — le filament risque de ramollir dans le tube. Température : {temp} °C.",
-      "ams_zu_heiss": "L'AMS est trop chaud — le filament risque de ramollir. Température : {temp} °C."
+      "chamber_too_hot": "La chambre est trop chaude — le filament risque de ramollir dans le tube. Température : {temp} °C.",
+      "ams_too_hot": "L'AMS est trop chaud — le filament risque de ramollir. Température : {temp} °C."
     },
-    "speicher": {
-      "speicher_knapp": "Peu de place pour les timelapses sur {ort} : {frei} libres, de quoi enregistrer environ {anzahl} fois.",
-      "speicher_ort_intern": "le stockage interne",
-      "speicher_ort_extern": "la clé USB"
+    "no_text": "Message de l'imprimante sans texte enregistré — {module}, {severity}. Code {code}",
+    "severity": {
+      "fatal": "critique",
+      "serious": "sérieux",
+      "common": "normal",
+      "info": "information",
+      "unknown": "gravité inconnue"
     },
-    "spule": {
-      "zuruecksetzen_links": "Le filament est sorti. Réinitialiser la bobine gauche ?",
-      "zuruecksetzen_rechts": "Le filament est sorti. Réinitialiser la bobine droite ?"
+    "storage": {
+      "low": "Peu de place pour les timelapses sur {place} : {free} libres, de quoi enregistrer environ {count} fois.",
+      "place_internal": "le stockage interne",
+      "place_external": "la clé USB"
+    },
+    "spool": {
+      "reset_left": "Le filament est sorti. Réinitialiser la bobine gauche ?",
+      "reset_right": "Le filament est sorti. Réinitialiser la bobine droite ?"
     }
   },
   "hms_notification_titles": {
@@ -430,5 +432,113 @@
   "scheduled": {
     "reason_klipper_boot": "Contrôleur Klipper injoignable après le démarrage",
     "reason_mqtt": "Pas de connexion MQTT après {cycles} cycles électriques"
+  },
+  "sensors": {
+    "nozzle": "Buse",
+    "bed": "Plateau",
+    "chamber": "Caisson",
+    "host": "Hôte",
+    "part_fan": "Ventilateur de pièce",
+    "hotend_fan": "Ventilateur hotend",
+    "aux_fan": "Ventilateur auxiliaire"
+  },
+  "api": {
+    "drying_disabled": "Le séchage du filament est désactivé",
+    "drying_enclosed_only": "Séchage du filament uniquement sur les imprimantes fermées (P1S, X1 Carbon, X1E). Ton imprimante : {printer}",
+    "drying_material_unknown": "Matériau {material} introuvable",
+    "drying_already_running": "Le séchage est déjà en cours",
+    "printer_printing": "L'imprimante est en train d'imprimer",
+    "homing_failed": "Échec du homing",
+    "positioning_failed": "Échec du positionnement",
+    "temperature_failed": "Impossible de régler la température",
+    "drying_none_active": "Aucun séchage en cours",
+    "no_file_received": "Aucun fichier reçu.",
+    "file_too_big": "Le fichier est trop volumineux.",
+    "test_ok": "Test réussi",
+    "mqtt_not_connected": "MQTT non connecté",
+    "pushall_sent": "Requête pushall envoyée",
+    "test_print_running": "Une impression de test est déjà en cours",
+    "test_print_none": "Aucune impression de test en cours",
+    "notifications_unavailable": "Notifications indisponibles",
+    "test_running": "Un test est déjà en cours",
+    "test_started": "Test démarré : {filename}",
+    "test_none": "Aucun test en cours",
+    "test_stopped": "Test arrêté",
+    "api_key_invalid": "Non autorisé – clé API manquante ou incorrecte",
+    "ams_slot_required": "ams_id et slot sont requis",
+    "meross_not_configured": "Meross n'est pas configuré",
+    "baselines_initialized": "Valeurs de référence définies pour {count} tâches",
+    "developer_mode_ok": "✅ Le mode développeur fonctionne – données complètes !",
+    "developer_mode_incomplete": "⚠️ Mode développeur actif, mais données incomplètes",
+    "developer_mode_no_data": "⚠️ Aucune donnée reçue – accès en lecture seule",
+    "no_file": "Aucun fichier",
+    "only_3mf_gcode": "Seuls les fichiers .3mf et .gcode sont autorisés",
+    "file_too_large": "Fichier trop volumineux (max. {max_mb} Mo)",
+    "no_filename": "Aucun nom de fichier",
+    "move_no_model": "Aucun modèle d'imprimante défini — le stationnement et le centrage sont bloqués.",
+    "move_no_park_position": "Aucune position de repos enregistrée pour {printer}.",
+    "filament_no_model": "Aucun modèle d'imprimante défini — le changement de filament a besoin des positions de purge et d'essuyage du modèle.",
+    "token_or_device_required": "Jeton ou ID d'appareil requis",
+    "status_requested": "Demande d'état envoyée",
+    "no_serial": "Aucun numéro de série configuré",
+    "power_off_test_started": "Minuteur de test démarré (2 min)",
+    "invalid_filename": "Nom de fichier invalide",
+    "save_failed": "Échec de l'enregistrement",
+    "upload_failed": "Échec de l'envoi",
+    "password_required": "Mot de passe requis",
+    "password_min_length": "Le mot de passe doit comporter au moins {length} caractères",
+    "password_needs_uppercase": "Le mot de passe doit contenir des majuscules",
+    "password_needs_lowercase": "Le mot de passe doit contenir des minuscules",
+    "password_needs_digit": "Le mot de passe doit contenir des chiffres",
+    "password_needs_special": "Le mot de passe doit contenir des caractères spéciaux",
+    "setup_already_done": "La configuration initiale est déjà faite. Connecte-toi normalement et change le mot de passe dans les réglages.",
+    "current_password_required": "Mot de passe actuel requis",
+    "current_password_wrong": "Le mot de passe actuel est incorrect",
+    "password_set": "Mot de passe défini",
+    "klipper_fields_required": "L'identifiant, le nom et l'adresse Moonraker sont requis",
+    "klipper_id_format": "Identifiant : uniquement a-z, 0-9, _ et -, sans commencer par - ou _",
+    "moonraker_url_scheme": "L'adresse Moonraker doit commencer par http:// ou https://",
+    "spoolman_disabled": "Spoolman n'est pas activé",
+    "spool_not_found": "Bobine introuvable",
+    "spool_activate_failed": "Impossible d'activer la bobine",
+    "update_failed": "Échec de la mise à jour",
+    "spool_create_failed": "Impossible de créer la bobine",
+    "local_network_ok": "Test du réseau local réussi",
+    "log_file_missing": "Fichier journal introuvable",
+    "username_password_required": "Nouveau nom d'utilisateur et mot de passe actuel requis",
+    "username_changed": "Nom d'utilisateur modifié. Reconnecte-toi.",
+    "language_required": "Langue requise",
+    "language_invalid": "Langue invalide ou utilisateur introuvable",
+    "language_changed": "Langue modifiée",
+    "deep_cleanup_done": "Nettoyage approfondi terminé",
+    "session_deleted": "Session {id}… supprimée",
+    "token_deleted": "Jeton orphelin {id}… supprimé",
+    "user_deleted": "Utilisateur {username} supprimé",
+    "field_required": "{field} est requis",
+    "field_invalid": "Format invalide pour {field}",
+    "ams_slot_numbers": "ams_id et slot_id doivent être des nombres",
+    "unknown_mode": "Mode inconnu : {mode}",
+    "cache_cleared": "Cache vidé",
+    "unknown_command": "Commande inconnue",
+    "percent_missing": "percent manquant",
+    "fan_control_unsupported": "Cette imprimante ne peut pas piloter les ventilateurs",
+    "unknown_model": "Modèle inconnu : {model}",
+    "file_param_missing": "file manquant",
+    "makerworld_maintenance": "MakerWorld est en maintenance — de retour bientôt",
+    "makerworld_unreachable": "MakerWorld injoignable : {error}",
+    "makerworld_sign_in": "MakerWorld a refusé — connecte-toi d'abord au compte Bambu",
+    "makerworld_captcha": "MakerWorld demande un captcha — trop de téléchargements en peu de temps. Cela se règle tout seul après un moment ; les modèles déjà récupérés restent disponibles.",
+    "makerworld_status": "MakerWorld a répondu {code}",
+    "makerworld_not_json": "MakerWorld a répondu autre chose que du JSON",
+    "makerworld_not_signed_in": "Pas connecté au compte Bambu — Réglages → Cloud",
+    "makerworld_no_download_url": "MakerWorld n'a fourni aucune adresse de téléchargement",
+    "makerworld_download_status": "Le téléchargement a répondu {code}",
+    "makerworld_file_too_large": "Le fichier est étonnamment volumineux — interrompu",
+    "makerworld_download_failed": "Le téléchargement a échoué : {error}",
+    "makerworld_bad_paging": "offset et limit doivent être des nombres",
+    "makerworld_instance_missing": "Le numéro de profil (instance_id) manque",
+    "makerworld_no_slicer": "Bambu Studio introuvable — aucun slicer disponible",
+    "makerworld_no_mirror": "La copie de la carte SD n'est pas disponible",
+    "makerworld_upload_failed": "Tranché, mais le fichier n'est pas arrivé à l'imprimante"
   }
 }

@@ -391,15 +391,18 @@
             const loadingText = texts.users_loading_devices || 'Loading devices and sessions...';
             listContainer.innerHTML = `<div class="loading"></div> ${loadingText}`;
             try {
-                // Only use /api/auth/sessions - it already contains all sessions!
-                const sessionsRes = await apiCall('/api/auth/sessions');
+                // Eine Liste, eine Quelle. Vorher fragte diese Seite
+                // /api/auth/sessions und die Sicherheitsseite
+                // /api/auth/devices -- zwei Filter, zwei Ergebnisse, vier
+                // Eintraege gegen drei.
+                const sessionsRes = await apiCall('/api/auth/logins');
 
                 if (sessionsRes.status === 401) return authHandler.redirectToLogin();
 
                 const allSessions = sessionsRes.ok ? await sessionsRes.json() : [];
 
                 allSessions.forEach(s => {
-                    s.id = s.session_id || s.device_id;
+                    s.id = s.login_id;
                 });
 
                 // No deduplication — the admin sees every session exactly as
@@ -430,9 +433,9 @@
             `<svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true">${BN_ICONS[art] || BN_ICONS.web}</svg>`;
 
         function getEntryIcon(entry) {
-            const { type, device_type, device_name, device_model } = entry;
+            const { device_type, device_name, device_model } = entry;
             const text = ((device_name || '') + ' ' + (device_model || '')).toLowerCase();
-            if (type === 'web') return bnIcon('web');
+            if (entry.kind === 'browser') return bnIcon('web');
             if (device_type === 'android' || device_type === 'ios') {
                 return bnIcon(/tab|pad/.test(text) ? 'tablet' : 'handy');
             }
@@ -492,9 +495,15 @@
 
             if (alleWeg) alleWeg.style.display = sortiert.length > 1 ? 'inline-flex' : 'none';
 
+            // Wem eine Anmeldung gehoert, steht nur dabei, wenn es mehr als
+            // einen gibt. Bei einem einzigen Benutzer waere es dieselbe Zeile
+            // unter jedem Eintrag und damit keine Auskunft.
+            const mehrereBenutzer =
+                new Set(sortiert.map(e => e.username).filter(Boolean)).size > 1;
+
             container.innerHTML = sortiert.map(entry => {
-                const { type, last_used, last_activity,
-                        is_current, id, session_id, device_id, app_version, device_type } = entry;
+                const { kind, last_used, last_activity, is_current, id, login_id,
+                        username, app_version, device_type } = entry;
 
                 // What a device is called lives in device-names.js — the
                 // message history needs the same answer, and two copies of
@@ -503,13 +512,11 @@
 
                 const artNamen = { web: 'Web', electron: 'Electron', ios: 'iOS',
                                    ipados: 'iPadOS', macos: 'macOS', android: 'Android' };
-                const artKey = device_type || (type === 'web' ? 'web' : 'unknown');
+                const artKey = device_type || (entry.kind === 'browser' ? 'web' : 'unknown');
                 const art = artNamen[artKey] || artKey.toUpperCase();
 
-                const kennung = id || session_id || device_id;
-                const aktion = type === 'web'
-                    ? `revokeSession('${escJsStr(kennung)}', '${escJsStr(name)}')`
-                    : `revokeDevice('${escJsStr(kennung)}', '${escJsStr(name)}')`;
+                const kennung = id || login_id;
+                const aktion = `revokeLogin('${escJsStr(kennung)}', '${escJsStr(name)}')`;
 
                 const wann = last_used || last_activity;
 
@@ -522,6 +529,7 @@
                                 ${is_current ? `<span class="bn-jetzt">${
                                     escHtml(texts.users_this_device || 'Dieses Gerät')}</span>` : ''}</span>
                             <span class="bn-s-meta">
+                                ${mehrereBenutzer && username ? `<span>${escHtml(username)}</span>` : ''}
                                 <span title="${escAttr(bnGenau(wann))}">${escHtml(bnHer(wann))}</span>
                                 ${app_version ? `<span>${escHtml(texts.users_version || 'Version')} ${escHtml(app_version)}</span>` : ''}
                             </span>
@@ -544,9 +552,7 @@
             const alle = (window._bnEintraege || []).filter(e => !e.is_current);
             let fehler = 0;
             for (const e of alle) {
-                const kennung = e.id || e.session_id || e.device_id;
-                const pfad = e.type === 'web'
-                    ? `/api/auth/session/${kennung}` : `/api/auth/device/${kennung}`;
+                const pfad = `/api/auth/login/${e.id || e.login_id}`;
                 try {
                     const r = await apiCall(pfad, { method: 'DELETE' });
                     if (!r.ok) fehler++;
@@ -558,20 +564,19 @@
             loadDevicesAndSessions();
         }
 
-        async function revokeSession(sessionId, deviceName) {
-            const confirmMsg = texts.users_confirm_end_session ? texts.users_confirm_end_session.replace('{name}', deviceName) : `Really end web session "${deviceName}"?`;
-            const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Session beenden');
-            if (!confirmed) return;
-            const successMsg = texts.users_session_ended ? texts.users_session_ended.replace('{name}', deviceName) : `Session "${deviceName}" has been ended.`;
-            await revokeEntry(`/api/auth/session/${sessionId}`, successMsg);
-        }
-
-        async function revokeDevice(deviceId, deviceName) {
-            const confirmMsg = texts.users_confirm_logout_device ? texts.users_confirm_logout_device.replace('{name}', deviceName) : `Really log out device "${deviceName}"?`;
+        // Eine Anmeldung beenden -- Geraet wie Browser, derselbe Weg. Es
+        // gab zwei Funktionen, weil es zwei Routen gab; jetzt ist es eine
+        // Sache und heisst auch so.
+        async function revokeLogin(loginId, deviceName) {
+            const confirmMsg = texts.users_confirm_logout_device
+                ? texts.users_confirm_logout_device.replace('{name}', deviceName)
+                : `Really log out device "${deviceName}"?`;
             const confirmed = await showConfirmDialog(confirmMsg, texts.users_confirm_title || 'Gerät abmelden');
             if (!confirmed) return;
-            const successMsg = texts.users_device_logged_out ? texts.users_device_logged_out.replace('{name}', deviceName) : `Device "${deviceName}" has been logged out.`;
-            await revokeEntry(`/api/auth/device/${deviceId}`, successMsg);
+            const successMsg = texts.users_device_logged_out
+                ? texts.users_device_logged_out.replace('{name}', deviceName)
+                : `Device "${deviceName}" has been logged out.`;
+            await revokeEntry(`/api/auth/login/${loginId}`, successMsg);
         }
 
         async function revokeEntry(url, successMessage) {
@@ -793,32 +798,6 @@
                         showError(texts.users_network_error || 'Network error');
                     }
                 });
-            }
-        });
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-
-            if (urlParams.get('app') === 'android') {
-                const backButton = document.getElementById('back-to-dashboard');
-                if (backButton) {
-                    // Turn the link into a button that calls the native Java function.
-                    backButton.href = "javascript:void(0);";
-
-                    backButton.onclick = function(event) {
-                        event.preventDefault();
-
-                        if (window.Android && typeof window.Android.goBackToDashboard === 'function') {
-                            // Call the native function in MainActivity.java
-                            window.Android.goBackToDashboard();
-                        } else {
-                            console.error("Android Bridge nicht gefunden!");
-                            window.location.href = '/?app=android';
-                        }
-                    };
-                }
             }
         });
     </script>

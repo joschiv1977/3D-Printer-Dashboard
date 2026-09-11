@@ -163,7 +163,7 @@
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const eur = n => (n || 0).toFixed(2) + ' €';
-  const clean = s => (window.cleanPrintName ? window.cleanPrintName(s) : (s || '')).replace(/\.(gcode|3mf)$/i, '');
+  const clean = s => window.cleanPrintName(s);
   const LOCALES = { de: 'de-DE', en: 'en-GB', fr: 'fr-FR', es: 'es-ES', it: 'it-IT' };
   const longDate = k => {
     try { return new Intl.DateTimeFormat(LOCALES[lang()] || 'de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(k + 'T00:00:00')); }
@@ -199,7 +199,9 @@
 .ad-stapel{display:flex;flex-direction:column-reverse;border-radius:3px;overflow:hidden;min-height:3px;}
 .ad-stapel i{display:block;}
 .ad-saeulen-f{display:flex;gap:8px;margin-top:5px;}
-.ad-saeulen-f span{flex:1 1 0;max-width:34px;font-size:10.5px;color:var(--text-secondary);text-align:center;white-space:nowrap;overflow:visible;}
+/* "Sept. 2026" is wider than a 34px bar. With nowrap the month names ran
+   into each other; now the label breaks at the space, month over year. */
+.ad-saeulen-f span{flex:1 1 0;max-width:34px;min-width:0;display:flex;justify-content:center;font-size:10.5px;line-height:1.25;color:var(--text-secondary);text-align:center;}
 .ad-donut{width:104px;height:104px;}
 .ad-donut-c b{font-size:21px;}
 .ad-herostat{gap:18px;}
@@ -292,7 +294,11 @@
 .ad-kpi .l{font-size:11px;color:var(--text-secondary);margin-top:2px;}
 .ad-bars{display:flex;flex-direction:column;gap:8px;}
 .ad-bar{display:flex;align-items:center;gap:10px;font-size:13px;}
-.ad-bar .lbl{width:96px;color:var(--text-secondary);flex:0 0 auto;}
+/* The same width in every row of a card, so the tracks line up -- but
+   not a fixed 96px: "Thermische Vorkonditionierung" and
+   "Genauigkeitskalibrierung" ran into the bar. A word that still does
+   not fit breaks instead of overflowing. */
+.ad-bar .lbl{flex:0 0 clamp(96px,34%,220px);min-width:0;color:var(--text-secondary);line-height:1.25;overflow-wrap:anywhere;hyphens:auto;}
 .ad-bar .track{flex:1;height:14px;border-radius:7px;background:var(--bg-card-variant);overflow:hidden;display:block;}
 .ad-bar .fill{display:block;height:100%;border-radius:7px;min-width:2px;transition:width .3s ease;}
 .ad-bar .val{width:88px;text-align:right;color:var(--text-primary);flex:0 0 auto;}
@@ -446,6 +452,9 @@
           + `<div class="ad-card ad-breit" id="ad-phases"></div>`
           + `<div class="ad-card" id="ad-corr"></div>`
           + distributions(r) + successWeekday(r) + waste(r) + records(r));
+      // The calendar's newest week is on the right. A grid wider than the
+      // card opens there, not at its oldest week.
+      container.querySelectorAll('.ad-cal').forEach(el => { el.scrollLeft = el.scrollWidth; });
       wire(r);
       if (!r.empty) { drawHero(r); drawMaterials(r); paintDeep(); ladeHms(); ladeFeuchte(); }
     }
@@ -470,28 +479,28 @@
       let daten = null;
       try { daten = await opts.fetchFeuchte(tage); } catch (_) { daten = null; }
       if (token !== feuchteToken) return;
-      const einheiten = ((daten || {}).einheiten || [])
-        .filter(e => (e.verlauf || []).length > 1);
+      const einheiten = ((daten || {}).units || [])
+        .filter(e => (e.history || []).length > 1);
       if (!einheiten.length) { el.remove(); return; }
       zeichneFeuchte(el, daten, einheiten);
     }
 
     function zeichneFeuchte(el, daten, einheiten) {
       const worte = { trocken: t('fk_trocken'), beobachten: t('fk_beobachten'), trocknen: t('fk_trocknen') };
-      const spulen = (daten.spulen || []).slice().sort((a, b) => b.tage_ueber - a.tage_ueber);
+      const spulen = (daten.spools || []).slice().sort((a, b) => b.days_above - a.days_above);
       el.innerHTML = `<h3>${ICO.wasser} ${esc(t('fk_titel'))}</h3>`
-        + `<div class="ad-sub">${esc(t('fk_grenze').replace('{s}', daten.schwelle))}</div>`
+        + `<div class="ad-sub">${esc(t('fk_grenze').replace('{s}', daten.threshold))}</div>`
         + `<div class="ad-chartbox ad-chartbox--hoch"><canvas id="ad-feuchte-cv"></canvas></div>`
         + (spulen.length ? `<div class="ad-fkliste">` + spulen.map(sp => `
             <div class="ad-fkzeile">
-              <span class="ad-fkpunkt" style="background:${esc(farbeVon(sp.farbe))}"></span>
-              <span class="ad-fkname">${esc((sp.typ || '?'))}
+              <span class="ad-fkpunkt" style="background:${esc(farbeVon(sp.color))}"></span>
+              <span class="ad-fkname">${esc((sp.type || '?'))}
                 <span class="ad-fkfach">${esc(t('fk_fach').replace('{a}', sp.ams_id).replace('{n}', sp.slot + 1))}</span></span>
-              <span class="ad-fkzeit">${esc(sp.tage_ueber >= 1
-                  ? t('fk_tage').replace('{n}', sp.tage_ueber.toFixed(sp.tage_ueber < 10 ? 1 : 0))
-                  : (sp.stunden_ueber > 0 ? t('fk_stunden').replace('{n}', Math.round(sp.stunden_ueber)) : '–'))}</span>
+              <span class="ad-fkzeit">${esc(sp.days_above >= 1
+                  ? t('fk_tage').replace('{n}', sp.days_above.toFixed(sp.days_above < 10 ? 1 : 0))
+                  : (sp.hours_above > 0 ? t('fk_stunden').replace('{n}', Math.round(sp.hours_above)) : '–'))}</span>
               <span class="ad-fkmax">${esc(t('fk_spitze').replace('{n}', sp.max))}</span>
-              <span class="ad-fkurteil ad-fkurteil--${esc(sp.urteil)}">${esc(worte[sp.urteil] || sp.urteil)}</span>
+              <span class="ad-fkurteil ad-fkurteil--${esc(sp.verdict)}">${esc(worte[sp.verdict] || sp.verdict)}</span>
             </div>`).join('') + `</div>` : '');
 
       const cv = el.querySelector('#ad-feuchte-cv');
@@ -500,8 +509,8 @@
       const FARBEN = ['#3b82f6', '#f59e0b', '#10b981', '#a855f7', '#ef4444', '#06b6d4'];
       const reihen = einheiten.map((e, i) => ({
         label: (e.model || ('AMS ' + e.id)),
-        data: (e.verlauf || []).filter(p => p.feuchte != null)
-          .map(p => ({ x: new Date(String(p.zeit).replace(' ', 'T')).getTime(), y: p.feuchte })),
+        data: (e.history || []).filter(p => p.humidity != null)
+          .map(p => ({ x: new Date(String(p.time).replace(' ', 'T')).getTime(), y: p.humidity })),
         borderColor: FARBEN[i % FARBEN.length], backgroundColor: FARBEN[i % FARBEN.length],
         borderWidth: 2, pointRadius: 0, tension: 0.25,
       }));
@@ -512,8 +521,8 @@
         reihen.push({
           label: t('fk_grenze_kurz'), borderColor: '#94a3b8', borderDash: [5, 4],
           borderWidth: 1, pointRadius: 0, fill: false,
-          data: [{ x: Math.min(...alle), y: daten.schwelle },
-                 { x: Math.max(...alle), y: daten.schwelle }],
+          data: [{ x: Math.min(...alle), y: daten.threshold },
+                 { x: Math.max(...alle), y: daten.threshold }],
         });
       }
       feuchteChart = new window.Chart(cv.getContext('2d'), {
@@ -731,11 +740,17 @@
     function calendar(r) {
       const days = Object.keys(r.calendar); if (!days.length) return '';
       const maxC = Math.max(...Object.values(r.calendar));
-      // Fixed number of weeks per range — exactly like Android (17/26/52). Cells have
-      // a fixed size (CSS), are NOT stretched to the card width (otherwise
-      // huge on a wide desktop).
-      const wks = (state.range === 'D90') ? 26 : (state.range === 'Y1' || state.range === 'ALL') ? 52 : 17;
+      // Week columns: from the week of the first print on, at least the 17 of
+      // the normal view, at most what the range covers (26 / 52) -- the same
+      // rule on Android and iOS. A fixed 52 for "all" showed eleven empty
+      // months before the first print, and the prints sat off to the right.
+      // Cells have a fixed size (CSS), NOT stretched to the card width
+      // (otherwise huge on a wide desktop).
+      const cap = (state.range === 'D90') ? 26 : (state.range === 'Y1' || state.range === 'ALL') ? 52 : 17;
       const today = new Date(); today.setHours(0, 0, 0, 0);
+      const firstPrint = new Date(days.slice().sort()[0] + 'T00:00:00');
+      const since = isNaN(firstPrint) ? 0 : Math.round((today - firstPrint) / 864e5);
+      const wks = Math.min(cap, Math.max(17, Math.floor((since + 6) / 7) + 1));
       const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       // Start = Monday of the week that is (wks-1) weeks before the current week.
       const start = new Date(today);

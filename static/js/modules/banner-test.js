@@ -5,10 +5,10 @@
  * a printer error, auto-off needs a finished print.
  *
  * Called from the browser console:
- *     bannerProbe()            all of them on, with sample data
- *     bannerProbe('hms')       only one
- *     bannerProbe.aus()        everything off again
- *     bannerProbe.liste()      which ones exist
+ *     bannerTest()            all of them on, with sample data
+ *     bannerTest('hms')       only one
+ *     bannerTest.off()        everything off again
+ *     bannerTest.list()      which ones exist
  *
  * The sample fills the REAL nodes from _banners.html -- so it really checks what
  * appears in operation, not a reproduction of it. The next status push
@@ -94,11 +94,11 @@
             if (setze(p)) gezeigt.push(n); else console.warn(`Banner sample: node missing for "${n}"`);
         });
         console.log(`🎏 Banner sample on: ${gezeigt.join(', ') || '(nothing)'}`);
-        console.log('   Off again with  bannerProbe.aus()');
+        console.log('   Off again with  bannerTest.off()');
         return gezeigt;
     }
 
-    sample.aus = function () {
+    sample.off = function () {
         Object.values(SAMPLES).forEach(p => {
             const el = document.getElementById(p.node);
             if (el) el.classList.remove('active');
@@ -106,7 +106,7 @@
         console.log('🎏 Banner sample off');
     };
 
-    sample.liste = function () {
+    sample.list = function () {
         console.log('🎏 Banner-Sample kennt:', Object.keys(SAMPLES).join(', '));
         return Object.keys(SAMPLES);
     };

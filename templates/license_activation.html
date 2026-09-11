@@ -49,13 +49,13 @@
 <div class="lz-huelle">
 
     <div class="lz-kopf">
-        <h1 data-i18n="lizenz_titel">Lizenz</h1>
-        <button type="button" class="es-knopf" title="Hell / Dunkel / Automatisch"
+        <h1 data-i18n="licgate_title">Lizenz</h1>
+        <button type="button" class="es-knopf" data-i18n-title="theme_toggle_title" title="Hell / Dunkel / Automatisch"
                 onclick="window.themeManager && window.themeManager.toggleTheme()">
             <span id="theme-icon"></span>
         </button>
     </div>
-    <div class="lz-unterzeile" data-i18n="lizenz_unterzeile">
+    <div class="lz-unterzeile" data-i18n="licgate_subtitle">
         Der Server braucht eine Lizenz, bevor es weitergeht.
     </div>
 
@@ -65,23 +65,23 @@
     <div class="es-karte">
         <div class="es-karte-kopf">
             <i class="fa fa-check-circle"></i>
-            <span data-i18n="lizenz_aktiv">Lizenz aktiv</span>
+            <span data-i18n="licgate_active">Lizenz aktiv</span>
         </div>
         <div class="es-zeile">
-            <div class="es-zeile-name"><span data-i18n="lizenz_typ">Art</span></div>
+            <div class="es-zeile-name"><span data-i18n="licgate_type">Art</span></div>
             <div class="es-zeile-wert">{{ license_info.license_type }}</div>
         </div>
         <div class="es-zeile">
-            <div class="es-zeile-name"><span data-i18n="lizenz_kunde">Kunde</span></div>
+            <div class="es-zeile-name"><span data-i18n="licgate_customer">Kunde</span></div>
             <div class="es-zeile-wert">{{ license_info.customer_name }}</div>
         </div>
         <div class="es-zeile">
-            <div class="es-zeile-name"><span data-i18n="lizenz_gueltig">Gültig</span></div>
+            <div class="es-zeile-name"><span data-i18n="licgate_valid">Gültig</span></div>
             <div class="es-zeile-wert">
                 {% if license_info.days_remaining != None %}
-                    {{ license_info.days_remaining }} <span data-i18n="lizenz_tage">Tage</span>
+                    {{ license_info.days_remaining }} <span data-i18n="licgate_days">Tage</span>
                 {% else %}
-                    <span data-i18n="lizenz_unbegrenzt">Unbegrenzt</span>
+                    <span data-i18n="licgate_unlimited">Unbegrenzt</span>
                 {% endif %}
             </div>
         </div>
@@ -89,23 +89,23 @@
 
     <div class="lz-fuss">
         <button type="button" class="es-knopf" onclick="lizenzLoesen()"
-                data-i18n="lizenz_loesen">Lizenz lösen</button>
+                data-i18n="licgate_release">Lizenz lösen</button>
         <a href="/" class="es-knopf es-knopf--haupt"
-           data-i18n="lizenz_weiter">Weiter zum Dashboard</a>
+           data-i18n="licgate_continue">Weiter zum Dashboard</a>
     </div>
 
     {% else %}
     <div class="es-karte">
         <div class="es-karte-kopf">
             <i class="fa fa-key"></i>
-            <span data-i18n="lizenz_eingeben">Lizenzschlüssel eingeben</span>
+            <span data-i18n="licgate_enter">Lizenzschlüssel eingeben</span>
         </div>
 
         <form id="lizenz-form" onsubmit="lizenzAktivieren(event)">
             <div class="es-zeile">
                 <div class="es-zeile-name">
-                    <label for="lizenz-schluessel" data-i18n="lizenz_schluessel">Schlüssel</label>
-                    <span data-i18n="lizenz_schluessel_hinweis">Steht in der E-Mail zum Kauf</span>
+                    <label for="lizenz-schluessel" data-i18n="licgate_key">Schlüssel</label>
+                    <span data-i18n="licgate_key_hint">Steht in der E-Mail zum Kauf</span>
                 </div>
                 <div class="es-zeile-wert">
                     <input type="text" id="lizenz-schluessel" class="es-breit es-feld--code"
@@ -117,21 +117,21 @@
 
             <div class="es-zeile">
                 <div class="es-zeile-name">
-                    <span data-i18n="lizenz_datei">Oder eine Lizenzdatei</span>
-                    <span data-i18n="lizenz_datei_hinweis">license.json, falls du eine bekommen hast</span>
+                    <span data-i18n="licgate_file">Oder eine Lizenzdatei</span>
+                    <span data-i18n="licgate_file_hint">license.json, falls du eine bekommen hast</span>
                 </div>
                 <div class="es-zeile-wert">
                     <input type="file" id="lizenz-datei" class="lz-datei" accept=".json"
                            onchange="lizenzDatei(event)">
                     <button type="button" class="es-knopf"
                             onclick="document.getElementById('lizenz-datei').click()"
-                            data-i18n="lizenz_datei_waehlen">Datei wählen</button>
+                            data-i18n="licgate_file_choose">Datei wählen</button>
                 </div>
             </div>
 
             <div class="lz-fuss">
                 <button type="submit" class="es-knopf es-knopf--haupt" id="lizenz-knopf"
-                        data-i18n="lizenz_aktivieren">Aktivieren</button>
+                        data-i18n="licgate_activate">Aktivieren</button>
             </div>
         </form>
     </div>
@@ -140,11 +140,11 @@
     <div class="es-karte">
         <div class="es-karte-kopf">
             <i class="fa fa-fingerprint"></i>
-            <span data-i18n="lizenz_kennung">Hardware-Kennung dieses Rechners</span>
+            <span data-i18n="licgate_hwid">Hardware-Kennung dieses Rechners</span>
         </div>
         <div class="es-zeile">
             <div class="es-zeile-name">
-                <span data-i18n="lizenz_kennung_hinweis">Die brauchst du beim Anfordern einer Lizenz</span>
+                <span data-i18n="licgate_hwid_hint">Die brauchst du beim Anfordern einer Lizenz</span>
             </div>
             <div class="es-zeile-wert">
                 <div class="lz-kennung" id="lizenz-kennung">…</div>
@@ -152,7 +152,7 @@
         </div>
         <div class="lz-fuss">
             <button type="button" class="es-knopf" onclick="kennungKopieren()"
-                    data-i18n="lizenz_kopieren">Kopieren</button>
+                    data-i18n="licgate_copy">Kopieren</button>
         </div>
     </div>
 
@@ -179,18 +179,31 @@ function texteSetzen() {
         const wert = texte[el.getAttribute('data-i18n')];
         if (wert) el.textContent = wert;
     });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+        const wert = texte[el.getAttribute('data-i18n-title')];
+        if (wert) el.setAttribute('title', wert);
+    });
+    if (texte.licgate_title) document.title = texte.licgate_title;
 }
 
 (function ladeSprache() {
     const s = document.createElement('script');
     s.src = '/static/lang/' + sprache + '.js';
     s.onload = function () {
-        texte = window['translations_' + sprache]
-             || window.translations_en || window.translations_de || {};
+        // lang/*.js declare `const translations_xx`: a global binding,
+        // but not a property of window.
+        const alle = {
+            de: typeof translations_de !== 'undefined' ? translations_de : null,
+            en: typeof translations_en !== 'undefined' ? translations_en : null,
+            es: typeof translations_es !== 'undefined' ? translations_es : null,
+            fr: typeof translations_fr !== 'undefined' ? translations_fr : null,
+            it: typeof translations_it !== 'undefined' ? translations_it : null,
+        };
+        texte = alle[sprache] || {};
         texteSetzen();
     };
     // When the file fails, the defaults in the HTML stand.
-    s.onerror = function () { console.warn('Sprachdatei nicht ladbar:', sprache); };
+    s.onerror = function () { console.warn('Language file could not be loaded:', sprache); };
     document.head.appendChild(s);
 })();
 
@@ -204,7 +217,7 @@ function melde(text, art) {
 function arbeitet(knopf, ja, ruhe) {
     if (!knopf) return;
     knopf.disabled = ja;
-    knopf.textContent = ja ? t('lizenz_arbeitet', 'Einen Moment …') : ruhe;
+    knopf.textContent = ja ? t('licgate_working', 'Einen Moment …') : ruhe;
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -220,9 +233,9 @@ let kennungWert = '';
         // The server names it differently per platform -- on macOS the Swift
         // launcher carries it and Python reports 'managed_by_app'.
         kennungWert = d.hardware_id || d.hardwareId || '';
-        feld.textContent = kennungWert || t('lizenz_kennung_fehlt', 'nicht ermittelbar');
+        feld.textContent = kennungWert || t('licgate_hwid_missing', 'nicht ermittelbar');
     } catch (e) {
-        feld.textContent = t('lizenz_kennung_fehlt', 'nicht ermittelbar');
+        feld.textContent = t('licgate_hwid_missing', 'nicht ermittelbar');
     }
 })();
 
@@ -230,7 +243,7 @@ async function kennungKopieren() {
     if (!kennungWert) return;
     try {
         await navigator.clipboard.writeText(kennungWert);
-        melde(t('lizenz_kopiert', 'Kennung kopiert.'), 'gut');
+        melde(t('licgate_copied', 'Kennung kopiert.'), 'gut');
     } catch (e) {
         // Without a clipboard -- over http instead of https, say -- at least
         // select it, and Ctrl+C is enough.
@@ -251,7 +264,7 @@ async function lizenzAktivieren(e) {
     const ruhe = knopf.textContent;
     const schluessel = document.getElementById('lizenz-schluessel').value.trim().toUpperCase();
     if (!schluessel) {
-        melde(t('lizenz_leer', 'Bitte einen Schlüssel eingeben.'), 'fehl');
+        melde(t('licgate_empty', 'Bitte einen Schlüssel eingeben.'), 'fehl');
         return;
     }
     arbeitet(knopf, true, ruhe);
@@ -264,9 +277,9 @@ async function lizenzAktivieren(e) {
         });
         const d = await a.json().catch(function () { return {}; });
         if (!a.ok || !d.success) {
-            throw new Error(d.message || d.error || t('lizenz_fehl', 'Aktivierung abgelehnt.'));
+            throw new Error(d.message || d.error || t('licgate_refused', 'Aktivierung abgelehnt.'));
         }
-        melde(t('lizenz_gut', 'Lizenz aktiviert.'), 'gut');
+        melde(t('licgate_activated', 'Lizenz aktiviert.'), 'gut');
         setTimeout(function () { window.location.reload(); }, 1200);
     } catch (err) {
         melde(err.message, 'fehl');
@@ -285,9 +298,9 @@ async function lizenzDatei(e) {
         });
         const d = await a.json().catch(function () { return {}; });
         if (!a.ok || !d.success) {
-            throw new Error(d.message || d.error || t('lizenz_fehl', 'Aktivierung abgelehnt.'));
+            throw new Error(d.message || d.error || t('licgate_refused', 'Aktivierung abgelehnt.'));
         }
-        melde(t('lizenz_gut', 'Lizenz aktiviert.'), 'gut');
+        melde(t('licgate_activated', 'Lizenz aktiviert.'), 'gut');
         setTimeout(function () { window.location.reload(); }, 1200);
     } catch (err) {
         melde(err.message, 'fehl');
@@ -298,7 +311,7 @@ async function lizenzDatei(e) {
 }
 
 async function lizenzLoesen() {
-    if (!window.confirm(t('lizenz_loesen_frage',
+    if (!window.confirm(t('licgate_release_question',
         'Die Lizenz von diesem Rechner lösen? Danach läuft der Server nicht mehr, bis eine neue aktiviert ist.'))) {
         return;
     }
@@ -310,7 +323,7 @@ async function lizenzLoesen() {
         });
         const d = await a.json().catch(function () { return {}; });
         if (!a.ok || !d.success) {
-            throw new Error(d.message || d.error || t('lizenz_fehl', 'Fehlgeschlagen.'));
+            throw new Error(d.message || d.error || t('licgate_refused', 'Fehlgeschlagen.'));
         }
         window.location.reload();
     } catch (err) {

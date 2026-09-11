@@ -394,7 +394,7 @@
                     <div class="sl-felder">
                         <div class="sl-feld">
                             <label for="printerSelect" id="sl-l-drucker">Drucker</label>
-                            <select id="printerSelect"><option value="">Lade Profile...</option></select>
+                            <select id="printerSelect"><option value="" data-i18n="slicer_loading_profiles">Lade Profile …</option></select>
                         </div>
                         <div class="sl-feld">
                             <label for="nozzleSize" id="sl-l-duese">Düse</label>
@@ -418,15 +418,15 @@
                         </div>
                         <div class="sl-feld">
                             <label for="processSelect" id="sl-l-qualitaet">Qualität</label>
-                            <select id="processSelect"><option value="">Lade Profile...</option></select>
+                            <select id="processSelect"><option value="" data-i18n="slicer_loading_profiles">Lade Profile …</option></select>
                         </div>
                         <div class="sl-feld">
                             <label for="filamentTypeSelect" id="sl-l-material">Material</label>
-                            <select id="filamentTypeSelect"><option value="">Typ wählen...</option></select>
+                            <select id="filamentTypeSelect"><option value="" data-i18n="slicer_select_filament_type">Typ wählen…</option></select>
                         </div>
                         <div class="sl-feld">
                             <label for="filamentSelect" id="sl-l-filament">Filament</label>
-                            <select id="filamentSelect"><option value="">Erst Typ wählen...</option></select>
+                            <select id="filamentSelect"><option value="" data-i18n="slicer_select_type_first">Erst Typ wählen…</option></select>
                         </div>
                     </div>
                     <div class="sl-hinweis">
@@ -1310,7 +1310,8 @@
                     const filament = data.local_profiles?.filament || 0;
                     const process = data.local_profiles?.process || 0;
                     document.getElementById('profileCount').textContent =
-                        `${total} (${machine} Drucker, ${filament} Filamente, ${process} Prozess)`;
+                        t('slicer_profile_count', { total, machine, filament, process })
+                        || `${total} (${machine} Drucker, ${filament} Filamente, ${process} Prozess)`;
 
                     // Update supported printers
                     if (data.supported_printers) {
@@ -1329,7 +1330,7 @@
                                     { day: '2-digit', month: '2-digit', year: 'numeric',
                                       hour: '2-digit', minute: '2-digit' });
                         } else {
-                            document.getElementById('backupDate').textContent = 'Vorhanden';
+                            document.getElementById('backupDate').textContent = t('slicer_backup_present') || 'Vorhanden';
                         }
                         document.getElementById('restoreBackupBtn').style.display = 'inline-block';
                     } else {
@@ -1583,7 +1584,7 @@
                             </div>
                             <div class="sl-erg-fuss">${t('slicer_update_hint')
                                 || 'Über „Profile aktualisieren" werden sie heruntergeladen.'}
-                                <span class="sl-erg-legende">${t('slicer_erg_legende')
+                                <span class="sl-erg-legende">${t('slicer_result_legend')
                                     || 'neu / auf GitHub'}</span></div>`;
                         document.getElementById('updateProfilesBtn').style.display = 'inline-flex';
                     } else {

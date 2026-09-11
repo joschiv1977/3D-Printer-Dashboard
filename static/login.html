@@ -232,30 +232,30 @@
         async function tryAutoLogin() {
             // Check whether the Electron app is running
             if (!window.electronAPI) {
-                console.log('[Auto-Login] Kein Electron - Skip Auto-Login');
+                console.log('[Auto-Login] Not Electron - skipping auto-login');
                 return false;
             }
 
             try {
-                console.log('[Auto-Login] Lade gespeicherte Credentials...');
+                console.log('[Auto-Login] Loading stored credentials...');
                 const credentials = await window.electronAPI.loadCredentials();
 
                 if (!credentials || !credentials.username || !credentials.deviceToken) {
-                    console.log('[Auto-Login] Keine Credentials gespeichert');
+                    console.log('[Auto-Login] No credentials stored');
                     return false;
                 }
 
                 if (!credentials.autoLogin) {
-                    console.log('[Auto-Login] Auto-Login ist deaktiviert');
+                    console.log('[Auto-Login] Auto-login is off');
                     return false;
                 }
 
-                console.log('[Auto-Login] Credentials gefunden für User:', credentials.username);
-                console.log('[Auto-Login] Versuche Auto-Login mit Device Token...');
+                console.log('[Auto-Login] Credentials found for user:', credentials.username);
+                console.log('[Auto-Login] Trying auto-login with the device token...');
 
                 // Show status message
                 const successMsg = document.getElementById('successMessage');
-                successMsg.textContent = 'Automatische Anmeldung läuft...';
+                successMsg.textContent = texts.login_auto_running || 'Automatische Anmeldung läuft …';
                 successMsg.style.display = 'block';
 
                 // Use device token for login
@@ -274,7 +274,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.username) {
-                    console.log('[Auto-Login] ✅ Auto-Login erfolgreich!');
+                    console.log('[Auto-Login] ✅ Auto-login succeeded');
 
                     // Store user data
                     localStorage.setItem('username', data.username);
@@ -293,7 +293,7 @@
                     window.location.href = nextUrl;
                     return true;
                 } else {
-                    console.log('[Auto-Login] ❌ Auto-Login fehlgeschlagen:', data.error);
+                    console.log('[Auto-Login] ❌ Auto-login failed:', data.error);
                     console.log('[Auto-Login] Fallback zu manuellem Login');
 
                     // Hide status message
@@ -311,7 +311,7 @@
 
         // Attempt auto-login as soon as the DOM is loaded
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('[Auto-Login] DOM geladen, starte Auto-Login...');
+            console.log('[Auto-Login] DOM loaded, starting auto-login...');
             await tryAutoLogin();
         });
 
@@ -337,6 +337,16 @@
                         ? crypto.randomUUID()
                         : `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
                     geraeteKennung = `web_${zufall}`;
+                    localStorage.setItem('web_device_id', geraeteKennung);
+                }
+
+                // Electron has an id of its own (device-service.js). The
+                // session carries THAT one, so the window and the registered
+                // device below are recognised as one machine.
+                const electronGeraet = (window.electronAPI && window.electronAPI.geraetInfo)
+                    ? await window.electronAPI.geraetInfo() : null;
+                if (electronGeraet && electronGeraet.device_id) {
+                    geraeteKennung = electronGeraet.device_id;
                     localStorage.setItem('web_device_id', geraeteKennung);
                 }
 
@@ -368,13 +378,21 @@
                     // ============================================
                     // Electron: register device token for auto-login
                     // ============================================
+                    // The only place Electron registers. preload.js used to
+                    // hook this same request and register a second time, 0.4 s
+                    // earlier, with the same data -- two tokens per login, the
+                    // first withdrawn at once by the second.
+                    //
+                    // No made-up values: this used to ask a Firebase API that
+                    // was removed on 08sep26, got nothing, and registered
+                    // "MacIntel" (navigator.platform), "Electron App" and
+                    // "1.0.0" under a random id -- a second entry for the
+                    // same machine.
                     if (window.electronAPI) {
                         try {
-                            console.log('[Auto-Login] Registriere Device für Auto-Login...');
-                            // Get device info from Electron (as in preload.js)
-                            let deviceInfo = {};
-                            if (window.electronAPI.fcm && window.electronAPI.fcm.getDeviceInfo) {
-                                deviceInfo = await window.electronAPI.fcm.getDeviceInfo();
+                            const deviceInfo = electronGeraet;
+                            if (!deviceInfo || !deviceInfo.device_id) {
+                                throw new Error('geraetInfo() returned no device id');
                             }
                             const registerResponse = await fetch('/api/auth/device/register', {
                                 method: 'POST',
@@ -383,18 +401,16 @@
                                 body: JSON.stringify({
                                     username: username,
                                     password: password,
-                                    device_name: deviceInfo.device_name || 'Electron App',
+                                    device_name: deviceInfo.device_name,
                                     device_type: 'electron',
-                                    device_model: deviceInfo.device_model || (navigator.platform || 'Desktop'),
-                                    device_id: deviceInfo.device_id || undefined,
-                                    app_version: deviceInfo.app_version || '1.0.0'
+                                    device_model: deviceInfo.device_model,
+                                    device_id: deviceInfo.device_id,
+                                    app_version: deviceInfo.app_version
                                 })
                             });
 
                             if (registerResponse.ok) {
                                 const registerData = await registerResponse.json();
-                                console.log('[Auto-Login] ✅ Device Token erhalten:', registerData.device_token.substring(0, 20) + '...');
-
                                 // Store only username and device token.
                                 // NOT the password: saveCredentials takes exactly
                                 // two arguments (preload.js).
@@ -402,12 +418,13 @@
                                     username,
                                     registerData.device_token
                                 );
-                                console.log('[Auto-Login] ✅ Credentials gespeichert für Auto-Login');
+                                console.log('[Auto-Login] device registered, credentials stored');
                             } else {
-                                console.error('[Auto-Login] ❌ Device Registrierung fehlgeschlagen');
+                                console.error('[Auto-Login] device registration failed:',
+                                              registerResponse.status);
                             }
                         } catch (error) {
-                            console.error('[Auto-Login] ❌ Error bei Device Registrierung:', error);
+                            console.error('[Auto-Login] device not registered, auto-login stays off:', error);
                         }
                     }
 

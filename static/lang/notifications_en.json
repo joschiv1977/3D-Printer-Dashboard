@@ -30,7 +30,7 @@
     },
     "filament_change_phase1": {
       "title": "🎨 Swap filament",
-      "body": "Change #{change_count}: {spool_info}"
+      "body": "Change #{change_count}{spool_info}"
     },
     "filament_change_phase2": {
       "title": "✅ Filament loaded?",
@@ -38,7 +38,7 @@
     },
     "filament_change_retry": {
       "title": "🔁 Reload filament",
-      "body": "Last attempt was not accepted — please try again: {spool_info}"
+      "body": "Last attempt was not accepted — please try again{spool_info}"
     },
     "milestone_25": {
       "title": "📊 25% Reached",
@@ -171,7 +171,9 @@
     "update_available": {
       "title": "⬆️ New version {version}",
       "body": "{version} is ready for {produkt}. Install it in the settings."
-    }
+    },
+    "filament_change_spool_pair": ": Spool {source} → spool {target}",
+    "filament_change_filament_pair": ": Filament {source} → filament {target}"
   },
   "status": {
     "ready": "Ready",
@@ -215,26 +217,26 @@
     "0300-8013": "Filament change for multi-color print required - please change manually",
     "0300-8004": "Filament empty - please load new filament",
     "fallback": "HMS error {code}",
-    "ohne_text": "Printer message with no stored text — {modul}, {stufe}. Code {code}",
-    "stufe": {
-      "fatal": "fatal",
-      "ernst": "serious",
-      "normal": "normal",
-      "Hinweis": "info",
-      "unbekannt": "severity unknown"
-    },
     "filament": {
-      "kammer_zu_heiss": "The chamber is too hot — the filament may soften in the tube. Chamber temperature: {temp} °C.",
-      "ams_zu_heiss": "The AMS is too hot — the filament may soften. Temperature: {temp} °C."
+      "chamber_too_hot": "The chamber is too hot — the filament may soften in the tube. Chamber temperature: {temp} °C.",
+      "ams_too_hot": "The AMS is too hot — the filament may soften. Temperature: {temp} °C."
     },
-    "speicher": {
-      "speicher_knapp": "Little timelapse space left on {ort}: {frei} free, room for about {anzahl} more recordings.",
-      "speicher_ort_intern": "internal storage",
-      "speicher_ort_extern": "the USB stick"
+    "no_text": "Printer message with no stored text — {module}, {severity}. Code {code}",
+    "severity": {
+      "fatal": "fatal",
+      "serious": "serious",
+      "common": "normal",
+      "info": "info",
+      "unknown": "severity unknown"
     },
-    "spule": {
-      "zuruecksetzen_links": "The filament is out. Reset the left spool?",
-      "zuruecksetzen_rechts": "The filament is out. Reset the right spool?"
+    "storage": {
+      "low": "Little timelapse space left on {place}: {free} free, room for about {count} more recordings.",
+      "place_internal": "internal storage",
+      "place_external": "the USB stick"
+    },
+    "spool": {
+      "reset_left": "The filament is out. Reset the left spool?",
+      "reset_right": "The filament is out. Reset the right spool?"
     }
   },
   "hms_notification_titles": {
@@ -430,5 +432,113 @@
   "scheduled": {
     "reason_klipper_boot": "Klipper controller not reachable after boot",
     "reason_mqtt": "No MQTT connection after {cycles} power cycles"
+  },
+  "sensors": {
+    "nozzle": "Nozzle",
+    "bed": "Bed",
+    "chamber": "Chamber",
+    "host": "Host",
+    "part_fan": "Part fan",
+    "hotend_fan": "Hotend fan",
+    "aux_fan": "Aux fan"
+  },
+  "api": {
+    "drying_disabled": "Filament drying is turned off",
+    "drying_enclosed_only": "Filament drying only on enclosed printers (P1S, X1 Carbon, X1E). Your printer: {printer}",
+    "drying_material_unknown": "Material {material} not found",
+    "drying_already_running": "Drying is already running",
+    "printer_printing": "The printer is printing",
+    "homing_failed": "Homing failed",
+    "positioning_failed": "Positioning failed",
+    "temperature_failed": "Setting the temperature failed",
+    "drying_none_active": "No drying running",
+    "no_file_received": "No file received.",
+    "file_too_big": "The file is too large.",
+    "test_ok": "Test succeeded",
+    "mqtt_not_connected": "MQTT not connected",
+    "pushall_sent": "Pushall request sent",
+    "test_print_running": "A test print is already running",
+    "test_print_none": "No test print running",
+    "notifications_unavailable": "Notifications not available",
+    "test_running": "A test is already running",
+    "test_started": "Test started: {filename}",
+    "test_none": "No test running",
+    "test_stopped": "Test stopped",
+    "api_key_invalid": "Unauthorized – API key missing or wrong",
+    "ams_slot_required": "ams_id and slot are required",
+    "meross_not_configured": "Meross is not set up",
+    "baselines_initialized": "Baselines set for {count} tasks",
+    "developer_mode_ok": "✅ Developer Mode works – complete data!",
+    "developer_mode_incomplete": "⚠️ Developer Mode on, but the data is incomplete",
+    "developer_mode_no_data": "⚠️ No data received – read-only access",
+    "no_file": "No file",
+    "only_3mf_gcode": "Only .3mf and .gcode files allowed",
+    "file_too_large": "File too large (max. {max_mb} MB)",
+    "no_filename": "No file name",
+    "move_no_model": "No printer model set — parking and centering are blocked.",
+    "move_no_park_position": "No park position is stored for {printer}.",
+    "filament_no_model": "No printer model set — the filament change needs the model's purge and wipe positions.",
+    "token_or_device_required": "Token or device ID required",
+    "status_requested": "Status request sent",
+    "no_serial": "No serial number set up",
+    "power_off_test_started": "Test timer started (2 min)",
+    "invalid_filename": "Invalid file name",
+    "save_failed": "Saving failed",
+    "upload_failed": "Upload failed",
+    "password_required": "Password required",
+    "password_min_length": "The password must be at least {length} characters long",
+    "password_needs_uppercase": "The password must contain uppercase letters",
+    "password_needs_lowercase": "The password must contain lowercase letters",
+    "password_needs_digit": "The password must contain digits",
+    "password_needs_special": "The password must contain special characters",
+    "setup_already_done": "First-time setup is already done. Please sign in normally and change the password in the settings.",
+    "current_password_required": "Current password required",
+    "current_password_wrong": "The current password is wrong",
+    "password_set": "Password set",
+    "klipper_fields_required": "ID, name and Moonraker address are required",
+    "klipper_id_format": "ID: only a-z, 0-9, _ and -, not starting with - or _",
+    "moonraker_url_scheme": "The Moonraker address needs http:// or https://",
+    "spoolman_disabled": "Spoolman is not turned on",
+    "spool_not_found": "Spool not found",
+    "spool_activate_failed": "The spool could not be activated",
+    "update_failed": "Update failed",
+    "spool_create_failed": "The spool could not be created",
+    "local_network_ok": "Local network test succeeded",
+    "log_file_missing": "Log file not found",
+    "username_password_required": "New user name and current password required",
+    "username_changed": "User name changed. Please sign in again.",
+    "language_required": "Language required",
+    "language_invalid": "Invalid language or user not found",
+    "language_changed": "Language changed",
+    "deep_cleanup_done": "Deep cleanup finished",
+    "session_deleted": "Session {id}… deleted",
+    "token_deleted": "Orphaned token {id}… deleted",
+    "user_deleted": "User {username} deleted",
+    "field_required": "{field} is required",
+    "field_invalid": "Invalid format for {field}",
+    "ams_slot_numbers": "ams_id and slot_id must be numbers",
+    "unknown_mode": "Unknown mode: {mode}",
+    "cache_cleared": "Cache cleared",
+    "unknown_command": "Unknown command",
+    "percent_missing": "percent missing",
+    "fan_control_unsupported": "This printer cannot control the fans",
+    "unknown_model": "Unknown model: {model}",
+    "file_param_missing": "file missing",
+    "makerworld_maintenance": "MakerWorld is under maintenance right now — it will be back soon",
+    "makerworld_unreachable": "MakerWorld not reachable: {error}",
+    "makerworld_sign_in": "MakerWorld refused — sign in to the Bambu account first",
+    "makerworld_captcha": "MakerWorld wants a captcha — too many downloads in a short time. It clears itself after a while; already fetched models still work.",
+    "makerworld_status": "MakerWorld answered {code}",
+    "makerworld_not_json": "MakerWorld answered something that is not JSON",
+    "makerworld_not_signed_in": "Not signed in to the Bambu account — Settings → Cloud",
+    "makerworld_no_download_url": "MakerWorld gave no download address",
+    "makerworld_download_status": "The download answered {code}",
+    "makerworld_file_too_large": "The file is unexpectedly large — stopped",
+    "makerworld_download_failed": "The download failed: {error}",
+    "makerworld_bad_paging": "offset and limit must be numbers",
+    "makerworld_instance_missing": "The profile number (instance_id) is missing",
+    "makerworld_no_slicer": "Bambu Studio not found — no slicer available",
+    "makerworld_no_mirror": "The SD card mirror is not available",
+    "makerworld_upload_failed": "Sliced, but the file did not reach the printer"
   }
 }

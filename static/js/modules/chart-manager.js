@@ -174,16 +174,16 @@ class ChartManager {
         const kasten = document.getElementById('vl-ruhe');
         if (!kasten) return;
         try {
-            const r = await apiCall('/api/strom/leerlauf?tage=30');
+            const r = await apiCall('/api/power/idle?days=30');
             const d = await r.json();
-            const z = (d && d.zustaende) || {};
+            const z = (d && d.states) || {};
             const texte = window.texts || {};
             const namen = {
                 leerlauf: texte.chart_idle || 'Leerlauf',
                 trocknet: texte.chart_drying || 'Trocknung',
             };
             const teile = Object.keys(namen)
-                .filter(k => z[k] && z[k].punkte > 0)
+                .filter(k => z[k] && z[k].points > 0)
                 .map(k => `<span class="vl-ruhe-teil"><b>${namen[k]}</b> `
                     + `${z[k].mittel_w.toLocaleString(undefined,
                         { maximumFractionDigits: 1 })} W</span>`);

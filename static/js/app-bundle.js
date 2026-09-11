@@ -26,13 +26,13 @@
         pause:    '<path d="M9 5v14M15 5v14"/>',
         stopp:    '<rect x="6" y="6" width="12" height="12" rx="1"/>',
         tropfen:  '<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/>',
-        // ACHTUNG: 'tropfen' oben ist in Wahrheit ein THERMOMETER (Kolben
-        // und Saeule) — der Name taeuscht. Das hier ist der echte Tropfen,
-        // fuer die Luftfeuchte im AMS.
+        // CAREFUL: 'tropfen' above is really a THERMOMETER (bulb and column)
+        // -- the name is misleading. This one is the real drop, for the
+        // humidity in the AMS.
         wasser:   '<path d="M12 3s6 6.4 6 10.4a6 6 0 0 1-12 0C6 9.4 12 3 12 3z"/>',
-        // Die beiden Plaketten am Geraet: Kammer und Heizbett. Sie lagen
-        // bisher nur als data-URI im Template (_progress.html) und fehlten
-        // damit Android und iOS. Aus dem 16er-Raster auf 24 gerechnet.
+        // The two badges on the machine: chamber and heated bed. They used to
+        // sit only as a data URI in the template (_progress.html) and were
+        // therefore missing on Android and iOS. Scaled from the 16 grid to 24.
         kammer:   '<rect x="2.25" y="2.25" width="18.258" height="19.687" rx="0.819"/><rect x="5.656" y="6.349" width="11.445" height="3.284" rx="0.819"/><rect x="5.656" y="14.552" width="7.357" height="3.284" rx="0.819"/>',
         heizbett: '<path d="M7.118 3C7.118 4.209 4.676 4.209 4.676 5.415C4.676 6.623 7.118 6.623 7.118 7.832C7.118 9.04 4.676 9.04 4.676 10.249C4.676 11.457 7.118 11.457 7.118 12.666C7.118 13.874 4.676 13.874 4.676 15.083"/><path d="M13.681 3C13.681 4.209 11.238 4.209 11.238 5.415C11.238 6.623 13.681 6.623 13.681 7.832C13.681 9.04 11.238 9.04 11.238 10.249C11.238 11.457 13.681 11.457 13.681 12.666C13.681 13.874 11.238 13.874 11.238 15.083"/><path d="M20.245 3C20.245 4.209 17.803 4.209 17.803 5.415C17.803 6.623 20.245 6.623 20.245 7.832C20.245 9.04 17.803 9.04 17.803 10.249C17.803 11.457 20.245 11.457 20.245 12.666C20.245 13.874 17.803 13.874 17.803 15.083"/><rect x="3.75" y="18.158" width="17.794" height="2.822" rx="1.411"/>',
         haus:     '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/>',
@@ -46,24 +46,24 @@
         schnee:   '<path d="M12 2v20M4.9 6.5l14.2 11M19.1 6.5 4.9 17.5"/>',
         hoch:     '<path d="M12 19V5M5 12l7-7 7 7"/>',
         runter:   '<path d="M12 5v14M19 12l-7 7-7-7"/>',
-        // Die drei kommen aus der Historie: Suchfeld leeren, Duplikate
-        // ausblenden, Filterblatt oeffnen. Standen dort inline im HTML —
-        // benannt braucht sie auch iOS und Android.
+        // These three come from the history: clear the search field, hide the
+        // duplicates, open the filter sheet. They stood there inline in the
+        // HTML -- named, iOS and Android need them too.
         kreuz:    '<path d="M18 6 6 18M6 6l12 12"/>',
         duplikate:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
         trichter: '<path d="M3 4h18l-7 8.5V20l-4-2v-5.5z"/>',
-        // Blaetterpfeile der Historie (.hv-blaettern) — spitze Winkel, kein
-        // Abspiel-Dreieck.
+        // The paging arrows of the history (.hv-blaettern) -- sharp chevrons,
+        // not a play triangle.
         chevronLinks:  '<path d="M15 18l-6-6 6-6"/>',
         chevronRechts: '<path d="M9 18l6-6-6-6"/>',
-        // Zeitraffer-Bedienung: Vollbild und Sichern.
+        // The timelapse controls: full screen and save.
         vollbild: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>',
         sichern:  '<path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/>',
         regler:   '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/>',
-        // Diese elf standen nur in SkIconPaths.swift und fehlten in dieser
-        // Quelle — ein Lauf des Generators haette sie geloescht (und hat es
-        // am 25aug26 auch getan). Sie gehoeren hierher, damit Web, Android
-        // und iOS dieselben Symbole haben.
+        // These eleven stood only in SkIconPaths.swift and were missing from
+        // this source -- one run of the generator would have deleted them (and
+        // did). They belong here, so that web, Android and iOS have the same
+        // symbols.
         protokoll: '<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/>',
         benutzer: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
         schild: '<path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"/>',
@@ -97,12 +97,12 @@
         waage:    '<path d="M12 4v16M7 20h10"/><path d="M5 9h14l-2 5H7z"/><circle cx="12" cy="4" r="1.5"/>',
         bett:     '<path d="M2 17h20M4 17V9a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8M4 17v3M20 17v3"/>',
         winkel:   '<path d="M4 4v16h16"/><path d="M4 12h8v8"/>',
-        // --- Nachgetragen 24aug26 ------------------------------------------
-        // Diese zehn standen bisher als Inline-SVG im Markup bzw. als IC_*-
-        // Konstanten in sd-card-manager.js, und Android hatte sie von Hand in
-        // SkIcon.kt kopiert. Damit gab es drei Wahrheiten. Jetzt stehen sie
-        // hier — icons.js ist die einzige Quelle, aus der Android und iOS
-        // erzeugt werden (tools/gen_skicon_swift.py).
+        // --- Added later ---------------------------------------------------
+        // These ten used to stand as inline SVG in the markup or as IC_*
+        // constants in sd-card-manager.js, and Android had copied them into
+        // SkIcon.kt by hand. That made three truths. Now they stand here --
+        // icons.js is the single source Android and iOS are generated from
+        // (tools/gen_skicon_swift.py).
         zeit:      '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         gewicht:   '<path d="M12 3v10M7 21h10M6 13h12l-2 8H8z"/>',
         drucker:   '<path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/>',
@@ -113,11 +113,11 @@
         druckbett: '<rect x="1" y="7" width="18" height="11" rx="2"/><path d="M3 12h18"/>',
         kalenderPlan: '<rect x="1" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
         sonneOptionen: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
-        // --- Kartenkoepfe der Statistik (25aug26) ---------------------------
-        // Eigene Zeichnungen, weil die gleichnamigen Symbole oben anders
-        // aussehen (ziel/balken/thermo/regler) oder fehlten. Standen bis
-        // heute nur inline in analytics-dashboard.js — iOS konnte sie damit
-        // nicht zeichnen und nahm SF-Symbole, die anders aussahen.
+        // --- The card heads of the statistics --------------------------------
+        // Drawings of their own, because the symbols of the same name above look
+        // different (ziel/balken/thermo/regler) or were missing. They stood only
+        // inline in analytics-dashboard.js -- iOS could not draw them and took
+        // SF Symbols, which looked different.
         statZiel:    '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
         statBalken:  '<path d="M4 20h16M7 16V8M12 16V4M17 16v-6"/>',
         statVerlauf: '<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>',
@@ -126,9 +126,9 @@
         statPokal:   '<path d="M8 3h8v5a4 4 0 0 1-8 0z"/><path d="M8 5H5v2a3 3 0 0 0 3 3M16 5h3v2a3 3 0 0 1-3 3M10 21h4M12 12v9"/>',
         statThermo:  '<path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/>',
         statRegler:  '<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
-        // --- Wartungen (25aug26) -------------------------------------------
-        // Standen nur inline in static/maintenance.html — iOS zeichnete
-        // dort leere Kacheln, weil es die Pfade nicht kannte.
+        // --- Maintenance -----------------------------------------------------
+        // These stood only inline in static/maintenance.html -- iOS drew empty
+        // tiles there, because it did not know the paths.
         wartung_duese: '<path d="M8 3h8v6l-2 3v9h-4v-9L8 9z"/>',
         wartung_platte: '<rect x="3" y="7" width="18" height="11" rx="2"/><path d="M3 12h18"/>',
         wartung_riemen: '<circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M7 9h10M7 15h10"/>',
@@ -146,10 +146,11 @@
         wartung_schrauber: '<path d="M14.7 6.3a4.5 4.5 0 0 0 6 6l-8.4 8.4a2.1 2.1 0 0 1-3 0l-3-3a2.1 2.1 0 0 1 0-3z"/><path d="M14.7 6.3 18 3"/>',
     };
 
-    /** Nur die Pfad-Bruchstuecke — fuer Aufrufer mit eigener SVG-Huelle. */
+    /** The path fragments only -- for callers with an SVG shell of their own. */
     window.skIconPfad = function (name) { return PFADE[name] || ''; };
 
-    /** SVG-Text für ein Symbol. `zusatz` hängt weitere Klassen an (z.B. 'hd-ic--xs'). */
+    /** The SVG text for one symbol. `zusatz` appends further classes
+     *  (e.g. 'hd-ic--xs'). */
     window.skIcon = function (name, zusatz) {
         const p = PFADE[name];
         if (!p) return '';
@@ -159,24 +160,69 @@
 })();
 
 
+;/* ---- filenames.js ---- */
+/**
+ * What a print file is called — the same answer as on the server, on Android
+ * and on iOS.
+ *
+ * `window.cleanPrintName` was CALLED in six places and defined in none. Every
+ * one of them read
+ *
+ *     window.cleanPrintName ? window.cleanPrintName(x) : x
+ *
+ * so the fallback always won and the web showed the full name with its
+ * suffix — while Android showed it cut and iOS cut it wrongly
+ * (`replacingOccurrences(of: ".3mf")` also hits the middle of a name). Three
+ * clients, three names for one file.
+ */
+(function () {
+    'use strict';
+
+    // Longest first: `.gcode.3mf` has to be tested before `.3mf`, or the
+    // shorter one wins and eats half of it.
+    const SUFFIXES = ['.gcode.3mf', '.gcode', '.gco', '.3mf', '.g'];
+
+    /** The name without its print suffix — for SHOWING, never for sending. */
+    function cleanPrintName(name) {
+        const n = (name || '').trim();
+        if (!n) return '';
+        const lower = n.toLowerCase();
+        for (const suffix of SUFFIXES) {
+            if (lower.endsWith(suffix)) return n.slice(0, -suffix.length);
+        }
+        return n;
+    }
+
+    /** Is this a print file at all? */
+    function isPrintFile(name) {
+        const n = (name || '').trim().toLowerCase();
+        return !!n && SUFFIXES.some(s => n.endsWith(s));
+    }
+
+    window.cleanPrintName = cleanPrintName;
+    window.isPrintFile = isPrintFile;
+    window.PRINT_SUFFIXES = SUFFIXES.slice();
+})();
+
+
 ;/* ---- image-utils.js ---- */
-// Notnagel fuer skIcon (icons.js): Seiten, die nur einen Teil der Module
-// laden — und ein Buendel, das nach einer neuen Moduldatei noch nicht neu
-// gebaut wurde — sollen kein Symbol bekommen, aber auch nicht abstuerzen.
+// A stopgap for skIcon (icons.js): pages that load only some of the modules --
+// and a bundle that has not been rebuilt after a new module file -- should get
+// no symbol, but should not crash either.
 window.skIcon = window.skIcon || function () { return ''; };
 
 /**
- * Bildtyp aus Base64-Daten bestimmen.
+ * Determine the image type from base64 data.
  *
- * Thumbnails kommen aus zwei Quellen: freigestellte Slicer-Vorschauen (PNG,
- * mit Transparenz) und Kamera-Schnappschuesse (JPEG). Vorher stand der Typ
- * an jeder Anzeigestelle fest verdrahtet — und damit an einer davon falsch.
+ * Thumbnails come from two sources: cut-out slicer previews (PNG, with
+ * transparency) and camera snapshots (JPEG). The type used to be hard-wired at
+ * every place that shows one -- and was therefore wrong at one of them.
  */
 (function (global) {
     'use strict';
 
-    // Signaturen am Anfang der Base64-Zeichenkette: PNG beginnt mit \x89PNG,
-    // JPEG mit \xFF\xD8\xFF, GIF mit "GIF8".
+    // The signatures at the start of the base64 string: PNG begins with
+    // \x89PNG, JPEG with \xFF\xD8\xFF, GIF with "GIF8".
     const SIGNATURES = [
         ['iVBORw0KGgo', 'image/png'],
         ['/9j/', 'image/jpeg'],
@@ -202,33 +248,31 @@ window.skIcon = window.skIcon || function () { return ''; };
 
 ;/* ---- hms-severity.js ---- */
 /**
- * HMS-Hinweis oder echter Fehler?
+ * An HMS notice or a real error?
  *
- * Der Drucker kodiert den Schweregrad in den Code selbst — deshalb braucht
- * es dafuer keine gepflegte Liste. Vorher hatte jede Oberflaeche (Web,
- * Android, iOS, Server) ihre eigene Aufzaehlung mit zwei Codes im kurzen
- * Format "0300-8013", die auf die 16-stelligen Codes aus hms_list nie
- * passte: eine offene Vordertuer kam damit als roter "⚠️ Druckerfehler"
- * mit Vibration durch.
+ * The printer encodes the severity in the code itself -- so no maintained list
+ * is needed for it. Every front end (web, Android, iOS, the server) used to
+ * have its own enumeration with two codes in the short format "0300-8013",
+ * which never matched the 16-digit codes from hms_list: an open front door came
+ * through as a red "printer error" with a vibration.
  *
- * Spiegelt mixins/progress/constants.py (hms_stufe_aus_code /
- * hms_ist_hinweis). Aendert sich die Regel dort, gehoert sie hier mit
- * angepasst.
+ * Mirrors mixins/progress/constants.py (hms_stufe_aus_code / hms_ist_hinweis).
+ * If the rule changes there, it wants changing here too.
  */
 (function (global) {
     'use strict';
 
-    // Kurze print_error-Codes ohne Schweregrad-Feld — nur die brauchen
-    // noch eine gepflegte Aufzaehlung.
+    // The short print_error codes without a severity field -- only those still
+    // need a maintained enumeration.
     const INFO_HMS_CODES = ['0300-8013', '0300-8004'];
 
     /**
-     * Schweregrad-Ziffer aus dem Code (0 = nicht ermittelbar).
+     * The severity digit out of the code (0 = cannot be determined).
      *
      *     0300940000030001
-     *     ^^^^^^^^          attr (Modul + Bauteil)
-     *             ^^^^      1 fatal, 2 ernst, 3 normal, 4 Hinweis
-     *                 ^^^^  laufende Nummer
+     *     ^^^^^^^^          attr (module and part)
+     *             ^^^^      1 fatal, 2 serious, 3 normal, 4 notice
+     *                 ^^^^  the running number
      */
     function hmsStufeAusCode(code) {
         const text = String(code || '').replace(/[-_]/g, '').trim();
@@ -238,18 +282,18 @@ window.skIcon = window.skIcon || function () { return ''; };
     }
 
     /**
-     * Hinweis (blaues Fenster am Drucker) statt Fehler?
+     * A notice (the blue window on the printer) rather than an error?
      *
-     * Stufe 3 ("normal") und 4 ("Hinweis") sind Meldungen, die den Druck
-     * nicht gefaehrden: offene Tuer, langsam kuehlende Kammer, Bett ueber
-     * Solltemperatur.
+     * Levels 3 ("normal") and 4 ("notice") are messages that do not endanger
+     * the print: an open door, a chamber cooling slowly, the bed above its
+     * target temperature.
      *
-     * @param {Object|string} fehler Fehlerobjekt vom Server (mit is_info)
-     *                               oder blosser Code.
+     * @param {Object|string} fehler the error object from the server (carrying
+     *                               is_info), or a bare code.
      */
     function hmsIstHinweis(fehler) {
         if (fehler && typeof fehler === 'object') {
-            // Der Server schickt die Einstufung mit — die gewinnt.
+            // The server sends its classification along -- that wins.
             if (typeof fehler.is_info === 'boolean') return fehler.is_info;
             return hmsIstHinweis(fehler.code);
         }
@@ -303,7 +347,7 @@ window.skIcon = window.skIcon || function () { return ''; };
     function setzeStartKnopf(daten) {
         const knopf = document.getElementById('prep-start');
         if (!knopf) return;
-        knopf.textContent = daten && daten.spulenauswahl_noetig
+        knopf.textContent = daten && daten.spool_choice_needed
             ? t('print_prepare_continue', 'Weiter')
             : t('print', 'Drucken');
     }
@@ -448,17 +492,17 @@ window.skIcon = window.skIcon || function () { return ''; };
     function feuchteHinweis() {
         const daten = feuchteStand;
         if (!daten) return null;
-        const nass = (daten.spulen || []).filter(sp => sp.urteil === 'trocknen');
+        const nass = (daten.spools || []).filter(sp => sp.verdict === 'trocknen');
         if (!nass.length) return null;
         // The longest time sitting sets the tone — it's the reason given.
-        nass.sort((a, b) => b.tage_ueber - a.tage_ueber);
+        nass.sort((a, b) => b.days_above - a.days_above);
         const s = nass[0];
         return {
             text: t('dry_spool_wet', 'Fach {slot} ({typ}) lag {n} Tage über {s} % Feuchte.')
                 .replace('{slot}', s.slot + 1)
-                .replace('{typ}', s.typ || '?')
-                .replace('{n}', s.tage_ueber.toFixed(s.tage_ueber < 10 ? 1 : 0))
-                .replace('{s}', daten.schwelle),
+                .replace('{typ}', s.type || '?')
+                .replace('{n}', s.days_above.toFixed(s.days_above < 10 ? 1 : 0))
+                .replace('{s}', daten.threshold),
         };
     }
 
@@ -467,8 +511,8 @@ window.skIcon = window.skIcon || function () { return ''; };
     let feuchteStand = null;
 
     async function holeFeuchte() {
-        if (!window.amsFeuchte) return null;
-        try { feuchteStand = await window.amsFeuchte.hole(14); } catch (e) { feuchteStand = null; }
+        if (!window.amsHumidity) return null;
+        try { feuchteStand = await window.amsHumidity.hole(14); } catch (e) { feuchteStand = null; }
         return feuchteStand;
     }
 
@@ -827,19 +871,19 @@ window.skIcon = window.skIcon || function () { return ''; };
 
 ;/* ---- thumb-preview.js ---- */
 /**
- * Thumbnail-Vorschau: Maus ueber ein Thumbnail -> grosse Ansicht daneben.
+ * The thumbnail preview: mouse over a thumbnail -> a large view beside it.
  *
- * Arbeitet mit Ereignis-Delegation am document, damit auch Thumbnails
- * abgedeckt sind, die erst spaeter nachgeladen werden (Verlaufsliste,
- * SD-Karte, Plattenauswahl). Kein Aufruf pro Anzeigestelle noetig.
+ * It works through event delegation on the document, so thumbnails that are
+ * only loaded later are covered too (the history list, the SD card, the plate
+ * picker). No call is needed per place that shows one.
  */
 (function () {
     'use strict';
 
-    // Alle Thumbnail-Bilder der Oberflaeche.
-    // Die Live-Kachel auf dem Dashboard bleibt bewusst aussen vor: dort wird
-    // das Bild ohnehin schon gross angezeigt, die Vorschau waere kaum
-    // groesser als das Original.
+    // Every thumbnail image in the interface.
+    // The live tile on the dashboard is deliberately left out: the image is
+    // already shown large there, and the preview would be barely bigger than
+    // the original.
     const SELECTOR = [
         '.hist-thumb',                // Verlaufsliste
         '.hist-detail-thumb',         // Verlaufs-Detail
@@ -855,8 +899,8 @@ window.skIcon = window.skIcon || function () { return ''; };
     let boxImg = null;
     let activeSource = null;
 
-    // Geraete ohne echten Zeiger (Touch) haben kein Hover — dort wuerde die
-    // Vorschau beim Tippen aufblitzen und stehen bleiben.
+    // Devices without a real pointer (touch) have no hover -- there the preview
+    // would flash up on a tap and stay.
     function hasHover() {
         return window.matchMedia && window.matchMedia('(hover: hover)').matches;
     }
@@ -875,13 +919,14 @@ window.skIcon = window.skIcon || function () { return ''; };
         const w = box.offsetWidth;
         const h = box.offsetHeight;
 
-        // Bevorzugt rechts neben das Thumbnail, sonst links, sonst angelegt.
+        // Preferably to the right of the thumbnail, otherwise to the left,
+        // otherwise flush against it.
         let left = r.right + GAP;
         if (left + w > window.innerWidth - MARGIN) left = r.left - GAP - w;
         if (left < MARGIN) left = Math.min(
             Math.max(MARGIN, r.left), window.innerWidth - w - MARGIN);
 
-        // Mittig zur Bildhoehe, aber vollstaendig im Fenster.
+        // Centred on the image height, but fully inside the window.
         let top = r.top + r.height / 2 - h / 2;
         top = Math.min(Math.max(MARGIN, top), window.innerHeight - h - MARGIN);
 
@@ -903,8 +948,8 @@ window.skIcon = window.skIcon || function () { return ''; };
         boxImg.style.maxWidth = (MAX_SIDE - 16) + 'px';
         boxImg.style.maxHeight = (MAX_SIDE - 16) + 'px';
 
-        // Erst positionieren, wenn die Groesse feststeht — sonst springt die
-        // Vorschau beim ersten Anzeigen.
+        // Position it only once the size is known -- otherwise the preview
+        // jumps the first time it is shown.
         const place = () => {
             if (activeSource !== source) return;
             position(source);
@@ -940,7 +985,7 @@ window.skIcon = window.skIcon || function () { return ''; };
         hide();
     });
 
-    // Beim Scrollen oder Groessenaendern wandert das Thumbnail weg.
+    // On scrolling or resizing the thumbnail moves away.
     window.addEventListener('scroll', hide, true);
     window.addEventListener('resize', hide);
 })();
@@ -948,8 +993,8 @@ window.skIcon = window.skIcon || function () { return ''; };
 
 ;/* ---- theme-manager.js ---- */
 /**
- * Theme Manager - Verwaltet Dark/Light Mode für die gesamte App
- * Wird von allen Seiten gemeinsam genutzt
+ * The theme manager - handles dark and light mode for the whole app.
+ * Shared by every page.
  */
 class ThemeManager {
     constructor() {
@@ -961,7 +1006,7 @@ class ThemeManager {
         this.applyTheme();
         this.updateIcons();
 
-        // Event Listener für System-Theme-Änderungen
+        // The event listener for changes of the system theme
         if (window.matchMedia) {
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 if (this.theme === 'auto') {
@@ -972,7 +1017,7 @@ class ThemeManager {
     }
 
     /**
-     * Wechselt zwischen Dark/Light/Auto Mode
+     * Cycles between the dark, light and auto modes
      */
     toggleTheme() {
         const themes = ['auto', 'dark', 'light'];
@@ -988,13 +1033,13 @@ class ThemeManager {
     }
 
     /**
-     * Wendet das aktuelle Theme an
+     * Applies the current theme
      */
     applyTheme() {
         const body = document.body;
 
         if (this.theme === 'auto') {
-            // System-Präferenz verwenden
+            // Use the system preference
             const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             body.classList.toggle('dark-mode', prefersDark);
         } else if (this.theme === 'dark') {
@@ -1010,7 +1055,9 @@ class ThemeManager {
     updateIcons() {
         const symbol = this.theme === 'auto' ? 'halbmond' : (this.theme === 'dark' ? 'mond' : 'sonne');
         const iconText = (typeof window.skIcon === 'function') ? window.skIcon(symbol) : '';
-        const labelText = this.theme === 'auto' ? 'Auto (System)' : (this.theme === 'dark' ? 'Dark Mode' : 'Light Mode');
+        const tx = window.texts || {};
+        const labelText = this.theme === 'auto' ? (tx.theme_auto || 'Automatisch (System)')
+            : (this.theme === 'dark' ? (tx.theme_dark || 'Dunkel') : (tx.theme_light || 'Hell'));
 
         const headerIcon = document.getElementById('theme-icon');
         const sidebarIcon = document.getElementById('theme-icon-sidebar'); // Legacy
@@ -1020,7 +1067,7 @@ class ThemeManager {
         if (headerIcon) headerIcon.innerHTML = iconText;
         if (sidebarIcon) sidebarIcon.innerHTML = iconText;
         if (settingsIcon) settingsIcon.innerHTML = iconText;
-        if (settingsLabel) settingsLabel.textContent = `Aktuell: ${labelText}`;
+        if (settingsLabel) settingsLabel.textContent = (tx.theme_current || 'Aktuell: {theme}').replace('{theme}', labelText);
 
         // Update meta theme-color for PWA
         const darkMeta = document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');
@@ -1030,14 +1077,14 @@ class ThemeManager {
     }
 
     /**
-     * Gibt den aktuellen Theme-Status zurück
+     * Returns the current theme state
      */
     getCurrentTheme() {
         return this.theme;
     }
 
     /**
-     * Gibt zurück ob Dark Mode aktiv ist
+     * Returns whether dark mode is active
      */
     isDarkMode() {
         if (this.theme === 'auto') {
@@ -1050,15 +1097,33 @@ class ThemeManager {
 // Globale Instanz erstellen
 window.themeManager = new ThemeManager();
 
-// Backwards Compatibility: Alte Funktionen behalten
+// Backwards compatibility: the old functions are kept
 window.toggleDarkMode = () => window.themeManager.toggleTheme();
 window.applyStoredTheme = () => window.themeManager.applyTheme();
 
 
 ;/* ---- i18n-manager.js ---- */
 /**
- * I18n Manager - Verwaltet Internationalisierung für die gesamte App
- * Wird von allen Seiten gemeinsam genutzt
+ * Every request to this server says which language the page shows: texts the
+ * server writes into its answer (an error in a toast) come back in it.
+ */
+(function () {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = function (input, init) {
+        const url = typeof input === 'string' ? input : (input && input.url) || '';
+        const sameServer = url.startsWith('/api/') || url.startsWith(location.origin + '/api/');
+        if (!sameServer) return originalFetch(input, init);
+        let lang = 'de';
+        try { lang = localStorage.getItem('language') || 'de'; } catch (e) { /* no storage: German, the page's default */ }
+        const headers = new Headers((init && init.headers) || (typeof input !== 'string' && input.headers) || {});
+        if (!headers.has('X-App-Language')) headers.set('X-App-Language', lang);
+        return originalFetch(input, Object.assign({}, init, { headers }));
+    };
+})();
+
+/**
+ * The i18n manager - handles the internationalisation for the whole app.
+ * Shared by every page.
  */
 class I18nManager {
     constructor() {
@@ -1069,13 +1134,13 @@ class I18nManager {
     }
 
     init() {
-        // Sprache aus URL oder localStorage laden
+        // Load the language from the URL or from localStorage
         const urlParams = new URLSearchParams(window.location.search);
         const urlLang = urlParams.get('lang');
 
         this.currentLang = urlLang || localStorage.getItem('language') || 'de';
 
-        // Translations Map erstellen (erwartet dass Sprachdateien bereits geladen sind)
+        // Build the translations map (it expects the language files to be loaded already)
         this.translationsMap = {
             'de': typeof translations_de !== 'undefined' ? translations_de : {},
             'en': typeof translations_en !== 'undefined' ? translations_en : {},
@@ -1086,13 +1151,13 @@ class I18nManager {
 
         this.texts = this.translationsMap[this.currentLang] || this.translationsMap['en'] || {};
 
-        // Übersetzungen anwenden
+        // Apply the translations
         this.applyTranslations();
     }
 
     /**
-     * Wechselt die Sprache
-     * @param {string} lang - Sprachcode (de, en, fr, es, it)
+     * Switch the language
+     * @param {string} lang - the language code (de, en, fr, es, it)
      */
     switchLanguage(lang) {
         localStorage.setItem('language', lang);
@@ -1100,16 +1165,16 @@ class I18nManager {
     }
 
     /**
-     * Holt einen übersetzten Text
-     * @param {string} key - Übersetzungsschlüssel
-     * @param {string} fallback - Fallback-Text
+     * Fetch a translated text
+     * @param {string} key - the translation key
+     * @param {string} fallback - the fallback text
      */
     getText(key, fallback = '') {
         return this.texts && this.texts[key] ? this.texts[key] : fallback;
     }
 
     /**
-     * Wendet Übersetzungen auf Elemente mit data-i18n an
+     * Applies the translations to the elements carrying data-i18n
      */
     applyTranslations() {
         const elements = document.querySelectorAll('[data-i18n]');
@@ -1120,36 +1185,46 @@ class I18nManager {
                 el.textContent = translation;
             }
         });
-        // Platzhalter in Suchfeldern: standen sonst in jeder Sprache deutsch da.
+        // The placeholders in the search fields: they otherwise stood there in
+        // German whatever the language.
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const t = this.getText(el.getAttribute('data-i18n-placeholder'));
             if (t) el.setAttribute('placeholder', t);
         });
-        // Sprechblasen (title). hms-banner.js setzt data-i18n-title seit je,
-        // nur hat es hier niemand ausgewertet -- die Blase blieb deutsch
-        // (01sep26). Dasselbe Muster wie oben, ein Attribut weiter.
+        // The tooltips (title). hms-banner.js has always set data-i18n-title,
+        // only nobody evaluated it here -- so the tooltip stayed German. The
+        // same pattern as above, one attribute further.
         document.querySelectorAll('[data-i18n-title]').forEach(el => {
             const t = this.getText(el.getAttribute('data-i18n-title'));
             if (t) el.setAttribute('title', t);
         });
+        // Screen-reader labels and image alternatives, the same pattern.
+        document.querySelectorAll('[data-i18n-aria-label]').forEach(el => {
+            const t = this.getText(el.getAttribute('data-i18n-aria-label'));
+            if (t) el.setAttribute('aria-label', t);
+        });
+        document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+            const t = this.getText(el.getAttribute('data-i18n-alt'));
+            if (t) el.setAttribute('alt', t);
+        });
     }
 
     /**
-     * Gibt die aktuelle Sprache zurück
+     * Returns the current language
      */
     getCurrentLang() {
         return this.currentLang;
     }
 
     /**
-     * Gibt alle Übersetzungen zurück
+     * Returns every translation
      */
     getAllTexts() {
         return this.texts;
     }
 }
 
-// Globale Instanz erstellen (nach DOM-Load)
+// Create the global instance (after the DOM has loaded)
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         window.i18nManager = new I18nManager();
@@ -1158,7 +1233,7 @@ if (document.readyState === 'loading') {
     window.i18nManager = new I18nManager();
 }
 
-// Backwards Compatibility: Alte Funktionen behalten
+// Backwards compatibility: the old functions are kept
 window.switchLanguage = (lang) => {
     if (window.i18nManager) {
         window.i18nManager.switchLanguage(lang);
@@ -1173,6 +1248,22 @@ window.getText = (key, fallback = '') => {
         return window.i18nManager.getText(key, fallback);
     }
     return fallback;
+};
+
+/**
+ * A status text the server sent. With `message_key` it is translated here and
+ * `message_args` fill {0}, {1} ...; without one, `message` is shown as it is --
+ * the server only sends language-neutral text then ("3 ⬇️ / 0 ⬆️").
+ */
+window.serverText = function (data) {
+    if (!data) return '';
+    if (!data.message_key) return data.message || '';
+    const text = (window.texts || {})[data.message_key];
+    if (!text) {
+        console.warn(`serverText: no translation for ${data.message_key} -- showing the server's text`);
+        return data.message || '';
+    }
+    return (data.message_args || []).reduce((s, arg, i) => s.split(`{${i}}`).join(String(arg)), text);
 };
 
 
@@ -1200,8 +1291,8 @@ class TabBarManager {
         if (path.includes('bedmesh.html')) return 'bedmesh';
         if (path.includes('mainsail.html')) return 'mainsail';
         if (path.includes('users.html') || path.includes('/users')) return 'users';
-        // Seiten ohne eigenen Reiter (z.B. Benachrichtigungen) markierten
-        // sonst faelschlich "Home" als aktiv.
+        // Pages without a tab of their own (notifications, say) otherwise
+        // wrongly marked "home" as active.
         if (path.includes('notifications.html')) return '';
         return 'dashboard';
     }
@@ -1210,21 +1301,24 @@ class TabBarManager {
      * Generate tab bar HTML
      */
     generateHTML() {
-        // Reihenfolge wie Android (Direct-Modus): Home, Konsole, Bed Mesh, Historie,
-        // Wartung, Einstellungen. Slicer + Users sind im Direct-Modus ausgeblendet.
+        // The same order as Android (direct mode): home, console, bed mesh,
+        // history, maintenance, settings. Slicer and users are hidden in direct
+        // mode.
         const tabs = [
             { id: 'dashboard', icon: 'fa-solid fa-house', label: 'Home', href: '/', desktopOnly: false },
             { id: 'logs', icon: 'fa-solid fa-terminal', label: 'Konsole', href: '/static/logs.html', desktopOnly: true },
-            // Bed Mesh: nur im Klipper-Direct-Modus (per _applyDirectMode eingeblendet).
+            // Bed mesh: only in Klipper direct mode (shown by _applyDirectMode).
             { id: 'bedmesh', icon: 'fa-solid fa-mountain', label: 'Bed Mesh', href: '/static/bedmesh.html', desktopOnly: false, directOnly: true },
             { id: 'history', icon: 'fa-solid fa-clock-rotate-left', label: 'History', href: '/static/history.html', desktopOnly: false },
             { id: 'maintenance', icon: 'fa-solid fa-wrench', label: 'Wartung', href: '/static/maintenance.html', desktopOnly: true },
-            // Mainsail: nur im Klipper-Direct-Modus. Lädt die Drucker-Web-UI eingebettet
-            // in der App (Electron <webview>; im Browser Fallback "im Browser öffnen").
+            // Mainsail: only in Klipper direct mode. It loads the printer web UI
+            // embedded in the app (an Electron <webview>; in a browser the
+            // fallback is "open in the browser").
             { id: 'mainsail', icon: 'fa-solid fa-gauge-high', label: 'Mainsail', href: '/static/mainsail.html', desktopOnly: false, directOnly: true },
-            // Slicer: im Direct-Modus ausgeblendet (Slicing läuft dort nicht über dieses Backend).
+            // Slicer: hidden in direct mode (slicing does not run through this
+            // backend there).
             { id: 'slicer', icon: 'fa-solid fa-cube', label: 'Slicer', href: '/static/slicer.html', desktopOnly: false, hideInDirect: true },
-            // Users: im Direct-Modus ausgeblendet (kein Multi-User-Backend).
+            // Users: hidden in direct mode (there is no multi-user backend).
             { id: 'users', icon: 'fa-solid fa-user-group', label: 'Users', href: '/static/users.html', desktopOnly: false, hideInDirect: true },
             { id: 'settings', icon: 'fa-solid fa-gear', label: '', href: this.getSettingsHref(), desktopOnly: false }
         ];
@@ -1246,7 +1340,7 @@ class TabBarManager {
                            tab.id === 'logs' ? 'logs' :
                            tab.id === 'history' ? 'history' : '';
 
-            // direct-only Tabs starten versteckt; _applyDirectMode blendet sie ein.
+            // The direct-only tabs start hidden; _applyDirectMode shows them.
             const style = tab.directOnly ? ' style="display:none;"' : '';
             return `
                 <a class="${classes.join(' ')}" href="${tab.href}" data-tab-id="${tab.id}"${style} ${tab.id === 'settings' && this.currentPage === 'dashboard' ? `onclick="event.preventDefault(); openSettings();"` : ''}>
@@ -1290,7 +1384,7 @@ class TabBarManager {
             window.i18nManager.applyTranslations();
         }
 
-        // Klipper-Direct: Users raus, Bed Mesh rein (async, sobald Config da).
+        // Klipper-Direct: users out, bed mesh in (async, as soon as the config is there).
         this._applyDirectMode();
 
         // Mainsail-Tab bei offline ausgrauen.
@@ -1298,25 +1392,26 @@ class TabBarManager {
     }
 
     /**
-     * Mainsail-Tab deaktivieren wenn der Drucker offline ist (Mainsail ist dann
-     * eh nicht erreichbar) — AUSSER im host_mode "external", wo Mainsail auf
-     * dem always-on-Host liegt und durchgehend erreichbar bleibt. Wird bei jedem Status-Wechsel erneut aufgerufen
-     * (updatePrinterDependentCards). Ist der Online-Status (noch) unbekannt —
-     * z.B. auf Seiten ohne Socket — bleibt der Tab aktiv (die Mainsail-Seite
-     * fängt offline selbst ab).
+     * Disable the Mainsail tab while the printer is offline (Mainsail is
+     * unreachable then anyway) -- EXCEPT in host_mode "external", where
+     * Mainsail sits on the always-on host and stays reachable throughout.
+     * Called again on every state change (updatePrinterDependentCards). While
+     * the online state is (still) unknown -- on pages without a socket, for
+     * instance -- the tab stays enabled (the Mainsail page catches being
+     * offline itself).
      */
     updateMainsailState() {
         const el = document.querySelector('.tab-item[data-tab-id="mainsail"]');
         if (!el) return;
-        // Always-on-Host (host_mode=external): Mainsail laeuft auf dem Host,
-        // nicht im Drucker — es bleibt also auch bei ausgeschalteter Steckdose
-        // erreichbar. Tab dann NIE ausgrauen.
+        // An always-on host (host_mode=external): Mainsail runs on the host,
+        // not in the printer -- so it stays reachable even with the socket
+        // switched off. The tab is then NEVER greyed out.
         if (window.lastHostMode === 'external') {
             el.classList.remove('tab-disabled');
             return;
         }
-        // Ohne eingerichtete Steckdose entscheidet die Verbindung -- die
-        // Antwort steht in status-manager.js, hier wird sie nur gelesen.
+        // Without a socket set up, the connection decides -- the answer lives
+        // in status-manager.js, here it is only read.
         const online = (typeof window.druckerDa === 'boolean') ? window.druckerDa
             : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
         const hasInfo = window.lastMqttStatus !== undefined || window.lastKnownSwitchState !== undefined;
@@ -1324,12 +1419,13 @@ class TabBarManager {
     }
 
     /**
-     * Blendet im Klipper-Direct-Modus den Bed-Mesh-Tab ein und den Users-Tab
-     * aus. Die /api/config-Abfrage wird global gecacht, damit nicht jede Seite
-     * neu fragt. direct_mode kommt nur vom lokalen Adapter (Bambu-Backend: falsy).
+     * In Klipper direct mode this shows the bed mesh tab and hides the users
+     * tab. The /api/config query is cached globally, so not every page asks
+     * again. direct_mode comes only from the local adapter (from the Bambu
+     * backend it is falsy).
      */
     _applyDirectMode() {
-        // Dokumentweit: greift Tab-Bar UND Header-Button (.hide-in-direct).
+        // Document-wide: this covers the tab bar AND the header button (.hide-in-direct).
         window.__directCfgPromise = window.__directCfgPromise ||
             fetch('/api/config', { credentials: 'same-origin' }).then(r => r.json()).catch(() => ({}));
         window.__directCfgPromise.then(cfg => {
@@ -1352,11 +1448,11 @@ window.tabBarManager = new TabBarManager();
  * Custom confirmation dialog replacing native confirm()
  */
 /**
- * Ein Fenster ueber alles legen, was gerade sichtbar ist.
+ * Put one window above everything that is visible right now.
  *
- * Feste z-index-Zahlen gehen schief, sobald ein Dialog aus einem Dialog
- * aufgeht: die Bestaetigung stand auf 9999, der Fach-Dialog auf 10050 —
- * also lag die Frage dahinter und war nicht zu sehen.
+ * Fixed z-index numbers go wrong as soon as a dialog opens out of a dialog:
+ * the confirmation sat at 9999 and the tray dialog at 10050 -- so the question
+ * lay behind it and could not be seen.
  */
 window.skNachVorn = function (el, mindestens) {
     let oben = mindestens || 1000;
@@ -1372,12 +1468,35 @@ window.skNachVorn = function (el, mindestens) {
 };
 
 class ConfirmDialogManager {
-    show(message, onConfirm, onCancel) {
+    /**
+     * Ask a yes/no question.
+     *
+     * `optionen.knopf` is the label of the confirming button and
+     * `optionen.gefaehrlich` paints it as destructive. Both used to be
+     * fixed: every caller got `texts.confirm_ok`, and that key reads
+     * "Delete" in all five languages. So the question "not enough filament
+     * -- print anyway?" was answered with a red DELETE, and so were the
+     * emergency stop, the page reload and the power-off. Deleting is now
+     * something a caller asks for; the default is a plain yes.
+     */
+    show(message, onConfirm, onCancel, optionen = {}) {
+        // A caller may hand in { text, knopf, gefaehrlich } instead of a bare
+        // string. The button belongs to the question, and the closing brace of
+        // a callback is an awkward place to append an argument.
+        if (message && typeof message === 'object') {
+            optionen = message;
+            message = optionen.text;
+        }
+
         // Remove any existing confirm dialog
         const existing = document.getElementById('customConfirmDialog');
         if (existing) existing.remove();
 
         const texts = window.texts || {};
+        const knopfText = optionen.knopf || texts.confirm_yes || 'OK';
+        const knopfStil = optionen.gefaehrlich
+            ? 'background:rgba(244,67,54,0.12); border-color:rgba(244,67,54,0.25); color:#c62828;'
+            : '';
 
         const modal = document.createElement('div');
         modal.id = 'customConfirmDialog';
@@ -1396,7 +1515,7 @@ class ConfirmDialogManager {
                     <div style="color:var(--text-primary); font-size:14px; line-height:1.6; white-space:pre-wrap;">${message}</div>
                     <div class="temp-actions" style="margin-top:20px;">
                         <button class="temp-btn temp-btn--cancel" id="confirm-cancel-btn">${texts.cancel || 'Abbrechen'}</button>
-                        <button class="temp-btn temp-btn--apply" id="confirm-ok-btn" style="background:rgba(244,67,54,0.12); border-color:rgba(244,67,54,0.25); color:#c62828;">${texts.confirm_ok || 'OK'}</button>
+                        <button class="temp-btn temp-btn--apply" id="confirm-ok-btn" style="${knopfStil}">${knopfText}</button>
                     </div>
                 </div>
             </div>
@@ -1425,11 +1544,13 @@ class ConfirmDialogManager {
 window.confirmDialogManager = new ConfirmDialogManager();
 
 // Backwards compatibility
-window.showConfirmDialog = (message, onConfirm, onCancel) => window.confirmDialogManager.show(message, onConfirm, onCancel);
+window.showConfirmDialog = (message, onConfirm, onCancel, optionen) =>
+    window.confirmDialogManager.show(message, onConfirm, onCancel, optionen);
 
-// Promise-Variante (statt nativem confirm): `if (!await skConfirm(msg)) return;`
-// SELBSTSTÄNDIG (eigene Inline-Styles) → funktioniert auf JEDER Seite, auch ohne
-// das App-CSS (Unterseiten wie settings/slicer/maintenance laden es nicht).
+// The promise variant (instead of the native confirm):
+// `if (!await skConfirm(msg)) return;`
+// SELF-CONTAINED (its own inline styles) -> it works on EVERY page, even without
+// the app CSS (subpages like settings, slicer and maintenance do not load it).
 window.skConfirm = (message, opts) => new Promise((resolve) => {
     const o = opts || {};
     const texts = window.texts || {};
@@ -1466,18 +1587,18 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
     ok.focus();
 });
 
-// Selbststaendiger Toast (ersetzt natives alert()). Bringt eigenes CSS mit
-// und laeuft daher auf JEDER Seite gleich — auch auf den Unterseiten
-// (settings, logs, slicer), die das App-CSS nicht laden.
+// A self-contained toast (it replaces the native alert()). It brings its own
+// CSS and therefore behaves the same on EVERY page -- including the subpages
+// (settings, logs, slicer) that do not load the app CSS.
 //
-// Aufbau seit 21aug26 nach dem freigegebenen Entwurf: oben rechts statt unten
-// mittig, Typ an Farbstreifen und Symbol erkennbar, zweite Zeile fuer den
-// Bezug ("Spule aktiviert" allein sagt nicht welche), optionale Handlung
-// daneben, Restzeit als Balken, Stapel statt Ueberschreiben.
+// The layout follows the approved design: top right instead of bottom centre,
+// the type recognisable from a colour stripe and an icon, a second line for the
+// context ("spool activated" alone does not say which one), an optional action
+// beside it, the remaining time as a bar, stacking instead of overwriting.
 //
-// skToast(text)                      — wie bisher
-// skToast(text, 'success')           — Typ erzwingen
-// skToast(text, 'success', 6000)     — Dauer in ms (Rueckwaertskompatibel)
+// skToast(text)                      -- as before
+// skToast(text, 'success')           -- force the type
+// skToast(text, 'success', 6000)     -- duration in ms (backwards compatible)
 // skToast(text, 'success', { detail, farbe, aktion: {text, onClick}, dauer })
 (function () {
     'use strict';
@@ -1535,9 +1656,9 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         const o = (drittes && typeof drittes === 'object') ? drittes : {};
         const dauer = (typeof drittes === 'number' ? drittes : o.dauer) || 4000;
 
-        // Typ aus fuehrendem Status-Emoji ableiten und das Emoji entfernen —
-        // der Toast bringt sein eigenes Symbol mit. So bleibt jeder alte
-        // Aufruf skToast('…', 'success') unveraendert richtig.
+        // Derive the type from a leading status emoji and strip the emoji --
+        // the toast brings its own icon. That keeps every old call
+        // skToast('…', 'success') correct, unchanged.
         let msg = String(message == null ? '' : message);
         const m = msg.match(/^\s*(✅|✔️?|⚠️?|❌|⛔|🚫|ℹ️?|🖨️?|📹|🌡️?|🔌|💧|⏹️?|🎨|📥|🧵)\s*/u);
         if (m) {
@@ -1586,7 +1707,7 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
             <button class="sk-toast-zu" aria-label="${sicher(hole('cancel') || 'Schliessen')}">×</button>
             <div class="sk-toast-balken"></div>`;
 
-        // Neueste oben — man liest von oben.
+        // The newest on top -- people read from the top.
         host.insertBefore(el, host.firstChild);
         requestAnimationFrame(() => el.classList.add('sk-an'));
 
@@ -1614,8 +1735,8 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         };
 
         laufen();
-        // Mit der Maus darauf haelt die Zeit an — sonst verschwindet die
-        // Meldung genau dann, wenn man sie liest.
+        // With the mouse on it the clock stops -- otherwise the message
+        // disappears exactly while it is being read.
         el.addEventListener('mouseenter', anhalten);
         el.addEventListener('mouseleave', () => {
             const anteil = parseFloat(balken.style.width) || 0;
@@ -1635,18 +1756,17 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
 })();
 
 /**
- * Erfolgs- und Fehlermeldungen der Unterseiten.
+ * Success and error messages on the subpages.
  *
- * Vorher hatte jede Seite ihren eigenen Weg: Wartung und Benutzer zeigten
- * einen Balken im Seitenfluss, der den Inhalt verschob; lief die Seite in
- * der Electron-App, uebernahm deren window.showToast und blendete einen
- * Dialog MITTEN ins Bild, den man wegklicken musste — fuer ein "erledigt
- * markiert". Jetzt ueberall derselbe Stapel oben rechts wie bei allen
- * anderen Meldungen.
+ * Every page used to have its own way: maintenance and users showed a bar in
+ * the page flow that pushed the content down; when the page ran inside the
+ * Electron app, its window.showToast took over and put a dialog RIGHT in the
+ * middle of the screen that had to be dismissed -- for a "marked as done". Now
+ * it is the same stack at the top right everywhere, like every other message.
  *
- * Bewusst ein eigener Name: window.showSuccess/showToast belegt die
- * Electron-App selbst, je nach Ladereihenfolge gewinnt mal die eine, mal
- * die andere Fassung.
+ * Deliberately a name of its own: window.showSuccess/showToast is taken by the
+ * Electron app itself, and depending on the load order one or the other version
+ * wins.
  */
 (function () {
     'use strict';
@@ -1656,7 +1776,7 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
             window.skToast(String(text || ''), art, titel ? { detail: '' } : undefined);
             return;
         }
-        // Ohne Toast-System (sollte nicht vorkommen): wenigstens die Konsole.
+        // Without the toast system (which should not happen): at least the console.
         console[art === 'error' ? 'error' : 'log'](text);
     }
 
@@ -1692,10 +1812,11 @@ class ZoomControlsManager {
         });
     }
 
-    // --- Kamera-Rotation/Flip beim Zoom ERHALTEN ---
-    // Bisher setzte der Zoom transform='scale(X)' und überschrieb die Basis-Transform
-    // (z.B. rotate(180deg)) → Bild auf dem Kopf, auch bei Reset. Jetzt: Basis + scale
-    // kombinieren; Origin bei 180°/Flip mitspiegeln, damit Zoom-auf-Cursor stimmt.
+    // --- PRESERVE the camera rotation and flip while zooming ---
+    // The zoom used to set transform='scale(X)' and overwrote the base transform
+    // (rotate(180deg), say) -> the image ended up upside down, on a reset too.
+    // Now the base and the scale are combined, and the origin is mirrored along
+    // at 180° or on a flip, so zoom-to-cursor is right.
     _baseTransform(img) { return (img && img.dataset.baseTransform) || ''; }
     _mapOrigin(base, x, y) {
         let ox = x, oy = y;
@@ -1722,11 +1843,11 @@ class ZoomControlsManager {
 
         const rect = img.getBoundingClientRect();
 
-        // Mausposition relativ zum Bild (in Prozent)
+        // The mouse position relative to the image (as a percentage)
         const x = ((mouseX - rect.left) / rect.width) * 100;
         const y = ((mouseY - rect.top) / rect.height) * 100;
 
-        // Neuer Scale-Wert
+        // The new scale value
         const newScale = Math.min(Math.max(1, this.fullscreenScale + deltaScale), 5);
 
         if (newScale !== this.fullscreenScale) {
@@ -1774,13 +1895,13 @@ class ZoomControlsManager {
             document.msExitFullscreen();
         }
 
-        // Container entfernen
+        // Remove the container
         const container = document.getElementById('fullscreen-container');
         if (container) {
             container.remove();
         }
 
-        // Zoom zurücksetzen
+        // Reset the zoom
         this.fullscreenScale = 1;
     }
 
@@ -1792,15 +1913,15 @@ class ZoomControlsManager {
 
         const rect = img.getBoundingClientRect();
 
-        // Mausposition relativ zum Bild (in Prozent)
+        // The mouse position relative to the image (as a percentage)
         const x = ((mouseX - rect.left) / rect.width) * 100;
         const y = ((mouseY - rect.top) / rect.height) * 100;
 
-        // Neuer Scale-Wert
+        // The new scale value
         const newScale = Math.min(Math.max(1, this.desktopScale + deltaScale), 5);
 
         if (newScale !== this.desktopScale) {
-            // Transform-Origin auf Mausposition setzen
+            // Set the transform origin to the mouse position
             this.transformOriginX = x;
             this.transformOriginY = y;
             this.desktopScale = newScale;
@@ -1809,7 +1930,7 @@ class ZoomControlsManager {
     }
 
     desktopZoomIn(e) {
-        // Wenn Event vorhanden (von Button), nutze Bildmitte
+        // With an event (from a button), use the centre of the image
         if (!e || !e.clientX) {
             const img = document.getElementById('camera-stream');
             const rect = img.getBoundingClientRect();
@@ -1871,13 +1992,13 @@ class IOSPushManager {
 
         // Setup on DOM ready
         document.addEventListener('DOMContentLoaded', () => {
-            // Warte auf Auth Handler Initialisierung
+            // Wait for the auth handler to initialise
             if (typeof authHandler !== 'undefined') {
                 // Check ob eingeloggt
                 const checkAuthAndSetupPush = async () => {
                     const token = localStorage.getItem('access_token');
                     if (token) {
-                        // Warte kurz bis alles geladen ist
+                        // Wait a moment until everything is loaded
                         setTimeout(() => {
                             this.setup();
                         }, 1000);
@@ -1886,13 +2007,13 @@ class IOSPushManager {
                 checkAuthAndSetupPush();
             }
 
-            // Listen für Login Events
+            // Listen for login events
             window.addEventListener('user-logged-in', () => {
                 console.log('[Push] User logged in - Setup Push');
                 this.setup();
             });
 
-            // Listen für Logout Events
+            // Listen for logout events
             window.addEventListener('user-logged-out', () => {
                 console.log('[Push] User logged out - Cleanup Push');
                 if ('serviceWorker' in navigator) {
@@ -1907,7 +2028,7 @@ class IOSPushManager {
     }
 
     async setup() {
-        // ZUERST AUTH CHECK!
+        // THE AUTH CHECK FIRST!
         const token = localStorage.getItem('access_token');
         if (!token) {
             console.log('[Push] not logged in - skipping push setup');
@@ -1934,7 +2055,7 @@ class IOSPushManager {
         if (!isIOS) return; // Nur für iOS
 
         if (!isPWA) {
-            // Zeige Install-Hinweis für iOS
+            // Show the install hint for iOS
             if (!localStorage.getItem('ios_install_dismissed')) {
                 this.showInstallHint();
             }
@@ -1951,7 +2072,7 @@ class IOSPushManager {
                 const registration = await navigator.serviceWorker.register('/static/sw.js');
                 console.log('[Push] SW registered for iOS');
 
-                // Check ob bereits subscribed
+                // Check whether it is subscribed already
                 const existingSubscription = await registration.pushManager.getSubscription();
                 if (existingSubscription) {
                     console.log('[Push] Already subscribed');
@@ -1967,7 +2088,7 @@ class IOSPushManager {
                         applicationServerKey: this._urlBase64ToUint8Array(window.JINJA_CONFIG.vapidPublicKey)
                     });
 
-                    // An Server MIT AUTH senden
+                    // Send it to the server WITH AUTH
                     const response = await apiCall('/api/webpush/subscribe', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -1991,7 +2112,7 @@ class IOSPushManager {
                 }
             } catch (error) {
                 console.error((texts.console_push_setup_failed || 'Push setup failed') + ':', error);
-                // Cleanup bei Fehler
+                // Clean up after an error
                 const reg = await navigator.serviceWorker.ready;
                 const sub = await reg.pushManager.getSubscription();
                 if (sub) await sub.unsubscribe();
@@ -2006,12 +2127,12 @@ class IOSPushManager {
                         background:var(--bg-card); border-radius:12px; padding:15px;
                         box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999;
                         animation: slideUp 0.3s ease-out;">
-                <h3 style="margin:0 0 10px 0;">Als App installieren</h3>
+                <h3 style="margin:0 0 10px 0;">${(window.texts||{}).ios_install_title || 'Als App installieren'}</h3>
                 <p style="margin:0 0 10px 0; color:var(--text-secondary);">
-                    Für Push-Benachrichtigungen auf iOS:
+                    ${(window.texts||{}).ios_install_intro || 'Für Push-Benachrichtigungen auf iOS:'}
                 </p>
                 <ol style="margin:0 0 10px 0; padding-left:20px;">
-                    <li>Tippe auf das Teilen-Symbol</li>
+                    <li>${(window.texts||{}).ios_tap_share || 'Tippe auf das Teilen-Symbol'}</li>
                     <li>${(window.texts||{}).ios_add_home || 'Wähle „Zum Home-Bildschirm"'}</li>
                     <li>${(window.texts||{}).ios_tap_add || 'Tippe auf „Hinzufügen"'}</li>
                 </ol>
@@ -2029,8 +2150,8 @@ class IOSPushManager {
         // Einfache Console Notification
         console.log(`[Push] ${type || 'info'}: ${message}`);
 
-        // Optional: Browser Notification falls verfügbar
-        // ELECTRON: Keine Browser-Notifications - Electron nutzt FCM Push
+        // Optional: a browser notification when one is available.
+        // ELECTRON: no browser notifications - Electron uses FCM push.
         if (!window.electronAPI && 'Notification' in window && Notification.permission === 'granted') {
             new Notification(message, {
                 icon: '/static/icon-192x192.png'
@@ -2160,7 +2281,7 @@ class FilamentDryingManager {
                 // Does the printer dry by itself? Then our homing and
                 // parking falls away — it does that in its own routine.
                 this.nativ = !!data.nativ;
-                this.letzteTrocknung = data.letzte_trocknung || null;
+                this.letzteTrocknung = data.last_drying || null;
                 const homingZeile = document.getElementById('skip-homing-checkbox')
                     ?.closest('.tr-schalter-zeile');
                 if (homingZeile) homingZeile.hidden = this.nativ;
@@ -2333,7 +2454,7 @@ class FilamentDryingManager {
 
             if (result.success) {
                 const currentLang = window.currentLang || 'de';
-                const positioningText = skipHoming ? (window.currentLang === 'de' ? ' (ohne Homing)' : ' (without homing)') : '';
+                const positioningText = skipHoming ? ` (${(window.texts || {}).drying_without_homing || 'ohne Homing'})` : '';
                 // On the native path the preparation runs first — and we say
                 // so. "Drying started" would be a lie, it only begins after
                 // that.
@@ -2522,29 +2643,28 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
 
 ;/* ---- hotend-rack.js ---- */
 /**
- * Hotend-Magazin (H2C) — Karte fuellen.
+ * The hotend rack (H2C) -- filling the card.
  *
- * Der H2C druckt an zwei Stellen, aber nur eine davon nimmt Wechsel-Hotends:
- * Bambu Studio gibt ihm `extruder_max_nozzle_count ['1','6']` — Extruder 1
- * traegt eine feste Duese, Extruder 2 bis zu sechs Hotends aus dem Magazin.
- * Der Drucker meldet die Plaetze als Duesen-ids 16-21; der Server trennt sie
- * in `hardware.hotend_rack` ab (services/printer_state.py).
+ * The H2C prints from two positions, but only one of them takes exchangeable
+ * hotends: Bambu Studio gives it `extruder_max_nozzle_count ['1','6']` --
+ * extruder 1 carries a fixed nozzle, extruder 2 up to six hotends from the
+ * rack. The printer reports the slots as nozzle ids 16-21; the server splits
+ * them off into `hardware.hotend_rack` (services/printer_state.py).
  *
- * Die Karte sagt NICHT, welche Seite die feste und welche die wechselbare
- * ist. Studio nummeriert Extruder 1 und 2, der MQTT-Block nummeriert Duesen
- * 0 und 1 (0 = rechts, 1 = links) — welche Nummer welcher entspricht, steht
- * in keiner Quelle, die wir haben. Belegt ist dagegen, WELCHER Platz
- * aufgesetzt ist: das sagt `tar_id`.
+ * The card does NOT say which side is the fixed one and which the
+ * exchangeable one. Studio numbers extruders 1 and 2, the MQTT block numbers
+ * nozzles 0 and 1 (0 = right, 1 = left) -- which number corresponds to which
+ * stands in no source we have. What is documented is WHICH slot is mounted:
+ * `tar_id` says so.
  *
- * Zwei Werte kommen bewusst roh durch, weil ihre Bedeutung in keiner
- * Bambu-Quelle steht, die wir haben:
- *   - der Typ-Code ("SS", "HS", …) wird angezeigt wie gemeldet. Die
- *     Home-Assistant-Integration liest die zweite Stelle als Fluss
- *     (H = High Flow); das ist die Lesart eines Drittanbieters und wird hier
- *     nicht als Tatsache verkauft.
- *   - der Verschleiss steht als Zahl da, ohne Balken. Der Drucker meldet
- *     keinen Maximalwert, ein Balken waere geraten.
- * Beides gehoert an einem echten H2C nachgesehen, dann kann hier mehr stehen.
+ * Two values deliberately come through raw, because their meaning stands in no
+ * Bambu source we have:
+ *   - the type code ("SS", "HS", …) is shown as reported. The Home Assistant
+ *     integration reads the second character as the flow (H = high flow); that
+ *     is a third party's reading and is not sold here as fact.
+ *   - the wear stands there as a number, without a bar. The printer reports no
+ *     maximum, so a bar would be guesswork.
+ * Both want checking on a real H2C, and then more can stand here.
  */
 (function (global) {
     'use strict';
@@ -2555,8 +2675,8 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
         }
 
         /**
-         * Aus dem Status-Paket fuellen.
-         * @param {object} daten – die Antwort von /api/status bzw. der Push.
+         * Fill from the status packet.
+         * @param {object} daten – the answer from /api/status, or the push.
          */
         aktualisieren(daten) {
             const karte = document.getElementById('hotend-rack-card-grid');
@@ -2565,8 +2685,8 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
             const magazin = (daten && daten.hardware && daten.hardware.hotend_rack) || {};
             const plaetze = magazin.slots || [];
 
-            // Keine Plaetze gemeldet = kein Magazin. Die Karte verschwindet,
-            // statt leer dazustehen; sie taucht nicht am Modellnamen auf.
+            // No slots reported = no rack. The card disappears instead of
+            // standing there empty; it does not appear from the model name.
             if (!plaetze.length) {
                 if (karte.style.display !== 'none') {
                     karte.style.display = 'none';
@@ -2585,7 +2705,7 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
             this._plaetze(t, magazin, plaetze);
         }
 
-        /** Titel, Zaehler und was gerade aufgesetzt ist. */
+        /** The title, the counter and what is mounted right now. */
         _kopf(t, magazin, plaetze) {
             const setzen = (id, text) => {
                 const el = document.getElementById(id);
@@ -2626,7 +2746,7 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
             this._wechselzeile(t, magazin, plaetze, laeuft);
         }
 
-        /** Die Zeile, die den laufenden Wechsel beschreibt. */
+        /** The line that describes the change in progress. */
         _wechselzeile(t, magazin, plaetze, laeuft) {
             const zeile = document.getElementById('hr-wechsel');
             if (!zeile) return;
@@ -2654,14 +2774,14 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
             }
         }
 
-        /** Das Raster der sechs Plaetze. */
+        /** The grid of the six slots. */
         _plaetze(t, magazin, plaetze) {
             const behaelter = document.getElementById('hr-plaetze');
             if (!behaelter) return;
 
             const laeuft = this._wechselLaeuft(magazin);
-            // Nur neu zeichnen, wenn sich wirklich etwas geaendert hat — sonst
-            // baut der 1-Sekunden-Push das Raster dauernd neu auf.
+            // Only redraw when something has really changed -- otherwise the
+            // one-second push rebuilds the grid constantly.
             const signatur = JSON.stringify([plaetze, magazin.src_id, magazin.tar_id, laeuft]);
             if (signatur === this._letzteSignatur) return;
             this._letzteSignatur = signatur;
@@ -2726,8 +2846,8 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
             });
         }
 
-        /** Laeuft gerade ein Wechsel? `state` != 0 sagt es, und Quelle und
-         *  Ziel muessen sich unterscheiden. */
+        /** Is a change running? `state` != 0 says so, and the source and the
+         *  target have to differ. */
         _wechselLaeuft(magazin) {
             const zustand = magazin.state;
             if (typeof zustand !== 'number' || zustand === 0) return false;
@@ -2736,7 +2856,7 @@ window.formatDuration = (s) => window.filamentDryingManager._formatDuration(s);
                 && magazin.tar_id !== null && magazin.tar_id !== undefined;
         }
 
-        /** Aus der Duesen-id (16-21) die Platznummer fuer Menschen (1-6). */
+        /** From the nozzle id (16-21) to the slot number for humans (1-6). */
         _platzNummer(id, plaetze) {
             const index = plaetze.findIndex(p => p.id === id);
             return index < 0 ? null : index + 1;
@@ -2789,17 +2909,18 @@ class TemperatureModalManager {
         const texts = window.texts || {};
         document.getElementById('tempModal').style.display = 'block';
 
-        // Bambu: Display-Stil wie das Luefter-Fenster (dfx-Stage), eigener
-        // Renderer mit Sofort-Senden. Klipper behaelt Slider + Anwenden.
+        // Bambu: the display style of the fan window (dfx stage), with a
+        // renderer of its own that sends straight away. Klipper keeps the
+        // slider plus apply.
         if (!(window.isKlipperMode && window.isKlipperMode())
                 && document.getElementById('dt-stage')) {
             this._zone = zone || null;
             document.getElementById('temp-modal-title').textContent =
                 texts.temp_control_title || 'Temperaturen';
-            // Und die Filament-Beschriftung. Der Textblock weiter unten setzt
-            // sie auch -- nur wird er hier nie erreicht, dieser Zweig kehrt
-            // vorher zurueck. Die Folge war ein deutsches "Laden/Entladen"
-            // mitten in einer englischen Oberflaeche (01sep26).
+            // And the filament labels. The block of text further down sets
+            // them too -- only it is never reached here, because this branch
+            // returns first. The result was a German "Laden/Entladen" in the
+            // middle of an English interface.
             const filLabel = document.getElementById('temp-filament-label');
             if (filLabel) filLabel.textContent = texts.mz_filament_shortcut || 'Laden/Entladen';
             this._pending = {};   // {schluessel: {wert, timer}}
@@ -2809,9 +2930,9 @@ class TemperatureModalManager {
             this._tick = setInterval(() => this.renderBambu(), 2000);
             return;
         }
-        // Merken, welche Zone gewuenscht ist — die Sichtbarkeit wird unten
-        // NACH der Faehigkeits-Pruefung angewandt (Kammer/Doppelduese haengen
-        // von capabilities ab und wuerden sonst wieder umgeschaltet).
+        // Remember which zone was asked for -- the visibility is applied
+        // below, AFTER the capability check (chamber and dual nozzle depend on
+        // the capabilities and would otherwise be switched back).
         this._zone = zone || null;
 
         // Texte setzen
@@ -2835,7 +2956,7 @@ class TemperatureModalManager {
         document.getElementById('temp-nozzle-left-label').textContent = texts.temp_nozzle_left || 'Links';
         document.getElementById('temp-nozzle-right-label').textContent = texts.temp_nozzle_right || 'Rechts';
 
-        // Aktuelle Temperaturen aus lastPrintData holen
+        // Take the current temperatures from lastPrintData
         if (window.lastPrintData) {
             this.lastNozzleTemp = window.lastPrintData.nozzle_temp || 0;
             this.lastBedTemp = window.lastPrintData.bed_temp || 0;
@@ -2843,19 +2964,19 @@ class TemperatureModalManager {
             this.lastBedTarget = window.lastPrintData.bed_target || 0;
         }
 
-        // Kammer und zweite Duese haengen an dem, was der Drucker meldet —
-        // nicht am Modellnamen. capabilities kommt vom Server (siehe
-        // services/printer_capabilities.py).
-        // Denselben Zustand nutzen wie der Geraete-Tab (printer-control.js):
-        // window.activePrinter.state traegt capabilities und den device-Block.
-        // Klipper fuellt window.activePrinter.state per Socket. Im
-        // Bambu-Betrieb bleibt das leer — dort pflegt printerControl den
-        // /api/status-Zustand (flach, inkl. capabilities). Ohne diesen
-        // Rueckgriff blieben Kammer und Doppelduese am X2D unsichtbar.
+        // The chamber and the second nozzle depend on what the printer
+        // reports, not on the model name. capabilities comes from the server
+        // (see services/printer_capabilities.py).
+        // The same state as the device tab (printer-control.js):
+        // window.activePrinter.state carries the capabilities and the device
+        // block. Klipper fills window.activePrinter.state over the socket. In
+        // Bambu mode it stays empty -- there printerControl keeps the
+        // /api/status state (flat, capabilities included). Without this
+        // fallback the chamber and the dual nozzle stayed invisible on the X2D.
         const status = (window.activePrinter && window.activePrinter.state)
             || (window.printerControlManager && window.printerControlManager.lastState) || {};
         const caps = status.capabilities || {};
-        // Bambu liefert die Werte flach, Klipper unter .device.
+        // Bambu delivers the values flat, Klipper under .device.
         const device = status.device || status;
 
         const chamberZone = document.getElementById('temp-zone-chamber');
@@ -2875,7 +2996,7 @@ class TemperatureModalManager {
             nozzleZone.style.display = '';
             const ist = device.nozzle_temps || {};
             const soll = device.nozzle_targets || {};
-            // 1 ist LINKS, 0 ist RECHTS — nicht umgekehrt.
+            // 1 is LEFT, 0 is RIGHT -- not the other way round.
             const zeige = (seite, key) => {
                 document.getElementById(`temp-nozzle-${seite}`).textContent =
                     ist[key] != null ? Math.round(ist[key]) : '--';
@@ -2885,8 +3006,9 @@ class TemperatureModalManager {
             zeige('left', '1');
             zeige('right', '0');
 
-            // Der Regler oben setzt immer die aktive Duese: M104 kennt keine
-            // Seitenwahl, weder bei uns noch in der Home-Assistant-Integration.
+            // The slider at the top always sets the active nozzle: M104 has no
+            // side selection, neither here nor in the Home Assistant
+            // integration.
             const aktiv = device.active_nozzle === 1
                 ? (texts.temp_nozzle_left || 'Links')
                 : (texts.temp_nozzle_right || 'Rechts');
@@ -2896,9 +3018,9 @@ class TemperatureModalManager {
             nozzleZone.style.display = 'none';
         }
 
-        // Einzel-Zonen-Aufruf (Plakette in der Grafik / Karte der
-        // Uebersicht): nur die angeklickte Zone zeigen. Der Temp-Knopf
-        // oeffnet weiterhin ohne zone → alles sichtbar.
+        // A single-zone call (a badge in the graphic, or a card on the
+        // overview): show only the zone that was clicked. The temperature
+        // button still opens without a zone -> everything visible.
         const zeige = (id, on) => {
             const e = document.getElementById(id);
             if (e) e.style.display = on ? '' : 'none';
@@ -2913,11 +3035,11 @@ class TemperatureModalManager {
             zeige('temp-zone-bed', true);
         }
 
-        // Aktuelle Werte anzeigen
+        // Show the current values
         document.getElementById('temp-nozzle-current').textContent = Math.round(this.lastNozzleTemp);
         document.getElementById('temp-bed-current').textContent = Math.round(this.lastBedTemp);
 
-        // Slider auf Zieltemperatur setzen (oder 0 wenn kein Ziel)
+        // Set the slider to the target temperature (or 0 when there is none)
         document.getElementById('temp-nozzle-slider').value = this.lastNozzleTarget;
         document.getElementById('temp-nozzle-input').value = this.lastNozzleTarget;
         document.getElementById('temp-bed-slider').value = this.lastBedTarget;
@@ -2930,8 +3052,9 @@ class TemperatureModalManager {
     }
 
     // =========================================================
-    // Bambu: Display-Stil wie das Luefter-Fenster — Maschine mittig,
-    // Zonen aussen mit Leader-Lines, Klick klappt Stepper + Presets aus.
+    // Bambu: the display style of the fan window -- the machine in the middle,
+    // the zones outside with leader lines, a click unfolds the stepper and the
+    // presets.
     // =========================================================
 
     static PRESETS = {
@@ -2954,13 +3077,13 @@ class TemperatureModalManager {
         return (window.printerControlManager && window.printerControlManager.lastState) || {};
     }
 
-    /** Sollwert einer Zone senden (nozzle-Seite via nozzle_id). */
+    /** Send the target of one zone (the nozzle side through nozzle_id). */
     _sende(schluessel, wert) {
         const w = Math.max(0, Math.round(wert));
         if (schluessel === 'bed') window.printerAdapter.setTemp('bed', w);
         else if (schluessel === 'chamber') window.printerAdapter.setTemp('chamber', w);
         else window.printerAdapter.setTemp('extruder', w, parseInt(schluessel, 10));
-        // Optimistik: Soll sofort anzeigen, Status bestaetigt spaeter.
+        // Optimistic: show the target straight away, the status confirms later.
         this._pending[schluessel] = { wert: w, bis: Date.now() + 8000 };
         this.renderBambu();
     }
@@ -2971,7 +3094,7 @@ class TemperatureModalManager {
         return 320;
     }
 
-    /** Stepper: sammelt kurz, sendet dann — vermeidet MQTT-Spam. */
+    /** The stepper: collects briefly, then sends -- this avoids MQTT spam. */
     dtStep(seite, delta) {
         const schluessel = String(seite);
         const aktuell = (this._pending[schluessel] && this._pending[schluessel].wert != null)
@@ -3000,12 +3123,13 @@ class TemperatureModalManager {
         return Math.round(v || st.nozzle_target || 0);
     }
 
-    // Bauteil-Positionen im x2d.png (Prozent) — Ziel der Leader-Lines.
+    // The positions of the parts in x2d.png (per cent) -- where the leader
+    // lines point.
     static ANKER = {
         nozzleL: '42,31', nozzleR: '48,30', bed: '42,62', chamber: '54,74',
     };
 
-    /** Ein Zonen-Eintrag im Luefter-Stil: Kopf › Wert › Detail (Stepper+Chips). */
+    /** One zone entry in the fan style: head › value › detail (stepper + chips). */
     _eintrag(def) {
         const box = document.createElement('div');
         box.className = 'dfx-fan dfx-fan--' + def.seite;
@@ -3040,7 +3164,7 @@ class TemperatureModalManager {
         detail.className = 'dtx-detail';
         detail.style.display = 'none';
 
-        // Zwei ruhige Segmentleisten statt Einzel-Buttons: Stepper + Presets.
+        // Two quiet segmented bars instead of single buttons: stepper + presets.
         const step = document.createElement('div');
         step.className = 'dtx-seg';
         [[-10, '−10'], [-1, '−1'], [1, '+1'], [10, '+10']].forEach(([d, label]) => {
@@ -3068,7 +3192,7 @@ class TemperatureModalManager {
         return box;
     }
 
-    /** Stage einmal bauen (wie das Luefter-Fenster) — Werte kommen separat. */
+    /** Build the stage once (like the fan window) -- the values arrive separately. */
     _baueStage(dual, hatKammer) {
         const wrap = document.getElementById('dt-stage');
         if (!wrap) return;
@@ -3087,8 +3211,9 @@ class TemperatureModalManager {
         const rechts = document.createElement('div');
         rechts.className = 'dfx-col dfx-col--r';
 
-        // Anordnung wie am Display: links Duese links + Heizbett,
-        // rechts Duese rechts + Kammer. 1 ist LINKS, 0 ist RECHTS.
+        // Laid out like the display: on the left the left nozzle and the heated
+        // bed, on the right the right nozzle and the chamber. 1 is LEFT,
+        // 0 is RIGHT.
         const A = TemperatureModalManager.ANKER;
         let defs = [];
         if (dual) {
@@ -3099,8 +3224,8 @@ class TemperatureModalManager {
         }
         defs.push({ key: 'bed', label: texts.temp_bed_full || 'Heizbett', seite: 'l', art: 'bed', anker: A.bed });
         if (hatKammer) defs.push({ key: 'chamber', label: texts.temp_chamber || 'Kammer', seite: 'r', art: 'chamber', anker: A.chamber });
-        // Zonen-Aufruf (Karte/Plakette): NUR die angeklickte Zone zeigen —
-        // bei 'nozzle' beide Duesen, sonst genau den einen Eintrag.
+        // A zone call (card or badge): show ONLY the zone that was clicked --
+        // for 'nozzle' both nozzles, otherwise exactly the one entry.
         if (this._zone) {
             defs = defs.filter(this._zone === 'nozzle'
                 ? d => d.art === 'nozzle'
@@ -3113,9 +3238,9 @@ class TemperatureModalManager {
         stage.appendChild(rechts);
         wrap.appendChild(stage);
 
-        // Hinweis passend zum sichtbaren Inhalt: Vollansicht nennt alle
-        // Zonen, die Düsen-Ansicht nur die Düse. Bett/Kammer kommen schon
-        // aufgeklappt — dort steht stattdessen die Erklärung wie am Display.
+        // The hint matches what is visible: the full view names every zone,
+        // the nozzle view only the nozzle. Bed and chamber arrive already
+        // unfolded -- there the explanation from the display stands instead.
         let hintText = null;
         if (!this._zone) {
             hintText = texts.temp_hint_click
@@ -3140,8 +3265,8 @@ class TemperatureModalManager {
         }
         if (window.dfxWatchStage) window.dfxWatchStage(stage);
 
-        // Zonen-Aufruf (Plakette/Karte): die angefragte Zone kommt
-        // gleich aufgeklappt — sichtbar bleiben alle.
+        // A zone call (badge or card): the requested zone arrives already
+        // unfolded -- all of them stay visible.
         const zielKey = this._zone === 'bed' ? 'bed'
             : this._zone === 'chamber' ? 'chamber'
             : this._zone === 'nozzle' ? (dual ? String(st.active_nozzle != null ? st.active_nozzle : 0) : defs[0].key)
@@ -3181,8 +3306,9 @@ class TemperatureModalManager {
             const sollV = soll(key);
             k.val.innerHTML = Math.round(ist || 0) + '° <small>/ ' + sollV + '°</small>';
 
-            // Presets zweizeilig: Material oben, Gradzahl klein darunter —
-            // einzeilig quetschte 'PETG 250' randlos an die Trennlinien.
+            // The presets take two lines: the material on top, the degrees
+            // small below it -- on one line 'PETG 250' was squeezed right up
+            // against the dividers.
             const presets = TemperatureModalManager.PRESETS[k.art];
             const eintraege = [[texts.temp_off || 'Aus', 0]].concat(
                 presets.map(([n, v]) => [n ? (n + '<small>' + v + '°</small>') : String(v), v]));
@@ -3297,10 +3423,10 @@ class SpeedModalManager {
         const texts = window.texts || {};
         document.getElementById('speedModal').style.display = 'block';
 
-        // Null-sicher: im Bambu-Template existieren Hint/Cancel/Apply und
-        // der Slider nicht (Klipper-Zweig) — harte getElementById-Zugriffe
-        // crashten open() VOR dem Karten-Code (deshalb fehlten Markierung
-        // und Hinweistext komplett).
+        // Null-safe: in the Bambu template the hint, cancel, apply and the
+        // slider do not exist (they are the Klipper branch) -- hard
+        // getElementById accesses crashed open() BEFORE the card code, which is
+        // why the selection and the hint text were missing entirely.
         const setze = (id, v) => { const e = document.getElementById(id); if (e && v) e.textContent = v; };
         setze('speed-modal-title', texts.speed_control);
         setze('speed-modal-hint', texts.speed_hint);
@@ -3311,7 +3437,7 @@ class SpeedModalManager {
         const labels = document.getElementById('speed-level-labels');
         this._klipper = !!(window.isKlipperMode && window.isKlipperMode());
 
-        // Bambu (Display-Stil): vier Stufen-Karten, Klick setzt sofort.
+        // Bambu (in the display style): four step cards, a tap sets it right away.
         if (!this._klipper && document.getElementById('ds-grid')) {
             const namen = {1: texts.speed_silent, 2: texts.speed_standard,
                            3: texts.speed_sport, 4: texts.speed_ludicrous};
@@ -3328,8 +3454,9 @@ class SpeedModalManager {
             const hint = document.getElementById('ds-hint');
             if (hint) hint.textContent = texts.speed_hint
                 || 'Wirkt sofort auf den laufenden Druck.';
-            // Aktive Stufe: der Bambu-Status traegt sie unter speed.speed_level
-            // (lastPrintData ist der Klipper-Weg und hier leer).
+            // The active level: the Bambu status carries it under
+            // speed.speed_level (lastPrintData is the Klipper route and empty
+            // here).
             const st = (window.printerControlManager
                 && window.printerControlManager.lastState) || {};
             const lvl = (st.speed && st.speed.speed_level)
@@ -3340,14 +3467,14 @@ class SpeedModalManager {
 
         if (!slider) return;
         if (this._klipper) {
-            // Klipper: stufenloser Geschwindigkeitsfaktor 1–200 % (M220), wie Mainsail.
+            // Klipper: a continuous speed factor of 1-200% (M220), as in Mainsail.
             if (labels) labels.style.display = 'none';
             slider.min = 1; slider.max = 200; slider.step = 1;
             const cur = Math.round((window.lastPrintData && window.lastPrintData.speed_percent) || 100);
             slider.value = Math.min(200, Math.max(1, cur));
             this.updateDisplay(slider.value);
         } else {
-            // Bambu: 4 Stufen mit Labels.
+            // Bambu: 4 levels with labels.
             if (labels) labels.style.display = '';
             slider.min = 1; slider.max = 4; slider.step = 1;
             document.getElementById('speed-label-silent').textContent = texts.speed_silent;
@@ -3371,7 +3498,7 @@ class SpeedModalManager {
         }
     }
 
-    /** Bambu-Karten: Stufe waehlen und sofort senden. */
+    /** The Bambu cards: pick a level and send it straight away. */
     pick(stufe) {
         const texts = window.texts || {};
         this._markiere(stufe);
@@ -3392,7 +3519,7 @@ class SpeedModalManager {
     updateDisplay(value) {
         const texts = window.texts || {};
         if (this._klipper) {
-            // Stufenlos: nur „X %" anzeigen.
+            // Continuous: show only "X %".
             const display = document.getElementById('speed-display');
             display.textContent = value + '%';
             display.style.color = 'var(--accent-blue)';
@@ -3419,11 +3546,11 @@ class SpeedModalManager {
         const slider = document.getElementById('speed-slider');
         let percent, speedText;
         if (this._klipper) {
-            // Klipper: Slider-Wert = Prozent direkt → M220.
+            // Klipper: the slider value is the percentage directly -> M220.
             percent = parseInt(slider.value, 10) || 100;
             speedText = percent + '%';
         } else {
-            // Bambu: 4 Levels → Prozent (Backend mappt zurück).
+            // Bambu: 4 levels -> a percentage (the backend maps it back).
             const speedLevel = parseInt(slider.value, 10);
             percent = {1: 50, 2: 100, 3: 124, 4: 166}[speedLevel] || 100;
             const names = ['', texts.speed_silent, texts.speed_standard,
@@ -3454,9 +3581,9 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
 
 
 ;/* ---- fan-modal.js ---- */
-// Lüfter-Steuerung (Klipper-Direct) — 1:1 wie Android FanControlDialog.
-// Grid aus Lüfter-Karten: 270°-Gauge + (Slider | „Ⓐ Automatisch"). Pollt /api/fans
-// alle 2s solange offen, setzt via POST /api/fans/set (M106/M107 bzw. SET_FAN_SPEED).
+// Fan control (Klipper direct) -- 1:1 like Android FanControlDialog.
+// A grid of fan cards: a 270° gauge plus a slider or "Ⓐ automatic". It polls
+// /api/fans every 2 s while open, setting via POST /api/fans/set.
 (function () {
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const R = 38;
@@ -3464,19 +3591,19 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
   const ARC = C * 0.75;        // sichtbarer 270°-Bogen
   let timer = null;
   let dragging = null;         // object-Name dessen Slider gerade gezogen wird
-  // Frisch gesetzte Werte: der Drucker meldet den neuen Stand erst einen
-  // Poll spaeter — solange halten wir den Sollwert fest, sonst springt der
-  // Regler einmal zurueck und wieder vor.
+  // Freshly set values: the printer reports the new state only one poll
+  // later -- until then we hold the target, or the slider jumps back once
+  // and forward again.
   const pending = {};          // object -> { value, until }
   const cards = {};            // object -> {prog, txt, rpm, slider}
   let curKeys = '';
 
   function t(key, fb) { return (window.getText ? window.getText(key, fb) : fb); }
 
-  // ===== Verbindungslinien wie am X2D-Display: vom Eintrag horizontal,
-  // Knick senkrecht ueber dem Bauteil, offener Kreis als Endpunkt. Jeder
-  // Eintrag traegt sein Ziel als data-anker="x,y" (Prozent im Maschinenbild).
-  // Wird auch vom Temperatur-Fenster benutzt (gleiche Stage). =====
+  // ===== Connection lines as on the X2D display: horizontal from the entry,
+  // a bend vertically above the component, an open circle as the endpoint.
+  // Every entry carries its target as data-anker="x,y" (per cent in the
+  // machine image). The temperature window uses it too (the same stage). =====
   window.dfxDrawWires = function (stage) {
     if (!stage || !stage.isConnected) return;
     const img = stage.querySelector('.dfx-mitte img');
@@ -3513,7 +3640,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     svg.innerHTML = teile;
   };
 
-  // Neu zeichnen sobald sich das Layout bewegt (Aufklappen, Resize, Bild da).
+  // Redraw as soon as the layout moves (unfolding, resize, image arriving).
   window.dfxWatchStage = function (stage) {
     const neu = () => window.requestAnimationFrame(() => window.dfxDrawWires(stage));
     const img = stage.querySelector('.dfx-mitte img');
@@ -3547,8 +3674,8 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     card.style.cssText = 'background:var(--bg-secondary); border-radius:12px; padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:6px;';
 
     const label = document.createElement('div');
-    // Bambu liefert i18n-Schluessel (fan_part, ...), Klipper fertige Namen —
-    // t() faellt bei unbekanntem Schluessel auf den Text selbst zurueck.
+    // Bambu delivers i18n keys (fan_part, …), Klipper finished names --
+    // t() falls back to the text itself on an unknown key.
     label.textContent = t(fan.label, fan.label);
     label.title = fan.object;
     label.style.cssText = 'font-size:13px; font-weight:600; color:var(--text-primary); text-align:center; min-height:34px; display:flex; align-items:center; justify-content:center; line-height:1.2;';
@@ -3587,10 +3714,10 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
         const pct = parseInt(slider.value, 10) || 0;
         dragging = null;
         pending[fan.object] = { value: pct, until: Date.now() + 6000 };
-        // apiCall setzt den CSRF-Token — roher fetch wurde vom Server mit
-        // "CSRF Token missing" abgelehnt und der Regler sprang nach dem
-        // naechsten Poll auf den echten Wert zurueck. Klipper-Direct hat
-        // kein apiCall und keine CSRF-Pruefung → fetch als Rueckfall.
+        // apiCall sets the CSRF token -- a raw fetch was refused by the
+        // server with "CSRF Token missing" and the slider jumped back to the
+        // real value on the next poll. Klipper direct has no apiCall and no
+        // CSRF check, so fetch is the fallback there.
         const anfrage = {
           method: 'POST', credentials: 'same-origin',
           headers: { 'Content-Type': 'application/json' },
@@ -3610,7 +3737,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
       }
     } else {
       const auto = document.createElement('div');
-      // note (z.B. fan_recirc im Heiz-Modus) erklaert WARUM nicht regelbar.
+      // note (fan_recirc in heating mode, say) explains WHY it is not controllable.
       auto.innerHTML = fan.note
         ? window.skIcon('hitze', 'hd-ic--xs') + ' ' + t(fan.note, fan.note)
         : window.skIcon('auto', 'hd-ic--xs') + ' ' + t('fan_automatic', 'Automatisch');
@@ -3625,12 +3752,12 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
   function updateCard(fan) {
     const c = cards[fan.object];
     if (!c) return;
-    // Sollwert-Schonfrist: gemeldeten Altwert ignorieren, bis der Drucker
-    // den neuen bestaetigt (oder 6s um sind — dann gilt die Realitaet).
+    // A grace period for the target: ignore the reported old value until the
+    // printer confirms the new one (or 6 s pass -- then reality counts).
     const p = pending[fan.object];
     let anzeige = fan.speed_percent;
     if (p) {
-      // Der Drucker rastet auf Zehnerschritte — kleine Abweichung = bestaetigt.
+      // The printer snaps to steps of ten -- a small deviation counts as confirmed.
       if (Math.abs(fan.speed_percent - p.value) <= 5 || Date.now() > p.until) {
         delete pending[fan.object];
       } else {
@@ -3642,9 +3769,9 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     if (c.slider && dragging !== fan.object) c.slider.value = String(anzeige);
   }
 
-  // ===== Bambu: Display-Layout wie am X2D ("Luftmanagement: Modi und
-  // Luefter") — Modus-Toggle oben, Maschine mittig, Luefter aussen mit
-  // gepunkteten Linien zu ihren Positionen. Klick klappt den Regler aus. =====
+  // ===== Bambu: the display layout as on the X2D ("air management: modes
+  // and fans") -- the mode toggle on top, the machine in the middle, the fans
+  // outside with dotted lines to their positions. A click unfolds the slider. =====
   function sende(fan, pct) {
     pending[fan.object] = { value: pct, until: Date.now() + 6000 };
     const anfrage = {
@@ -3658,7 +3785,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     ).catch(() => {});
   }
 
-  // Bauteil-Positionen im x2d.png (Prozent): dahin zeigen die Linien.
+  // Component positions in x2d.png (per cent): that is where the lines point.
   const ANKER = {
     part: '44,34', aux_l: '26,50', aux: '26,50',
     aux_r: '58,36', chamber: '72,34', hotend: '48,29',
@@ -3739,25 +3866,25 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
   }
 
   /**
-   * Kammer- und AUX-Luefter auf 100 %.
+   * Chamber and AUX fans to 100 %.
    *
-   * Nur was der Drucker gerade regeln laesst: im Heiz-Modus gehoeren die
-   * AUX-Pfade zum Umluftkreis der Kammerheizung und faellt AUX links ganz
-   * aus der Liste (19aug26 gemessen). Deshalb wird nicht blind gesetzt,
-   * sondern gegen die gemeldete Liste geprueft und gesagt, was ging.
+   * Only what the printer currently lets one control: in heating mode the
+   * AUX paths belong to the recirculation circuit of the chamber heater, and
+   * AUX left drops out of the list entirely. So nothing is set blindly; it is
+   * checked against the reported list, and what worked is said.
    */
   const KUEHL_LUEFTER = ['chamber', 'aux_l', 'aux_r', 'aux'];
 
-  /** Die regelbaren Kuehl-Luefter aus der zuletzt gemeldeten Liste. */
+  /** The controllable cooling fans from the last reported list. */
   function kuehlLuefter() {
     return (letzteFans || []).filter(
       f => KUEHL_LUEFTER.includes(f.object) && f.controllable !== false);
   }
 
   /**
-   * Laeuft die Abkuehlung? Wenn ALLE regelbaren Kuehl-Luefter auf 100
-   * stehen. Damit stimmt der Knopf auch nach einem Neuladen der Seite —
-   * er haengt am Zustand des Druckers, nicht an einem Merker.
+   * Is the cool-down running? When ALL controllable cooling fans stand at
+   * 100. That way the button is right after a page reload too -- it hangs off
+   * the printer state, not off a flag.
    */
   function kuehltGerade() {
     const l = kuehlLuefter();
@@ -3765,12 +3892,12 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
   }
 
   /**
-   * Was der Nutzer sieht: der eben gesendete Wert, solange der Drucker ihn
-   * noch nicht bestaetigt hat, sonst der gemeldete.
+   * What the user sees: the value just sent, while the printer has not
+   * confirmed it yet, otherwise the reported one.
    *
-   * Ohne das dauerte es bis zu acht Sekunden, bis der Knopf auf „Kuehlung
-   * abbrechen" umsprang — so lange braucht die Runde ueber MQTT und den
-   * 2-s-Takt. Die Regler daneben rechnen laengst so.
+   * Without that it took up to eight seconds for the button to flip to
+   * "cancel cooling" -- that is how long the round over MQTT and the 2 s
+   * beat takes. The sliders beside it have long computed that way.
    */
   function angezeigterWert(fan) {
     const p = pending[fan.object];
@@ -3778,7 +3905,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     return fan.speed_percent || 0;
   }
 
-  /** Werte vor der Abkuehlung, damit „abbrechen" sie zurueckholt. */
+  /** Values from before the cool-down, so "cancel" brings them back. */
   const vorKuehlung = {};
 
   function kuehleAb() {
@@ -3796,10 +3923,10 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
   }
 
   /**
-   * Zurueck auf die Werte von vorher. Sind keine gemerkt (Seite neu
-   * geladen, Fenster zwischendurch zu), dann aus — das ist die Erwartung
-   * bei „Kühlung abbrechen", und ein geratener Zwischenwert waere
-   * schlechter als ein klarer Zustand.
+   * Back to the earlier values. Where none are remembered (the page was
+   * reloaded, the window closed in between) it goes off -- that is what one
+   * expects from "cancel cooling", and a guessed middle value would be worse
+   * than a clear state.
    */
   function brichAb() {
     const treffer = kuehlLuefter();
@@ -3808,7 +3935,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     skToast(t('fan_cooldown_stopped', 'Kühlung beendet'), 'info');
   }
 
-  /** Beschriftung des Knopfes an den Zustand haengen. */
+  /** Hang the button label off the state. */
   function zeigeKuehlKnopf() {
     const b = document.getElementById('dfx-abkuehlen');
     if (!b) return;
@@ -3826,7 +3953,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     });
   }
 
-  /** Zuletzt gemeldete Luefter — „Drucker abkuehlen" prueft dagegen. */
+  /** The fans last reported -- "cool the printer down" checks against them. */
   let letzteFans = [];
 
   function renderBambu(fans) {
@@ -3860,7 +3987,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
         ziel.appendChild(fanEintrag(f, ziel === links ? 'l' : 'r'));
       });
 
-      // Kammer-Temperatur wie am Display als eigener Eintrag rechts unten.
+      // Chamber temperature as on the display, an entry of its own bottom right.
       const kt = document.createElement('div');
       kt.className = 'dfx-fan dfx-fan--r';
       kt.dataset.anker = '54,76';
@@ -3880,10 +4007,9 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
       stage.appendChild(rechts);
       grid.appendChild(stage);
 
-      // „Drucker abkuehlen" unter der Maschine, mittig. In der Modus-Zeile
-      // stand er zwischen zwei Knoepfen, die eine AUSWAHL sind — hier ist
-      // es eine Handlung. Am Telefon blieb dort ausserdem nur „Druck…"
-      // uebrig (24aug26 am Geraet gesehen).
+      // "Cool the printer down" under the machine, centred. In the mode row
+      // it stood between two buttons that are a CHOICE -- this is an action.
+      // On the phone only "coo…" was left there as well.
       const kuehlZeile = document.createElement('div');
       kuehlZeile.className = 'dfx-kuehl-zeile';
       const kuehl = document.createElement('button');
@@ -3942,7 +4068,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
       return;
     }
     if (empty) empty.style.display = 'none';
-    // Bambu: Display-Stil mit Maschinen-Render. Klipper: Gauge-Grid.
+    // Bambu: display style with the machine render. Klipper: a gauge grid.
     if (!(window.isKlipperMode && window.isKlipperMode())) {
       renderBambu(fans);
       return;
@@ -3981,7 +4107,7 @@ window.dsPick = (stufe) => window.speedModal.pick(stufe);
     dragging = null;
   };
 
-  // Klick auf den abgedunkelten Hintergrund schließt das Modal.
+  // A click on the dimmed background closes the modal.
   document.addEventListener('DOMContentLoaded', () => {
     const m = document.getElementById('fanModal');
     if (m) m.addEventListener('click', (e) => { if (e.target === m) window.closeFanControl(); });
@@ -4026,9 +4152,9 @@ class SpoolmanManager {
             const statusIndicator = document.getElementById('spoolman-connection');
             const spoolmanContent = document.getElementById('spoolman-content');
 
-            // spoolman-card-grid existiert nur noch im Klipper-Betrieb — im
-            // Bambu-Betrieb lebt der Block in der Material-Zone. Die Karte
-            // ist deshalb KEINE Voraussetzung mehr.
+            // spoolman-card-grid exists only in Klipper mode -- in Bambu mode
+            // the block lives in the material zone. The card is therefore NO
+            // longer a precondition.
             if (!statusIndicator || !spoolmanContent) return;
 
             if (data.enabled && data.connected) {
@@ -4068,8 +4194,8 @@ class SpoolmanManager {
         try {
             const response = await apiCall('/api/spoolman/spools');
             const spools = await response.json();
-            // Merken: die Dateiliste zeigt die aktive Spule in ihrer
-            // Werkzeugleiste und braucht dafuer mehr als nur die ID.
+            // Remembered: the file list shows the active spool in its toolbar
+            // and needs more than just the id for that.
             this.spools = spools;
             if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
             this._knopfBeschriften();
@@ -4254,15 +4380,15 @@ class SpoolmanManager {
                 window.activeSpoolId = parseInt(spoolId);
                 this.activeSpoolId = parseInt(spoolId);
                 this.updateDisplay();
-                // Wurde mitten im Druck gewechselt, hat der Server den bis
-                // dahin verbrauchten Anteil auf die alte Rolle gebucht — das
-                // gehoert gesagt, sonst wundert man sich ueber die Restmenge.
+                // If the change happened mid-print, the server booked the
+                // share used up to that point onto the old spool -- that wants
+                // saying, or the remaining amount looks puzzling.
                 if (data.booked_to_previous) {
                     skToast((texts.toast_spool_changed_booked || '')
                         .replace('{g}', Math.round(data.booked_to_previous))
                         || `${Math.round(data.booked_to_previous)} g auf die alte Rolle gebucht`, 'success');
                 } else {
-                    // Mit Bezug: "Spule aktiviert" allein sagt nicht, welche.
+                    // With context: "spool activated" alone does not say which one.
                     const gewaehlt = (this.spools || []).find(x => x.id === parseInt(spoolId));
                     const fil = (gewaehlt && gewaehlt.filament) || {};
                     const hersteller = (fil.vendor && fil.vendor.name) || '';
@@ -4298,9 +4424,9 @@ class SpoolmanManager {
     }
 
     /**
-     * Der Knopf der Material-Karte traegt die aktive Spule: Farbpunkt und
-     * Name. Ohne das saehe man erst nach dem Oeffnen des Fensters, was
-     * gerade eingelegt ist — die alte Auswahlliste zeigte es direkt.
+     * The button on the material card carries the active spool: a colour dot
+     * and the name. Without it you would only see what is loaded after opening
+     * the window -- the old dropdown showed it directly.
      */
     _knopfBeschriften() {
         const text = document.getElementById('mz-spulknopf-text');
@@ -4367,11 +4493,10 @@ class SpoolmanManager {
                         const lastUsedDate = new Date(spool.last_used);
                         const now = new Date();
                         const diffTime = Math.abs(now - lastUsedDate);
-                        // floor statt ceil: ein angefangener Tag ist kein
-                        // ganzer. Mit ceil zeigte der Hinweis bei exakt 30
-                        // Tagen "31" und sprang einen Tag zu frueh an —
-                        // dieselbe Rechnung nutzt der Trocknungs-Schalter in
-                        // der Druckvorbereitung.
+                        // floor rather than ceil: a day that has begun is not a
+                        // whole one. With ceil the hint read "31" at exactly 30
+                        // days and fired a day too early -- the drying switch in
+                        // the print preparation uses the same arithmetic.
                         daysSinceUse = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
                         lastUsed = lastUsedDate.toLocaleDateString('de-DE', {
@@ -4383,9 +4508,9 @@ class SpoolmanManager {
                         });
                     }
 
-                    // Die Feuchte-Vorgeschichte steht in der Spulenauswahl,
-                    // nicht hier: auf der Startseite war sie nur eine weitere
-                    // Kachel, die niemand gesucht hat (27aug26 verworfen).
+                    // The humidity history stands in the spool picker, not
+                    // here: on the home page it was just another tile that
+                    // nobody was looking for.
                     const dryingHint = ((daysSinceUse && daysSinceUse > 30) ? `
                         <div style="grid-column:1/4; text-align:center; margin-top:8px;
                              padding:6px 10px; background:rgba(255,152,0,0.1);
@@ -4462,7 +4587,7 @@ class SpoolmanManager {
             let spoolmanUrl = config.spoolman?.external_url || config.spoolman?.url;
 
             if (!spoolmanUrl) {
-                skToast('Spoolman URL nicht konfiguriert', 'warning');
+                skToast((window.texts || {}).spoolman_url_missing || 'Spoolman-URL nicht eingerichtet', 'warning');
                 return;
             }
 
@@ -4642,7 +4767,7 @@ class CameraManager {
         this.streamRetryTimeout = setTimeout(() => {
             const newSrc = '/api/camera?t=' + Date.now();
             img.src = newSrc;
-            console.log('🔄 Versuche Stream neu zu laden...');
+            console.log('🔄 Trying to reload the stream...');
             this.streamRetryTimeout = null;
         }, 2000);
     }
@@ -4943,7 +5068,7 @@ class CameraManager {
                 const r = await apiCall('/api/camera/mode');
                 const d = await r.json();
                 if (d.type === 'webrtc') {
-                    console.log('WebRTC inzwischen verfügbar — wechsle von MJPEG');
+                    console.log('WebRTC available now — switching from MJPEG');
                     this.stopSnapshotPolling();
                     window._cameraMode = 'webrtc';
                     await this.startWebRTCStream();
@@ -5246,10 +5371,10 @@ class CameraManager {
                 if (document.hidden) {
                     self.stopSnapshotPolling();
                     self._stopKlipperPoll();   // close the persistent Klipper MJPEG connection
-                    console.log('⏸️ Kamera pausiert (Tab im Hintergrund)');
+                    console.log('⏸️ Camera paused (tab in the background)');
                 } else {
                     self.startSnapshotPolling();   // Klipper mode: redirects to _initKlipperCamera
-                    console.log('▶️ Kamera fortgesetzt');
+                    console.log('▶️ Camera resumed');
                 }
             }
 
@@ -5266,7 +5391,7 @@ class CameraManager {
                     controlImg.dataset.originalSrc = controlImg.src.split('?')[0];
                     controlImg.src = '';
                     controlImg.onerror = null;
-                    console.log('⏸️ Control-Kamera pausiert (Tab im Hintergrund)');
+                    console.log('⏸️ Control camera paused (tab in the background)');
                 }
                 if (self.streamRetryTimeout) {
                     clearTimeout(self.streamRetryTimeout);
@@ -5283,7 +5408,7 @@ class CameraManager {
                         const baseSrc = cameraEl.dataset.originalSrc;
                         cameraEl.src = baseSrc + '?t=' + Date.now();
                         streamWasActive = false;
-                        console.log('▶️ Kamera-Stream fortgesetzt');
+                        console.log('▶️ Camera stream resumed');
 
                         // Error handler with retry
                         let retryCount = 0;
@@ -5311,7 +5436,7 @@ class CameraManager {
                     const baseSrc = controlImg.dataset.originalSrc;
                     controlImg.src = baseSrc + '?t=' + Date.now();
                     controlStreamWasActive = false;
-                    console.log('▶️ Control-Kamera fortgesetzt');
+                    console.log('▶️ Control camera resumed');
                 }
             }
         });
@@ -5436,11 +5561,13 @@ class CameraManager {
 
                 document.getElementById('control-camera-source').textContent = sourceText;
                 document.getElementById('camera-source-text').textContent =
-                    data.source === 'external' ? 'P1S Kamera' : 'Externe Kamera';
+                    data.source === 'external' ? (texte.camera_builtin || 'Eingebaute Kamera') : (texte.camera_external || 'Externe Kamera');
 
                 // Show info if the P1S camera was automatically restarted
                 if (data.auto_restarted) {
-                    skToast(`P1S Kamera neugestartet: ${data.restart_reason}`, 'info');
+                    skToast((texte.camera_restarted_toast || '{name} neu gestartet: {reason}')
+                        .replace('{name}', texte.camera_builtin || 'Eingebaute Kamera')
+                        .replace('{reason}', data.restart_reason), 'info');
                 }
             }
         } catch (error) {
@@ -5798,7 +5925,7 @@ class CameraManager {
             mainImg.dataset.pipPaused = mainImg.src.split('?')[0];
             mainImg.src = '';
             mainImg.onerror = null; // Disable the error handler so the stream doesn't auto-restart
-            console.log('⏸️ Kamera-Stream pausiert (PiP aktiv)');
+            console.log('⏸️ Camera stream paused (PiP active)');
         }
     }
 
@@ -5812,14 +5939,14 @@ class CameraManager {
             if (ph && ph.dataset.pip) { ph.style.display = 'none'; delete ph.dataset.pip; }
             if (this._klipperSources && this._klipperSources.length) this._setKlipperCamera(this._klipperSourceIdx || 0);
             else this._initKlipperCamera();
-            console.log('▶️ Klipper-Snapshot-Polling fortgesetzt (PiP geschlossen)');
+            console.log('▶️ Klipper snapshot polling resumed (PiP closed)');
             return;
         }
         const img = document.getElementById('camera-stream');
         if (img && img.dataset.pipPaused) {
             img.src = img.dataset.pipPaused + '?t=' + Date.now();
             delete img.dataset.pipPaused;
-            console.log('▶️ Kamera-Stream fortgesetzt (PiP geschlossen)');
+            console.log('▶️ Camera stream resumed (PiP closed)');
         }
     }
 
@@ -6067,16 +6194,16 @@ class ChartManager {
         const kasten = document.getElementById('vl-ruhe');
         if (!kasten) return;
         try {
-            const r = await apiCall('/api/strom/leerlauf?tage=30');
+            const r = await apiCall('/api/power/idle?days=30');
             const d = await r.json();
-            const z = (d && d.zustaende) || {};
+            const z = (d && d.states) || {};
             const texte = window.texts || {};
             const namen = {
                 leerlauf: texte.chart_idle || 'Leerlauf',
                 trocknet: texte.chart_drying || 'Trocknung',
             };
             const teile = Object.keys(namen)
-                .filter(k => z[k] && z[k].punkte > 0)
+                .filter(k => z[k] && z[k].points > 0)
                 .map(k => `<span class="vl-ruhe-teil"><b>${namen[k]}</b> `
                     + `${z[k].mittel_w.toLocaleString(undefined,
                         { maximumFractionDigits: 1 })} W</span>`);
@@ -6898,7 +7025,7 @@ class SDCardManager {
                         document.getElementById('sd-loading').style.display = 'none';
                         this._syncKopfAus();
 
-                        skToast(data.message || (window.texts||{}).ftps_busy || 'FTPS ist beschäftigt — bitte warten', 'warning');
+                        skToast(window.serverText(data) || (window.texts||{}).ftps_busy || 'FTPS ist beschäftigt — bitte warten', 'warning');
 
                         // Still show cached files if available —
                         // the server also sends page, page count and
@@ -6993,7 +7120,7 @@ class SDCardManager {
         const abgleich = document.getElementById('sd-refresh-btn');
         if (abgleich && !abgleich.classList.contains('sd-refresh--laeuft')) {
             abgleich.disabled = aus;
-            abgleich.title = aus ? grund : (texts.sd_refresh || '');
+            abgleich.title = aus ? grund : (texts.refresh || '');
             abgleich.style.opacity = aus ? '0.45' : '';
         }
 
@@ -7059,7 +7186,15 @@ class SDCardManager {
         // arrive out of order. Only the latest one counts.
         const marke = (this._sdMarke = (this._sdMarke || 0) + 1);
 
-        return apiCall('/api/mqtt/sdcard?' + p.toString())
+        // The archive is a different source with the same shape — same
+        // paging, same search, same sorting, same pager bar. It used to have
+        // a fetch of its own that handed everything over as one page; that
+        // was fine at six files and stopped being fine as it grew.
+        const quelle = window.sdArchivAktiv
+            ? '/api/sd/archiv?' + p.toString()
+            : '/api/mqtt/sdcard?' + p.toString();
+
+        return apiCall(quelle)
             .then(r => r.json())
             .then(daten => {
                 if (marke !== this._sdMarke) return;
@@ -7131,8 +7266,8 @@ class SDCardManager {
         const gesamt = this.sdKopf?.total ?? 0;
         const gefiltert = !!(this.sdAbfrage?.search || this.sdAbfrage?.only_new);
         const muster = gefiltert
-            ? (gesamt === 1 ? texts.sd_ein_treffer : texts.sd_treffer)
-            : (gesamt === 1 ? texts.sd_datei_gesamt : texts.sd_dateien_gesamt);
+            ? (gesamt === 1 ? texts.sd_one_match : texts.sd_treffer)
+            : (gesamt === 1 ? texts.sd_file_total : texts.sd_files_total);
         el.textContent = (muster || '{count}').replace('{count}', gesamt);
     }
 
@@ -7166,13 +7301,13 @@ class SDCardManager {
         dazu(k.pages);
         nummern.sort((a, b) => a - b);
 
-        const stand = (texts.sd_seite_von || 'Seite {page} von {pages}')
+        const stand = (texts.sd_page_of || 'Seite {page} von {pages}')
             .replace('{page}', `<b>${k.page}</b>`)
             .replace('{pages}', `<b>${k.pages}</b>`);
-        const gesamtText = ((k.total === 1 ? texts.sd_datei_gesamt : texts.sd_dateien_gesamt) || '{count}')
+        const gesamtText = ((k.total === 1 ? texts.sd_file_total : texts.sd_files_total) || '{count}')
             .replace('{count}', k.total);
 
-        let knoepfe = `<button ${k.page <= 1 ? 'disabled' : ''} title="${texts.sd_seite_zurueck || ''}"
+        let knoepfe = `<button ${k.page <= 1 ? 'disabled' : ''} title="${texts.sd_page_back || ''}"
                 onclick="sdSeiteWechseln(${k.page - 1})">&lsaquo;</button>`;
         let vorher = 0;
         for (const n of nummern) {
@@ -7181,7 +7316,7 @@ class SDCardManager {
                 onclick="sdSeiteWechseln(${n})">${n}</button>`;
             vorher = n;
         }
-        knoepfe += `<button ${k.page >= k.pages ? 'disabled' : ''} title="${texts.sd_seite_vor || ''}"
+        knoepfe += `<button ${k.page >= k.pages ? 'disabled' : ''} title="${texts.sd_page_next || ''}"
                 onclick="sdSeiteWechseln(${k.page + 1})">&rsaquo;</button>`;
 
         leiste.innerHTML = `
@@ -7239,9 +7374,9 @@ class SDCardManager {
                 <span>${texts.sd_only_new || 'Nur neue'}</span>
             </label>
             <span class="sd-file-count" id="sd-file-count"></span>
-            <!-- Welche Spule gerade aktiv ist. Stand frueher als
-                 Auswahlfeld in JEDER Dateikarte, ueberall mit demselben
-                 Wert — hier steht es einmal, wo es hingehoert. -->
+            <!-- Which spool is active right now. It used to be a dropdown in
+                 EVERY file card, everywhere with the same value -- here it
+                 stands once, where it belongs. -->
             <button class="sd-aktive-spule" id="sd-aktive-spule" style="display:none;"
                     onclick="openSpoolmanFromSD()"></button>
         `;
@@ -7284,11 +7419,11 @@ class SDCardManager {
         // A plain Studio or MakerWorld project carries no
         // print job: the archive is missing every `Metadata/plate_N.gcode`,
         // and that's exactly what the print command points at. The server checks this and sets
-        // `nicht_geschnitten` ONLY on a clear no — without a readable copy
+        // `not_sliced` ONLY on a clear no — without a readable copy
         // the field stays absent and everything behaves as before.
-        const ungeschnitten = file.nicht_geschnitten === true;
+        const ungeschnitten = file.not_sliced === true;
         const isPrintable = !isCorrupt && !ungeschnitten
-            && (file.name.endsWith('.3mf') || file.name.endsWith('.gcode'));
+            && window.isPrintFile(file.name);
         const printState = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
         const printActive = ['RUNNING', 'PAUSE', 'PREPARE'].includes(printState);
         // With the printer off, the list stays readable, but printing
@@ -7373,8 +7508,8 @@ class SDCardManager {
         // file can exist on both — when deleting you need to know
         // which one is meant. The internal storage wasn't visible at all until 29aug26,
         // because FTPS only shows the stick.
-        if (file.speicher) {
-            const intern = file.speicher === 'intern';
+        if (file.storage) {
+            const intern = file.storage === 'intern';
             marken.push(`<span class="sd-marke sd-marke--speicher">` +
                 e(intern ? (texts.storage_internal || 'Intern')
                          : (texts.storage_usb || 'USB-Stick')) + '</span>');
@@ -7384,15 +7519,24 @@ class SDCardManager {
         // It used to sit in EVERY card, spanning the full width.
         // In the archive, the same card has different buttons: restore instead
         // of archive, and the trash icon deletes for good.
-        const imArchiv = file.archiviert === true || file.location === 'archiv';
+        const imArchiv = file.archived === true || file.location === 'archiv';
         const zeigeSpule = mode === 'full'
             && window.spoolmanManager && window.spoolmanManager.connected;
 
         // --- Actions: printing carries color, the rest are icons -------
         let aktionen;
         if (mode === 'schedule-pick') {
+            // From the archive it takes one step more: fetch it back first,
+            // otherwise the plan points at a file the sync deliberately never
+            // carries onto the printer.
+            const planen = imArchiv
+                ? `schedulePrintFromArchive('${safeFilename}')`
+                : `schedulePrintFromScheduleManager('${safeFilename}', '${fileLocation}')`;
             aktionen = isPrintable ? `
-                <button class="sd-btn-haupt" onclick="schedulePrintFromScheduleManager('${safeFilename}', '${fileLocation}')">
+                <button class="sd-btn-haupt" onclick="${planen}"
+                        title="${e(imArchiv ? (texts.sched_archive_pick
+                                    || 'Aus dem Archiv holen und einplanen')
+                                  : (texts.schedule || 'Planen'))}">
                     ${ic(IC_ZEIT)}${e(texts.schedule || 'Planen')}</button>` : '';
         } else {
             aktionen = `
@@ -7437,7 +7581,7 @@ class SDCardManager {
                 </div>
 
                 <div class="sd-zeile-text">
-                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.speicher !== 'intern' ? ` ondblclick="startRenameFile(this, '${safeFilename}')"` : ''}>${e(file.name)}</div>
+                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.storage !== 'intern' ? ` ondblclick="startRenameFile(this, '${safeFilename}')"` : ''}>${e(file.name)}</div>
                     <div class="sd-zeile-fakten">${fakten.map(f => `<span>${f}</span>`).join('')}</div>
                     <div class="sd-zeile-marken">
                         ${marken.join('')}
@@ -7776,7 +7920,7 @@ class SDCardManager {
                 }
             });
             const msg = (texts.confirm_delete_file || 'Datei wirklich löschen') + '?\n' + filename;
-            if (window.showConfirmDialog) window.showConfirmDialog(msg, doDelete);
+            if (window.showConfirmDialog) window.showConfirmDialog({ text: msg, knopf: texts.confirm_ok, gefaehrlich: true }, doDelete);
             else if (window.skConfirm) window.skConfirm(msg, { danger: true })
                 .then(ja => { if (ja) doDelete(); });
             return;
@@ -7800,13 +7944,13 @@ class SDCardManager {
 
                 confirmMessage += `\n\n${texts.confirm_cannot_undo}`;
 
-                showConfirmDialog(confirmMessage, function() {
+                showConfirmDialog({ text: confirmMessage, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
                     self.doDeleteFile(filename, location, checkData);
                 });
             })
             .catch(error => {
                 console.error(texts.console_error_checking + ':', error);
-                showConfirmDialog(texts.confirm_delete_file_warning.replace('{filename}', filename), function() {
+                showConfirmDialog({ text: texts.confirm_delete_file_warning.replace('{filename}', filename), knopf: texts.confirm_ok, gefaehrlich: true }, function() {
                     self.doDeleteFile(filename, location, { count: 0 });
                 });
             });
@@ -7835,7 +7979,7 @@ class SDCardManager {
                     .then(response => response.json())
                     .then(deleteScheduledData => {
                         if (deleteScheduledData.success) {
-                            console.log(`✅ ${deleteScheduledData.deleted} ${texts.scheduled_prints} gelöscht`);
+                            console.log(`✅ ${deleteScheduledData.deleted} scheduled print(s) deleted`);
                             // Refresh the lists if visible
                             if (typeof loadScheduledPrints === 'function') {
                                 loadScheduledPrints();
@@ -8336,24 +8480,12 @@ window.sdArchivUmschalten = function() {
 };
 
 window.sdArchivLaden = function() {
-    return apiCall('/api/sd/archiv')
-        .then(r => r.json())
-        .then(daten => {
-            if (!daten || !daten.success) throw new Error(daten && daten.error);
-            // Same display as the live system — the archive doesn't
-            // paginate, it's a repository, not a running list.
-            window.sdCardManager.zeigeSeite({
-                files: daten.files || [],
-                total: daten.count || 0,
-                page: 1, pages: 1,
-                per_page: Math.max(1, daten.count || 1),
-            });
-        })
-        .catch(fehler => {
-            const texts = window.texts || {};
-            skToast(texts.sd_archive_error || 'Archiv nicht lesbar', 'error');
-            console.error('Archiv:', fehler);
-        });
+    // Back to page one: what stood on page 3 of the live list says nothing
+    // about the archive.
+    const verwalter = window.sdCardManager;
+    verwalter.sdAbfrage = verwalter.sdAbfrage || { per_page: 25, sort: 'date' };
+    verwalter.sdAbfrage.page = 1;
+    return verwalter.ladeSeite();
 };
 
 /**
@@ -8398,7 +8530,7 @@ function sdArchivRuf(pfad, name, erfolgstext) {
         .then(r => r.json())
         .then(daten => {
             if (!daten || !daten.success) {
-                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
                 return false;
             }
             skToast(erfolgstext, 'success');
@@ -8421,7 +8553,7 @@ window.sdArchivAblegen = function(name, ort) {
         .then(r => r.json())
         .then(daten => {
             if (!daten || !daten.success) {
-                skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+                skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
                 return;
             }
             // The printer loses the file on the next sync — even
@@ -8460,7 +8592,7 @@ window.sdArchivHolenUndDrucken = async function(name, knopf) {
         });
         const daten = await antwort.json();
         if (!daten || !daten.success) {
-            skToast((daten && daten.error) || (texts.toast_error || 'Fehler'), 'error');
+            skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
             return;
         }
         // Back to the live view, then the normal path — that loads the
@@ -8634,38 +8766,38 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
 ;/* ---- spool-picker.js ---- */
 /**
- * Spulenauswahl  (24aug26)
+ * Spool selection
  * ==========================================================================
- * Ein eigenes Fenster statt der Auswahlliste in der Material-Karte.
+ * A window of its own instead of the picker list in the material card.
  *
- * Die Liste konnte nur eine Zeile Text je Spule — Name, Material, Gramm,
- * Prozent, alles hintereinander. Beim Spulenwechsel sucht man aber nach
- * FARBE und Restmenge, und beides las man dort erst nach dem Aufklappen.
+ * The list could only manage one line of text per spool -- name, material,
+ * grams, per cent, all in a row. But on a spool change one looks for COLOUR
+ * and remaining amount, and both were only readable there after unfolding.
  *
- * Jede Spule ist hier ein Rad: der Aussenring traegt die Filamentfarbe und
- * ist so weit gefuellt, wie die Spule noch voll ist. Farbe und Rest in
- * einem Blick.
+ * Every spool is a ring here: the outer ring carries the filament colour and
+ * is filled as far as the spool is still full. Colour and remainder at a
+ * glance.
  *
- * Vier Zustaende erzaehlt die Karte selbst:
- *   passt   — blau, kommt aus /api/spoolman/match zur gewaehlten Datei
- *   aktiv   — gruen
- *   knapp   — orange, unter KNAPP_GRAMM
- *   leer    — abgeblendet, nicht waehlbar
+ * The card tells four states itself:
+ *   match   -- blue, from /api/spoolman/match for the chosen file
+ *   active  -- green
+ *   low     -- orange, under KNAPP_GRAMM
+ *   empty   -- dimmed, not selectable
  */
 (function () {
     'use strict';
 
-    /** Ab hier ist eine Spule „knapp" — dieselbe Schwelle wie im Server-Warner. */
+    /** From here a spool counts as "low" -- the same threshold as the server warner. */
     const KNAPP_GRAMM = 50;
 
-    /** Dichte in g/cm3 je Materialfamilie, fuer die Laengenschaetzung. */
+    /** Density in g/cm3 per material family, for the length estimate. */
     const DICHTE = {
         pla: 1.24, petg: 1.27, abs: 1.04, asa: 1.07,
         tpu: 1.21, pc: 1.20, nylon: 1.14, hips: 1.04, pva: 1.23,
     };
 
     let zustand = {
-        spulen: [],
+        spools: [],
         treffer: [],       // IDs, die zur aktuellen Datei passen
         datei: null,       // Dateiname, wenn aus dem Planen/Drucken geoeffnet
         wanted: null,      // {material, color} der Datei
@@ -8681,7 +8813,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-    /** Materialfamilie — dieselbe Zusammenfassung wie am Server. */
+    /** Material family -- the same grouping as on the server. */
     function familie(material) {
         const m = String(material || '').toLowerCase().trim();
         for (const schluessel of Object.keys(DICHTE)) {
@@ -8691,9 +8823,9 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
     }
 
     /**
-     * Gramm in laufende Meter. Geschaetzt: Dichte je Material, Durchmesser
-     * aus der Spule (Rueckfall 1,75 mm). Steht klein neben der Restmenge,
-     * damit man weiss, ob der Druck ueberhaupt draufpasst.
+     * Grams into running metres. Estimated: density per material, diameter
+     * from the spool (falling back to 1.75 mm). It stands small beside the
+     * remaining amount, so one knows whether the print fits at all.
      */
     function meter(spool) {
         const gramm = spool.remaining_weight || 0;
@@ -8706,7 +8838,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         return Math.round(laenge / 100);               // m
     }
 
-    /** „heute, 06:10" · „vor 3 Tagen" · „vor 2 Monaten" · „neu" */
+    /** "today, 06:10" · "3 days ago" · "2 months ago" · "new" */
     function zuletzt(iso) {
         if (!iso) return t('spool_never_used', 'neu');
         const d = new Date(iso);
@@ -8730,7 +8862,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
             hersteller: (fil.vendor && fil.vendor.name) || '',
             name: fil.name || t('unknown', 'Unbekannt'),
             material: fil.material || '',
-            farbe: fil.color_hex ? ('#' + String(fil.color_hex).replace('#', '').slice(0, 6)) : '#8a8a8a',
+            color: fil.color_hex ? ('#' + String(fil.color_hex).replace('#', '').slice(0, 6)) : '#8a8a8a',
         };
     }
 
@@ -8775,7 +8907,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         return `
             <button type="button" class="${klassen.join(' ')}" data-id="${spool.id}"${leer ? ' disabled' : ''}>
                 ${marke}
-                <span class="spw-rad" style="--fuell:${prozent}; --farbe:${esc(a.farbe)};"><span>${prozent}%</span></span>
+                <span class="spw-rad" style="--fuell:${prozent}; --farbe:${esc(a.color)};"><span>${prozent}%</span></span>
                 <span class="spw-text">
                     <span class="spw-hersteller">${esc(a.hersteller)}</span>
                     <span class="spw-name">${esc(a.name)}</span>
@@ -8793,97 +8925,96 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         return window.skIcon ? window.skIcon(name, 'hd-ic--xs') : '';
     }
 
-    // Feuchte-Gedaechtnis je Spoolman-Nummer. Die Bruecke entsteht beim
-    // Druckstart (print_filaments haelt spool_id und ams_tray_id zusammen),
-    // deshalb hat nicht jede Rolle einen Eintrag — angezeigt wird nur, was
-    // wirklich gemessen wurde.
+    // Humidity memory per Spoolman number. The bridge comes into being at the
+    // print start (print_filaments holds spool_id and ams_tray_id together),
+    // so not every spool has an entry -- only what was really measured is shown.
     let feuchteJeSpule = new Map();
     let feuchteStand = {};
     let feuchteSchwelle = 35;
 
     async function ladeFeuchte() {
-        if (!window.amsFeuchte) return;
+        if (!window.amsHumidity) return;
         try {
-            const daten = await window.amsFeuchte.hole(400);
+            const daten = await window.amsHumidity.hole(400);
             if (!daten) return;
-            feuchteSchwelle = daten.schwelle;
+            feuchteSchwelle = daten.threshold;
             feuchteStand = daten;
-            // Mehrere Reihen koennen auf dieselbe Spoolman-Nummer zeigen:
-            // je Liegezeit im Fach eine, und eine Rolle liegt oft mehrfach
-            // drin. `new Map([...])` nimmt bei gleichem Schluessel den
-            // LETZTEN — ohne jede Regel, welcher der richtige ist. Am
-            // 01sep26 gewann so eine Reihe, die um 14:16 endete, waehrend
-            // die offene bis 15:43 gemessen hatte: das Fenster zeigte den
-            // Stand von vor anderthalb Stunden.
+            // Several rows can point at the same Spoolman number: one per
+            // spell in the tray, and a spool often lies in there more than
+            // once. `new Map([...])` takes the LAST on an equal key -- with no
+            // rule at all about which is the right one. A row that ended at
+            // 14:16 once won that way while the open one had measured until
+            // 15:43: the window showed the state from an hour and a half
+            // earlier.
             //
-            // Jetzt gewinnt die Reihe mit der juengsten Messung; bei
-            // Gleichstand die noch offene.
+            // Now the row with the most recent measurement wins; on a tie the
+            // one still open.
             const juengste = e => {
-                const v = e.verlauf || [];
-                return v.length ? String(v[v.length - 1].zeit || '') : '';
+                const v = e.history || [];
+                return v.length ? String(v[v.length - 1].time || '') : '';
             };
             feuchteJeSpule = new Map();
-            for (const e of (daten.verlauf_spulen || [])) {
+            for (const e of (daten.history_spools || [])) {
                 if (e.spool_id == null) continue;
                 const bisher = feuchteJeSpule.get(e.spool_id);
                 if (!bisher) { feuchteJeSpule.set(e.spool_id, e); continue; }
                 const a = juengste(e), b = juengste(bisher);
-                if (a > b || (a === b && e.bis == null && bisher.bis != null)) {
+                if (a > b || (a === b && e.inside && !bisher.inside)) {
                     feuchteJeSpule.set(e.spool_id, e);
                 }
             }
         } catch (e) { /* ohne Feuchte bleibt es die einfache Auswahl */ }
     }
 
-    /** Die Plakette auf der Karte: Urteil und wie lange es zu feucht war. */
+    /** The badge on the card: the verdict and how long it was too damp. */
     function feuchteChip(spoolId) {
         const e = feuchteJeSpule.get(spoolId);
         if (!e) return '';
         let text;
-        if (e.urteil === 'trocken') {
-            text = t('feuchte_urteil_trocken', 'trocken');
-        } else if (e.tage_ueber >= 1) {
-            text = t('feuchte_kurz_tage', '{n} d über {s} %')
-                .replace('{n}', e.tage_ueber.toFixed(e.tage_ueber < 10 ? 1 : 0))
+        if (e.verdict === 'trocken') {
+            text = t('humidity_verdict_dry', 'trocken');
+        } else if (e.days_above >= 1) {
+            text = t('humidity_short_days', '{n} d über {s} %')
+                .replace('{n}', e.days_above.toFixed(e.days_above < 10 ? 1 : 0))
                 .replace('{s}', feuchteSchwelle);
         } else {
-            text = t('feuchte_kurz_stunden', '{n} h über {s} %')
-                .replace('{n}', Math.max(1, Math.round(e.stunden_ueber)))
+            text = t('humidity_short_hours', '{n} h über {s} %')
+                .replace('{n}', Math.max(1, Math.round(e.hours_above)))
                 .replace('{s}', feuchteSchwelle);
         }
-        // Anklickbar statt nur beschriftet: die Vorgeschichte gehoert in ein
-        // eigenes Fenster. Unter der Karte angeklebt sah die Kurve auf elf
-        // Karten nach Tapete aus.
-        // KEIN <button>: die Karte selbst ist schon eines, und ein Knopf im
-        // Knopf ist ungueltiges HTML — der Browser bricht die Karte dort auf.
-        const titel = t('feuchte_open', 'Feuchteverlauf zeigen');
-        return `<span class="spw-feucht spw-feucht--${esc(e.urteil)}" role="button"`
-             + ` tabindex="0" data-feuchte="${spoolId}" title="${esc(titel)}">`
+        // Clickable rather than just labelled: the history belongs in a window
+        // of its own. Glued under the card, the curve looked like wallpaper
+        // across eleven cards.
+        // NOT a <button>: the card is one already, and a button inside a
+        // button is invalid HTML -- the browser breaks the card open there.
+        const titel = t('humidity_open', 'Feuchteverlauf zeigen');
+        return `<span class="spw-feucht spw-feucht--${esc(e.verdict)}" role="button"`
+             + ` tabindex="0" data-humidity="${spoolId}" title="${esc(titel)}">`
              + ikon('wasser') + esc(text) + ikon('chevronRechts') + '</span>';
     }
 
-    /** Die Vorgeschichte einer Rolle als eigenes Fenster. */
+    /** The history of one spool as a window of its own. */
     function zeigeFeuchte(spoolId) {
         const e = feuchteJeSpule.get(spoolId);
-        if (!e || !window.amsFeuchte) return;
-        const spule = zustand.spulen.find(x => x.id === spoolId) || {};
+        if (!e || !window.amsHumidity) return;
+        const spule = zustand.spools.find(x => x.id === spoolId) || {};
         const fil = spule.filament || {};
         const name = [((fil.vendor || {}).name || ''), fil.name || ''].filter(Boolean).join(' ')
-            || (e.typ || '');
-        const zeit = window.amsFeuchte.spanne(e.verlauf);
-        const kurve = window.amsFeuchte.kurve(e.verlauf, feuchteSchwelle, 480, 96);
+            || (e.type || '');
+        const zeit = window.amsHumidity.spanne(e.history);
+        const kurve = window.amsHumidity.kurve(e.history, feuchteSchwelle, 480, 96);
         const worte = {
-            trocken: t('feuchte_urteil_trocken', 'trocken'),
-            beobachten: t('feuchte_urteil_beobachten', 'im Blick behalten'),
-            trocknen: t('feuchte_urteil_trocknen', 'trocknen'),
+            trocken: t('humidity_verdict_dry', 'trocken'),
+            beobachten: t('humidity_verdict_watch', 'im Blick behalten'),
+            trocknen: t('humidity_verdict_needs_drying', 'trocknen'),
         };
-        const ueber = e.tage_ueber >= 1
-            ? t('feuchte_kurz_tage', '{n} d über {s} %')
-                .replace('{n}', e.tage_ueber.toFixed(e.tage_ueber < 10 ? 1 : 0))
+        const ueber = e.days_above >= 1
+            ? t('humidity_short_days', '{n} d über {s} %')
+                .replace('{n}', e.days_above.toFixed(e.days_above < 10 ? 1 : 0))
                 .replace('{s}', feuchteSchwelle)
-            : (e.stunden_ueber > 0
-                ? t('feuchte_kurz_stunden', '{n} h über {s} %')
-                    .replace('{n}', Math.max(1, Math.round(e.stunden_ueber)))
+            : (e.hours_above > 0
+                ? t('humidity_short_hours', '{n} h über {s} %')
+                    .replace('{n}', Math.max(1, Math.round(e.hours_above)))
                     .replace('{s}', feuchteSchwelle)
                 : '–');
         const wert = (kopf, w) => `<div class="spf-wert"><div class="spf-wert-kopf">${esc(kopf)}</div>`
@@ -8898,25 +9029,25 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
             <div class="tray-edit-box spf-box">
                 <h4>${esc(name)}</h4>
                 <div class="spf-kopf">
-                    <span class="spf-urteil spf-urteil--${esc(e.urteil)}">${esc(worte[e.urteil] || e.urteil)}</span>
+                    <span class="spf-urteil spf-urteil--${esc(e.verdict)}">${esc(worte[e.verdict] || e.verdict)}</span>
                     ${zeit.text ? `<span class="spf-spanne">${esc(zeit.text)}</span>` : ''}
-                    <span class="spf-grenze">${esc(t('feuchte_schwelle', 'Grenze {s} %')
+                    <span class="spf-grenze">${esc(t('humidity_threshold', 'Grenze {s} %')
                         .replace('{s}', feuchteSchwelle))}</span>
                 </div>
-                ${kurve || `<div class="fk-frisch">${esc(t('feuchte_zu_kurz',
+                ${kurve || `<div class="fk-frisch">${esc(t('humidity_too_short',
                     'Noch zu wenig aufgezeichnet für einen Verlauf.'))}</div>`}
                 <div class="spf-werte">
-                    ${wert(t('feuchte_jetzt', 'Jetzt'), e.jetzt + ' %')}
-                    ${wert(t('feuchte_max', 'Spitze'), e.max + ' %')}
-                    ${wert(t('feuchte_ueber', 'Über der Grenze'), ueber)}
-                    ${wert(t('feuchte_liegezeit', 'Im AMS'), Math.round(e.stunden) + ' h')}
+                    ${wert(t('humidity_now', 'Jetzt'), e.now + ' %')}
+                    ${wert(t('humidity_max', 'Spitze'), e.max + ' %')}
+                    ${wert(t('humidity_above', 'Über der Grenze'), ueber)}
+                    ${wert(t('humidity_dwell', 'Im AMS'), Math.round(e.hours) + ' h')}
                 </div>
                 <div class="tray-edit-actions">
                     <button class="tray-edit-cancel" id="spf-zu">${esc(t('settings_close', 'Schließen'))}</button>
                 </div>
             </div>`;
         document.body.appendChild(ov);
-        // Ueber der Spulenauswahl, die selbst schon vorn liegt.
+        // Above the spool picker, which already lies in front.
         if (window.skNachVorn) window.skNachVorn(ov, 10050);
         const zu = () => ov.remove();
         ov.querySelector('#spf-zu').addEventListener('click', zu);
@@ -8925,7 +9056,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
     function gefiltert() {
         const suche = zustand.suche.trim().toLowerCase();
-        let liste = zustand.spulen.filter(spool => {
+        let liste = zustand.spools.filter(spool => {
             const a = anzeigeName(spool);
             if (zustand.material && familie(a.material) !== zustand.material) return false;
             if (!suche) return true;
@@ -8947,8 +9078,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
             }
         });
 
-        // Passende Spulen nach oben — sie sind der Grund, warum das Fenster
-        // aufging.
+        // Matching spools to the top -- they are the reason the window opened.
         if (zustand.treffer.length) {
             liste.sort((x, y) =>
                 (zustand.treffer.includes(y.id) ? 1 : 0) - (zustand.treffer.includes(x.id) ? 1 : 0));
@@ -8958,18 +9088,18 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
     function materialChips() {
         const zaehler = {};
-        zustand.spulen.forEach(s => {
+        zustand.spools.forEach(s => {
             const f = familie(anzeigeName(s).material);
             if (!f) return;
-            zaehler[f] = zaehler[f] || { n: 0, farbe: anzeigeName(s).farbe };
+            zaehler[f] = zaehler[f] || { n: 0, color: anzeigeName(s).color };
             zaehler[f].n++;
         });
         const chips = [`<button type="button" class="spw-chip${zustand.material ? '' : ' spw-chip--an'}"
-                          data-material="">${esc(t('all', 'Alle'))} <b>${zustand.spulen.length}</b></button>`];
+                          data-material="">${esc(t('all', 'Alle'))} <b>${zustand.spools.length}</b></button>`];
         Object.keys(zaehler).sort().forEach(f => {
             chips.push(`<button type="button" class="spw-chip${zustand.material === f ? ' spw-chip--an' : ''}"
                           data-material="${esc(f)}">
-                          <i class="spw-chip-punkt" style="background:${esc(zaehler[f].farbe)}"></i>
+                          <i class="spw-chip-punkt" style="background:${esc(zaehler[f].color)}"></i>
                           ${esc(f.toUpperCase())} <b>${zaehler[f].n}</b></button>`);
         });
         return chips.join('');
@@ -8983,11 +9113,11 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
             ? liste.map(karteHtml).join('')
             : `<div class="spw-leer">${esc(t('spool_none_found', 'Keine Spule gefunden'))}</div>`;
 
-        // Sagen, wenn ein Fach keiner Spule zugeordnet ist.
+        // Say when a tray has no spool assigned.
         //
-        // Vorher blieb das stumm: die Karte zeigte einfach keine Plakette,
-        // und niemand konnte wissen, dass etwas zu setzen ist. Geraten wird
-        // seit 01sep26 bewusst nicht mehr — dann muss der Hinweis her.
+        // This used to stay silent: the card simply showed no badge, and
+        // nobody could know there was something to set. Nothing is guessed any
+        // more, so the hint has to be there.
         const hinweis = document.getElementById('spw-hinweis');
         if (hinweis) hinweis.innerHTML = ohneZuordnungHtml();
 
@@ -8998,18 +9128,18 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         if (uebernehmen) uebernehmen.disabled = zustand.gewaehlt == null;
     }
 
-    /** Faecher im AMS, denen keine Spoolman-Rolle zugeordnet ist. */
+    /** Trays in the AMS with no Spoolman spool assigned. */
     function ohneZuordnungHtml() {
-        const offen = (feuchteStand.spulen || []).filter(s => s.spool_id == null);
+        const offen = (feuchteStand.spools || []).filter(s => s.spool_id == null);
         if (!offen.length) return '';
         return offen.map(s => {
-            const vorschlag = (s.vorschlaege || [])[0];
+            const vorschlag = (s.suggestions || [])[0];
             return '<div class="spw-hinweis-zeile">'
-                 + esc(t('feuchte_ohne_zuordnung',
+                 + esc(t('humidity_unassigned',
                          'Fach {n} im AMS ist keiner Spule zugeordnet.')
                        .replace('{n}', (s.slot ?? 0) + 1))
                  + (vorschlag
-                    ? ' <b>' + esc(t('feuchte_vorschlag', 'Vorschlag: {name}')
+                    ? ' <b>' + esc(t('humidity_suggestion', 'Vorschlag: {name}')
                                    .replace('{name}', vorschlag.name || '')) + '</b>'
                     : '')
                  + '</div>';
@@ -9037,11 +9167,11 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
     /**
      * @param {object} opts
-     *   datei   — Dateiname; setzt das Empfehlungsband und die Treffer
-     *   plate   — Plattennummer (Standard 1)
-     *   gewaehlt— vorgewaehlte Spulen-ID
-     *   onWahl  — Rueckruf mit der gewaehlten Spule; ohne ihn wird direkt
-     *             aktiviert (Material-Karte)
+     *   datei   -- file name; it sets the recommendation band and the matches
+     *   plate   -- plate number (default 1)
+     *   gewaehlt-- preselected spool id
+     *   onWahl  -- callback with the chosen spool; without it the spool is
+     *              activated directly (the material card)
      */
     async function oeffne(opts = {}) {
         const sm = window.spoolmanManager;
@@ -9051,7 +9181,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
         }
 
         zustand = Object.assign(zustand, {
-            spulen: sm.spools || [],
+            spools: sm.spools || [],
             treffer: [],
             datei: opts.datei || null,
             wanted: null,
@@ -9063,16 +9193,16 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
         const fenster = document.getElementById('spoolPickerModal');
         if (!fenster) return;
-        // Der Fach-Dialog liegt auf z-index 10050. Ohne das oeffnete sich die
-        // Auswahl DAHINTER — sichtbar war nur die Abdunklung.
+        // The tray dialog sits at z-index 10050. Without this the picker
+        // opened BEHIND it -- only the dimming was visible.
         if (window.skNachVorn) window.skNachVorn(fenster, 1006);
         fenster.style.display = 'block';
         document.getElementById('spw-band').innerHTML = '';
         zeichne();
         ladeFeuchte().then(() => { if (feuchteJeSpule.size) zeichne(); });
 
-        // Passende Spulen nachladen — der Abgleich liegt am Server, damit
-        // Liste, Planen und Sofortdruck dieselbe Meinung haben.
+        // Load the matching spools -- the matching lives on the server, so the
+        // list, scheduling and an immediate print share one opinion.
         if (opts.datei) {
             try {
                 const antwort = await window.apiCall(
@@ -9083,7 +9213,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
                 document.getElementById('spw-band').innerHTML = bandHtml();
                 zeichne();
             } catch (e) {
-                /* ohne Treffer bleibt es die einfache Auswahl */
+                /* without matches it stays the plain picker */
             }
         }
     }
@@ -9096,7 +9226,7 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
     function uebernehmen() {
         const id = zustand.gewaehlt;
         if (id == null) return;
-        const spule = zustand.spulen.find(s => s.id === id);
+        const spule = zustand.spools.find(s => s.id === id);
         if (zustand.onWahl) {
             zustand.onWahl(spule);
         } else if (window.activateSpool) {
@@ -9110,12 +9240,12 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
     // ======================================================================
 
     document.addEventListener('click', (e) => {
-        const feucht = e.target.closest && e.target.closest('[data-feuchte]');
+        const feucht = e.target.closest && e.target.closest('[data-humidity]');
         if (feucht) {
-            // Nicht die Karte auswaehlen — der Klick galt der Plakette.
+            // Do not select the card -- the click was meant for the badge.
             e.preventDefault();
             e.stopPropagation();
-            zeigeFeuchte(parseInt(feucht.dataset.feuchte, 10));
+            zeigeFeuchte(parseInt(feucht.dataset.humidity, 10));
             return;
         }
         const karte = e.target.closest && e.target.closest('.spw-spule');
@@ -9151,9 +9281,9 @@ window.displaySDFiles = function(files) { window.sdCardManager.displaySDFiles(fi
 
 
 ;/* ---- filament-db.js ---- */
-// Automatisch erzeugt aus den Bambu-Studio-Filamentprofilen
-// (resources/profiles/BBL/filament, 20aug26) + pybambu filaments.json.
-// [tray_info_idx, Anzeigename, tray_type, nozzle_temp_min, nozzle_temp_max]
+// Generated automatically from the Bambu Studio filament profiles
+// (resources/profiles/BBL/filament) and pybambu's filaments.json.
+// [tray_info_idx, display name, tray_type, nozzle_temp_min, nozzle_temp_max]
 window.BAMBU_FILAMENT_DB = [
   ['GFB00', 'Bambu ABS', 'ABS', 240, 280],
   ['GFB50', 'Bambu ABS-GF', 'ABS-GF', 240, 280],
@@ -9237,16 +9367,16 @@ window.BAMBU_FILAMENT_DB = [
 ];
 
 /**
- * Trocknungs-Vorgaben vom Server uebernehmen (/api/filament/db).
+ * Take the drying presets from the server (/api/filament/db).
  *
- * Die Tabelle darunter ist ab 28aug26 nur noch der Rueckfall: dieselben
- * Zahlen lagen bis dahin fuenfmal im Baum (Server, hier, ZWEIMAL auf
- * Android, iOS). Sie waren zwar alle gleich — nachgemessen —, aber vier
- * Kopien, die niemand vergleicht. Jetzt fuehrt der Server sie, und wer sie
- * braucht, hat sie nach dem ersten Abruf der Profilliste.
+ * The table below is only the fallback now: the same numbers used to sit in the
+ * tree five times over (the server, here, TWICE on Android, and iOS). They were
+ * all identical -- that was checked -- but they were four copies nobody
+ * compares. The server keeps them now, and whoever needs them has them after
+ * the first call for the profile list.
  *
- * Form vom Server: {PLA: {idle: {temp, hours}, printing: {temp, hours}}}
- * Form hier:       {PLA: [[Grad, Stunden] idle, [Grad, Stunden] im Druck]}
+ * The shape from the server: {PLA: {idle: {temp, hours}, printing: {temp, hours}}}
+ * The shape here:            {PLA: [[degrees, hours] idle, [degrees, hours] printing]}
  */
 window.uebernehmeTrocknung = function (vomServer) {
     if (!vomServer || typeof vomServer !== 'object') return;
@@ -9261,11 +9391,11 @@ window.uebernehmeTrocknung = function (vomServer) {
     if (Object.keys(raus).length) window.BAMBU_DRY_PRESETS = raus;
 };
 
-// Trocknungs-Empfehlung je Materialtyp — AMS HT (n3s) aus den Studio-
-// Profilen (filament_dev_ams_drying_temperature/-_time, Index 1 = idle,
-// Index 3 = waehrend des Drucks; im Druck niedriger, z.B. ABS 75 statt 80,
-// damit das Filament nicht zu weich in den Extruder laeuft).
-// typ: [[Grad, Stunden] idle, [Grad, Stunden] im Druck]
+// The drying recommendation per material type -- AMS HT (n3s) from the Studio
+// profiles (filament_dev_ams_drying_temperature/-_time, index 1 = idle,
+// index 3 = during a print; lower while printing, ABS 75 instead of 80 for
+// instance, so the filament does not run into the extruder too soft).
+// type: [[degrees, hours] idle, [degrees, hours] printing]
 window.BAMBU_DRY_PRESETS = {
   PLA: [[45, 12], [45, 12]], PETG: [[65, 12], [55, 12]], PET: [[65, 12], [55, 12]],
   PCTG: [[65, 12], [55, 12]], ABS: [[80, 8], [75, 8]], ASA: [[80, 8], [80, 8]],
@@ -9276,15 +9406,15 @@ window.BAMBU_DRY_PRESETS = {
 };
 
 
-;/* ---- ams-feuchte.js ---- */
+;/* ---- ams-humidity.js ---- */
 /**
- * Feuchte-Gedaechtnis des AMS.
+ * The humidity memory of the AMS.
  *
- * Der Momentwert steht im Status und wird ueberall angezeigt. Die Frage vor
- * einem Druck ist aber, wie lange eine Spule feucht LAG — dafuer liefert der
- * Server unter /api/filament/feuchte den Verlauf je Einheit und ein Urteil je
- * Fach. Dieses Modul holt das einmal, haelt es kurz und zeichnet daraus die
- * Kurve und die Merkzeile.
+ * The instantaneous value is in the status and shown everywhere. The question
+ * before a print, though, is how long a spool LAY damp -- for that the server
+ * delivers the history per unit and a verdict per tray under
+ * /api/filament/humidity. This module fetches that once, keeps it briefly and
+ * draws the curve and the summary line from it.
  */
 (function () {
     'use strict';
@@ -9296,7 +9426,7 @@ window.BAMBU_DRY_PRESETS = {
     const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,
         c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-    /** Holt den Stand; mehrfache Aufrufe im selben Moment teilen eine Anfrage. */
+    /** Fetches the state; several calls in the same moment share one request. */
     async function hole(tage) {
         const jetzt = Date.now();
         if (stand && (jetzt - geholt) < GUELTIG_MS) return stand;
@@ -9304,7 +9434,7 @@ window.BAMBU_DRY_PRESETS = {
         laufend = (async () => {
             try {
                 const antwort = await window.apiCall(
-                    '/api/filament/feuchte?tage=' + (tage || 14));
+                    '/api/filament/humidity?days=' + (tage || 14));
                 const daten = await antwort.json();
                 if (daten && daten.success) { stand = daten; geholt = Date.now(); }
                 return stand;
@@ -9315,91 +9445,92 @@ window.BAMBU_DRY_PRESETS = {
         return laufend;
     }
 
-    /** Nach einer Trocknung ist der alte Stand hinfaellig. */
+    /** After a drying run the old state is void. */
     function vergiss() { stand = null; geholt = 0; }
 
     function fuerFach(daten, amsId, slot) {
-        return ((daten && daten.spulen) || []).find(
+        return ((daten && daten.spools) || []).find(
             s => s.ams_id === amsId && s.slot === slot) || null;
     }
 
     function einheit(daten, amsId) {
-        return ((daten && daten.einheiten) || []).find(e => e.id === amsId) || null;
+        return ((daten && daten.units) || []).find(e => e.id === amsId) || null;
     }
 
-    /** Wie viel Zeit die Messreihe wirklich abdeckt — als Text. */
+    /** How much time the series really covers -- as text. */
     function spanne(verlauf) {
-        const p = (verlauf || []).filter(x => x.feuchte != null);
+        const p = (verlauf || []).filter(x => x.humidity != null);
         if (p.length < 2) return { ms: 0, text: '' };
-        const zeit = x => new Date(String(x.zeit).replace(' ', 'T')).getTime();
+        const zeit = x => new Date(String(x.time).replace(' ', 'T')).getTime();
         const t0 = zeit(p[0]), t1 = zeit(p[p.length - 1]);
         const ms = Math.max(t1 - t0, 0);
         const stunden = ms / 3600000;
-        // Die Ueberschrift sagte bisher immer "letzte 14 Tage" — auch wenn
-        // fuenf Minuten Messwerte dahinter lagen. Sie nennt jetzt, was
-        // wirklich drin ist.
-        // Einheit so waehlen, dass die Zahl immer >= 2 ist — sonst stuende da
-        // "letzte 1 Stunden". Einzahlformen fuer fuenf Sprachen waeren zehn
-        // weitere Zeichenketten fuer einen Fall, den es so nicht gibt.
+        // The heading always used to say "the last 14 days" -- even with five
+        // minutes of measurements behind it. It now names what is really
+        // there.
+        // The unit is chosen so the number is always >= 2 -- otherwise it would
+        // read "the last 1 hours". Singular forms for five languages would be
+        // ten more strings for a case that does not arise.
         const text = stunden >= 48
-            ? t('feuchte_spanne_tage', 'letzte {n} Tage').replace('{n}', Math.round(stunden / 24))
+            ? t('humidity_span_days', 'letzte {n} Tage').replace('{n}', Math.round(stunden / 24))
             : (stunden >= 2
-                ? t('feuchte_spanne_stunden', 'letzte {n} Stunden').replace('{n}', Math.round(stunden))
-                : t('feuchte_spanne_minuten', 'letzte {n} Minuten').replace('{n}', Math.max(2, Math.round(ms / 60000))));
+                ? t('humidity_span_hours', 'letzte {n} Stunden').replace('{n}', Math.round(stunden))
+                : t('humidity_span_minutes', 'letzte {n} Minuten').replace('{n}', Math.max(2, Math.round(ms / 60000))));
         return { ms, text, von: t0, bis: t1 };
     }
 
     let lfdNr = 0;
 
-    /** Die Flaeche unter der Kurve — je Liegezeit ein geschlossener Zug. */
+    /** The area under the curve -- one closed path per period. */
     function flaeche(punkte, x, y, h) {
         const stuecke = [];
         let lauf = [];
         punkte.forEach((p, i) => {
-            if (i && p.luecke) { stuecke.push(lauf); lauf = []; }
+            if (i && p.gap) { stuecke.push(lauf); lauf = []; }
             lauf.push(p);
         });
         stuecke.push(lauf);
         return stuecke.filter(st => st.length > 1).map(st =>
-            st.map((p, i) => (i ? 'L' : 'M') + x(p).toFixed(1) + ' ' + y(p.feuchte).toFixed(1)).join(' ')
+            st.map((p, i) => (i ? 'L' : 'M') + x(p).toFixed(1) + ' ' + y(p.humidity).toFixed(1)).join(' ')
             + ` L${x(st[st.length - 1]).toFixed(1)} ${h} L${x(st[0]).toFixed(1)} ${h} Z`).join(' ');
     }
 
     /**
-     * Der Verlauf als Kurve.
+     * The history as a curve.
      *
-     * Gefuellt wird NUR ueber der Grenze und in Rot: eine Flaeche vom Wert
-     * bis zum Boden sah bei jeder ruhigen Spule gleich aus — ein halb
-     * blauer Kasten, der nichts sagte. So bleiben von einer trockenen Spule
-     * eine flache Linie und von einer nassen rote Berge uebrig.
+     * It is filled ONLY above the threshold, and in red: an area from the value
+     * down to the floor looked the same for every quiet spool -- a half-blue
+     * box that said nothing. This way a dry spool leaves a flat line and a wet
+     * one leaves red mountains.
      */
     function kurve(verlauf, schwelle, breite, hoehe) {
-        const punkte = (verlauf || []).filter(p => p.feuchte != null);
+        const punkte = (verlauf || []).filter(p => p.humidity != null);
         if (punkte.length < 2) return '';
         const b = breite || 260, h = hoehe || 46;
-        const zeit = p => new Date(String(p.zeit).replace(' ', 'T')).getTime();
+        const zeit = p => new Date(String(p.time).replace(' ', 'T')).getTime();
         const t0 = zeit(punkte[0]), t1 = zeit(punkte[punkte.length - 1]);
         const dauer = Math.max(t1 - t0, 1);
-        // Feste Skala 10–60 %: eine mitwachsende Achse liesse eine ruhige
-        // Spule genauso zappeln wie eine nasse. 35 % liegt damit in der Mitte.
+        // A fixed scale of 10-60%: an axis that grows with the data would make
+        // a quiet spool jitter exactly like a wet one. 35% then sits in the
+        // middle.
         const UNTEN = 10, OBEN = 60;
         const x = p => ((zeit(p) - t0) / dauer) * b;
         const y = v => h - ((Math.min(Math.max(v, UNTEN), OBEN) - UNTEN) / (OBEN - UNTEN)) * h;
-        // `luecke` faengt einen neuen Strich an: zwischen zwei Liegezeiten
-        // lag die Spule im Regal, da wurde nichts gemessen. Eine
-        // durchgezogene Linie waere dort erfunden.
-        const d = punkte.map((p, i) => ((i && !p.luecke) ? 'L' : 'M') + x(p).toFixed(1)
-            + ' ' + y(p.feuchte).toFixed(1)).join(' ');
+        // `luecke` starts a new stroke: between two periods the spool sat on
+        // the shelf and nothing was measured. A continuous line would be made
+        // up there.
+        const d = punkte.map((p, i) => ((i && !p.gap) ? 'L' : 'M') + x(p).toFixed(1)
+            + ' ' + y(p.humidity).toFixed(1)).join(' ');
         const ys = y(schwelle).toFixed(1);
         const nr = 'fkc' + (++lfdNr);
-        const nass = punkte.some(p => p.feuchte >= schwelle);
-        // Die Messpunkte reisen im Element mit: beim Ueberfahren sucht der
-        // Zeiger den naechsten und zeigt Zeit, Feuchte und Temperatur. Ohne
-        // das waere die Kurve nur eine Form ohne Zahlen.
+        const nass = punkte.some(p => p.humidity >= schwelle);
+        // The measurements travel inside the element: on hover the pointer
+        // finds the nearest one and shows time, humidity and temperature.
+        // Without that the curve would be a shape without numbers.
         const daten = punkte.map(p => [
-            new Date(String(p.zeit).replace(' ', 'T')).getTime(),
-            Math.round(p.feuchte * 10) / 10,
-            p.temperatur == null ? null : Math.round(p.temperatur * 10) / 10,
+            new Date(String(p.time).replace(' ', 'T')).getTime(),
+            Math.round(p.humidity * 10) / 10,
+            p.temperature == null ? null : Math.round(p.temperature * 10) / 10,
         ]);
         return `<svg class="fk-kurve" viewBox="0 0 ${b} ${h}" preserveAspectRatio="none"
                      role="img" aria-hidden="true"
@@ -9411,36 +9542,36 @@ window.BAMBU_DRY_PRESETS = {
         </svg>`;
     }
 
-    /** Die Merkzeile zu einer Spule: Urteil, Spitzenwert, Zeit ueber der Schwelle. */
+    /** The summary line for a spool: verdict, peak value, time above the threshold. */
     function merkzeile(spule, schwelle) {
         if (!spule) return '';
         const worte = {
-            trocken: t('feuchte_urteil_trocken', 'trocken'),
-            beobachten: t('feuchte_urteil_beobachten', 'im Blick behalten'),
-            trocknen: t('feuchte_urteil_trocknen', 'trocknen'),
+            trocken: t('humidity_verdict_dry', 'trocken'),
+            beobachten: t('humidity_verdict_watch', 'im Blick behalten'),
+            trocknen: t('humidity_verdict_needs_drying', 'trocknen'),
         };
         const teile = [];
-        if (spule.tage_ueber >= 1) {
-            teile.push(t('feuchte_tage_ueber', '{n} Tage über {s} %')
-                .replace('{n}', spule.tage_ueber.toFixed(spule.tage_ueber < 10 ? 1 : 0))
+        if (spule.days_above >= 1) {
+            teile.push(t('humidity_days_above', '{n} Tage über {s} %')
+                .replace('{n}', spule.days_above.toFixed(spule.days_above < 10 ? 1 : 0))
                 .replace('{s}', schwelle));
-        } else if (spule.stunden_ueber > 0) {
-            teile.push(t('feuchte_stunden_ueber', '{n} h über {s} %')
-                .replace('{n}', Math.round(spule.stunden_ueber))
+        } else if (spule.hours_above > 0) {
+            teile.push(t('humidity_hours_above', '{n} h über {s} %')
+                .replace('{n}', Math.round(spule.hours_above))
                 .replace('{s}', schwelle));
         }
-        teile.push(t('feuchte_spitze', 'Spitze {n} %').replace('{n}', spule.max));
-        return `<span class="fk-urteil fk-urteil--${esc(spule.urteil)}">`
-             + esc(worte[spule.urteil] || spule.urteil) + '</span>'
+        teile.push(t('humidity_peak', 'Spitze {n} %').replace('{n}', spule.max));
+        return `<span class="fk-urteil fk-urteil--${esc(spule.verdict)}">`
+             + esc(worte[spule.verdict] || spule.verdict) + '</span>'
              + `<span class="fk-detail">${esc(teile.join(' · '))}</span>`;
     }
 
     // ------------------------------------------------------------------
-    // Beim Ueberfahren: Zeit, Feuchte und Temperatur des naechsten Punktes.
+    // On hover: the time, humidity and temperature of the nearest point.
     //
-    // EIN Zuhoerer am Dokument statt einer je Kurve — die Kurven entstehen
-    // und verschwinden mit ihren Fenstern, ein delegierter Zuhoerer trifft
-    // auch die, die es beim Laden noch nicht gab.
+    // ONE listener on the document rather than one per curve -- the curves come
+    // and go with their windows, and a delegated listener also catches the ones
+    // that did not exist at load time.
     // ------------------------------------------------------------------
     let schild = null;
 
@@ -9453,9 +9584,9 @@ window.BAMBU_DRY_PRESETS = {
         const anteil = (ev.clientX - kasten.left) / kasten.width;
         const t0 = punkte[0][0], t1 = punkte[punkte.length - 1][0];
         const gesucht = t0 + anteil * Math.max(t1 - t0, 1);
-        // Naechster Punkt statt Interpolation: zwischen zwei Messungen liegt
-        // je nach Bremse bis zu eine Stunde — ein gerechneter Wert waere
-        // erfunden.
+        // The nearest point rather than interpolation: depending on the
+        // throttle there can be up to an hour between two measurements -- a
+        // computed value would be made up.
         let nah = punkte[0];
         for (const p of punkte) {
             if (Math.abs(p[0] - gesucht) < Math.abs(nah[0] - gesucht)) nah = p;
@@ -9472,7 +9603,7 @@ window.BAMBU_DRY_PRESETS = {
             + (nah[2] == null ? '' : '<span>' + esc(nah[2]) + ' °C</span>')
             + '<span class="fk-schild-zeit">' + esc(zeit) + '</span>';
         schild.style.display = 'block';
-        // Am Zeiger, aber nie ueber den Fensterrand hinaus.
+        // At the pointer, but never past the edge of the window.
         const breite = schild.offsetWidth;
         const links = Math.min(Math.max(ev.clientX - breite / 2, 8),
                                window.innerWidth - breite - 8);
@@ -9490,7 +9621,7 @@ window.BAMBU_DRY_PRESETS = {
         else versteckeSchild();
     }, { passive: true });
     document.addEventListener('mouseleave', versteckeSchild, true);
-    // Auf dem Tablet gibt es keinen Zeiger — dort tut es der Finger.
+    // On a tablet there is no pointer -- there the finger does it.
     document.addEventListener('touchmove', (ev) => {
         const b = ev.touches && ev.touches[0];
         if (!b) return;
@@ -9501,7 +9632,7 @@ window.BAMBU_DRY_PRESETS = {
     }, { passive: true });
     document.addEventListener('touchend', versteckeSchild, { passive: true });
 
-    window.amsFeuchte = { hole, vergiss, fuerFach, einheit, kurve, merkzeile, spanne };
+    window.amsHumidity = { hole, vergiss, fuerFach, einheit, kurve, merkzeile, spanne };
 })();
 
 
@@ -9554,6 +9685,8 @@ class PrinterControlManager {
                     this.applyNozzleSelector(this._caps || {});
                     this.applyDeviceTab(this._caps || {}, st);
                     this.updateDeviceTab(st);
+                    this.sperreTabsWennAus();
+                    if (window.refreshMovementMap) window.refreshMovementMap();
                 });
             };
             attach();
@@ -9730,6 +9863,10 @@ class PrinterControlManager {
         if (flach.capabilities) this._caps = flach.capabilities;
         this.applyDeviceTab(this._caps || {}, flach);
         this.updateDeviceTab(flach);
+        this.sperreTabsWennAus();
+        // The bed map reads lastState. It has to hear about a new one, or the
+        // homing lock stays on screen after a home.
+        if (window.refreshMovementMap) window.refreshMovementMap();
         // The calibration progress used to hang off exactly two calls until
         // 28aug26: tab switch and 1.5s after start. After that the card stood
         // still -- for a 49-minute calibration that's most of the time.
@@ -10142,7 +10279,7 @@ class PrinterControlManager {
                     .then(r => r.json())
                     .then(d => {
                         this._filamentDb = ((d && d.profiles) || []).map(p =>
-                            [p.idx, p.name, p.typ || '?',
+                            [p.idx, p.name, p.type || '?',
                              parseInt(p.min, 10) || 190, parseInt(p.max, 10) || 240]);
                         // Drying presets come from the same response.
                         // The table in filament-db.js remains as a fallback
@@ -10624,7 +10761,7 @@ class PrinterControlManager {
      *
      * The printer reports the current source as a GLOBAL number: 0-3 for
      * AMS 0, 4-7 for AMS 1, from 128 the HT units, 254/255 the external
-     * spools. Same computation as in the server (`_spulen_ids`), which is
+     * spools. Same computation as in the server (`_spool_ids`), which is
      * checked against print_filaments.ams_tray_id.
      */
     _istAktivesFach(amsId, trayId) {
@@ -10640,7 +10777,7 @@ class PrinterControlManager {
         for (const u of einheiten) {
             if (u.id !== amsId) continue;
             for (const t of (u.trays || [])) {
-                if (t.id === trayId && t.geladen != null) return !!t.geladen;
+                if (t.id === trayId && t.loaded != null) return !!t.loaded;
             }
         }
         // Fallback. It never once matched here: the printer reports only
@@ -10681,11 +10818,11 @@ class PrinterControlManager {
      * comes from its own request, and the card shouldn't wait on it.
      */
     _markiereOhneZuordnung(wrap, units) {
-        if (!window.amsFeuchte || !wrap) return;
-        window.amsFeuchte.hole(14).then(daten => {
+        if (!window.amsHumidity || !wrap) return;
+        window.amsHumidity.hole(14).then(daten => {
             if (!daten || !wrap.isConnected) return;
             const zuordnung = new Map(
-                (daten.spulen || []).map(s => [s.ams_id + ':' + s.slot, s]));
+                (daten.spools || []).map(s => [s.ams_id + ':' + s.slot, s]));
             (units || []).forEach(u => (u.trays || []).forEach(t => {
                 // Via the id on the element, not via ordering.
                 const feld = wrap.querySelector(
@@ -10694,7 +10831,7 @@ class PrinterControlManager {
                 // the reliable answer, the missing type only the old
                 // workaround -- which still applies where the printer
                 // doesn't send the bitmask.
-                if (!feld || t.vorhanden === false || !t.type) return;
+                if (!feld || t.present === false || !t.type) return;
                 const eintrag = zuordnung.get(u.id + ':' + (t.id || 0));
                 // No entry at all does NOT mean "no mapping", but
                 // "nothing recorded yet". `spulen()` only returns a
@@ -10706,11 +10843,11 @@ class PrinterControlManager {
                 if (!eintrag) return;
                 if (eintrag.spool_id != null) return;
                 feld.classList.add('mz-slot--offen');
-                const vorschlag = (eintrag && (eintrag.vorschlaege || [])[0]) || null;
-                feld.title = (texts.feuchte_ohne_zuordnung
+                const vorschlag = (eintrag && (eintrag.suggestions || [])[0]) || null;
+                feld.title = (texts.humidity_unassigned
                     || 'Fach {n} im AMS ist keiner Spule zugeordnet.')
                     .replace('{n}', (t.id || 0) + 1)
-                    + (vorschlag ? ' ' + (texts.feuchte_vorschlag || 'Vorschlag: {name}')
+                    + (vorschlag ? ' ' + (texts.humidity_suggestion || 'Vorschlag: {name}')
                         .replace('{name}', vorschlag.name || '') : '');
                 this._meldeOhneZuordnung(u.id, t.id || 0, feld.title);
             }));
@@ -10738,14 +10875,14 @@ class PrinterControlManager {
         // dwell time even when the printer reports the slot empty -- the
         // spool is sitting in there but not fed in. In that case, these
         // three values wouldn't be retrievable from the slot.
-        window.apiCall('/api/filament/feuchte/zuordnung', {
+        window.apiCall('/api/filament/humidity/assign', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ams_id: amsId, slot: trayId, spool_id: spoolId,
                 typ: typ || '', farbe: farbe || '', name: name || '',
             }),
-        }).then(() => { if (window.amsFeuchte) window.amsFeuchte.vergiss(); })
+        }).then(() => { if (window.amsHumidity) window.amsHumidity.vergiss(); })
           .catch(() => {});
     }
 
@@ -10758,7 +10895,7 @@ class PrinterControlManager {
      */
     _feuchteGedaechtnis(overlay, unit) {
         const ziel = overlay.querySelector('#dry-gedaechtnis');
-        if (!ziel || !window.amsFeuchte) return;
+        if (!ziel || !window.amsHumidity) return;
         const texts = window.texts || {};
         const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,
             c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -10774,42 +10911,42 @@ class PrinterControlManager {
                 { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
         };
 
-        window.amsFeuchte.hole(14).then(daten => {
+        window.amsHumidity.hole(14).then(daten => {
             if (!daten || !overlay.isConnected) return;
-            const e = window.amsFeuchte.einheit(daten, unit.id);
-            const kurve = e ? window.amsFeuchte.kurve(e.verlauf, daten.schwelle) : '';
+            const e = window.amsHumidity.einheit(daten, unit.id);
+            const kurve = e ? window.amsHumidity.kurve(e.history, daten.threshold) : '';
             const faecher = (unit.trays || []).filter(t => t.type).map(t => {
-                const spule = window.amsFeuchte.fuerFach(daten, unit.id, t.id);
+                const spule = window.amsHumidity.fuerFach(daten, unit.id, t.id);
                 if (!spule) return '';
                 return '<div class="fk-fach">'
                      + '<span class="mz-slot-col" style="background:'
                      + farbe(t.color) + '"></span>'
                      + '<span class="fk-fach-name">' + esc(t.type || '?') + '</span>'
-                     + window.amsFeuchte.merkzeile(spule, daten.schwelle)
+                     + window.amsHumidity.merkzeile(spule, daten.threshold)
                      + '</div>';
             }).join('');
-            const zeit = window.amsFeuchte.spanne(e && e.verlauf);
+            const zeit = window.amsHumidity.spanne(e && e.history);
             // Less than half an hour of readings isn't a history, it's just
             // a straight line. Better to say honestly that the recording just
             // started than to fake a curve.
             const frisch = !kurve || zeit.ms < 1800000;
             if (frisch && !faecher) {
-                if (!(e && e.verlauf && e.verlauf.length)) return;
+                if (!(e && e.history && e.history.length)) return;
                 ziel.innerHTML =
-                    '<div class="fk-kopf">' + esc(texts.feuchte_titel || 'Feuchte')
+                    '<div class="fk-kopf">' + esc(texts.humidity_title || 'Feuchte')
                     + '<span class="fk-schwelle-text">' + esc(
-                        (texts.feuchte_schwelle || 'Grenze {s} %').replace('{s}', daten.schwelle))
+                        (texts.humidity_threshold || 'Grenze {s} %').replace('{s}', daten.threshold))
                     + '</span></div>'
                     + '<div class="fk-frisch">' + esc(
-                        (texts.feuchte_frisch || 'Aufzeichnung läuft seit {zeit}')
-                            .replace('{zeit}', uhrzeit(e.verlauf[0].zeit))) + '</div>';
+                        (texts.humidity_fresh || 'Aufzeichnung läuft seit {zeit}')
+                            .replace('{zeit}', uhrzeit(e.history[0].time))) + '</div>';
                 return;
             }
             ziel.innerHTML =
-                '<div class="fk-kopf">' + esc(texts.feuchte_titel || 'Feuchte')
+                '<div class="fk-kopf">' + esc(texts.humidity_title || 'Feuchte')
                 + (zeit.text ? '<span class="fk-spanne">' + esc(zeit.text) + '</span>' : '')
                 + '<span class="fk-schwelle-text">' + esc(
-                    (texts.feuchte_schwelle || 'Grenze {s} %').replace('{s}', daten.schwelle))
+                    (texts.humidity_threshold || 'Grenze {s} %').replace('{s}', daten.threshold))
                 + '</span></div>' + kurve + faecher;
         }).catch(() => {});
     }
@@ -10844,11 +10981,11 @@ class PrinterControlManager {
         const knopf = document.getElementById('cali-start');
         if (knopf) knopf.textContent = texts.cali_start || 'Kalibrierung starten';
         const titel = document.getElementById('dev-cali-title');
-        if (titel) titel.textContent = texts.cali_schritte_titel || 'Schritte';
+        if (titel) titel.textContent = texts.cali_steps_title || 'Schritte';
         const reiter = document.getElementById('ctrl-tab-cali-label');
         if (reiter) reiter.textContent = texts.cali_title || 'Kalibrierung';
         const hinweis = document.getElementById('cali-hinweis');
-        if (hinweis) hinweis.textContent = texts.cali_hinweis
+        if (hinweis) hinweis.textContent = texts.cali_hint
             || 'Dauert je nach Auswahl mehrere Minuten. Währenddessen ist kein Druck möglich.';
         this.zeichneKalibrierLaeufe(c);
     }
@@ -10867,15 +11004,15 @@ class PrinterControlManager {
         if (!ziel) return;
         const c = caps || {};
         const titel = document.getElementById('cali-laeufe-titel');
-        if (titel) titel.textContent = texts.cali_laeufe_titel || 'Einzelne Läufe';
+        if (titel) titel.textContent = texts.cali_runs_title || 'Einzelne Läufe';
         const hinweis = document.getElementById('cali-lauf-hinweis');
-        if (hinweis) hinweis.textContent = texts.cali_lauf_hinweis || '';
+        if (hinweis) hinweis.textContent = texts.cali_run_hint || '';
 
         // An offset between two nozzles is a non-issue with a single nozzle.
         const laeufe = [
-            ['nozzle_offset_precise', texts.cali_lauf_nozzle_offset_precise
+            ['nozzle_offset_precise', texts.cali_run_nozzle_offset_precise
                 || 'Hochpräziser Düsenversatz', !!c.dual_nozzle],
-            ['motion_precision', texts.cali_lauf_motion_precision
+            ['motion_precision', texts.cali_run_motion_precision
                 || 'Bewegungsgenauigkeit (Vision Encoder)', true],
         ];
         const esc = x => String(x == null ? '' : x).replace(/[&<>"]/g,
@@ -10891,17 +11028,17 @@ class PrinterControlManager {
     startCalibrationRun(name) {
         const texts = window.texts || {};
         if (!name) return;
-        const frage = texts.cali_lauf_confirm || texts.cali_confirm
+        const frage = texts.cali_run_confirm || texts.cali_confirm
             || 'Diesen Lauf jetzt starten? Der Drucker fährt dabei und heizt.';
         const los = () => {
             window.printerAdapter.action('start_calibration_run', { name })
                 .then(r => {
                     if (r.ok) {
-                        skToast(texts.cali_gestartet || 'Kalibrierung gestartet', 'info');
+                        skToast(texts.cali_started || 'Kalibrierung gestartet', 'info');
                         setTimeout(() => this.zeichneKalibrierLauf(), 1500);
                     } else {
                         // The server names the reason as a key -- e.g.
-                        // guard_braucht_pla when no PLA is loaded.
+                        // guard_needs_pla when no PLA is loaded.
                         skToast(this.fehlerText(r.error, texts.connection_error), 'error');
                     }
                 })
@@ -10923,7 +11060,7 @@ class PrinterControlManager {
         const ziel = document.getElementById('cali-lauf');
         if (!ziel) return;
         const titel = document.getElementById('cali-lauf-titel');
-        if (titel) titel.textContent = texts.cali_lauf_titel || 'Ablauf';
+        if (titel) titel.textContent = texts.cali_run_title || 'Ablauf';
 
         // Two sources, same field names: the socket (`lastPrintData`)
         // updates faster during a print, /api/status (`lastState`)
@@ -10950,13 +11087,13 @@ class PrinterControlManager {
         if (knopf) {
             knopf.disabled = gesperrt;
             knopf.textContent = gesperrt && system
-                ? (texts.cali_laeuft || 'Kalibrierung läuft')
+                ? (texts.cali_running || 'Kalibrierung läuft')
                 : (texts.cali_start || 'Kalibrierung starten');
         }
 
         if (!laeuft || !system) {
             ziel.innerHTML = `<div class="ext-sub">${
-                (texts.cali_kein_lauf || 'Gerade läuft keine Kalibrierung.')}</div>`;
+                (texts.cali_no_run || 'Gerade läuft keine Kalibrierung.')}</div>`;
             return;
         }
         const esc = x => String(x == null ? '' : x).replace(/[&<>"]/g,
@@ -10995,7 +11132,7 @@ class PrinterControlManager {
         const gewaehlt = Array.from(document.querySelectorAll('.cali-box:checked'))
             .map(b => b.value);
         if (!gewaehlt.length) {
-            skToast(texts.cali_keine_wahl || 'Kein Schritt gewählt', 'warning');
+            skToast(texts.cali_no_choice || 'Kein Schritt gewählt', 'warning');
             return;
         }
         // The head moves and the bed heats -- ask before doing that.
@@ -11005,7 +11142,7 @@ class PrinterControlManager {
             window.printerAdapter.action('start_calibration', { schritte: gewaehlt })
                 .then(r => {
                     if (r.ok) {
-                        skToast(texts.cali_gestartet || 'Kalibrierung gestartet', 'info');
+                        skToast(texts.cali_started || 'Kalibrierung gestartet', 'info');
                         setTimeout(() => this.zeichneKalibrierLauf(), 1500);
                     }
                     else skToast(this.fehlerText(r.error, texts.connection_error), 'error');
@@ -11020,7 +11157,7 @@ class PrinterControlManager {
         const texts = window.texts || {};
         window.printerAdapter.amsDryStop(amsId).then(r => {
             if (!r.ok) skToast(this.fehlerText(r.error, texts.connection_error), 'error');
-            else if (window.amsFeuchte) window.amsFeuchte.vergiss();
+            else if (window.amsHumidity) window.amsHumidity.vergiss();
         }).catch(() => skToast(texts.connection_error, 'error'));
     }
 
@@ -11070,10 +11207,15 @@ class PrinterControlManager {
         } else if (document.body.dataset.activePrinter !== 'klipper') {
             this.switchControlTab('ctrlov');
             this.updateOverviewTab();
+        } else {
+            // Klipper opens on movement. That used to happen through the
+            // markup alone, so switchControlTab never ran and the map was
+            // never drawn -- say it out loud instead.
+            this.switchControlTab('movement');
         }
 
-        // iOS app fullscreen - when we have the IDs
-        if (window.isIOSApp || window.isSafari) {
+        // Safari (and the home-screen app): the modal fills the screen
+        if (window.isSafari) {
             const modalContent = document.getElementById('printerControlModalContent');
             if (modalContent) {
                 modalContent.style.position = 'fixed';
@@ -11400,7 +11542,7 @@ class PrinterControlManager {
             // Only clear on an explicit `false`: `null` means
             // "the printer doesn't say", and then it keeps the old
             // behavior instead of hiding a full spool.
-            const leer = t.vorhanden === false;
+            const leer = t.present === false;
             const rest = (!leer && t.remain != null && t.remain > 0) ? t.remain + '%' : '';
             const name = leer
                 ? (seite ? seite + ' · ' : '') + (texts.ams_empty || 'leer')
@@ -11562,7 +11704,7 @@ class PrinterControlManager {
                 // the SLOT.
                 const aktiv = quellenPaare.length
                     ? quellenPaare.includes(u.id + ':' + (t.id || 0))
-                    : (t.geladen != null ? t.geladen : aktivTray === global);
+                    : (t.loaded != null ? t.loaded : aktivTray === global);
                 html += slot(t, aktiv, "amsEditTray(" + u.id + "," + (t.id || 0) + ")",
                              null, { ams: u.id, slot: t.id || 0 });
             });
@@ -11621,10 +11763,54 @@ class PrinterControlManager {
         }
     }
 
+    /** Tabs that need a printer answering, locked while none is.
+     *
+     *  Axes, extruder, filament and calibration all end in a command to the
+     *  machine. With the printer off they offer something that cannot happen,
+     *  and the failure only shows up as a toast after the click. Overview and
+     *  device stay open -- they show what is known, they do not act.
+     *
+     *  The state comes from `window.druckerDa`, the one place that already
+     *  weighs socket against live connection. Where it says nothing -- no
+     *  socket configured, nothing heard yet -- nothing is locked: unreachable
+     *  is not the same as off, and locking on a hunch takes the machine away
+     *  from someone who can still reach it.
+     */
+    sperreTabsWennAus() {
+        if (typeof window.druckerDa !== 'boolean') return;
+        const aus = window.druckerDa === false;
+        const betroffen = ['movement', 'extruder', 'filament', 'cali'];
+        const texts = window.texts || {};
+        let aktivGesperrt = false;
+
+        betroffen.forEach(name => {
+            const knopf = document.querySelector(`.ctrl-tab[data-tab="${name}"]`);
+            if (!knopf) return;
+            knopf.disabled = aus;
+            knopf.classList.toggle('ctrl-tab--aus', aus);
+            if (aus) knopf.title = texts.tab_needs_printer || 'Drucker ist aus';
+            else knopf.removeAttribute('title');
+            if (aus && knopf.classList.contains('active')) aktivGesperrt = true;
+        });
+
+        // Standing in a tab that just got locked would leave dead controls on
+        // screen. Move to one that still has something to say.
+        if (aktivGesperrt) {
+            const uebersicht = document.querySelector('.ctrl-tab[data-tab="ctrlov"]');
+            const sichtbar = uebersicht && uebersicht.offsetParent !== null;
+            this.switchControlTab(sichtbar ? 'ctrlov' : 'device');
+        }
+    }
+
     // ========================================
     // switchControlTab
     // ========================================
     switchControlTab(tab) {
+        // The lock above only greys the button out. This is the bolt behind
+        // it -- switchControlTab is global and reachable without the button.
+        const knopf = document.querySelector(`.ctrl-tab[data-tab="${tab}"]`);
+        if (knopf && knopf.disabled) return;
+
         // Hide all tabs
         document.querySelectorAll('.control-tab-content').forEach(content => {
             content.style.display = 'none';
@@ -11653,6 +11839,11 @@ class PrinterControlManager {
         if (tab === 'filament') this.renderFilamentSlots();
         if (tab === 'extruder') this.updateExtruderTab();
         if (tab === 'ctrlov') this.updateOverviewTab();
+        // The map is the default view of this tab, and it has to be DRAWN --
+        // the markup only makes its container visible. This also fetches the
+        // bed size and puts the homing lock on screen before the first click
+        // can happen.
+        if (tab === 'movement' && window.setMovementView) window.setMovementView('map');
     }
 
     // ========================================
@@ -11997,39 +12188,12 @@ class PrinterControlManager {
             if (r.ok) {
                 skToast(texts.toast_homing_started + '...', 'info');
                 setTimeout(() => {
-                    homingDone = true;
                     const warning = document.getElementById('homing-warning');
                     if (warning) warning.style.display = 'none';
                     skToast(texts.toast_homing_completed, 'success');
                 }, 3000);
             } else {
                 skToast(this.fehlerText(r.error, texts.error), 'error');
-            }
-        });
-        return;  // alter Pfad unten unreachable, bleibt als no-op
-        // legacy fallback path:
-        apiCall('/api/mqtt/home', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({axis: 'all'})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                skToast(texts.toast_homing_started + '...', 'info');
-
-                // Wait 3 seconds until homing is done
-                setTimeout(() => {
-                    homingDone = true;
-
-                    // Hide the warning
-                    const warning = document.getElementById('homing-warning');
-                    if (warning) {
-                        warning.style.display = 'none';
-                    }
-
-                    skToast(texts.toast_homing_completed, 'success');
-                }, 3000);
             }
         });
     }
@@ -12490,7 +12654,8 @@ class PrinterControlManager {
     kFirmwareRestart() { skToast(this.kt('control_fw_restart', 'Firmware-Neustart') + ' …'); window.printerAdapter.action('firmware_restart'); }
     kRestart() { skToast(this.kt('control_klipper_restart', 'Klipper-Neustart') + ' …'); window.printerAdapter.action('host_restart'); }
     kEmergencyStop() {
-        showConfirmDialog(this.kt('control_emergency_confirm', 'Drucker sofort stoppen?'), () => {
+        showConfirmDialog({ text: this.kt('control_emergency_confirm', 'Drucker sofort stoppen?'),
+            knopf: this.kt('confirm_stop', 'Stop'), gefaehrlich: true }, () => {
             skToast(this.kt('control_emergency_stop', 'NOT-AUS'), 'error');
             window.printerAdapter.action('emergency_stop');
         });
@@ -12659,8 +12824,10 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
     let targetZ = null;
 
     const SVG = 'http://www.w3.org/2000/svg';
-    /** SVG viewBox of the bed map, and the frame inset inside it. */
-    const BOX = 240, PAD = 10, SIDE = BOX - 2 * PAD;
+    /** SVG viewBox of the bed map, and the frame inset inside it.
+     *  HOEHE is taller than BOX: the bed stays square, the extra strip at the
+     *  bottom carries the plate's label bar. */
+    const BOX = 240, PAD = 10, SIDE = BOX - 2 * PAD, HOEHE = 256;
 
     const t = (key, fallback) => (window.texts && window.texts[key]) || fallback;
     const state = () => (window.printerControlManager &&
@@ -12678,23 +12845,80 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
             const r = await fetch('/api/printer/info', { credentials: 'same-origin' });
             const info = await r.json();
             const l = info && info.bed_limits;
-            if (l && l.x && l.y) bed = { x: +l.x, y: +l.y, z: +(l.z || 0) };
+            if (l && l.x && l.y) {
+                bed = { x: +l.x, y: +l.y, z: +(l.z || 0),
+                        duesen: l.nozzle_range || null };
+            }
         } catch (e) {
             console.debug('movement-map: bed size not readable', e);
         }
         return bed;
     }
 
-    /** Are X and Y referenced? null means the printer does not say. */
-    function homed() {
+    /** What the plate carries printed on its front edge. Read off Bambu
+     *  Studio's own artwork (images/bbl_bed_<x>_bottom_n.svg, where the text
+     *  is outlines, not strings). Fixed per plate: the printer reports WHICH
+     *  plate lies there, never what is written on it. */
+    const LEISTE = {
+        1: ['PLA', 'GLUE STICK CAN HELP.'],
+        2: ['Engineering Plate', 'APPLY GLUE STICK BEFORE PRINTING'],
+        3: ['PLA/ABS/PETG', 'HOT SURFACE'],
+        4: ['PLA/ABS/PETG', 'HOT SURFACE'],
+        5: ['Cool Plate Super Tack', 'PLA/PETG'],
+    };
+
+    /** Which plate is on the bed, or '' when the printer does not say.
+     *  base is the slicer BedType enum, measured on the X2D; the raw QR id is
+     *  the fallback. Same table as the device tab (printer-control.js). */
+    const PLATTEN = { 1: 'Cool Plate', 2: 'Engineering Plate', 3: 'Smooth PEI Plate',
+                      4: 'Textured PEI Plate', 5: 'Cool Plate SuperTack' };
+    function plattenName() {
+        const bp = (state() || {}).build_plate || {};
+        return PLATTEN[bp.base] || '';
+    }
+
+    /** Are the named axes referenced? null means the printer does not say.
+     *  Klipper answers with a string, Bambu with a bitmask: bit 0 X, 1 Y, 2 Z.
+     */
+    function homed(achsen = 'xy') {
         const s = state();
+        const wanted = achsen.toLowerCase().split('');
         if (typeof s.homed_axes === 'string') {
             const a = s.homed_axes.toLowerCase();
-            return a.includes('x') && a.includes('y');
+            return wanted.every(x => a.includes(x));
         }
-        // Bambu sends a bitmask instead of a string: bit 0 is X, bit 1 is Y.
-        if (typeof s.home_flag === 'number') return (s.home_flag & 0b011) === 0b011;
+        if (typeof s.home_flag === 'number') {
+            const bit = { x: 0, y: 1, z: 2 };
+            return wanted.every(x => (s.home_flag >> bit[x]) & 1);
+        }
         return null;
+    }
+
+    /** How far X may travel — for the nozzle that is active.
+     *
+     *  Both nozzles sit on the same carriage at different X offsets, so
+     *  they do not reach the same edge (X2D: the right one not closer than
+     *  20.5 mm to the left). The map DREW that strip from the start but
+     *  took a click in it all the same, and the head ran into the side.
+     *
+     *  1 = left, 0 = right — device.extruder.state bits 4-7, see
+     *  docs/duesen-ams-spulen.md. A missing value is not a nozzle: then the
+     *  strict range applies, what both reach. The server clamps the same
+     *  way (bambu.py `_x_bereich`); this is the lock in front of it, so a
+     *  click is refused with a reason instead of silently landing
+     *  somewhere else.
+     */
+    function xBereich() {
+        const breite = (bed && bed.x) || 0;
+        const dn = bed && bed.duesen;
+        if (!dn || !Array.isArray(dn.left) || !Array.isArray(dn.right)) {
+            return { von: 0, bis: breite, duese: null };
+        }
+        const aktiv = state().active_nozzle;
+        if (aktiv === 1) return { von: dn.left[0], bis: Math.min(dn.left[1], breite), duese: 'left' };
+        if (aktiv === 0) return { von: dn.right[0], bis: Math.min(dn.right[1], breite), duese: 'right' };
+        return { von: Math.max(dn.left[0], dn.right[0]),
+                 bis: Math.min(dn.left[1], dn.right[1], breite), duese: null };
     }
 
     /** Where the head really is -- or null when the printer never says. */
@@ -12724,16 +12948,122 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
             return;
         }
 
+        // The plate seen from above, the way Bambu Studio draws it: dark
+        // body, the handle notch at the top, a millimetre grid and the plate
+        // name across it. Drawn rather than photographed -- a photo has to be
+        // stretched to the bed size, and then its grid no longer lines up with
+        // the coordinates it is supposed to help read.
+        svg.appendChild(el('path', {
+            d: `M${BOX / 2 - 22} ${PAD} q0 -7 7 -7 h30 q7 0 7 7 z`,
+            class: 'bed-lasche' }));
         svg.appendChild(el('rect', { x: PAD, y: PAD, width: SIDE, height: SIDE,
-                                     rx: 4, class: 'bed-area' }));
-        // Quarters, not a fine grid: enough to judge a position, not so much
-        // that it reads as graph paper.
-        for (let i = 1; i < 4; i++) {
-            const v = PAD + (SIDE / 4) * i;
-            svg.appendChild(el('line', { x1: v, y1: PAD, x2: v, y2: PAD + SIDE,
-                                         class: 'bed-grid' }));
-            svg.appendChild(el('line', { x1: PAD, y1: v, x2: PAD + SIDE, y2: v,
-                                         class: 'bed-grid' }));
+                                     rx: 5, class: 'bed-platte' }));
+
+        // 10 mm fine, 50 mm strong -- Studio's spacing. In millimetres, not in
+        // quarters of the picture, so a line means the same on every bed size.
+        const raster = (schritt, klasse) => {
+            for (let mm = schritt; mm < bed.x; mm += schritt) {
+                const x = PAD + (mm / bed.x) * SIDE;
+                svg.appendChild(el('line', { x1: x, y1: PAD, x2: x, y2: PAD + SIDE,
+                                             class: klasse }));
+            }
+            for (let mm = schritt; mm < bed.y; mm += schritt) {
+                const y = PAD + SIDE - (mm / bed.y) * SIDE;
+                svg.appendChild(el('line', { x1: PAD, y1: y, x2: PAD + SIDE, y2: y,
+                                             class: klasse }));
+            }
+        };
+        raster(10, 'bed-grid');
+        raster(50, 'bed-grid bed-grid--stark');
+
+        // Where only one nozzle reaches. On the X2D the right one cannot come
+        // closer than 20.5 mm to the left edge; on the H2D it cuts both ways,
+        // the left stopping at 325 while the right goes to 350. Both numbers
+        // come from the printer profile, taken from Studio's own machine
+        // profile (extruder_printable_area) -- no guessed width.
+        const dn = bed.duesen;
+        if (dn && Array.isArray(dn.left) && Array.isArray(dn.right)) {
+            const streifen = (von, bis, text) => {
+                if (!(bis > von)) return;
+                const x = PAD + (von / bed.x) * SIDE;
+                const w = ((bis - von) / bed.x) * SIDE;
+                svg.appendChild(el('rect', { x, y: PAD, width: w, height: SIDE,
+                                             class: 'bed-nur-eine' }));
+                const zeile = el('text', { x: x + w / 2, y: PAD + SIDE / 2,
+                                           'text-anchor': 'middle',
+                                           class: 'bed-nur-eine-text',
+                                           transform: `rotate(-90 ${x + w / 2} ${PAD + SIDE / 2})` });
+                zeile.textContent = text;
+                svg.appendChild(zeile);
+            };
+            streifen(dn.left[0], dn.right[0], t('move_left_nozzle_only', 'Nur linke Düse'));
+            streifen(dn.left[1], dn.right[1], t('move_right_nozzle_only', 'Nur rechte Düse'));
+        }
+
+        svg.appendChild(el('rect', { x: PAD, y: PAD, width: SIDE, height: SIDE,
+                                     rx: 5, class: 'bed-area' }));
+
+        // Fields a game has lit. Above the grid so they read, below the mark
+        // so the head stays the most important thing on the picture.
+        for (const f of spielFelder) {
+            svg.appendChild(el('rect', {
+                x: PAD + (f.x / bed.x) * SIDE,
+                y: PAD + SIDE - ((f.y + f.h) / bed.y) * SIDE,
+                width: (f.w / bed.x) * SIDE,
+                height: (f.h / bed.y) * SIDE,
+                rx: 3,
+                class: f.an ? 'bed-feld bed-feld--an' : 'bed-feld' }));
+        }
+
+        // The name of the plate the printer reports. No guess: without the
+        // report nothing is written there.
+        const platte = plattenName();
+        if (platte) {
+            const schrift = el('text', { x: BOX / 2, y: PAD + 16,
+                                         'text-anchor': 'middle', class: 'bed-plattenname' });
+            schrift.textContent = platte;
+            svg.appendChild(schrift);
+        }
+
+        // The label bar on the plate's front edge. Below the printable area,
+        // never inside it -- inside it would cover bed a click can reach.
+        const bp = (state() || {}).build_plate || {};
+        const beschriftung = LEISTE[bp.base];
+        if (beschriftung) {
+            const y = PAD + SIDE + 3, h = HOEHE - y - 1;
+            svg.appendChild(el('rect', { x: PAD + 14, y, width: SIDE - 28, height: h,
+                                         rx: 1.5, class: 'bed-leiste' }));
+            // Each half gets its own room. "Engineering Plate" and "APPLY GLUE
+            // STICK BEFORE PRINTING" ran into each other otherwise -- the bar
+            // is narrow and one of the two is always long. Where a half does
+            // not fit, textLength squeezes it instead of letting it collide;
+            // the width is estimated from the character count, because in an
+            // SVG the real width is only known after it is in the document.
+            const haelfte = (SIDE - 38) / 2 - 3;
+            const setz = (x, anker, text) => {
+                const z = el('text', { x, y: y + h - 3.2, 'text-anchor': anker,
+                                       class: 'bed-leiste-text' });
+                if (text.length * 3.9 > haelfte) {
+                    z.setAttribute('textLength', haelfte);
+                    z.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+                }
+                z.textContent = text;
+                svg.appendChild(z);
+            };
+            setz(PAD + 19, 'start', beschriftung[0]);
+            setz(PAD + SIDE - 19, 'end', beschriftung[1]);
+        }
+
+        const gesperrt = homed('xy') === false;
+        svg.classList.toggle('bed-map--gesperrt', gesperrt);
+        if (gesperrt) {
+            svg.appendChild(el('rect', { x: PAD, y: PAD, width: SIDE, height: SIDE,
+                                         rx: 4, class: 'bed-sperre' }));
+            const zeile = el('text', { x: BOX / 2, y: BOX / 2 + 5,
+                                       'text-anchor': 'middle', class: 'bed-sperre-text' });
+            zeile.textContent = t('move_locked_home', 'Erst Home fahren');
+            svg.appendChild(zeile);
+            return;
         }
 
         const live = livePosition();
@@ -12749,7 +13079,17 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
         group.appendChild(el('line', { x1: px - 12, y1: py, x2: px + 12, y2: py }));
         if (live) group.appendChild(el('circle', { cx: px, cy: py, r: 2.5,
                                                    class: 'bed-mark-core' }));
-        const label = el('text', { x: px, y: py + 28, 'text-anchor': 'middle' });
+        // The label has to stay inside the picture. Centred under the mark it
+        // ran off the left edge at X 0 -- "X 1" was cut away and only "7 · Y
+        // 247" was left standing. Near an edge it anchors to that edge
+        // instead, and below the bed it flips above the mark.
+        const rand = 3;
+        const anchor = px < 44 ? 'start' : px > BOX - 44 ? 'end' : 'middle';
+        const lx = anchor === 'start' ? rand
+                 : anchor === 'end' ? BOX - rand
+                 : px;
+        const ly = py + 28 > BOX - 6 ? py - 20 : py + 28;
+        const label = el('text', { x: lx, y: ly, 'text-anchor': anchor });
         label.textContent = `X ${Math.round(point.x)} · Y ${Math.round(point.y)}`;
         group.appendChild(label);
         svg.appendChild(group);
@@ -12759,6 +13099,7 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
     function drawSide() {
         const svg = document.getElementById('z-side');
         if (!svg || !bed || !bed.z) return;
+        zSperre();
         svg.textContent = '';
         const top = 14, bottom = 226, left = 18, right = 102;
 
@@ -12778,6 +13119,23 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
         const y = top + 26 + (clamped / bed.z) * (bottom - top - 40);
         svg.appendChild(el('line', { x1: left + 6, y1: y, x2: right - 6, y2: y,
                                      class: 'side-bed' }));
+
+        if (homed('z') === false) {
+            const zeile = el('text', { x: (left + right) / 2, y: (top + bottom) / 2,
+                                       'text-anchor': 'middle', class: 'bed-sperre-text' });
+            zeile.textContent = t('move_locked_home', 'Erst Home fahren');
+            svg.appendChild(zeile);
+        }
+    }
+
+    /** Grey the slider out while Z is unreferenced -- a control that cannot
+     *  act should not look as if it could. */
+    function zSperre() {
+        const slider = document.getElementById('z-slider');
+        if (!slider) return;
+        const gesperrt = homed('z') === false;
+        slider.disabled = gesperrt;
+        slider.classList.toggle('z-slider--gesperrt', gesperrt);
     }
 
     function draw() { drawBed(); drawSide(); }
@@ -12790,17 +13148,43 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
         // The SVG scales with the panel, so go through the viewBox rather
         // than whatever pixel size it happens to have right now.
         const vx = ((event.clientX - box.left) / box.width) * BOX;
-        const vy = ((event.clientY - box.top) / box.height) * BOX;
+        const vy = ((event.clientY - box.top) / box.height) * HOEHE;
         const x = ((vx - PAD) / SIDE) * bed.x;
         const y = (1 - (vy - PAD) / SIDE) * bed.y;
         if (x < 0 || y < 0 || x > bed.x || y > bed.y) return;
 
-        if (homed() === false) {
+        // A running game owns the clicks -- otherwise a tap would drive the
+        // head freely in the middle of a round.
+        if (window.bedSimon && window.bedSimon.nimmtKlicks()) {
+            window.bedSimon.tipp(x, y);
+            return;
+        }
+
+        // Unreferenced axes: the click goes nowhere. Without a reference the
+        // printer counts from wherever it happens to stand, so a target in
+        // millimetres means nothing and the head runs into the frame. The map
+        // says so itself (drawBed), this is the second lock behind it.
+        const bereit = homed('xy');
+        if (bereit === false) return;
+        if (bereit === null) {
+            // Neither homed_axes nor home_flag -- the printer does not say.
+            // Ask instead of refusing: refusing would lock out every machine
+            // that simply keeps quiet about it.
             const go = window.skConfirm
                 ? await window.skConfirm(t('move_home_first',
                     'Achsen nicht referenziert. Erst Home fahren?'))
                 : true;
             if (!go) return;
+        }
+        const bereich = xBereich();
+        if (x < bereich.von || x > bereich.bis) {
+            const text = bereich.duese === 'right'
+                ? t('move_out_of_reach_right', 'Dort kommt die rechte Düse nicht hin')
+                : bereich.duese === 'left'
+                    ? t('move_out_of_reach_left', 'Dort kommt die linke Düse nicht hin')
+                    : t('move_out_of_reach', 'Dort kommt die aktive Düse nicht hin');
+            if (window.skToast) window.skToast(text, 'warning');
+            return;
         }
         await send({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
     }
@@ -12857,7 +13241,19 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
         drawSide();
     };
 
-    window.zSliderReleased = function (value) {
+    window.zSliderReleased = async function (value) {
+        // Z has its own reference bit; the X/Y question would be the wrong one
+        // here. The slider is disabled while it is unset (zSperre), this is
+        // the lock behind that.
+        const bereit = homed('z');
+        if (bereit === false) return;
+        if (bereit === null) {
+            const go = window.skConfirm
+                ? await window.skConfirm(t('move_home_first',
+                    'Achsen nicht referenziert. Erst Home fahren?'))
+                : true;
+            if (!go) return;
+        }
         send({ z: Math.round(parseFloat(value) * 10) / 10 });
     };
 
@@ -12868,19 +13264,227 @@ function filSelectTray(a, s) { window.printerControlManager.filSelectTray(a, s);
         draw();
     };
 
+    let letzterStand = null;
+    /** Fields a game wants lit, as {x, y, w, h} in millimetres. */
+    let spielFelder = [];
+
+    /** Redraw when the live state moved. Called by printer-control.js right
+     *  after it writes `lastState` -- both modes, one place.
+     *
+     *  Hanging this off the socket does not work: the only event that carries
+     *  it in Klipper mode is `printer_state`, and the Bambu server never emits
+     *  that one (it pushes `print_progress`). The lock therefore stayed on
+     *  screen after a home until the view was switched by hand. Whoever writes
+     *  the state says so, and the order is guaranteed. */
+    window.refreshMovementMap = function () {
+        const map = document.getElementById('jog-layout-map');
+        if (!map || map.style.display === 'none') return;
+        // A live position moves the mark; the homing state lifts the lock.
+        const stand = `${homed('xy')}|${homed('z')}`;
+        if (livePosition() || stand !== letzterStand) {
+            letzterStand = stand;
+            draw();
+        }
+    };
+
+    /** What a game on the bed needs, and nothing more. Everything goes
+     *  through the same paths a click takes -- the same guard, the same
+     *  server-side clamp to the build volume. */
+    window.bedMap = {
+        /** Bed size in mm, or null while it is unknown. */
+        masse: () => (bed ? { x: bed.x, y: bed.y } : null),
+        /** May the head move at all right now? */
+        bereit: () => Boolean(bed) && homed('xy') === true,
+        /** Drive there. Same call as a click on the map. */
+        fahre: (ziel) => send(ziel),
+        /** Light fields, [] clears them. */
+        felder: (liste) => { spielFelder = liste || []; draw(); },
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         const svg = document.getElementById('bed-map');
         if (svg) svg.addEventListener('click', bedClicked);
-        // Klipper pushes a real position; redraw so the mark follows the head
-        // even when it was moved at the printer itself.
-        const attach = () => {
-            if (!window.socket || !window.socket.on) { setTimeout(attach, 500); return; }
-            window.socket.on('printer_state', () => {
-                const map = document.getElementById('jog-layout-map');
-                if (map && map.style.display !== 'none' && livePosition()) draw();
-            });
-        };
-        attach();
+    });
+})();
+
+
+;/* ---- bed-simon.js ---- */
+/**
+ * Simon Says on the print bed.
+ *
+ * The printer plays a sequence of fields, the head really drives to each one,
+ * and you tap them back on the map. One field longer every round.
+ *
+ * Why this game and not a shooter: the head is mechanics. At F6000 it crosses
+ * a 256 mm bed in about 2.6 seconds, so anything that wants reflexes would
+ * either be unplayable or would whip the belts. And the Bambu firmware reports
+ * no position at all -- we only ever know where the head was SENT -- so a game
+ * that needs to know where it IS could not tell the truth. Simon Says needs
+ * neither: few deliberate moves, no hit detection.
+ *
+ * It moves the machine through exactly the same path a click on the map takes:
+ * window.bedMap.fahre -> printerAdapter.moveTo -> the server, which clamps
+ * to the build volume and refuses while a print runs. No second door.
+ */
+(function () {
+    'use strict';
+
+    const t = (key, fallback) => (window.texts && window.texts[key]) || fallback;
+
+    /** 3x3 -- nine fields are enough to get hard, and each one stays big
+     *  enough to hit on a phone. */
+    const N = 3;
+    /** Measured, not guessed: the moves go out as G0 F6000. */
+    const MM_PRO_S = 100;
+    /** On top of the travel time, so a field is seen and not just passed. */
+    const RUHE_MS = 420;
+
+    let folge = [];
+    let dran = 0;          // how far the player has got this round
+    let laeuft = false;    // a game is running at all
+    let eingabe = false;   // the player's turn
+
+    /** Field i as a rectangle in millimetres. A margin all round keeps the
+     *  head off the very edge of the bed. */
+    function feld(i) {
+        const b = window.bedMap.masse();
+        const rand = 12;
+        const w = (b.x - 2 * rand) / N;
+        const h = (b.y - 2 * rand) / N;
+        return { x: rand + (i % N) * w, y: rand + Math.floor(i / N) * h, w, h };
+    }
+
+    function mitte(i) {
+        const f = feld(i);
+        return { x: Math.round((f.x + f.w / 2) * 10) / 10,
+                 y: Math.round((f.y + f.h / 2) * 10) / 10 };
+    }
+
+    /** Which field a point in millimetres falls into, or -1 beside them. */
+    function feldBei(x, y) {
+        for (let i = 0; i < N * N; i++) {
+            const f = feld(i);
+            if (x >= f.x && x <= f.x + f.w && y >= f.y && y <= f.y + f.h) return i;
+        }
+        return -1;
+    }
+
+    function zeichne(anI) {
+        const liste = [];
+        for (let i = 0; i < N * N; i++) liste.push({ ...feld(i), an: i === anI });
+        window.bedMap.felder(liste);
+    }
+
+    function melde(text) {
+        const el = document.getElementById('move-bed-clear');
+        if (el) el.textContent = text;
+    }
+
+    /** Put the panel's own note back -- the game borrowed that line, it does
+     *  not own it, and a finished game must not leave "Vorbei" standing under
+     *  a map that works perfectly well. */
+    function meldungZurueck() {
+        melde(t('move_bed_clear', 'Bett frei? Der Kopf fährt sofort los.'));
+    }
+
+    const warte = (ms) => new Promise(r => setTimeout(r, ms));
+
+    /** How long the head needs from `von` to `nach`, plus a moment to settle.
+     *  There is no arrival message from the printer, so this is reckoned, and
+     *  reckoned generously -- a field shown too early is a wrong answer the
+     *  player never made. */
+    function fahrzeit(von, nach) {
+        const d = von ? Math.hypot(nach.x - von.x, nach.y - von.y)
+                      : Math.hypot(nach.x, nach.y);
+        return Math.min(4200, (d / MM_PRO_S) * 1000 + RUHE_MS);
+    }
+
+    async function vorspielen() {
+        eingabe = false;
+        melde(t('simon_watch', 'Zusehen …'));
+        let vorher = null;
+        for (const i of folge) {
+            if (!laeuft) return;
+            const ziel = mitte(i);
+            zeichne(i);
+            window.bedMap.fahre(ziel);
+            await warte(fahrzeit(vorher, ziel));
+            vorher = ziel;
+            zeichne(-1);
+            await warte(160);
+        }
+        if (!laeuft) return;
+        dran = 0;
+        eingabe = true;
+        melde(t('simon_your_turn', 'Du bist dran') + ' · ' + folge.length);
+    }
+
+    async function naechsteRunde() {
+        folge.push(Math.floor(Math.random() * N * N));
+        await warte(500);
+        await vorspielen();
+    }
+
+    function ende(gewonnen) {
+        laeuft = false;
+        eingabe = false;
+        window.bedMap.felder([]);
+        melde(gewonnen ? t('simon_done', 'Geschafft!')
+                       : t('simon_over', 'Vorbei') + ' · ' + (folge.length - 1));
+        folge = [];
+        setTimeout(meldungZurueck, 4000);
+    }
+
+    window.bedSimon = {
+        /** True while the game wants the clicks on the map. */
+        nimmtKlicks: () => laeuft && eingabe,
+
+        /** Start, if the machine is in a state to be driven at all. */
+        start() {
+            if (laeuft) return;
+            if (!window.bedMap || !window.bedMap.bereit()) {
+                if (window.skToast) window.skToast(t('move_locked_home', 'Erst Home fahren'), 'warning');
+                return;
+            }
+            folge = [];
+            laeuft = true;
+            if (window.skToast) window.skToast(t('simon_start', 'Simon sagt …'), 'info');
+            naechsteRunde();
+        },
+
+        stop() { if (laeuft) ende(false); },
+
+        /** A tap during the player's turn. */
+        async tipp(x, y) {
+            if (!eingabe) return;
+            const i = feldBei(x, y);
+            if (i < 0) return;
+            zeichne(i);
+            setTimeout(() => { if (eingabe) zeichne(-1); }, 220);
+
+            if (i !== folge[dran]) { ende(false); return; }
+            dran += 1;
+            if (dran < folge.length) return;
+
+            eingabe = false;
+            melde(t('simon_right', 'Richtig!'));
+            await warte(600);
+            if (laeuft) naechsteRunde();
+        },
+    };
+
+    // The way in: seven taps on the heading of the map panel. No new control
+    // anywhere -- an easter egg that advertises itself is a button.
+    document.addEventListener('DOMContentLoaded', () => {
+        const titel = document.getElementById('control-xy-movement-map');
+        if (!titel) return;
+        let zaehler = 0, letzter = 0;
+        titel.addEventListener('click', () => {
+            const jetzt = Date.now();
+            zaehler = (jetzt - letzter < 900) ? zaehler + 1 : 1;
+            letzter = jetzt;
+            if (zaehler >= 7) { zaehler = 0; window.bedSimon.start(); }
+        });
     });
 })();
 
@@ -12898,6 +13502,8 @@ class PrintSchedulerManager {
         this.scheduledFileLocation = '';
         this.cameFromScheduleManager = false;
         this.editingScheduledId = null;   // Edit mode: id of the entry being replaced
+        /** Does the file picker show the archive instead of the live list? */
+        this.archivAktiv = false;
 
         // Refresh the badge periodically
         setInterval(() => this.updateScheduledPrintsBadge(), 30000);
@@ -13376,7 +13982,7 @@ class PrintSchedulerManager {
                 if (errorText) errorText.textContent = message;
                 if (errorDiv) errorDiv.style.display = 'flex';
             } else if (data.error_key === 'schedule_existing_print_conflict') {
-                const template = texts.schedule_existing_print_conflict || 'Der geplante Druck "{file}" startet um {start} und dauert ungefähr {duration}.';
+                const template = texts.schedule_existing_print_conflict;
                 const duration = data.conflict_minutes >= 60
                     ? `${Math.floor(data.conflict_minutes / 60)} h ${data.conflict_minutes % 60} min`
                     : `${data.conflict_minutes} min`;
@@ -13417,7 +14023,7 @@ class PrintSchedulerManager {
             console.error(texts.console_error_scheduling + ':', error);
             const errorDiv = document.getElementById('schedule-error');
             const errorText = document.getElementById('schedule-error-text');
-            errorText.textContent = `Fehler beim Planen: ${error.message || error}`;
+            errorText.textContent = (texts.sched_error_planning || 'Fehler beim Planen: {error}').replace('{error}', error.message || error);
             errorDiv.style.display = 'block';
         });
     }
@@ -13842,7 +14448,7 @@ class PrintSchedulerManager {
     cancelScheduledPrint(printId) {
         const texts = window.texts || {};
 
-        showConfirmDialog(texts.confirm_delete_scheduled, function() {
+        showConfirmDialog({ text: texts.confirm_delete_scheduled, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
         apiCall(`/api/scheduled_prints/${printId}`, {method: 'DELETE'})
             .then(response => response.json())
             .then(data => {
@@ -13874,7 +14480,7 @@ class PrintSchedulerManager {
         const message = `\u26a0\ufe0f ${title}:\n\n${conflict.message}\n\n`
             + (texts.schedule_conflict_confirm || 'Trotzdem einplanen?');
 
-        showConfirmDialog(message, () => {
+        showConfirmDialog({ text: message, knopf: texts.confirm_schedule_anyway }, () => {
             requestData.force = true;
             apiCall('/api/schedule_print', {
                 method: 'POST',
@@ -13900,7 +14506,7 @@ class PrintSchedulerManager {
                 console.error('Error scheduling with force:', error);
                 const errorDiv = document.getElementById('schedule-error');
                 const errorText = document.getElementById('schedule-error-text');
-                errorText.textContent = `Fehler: ${error.message || error}`;
+                errorText.textContent = `${texts.error || 'Fehler'}: ${error.message || error}`;
                 errorDiv.style.display = 'block';
             });
         });
@@ -13921,7 +14527,7 @@ class PrintSchedulerManager {
 
         const message = `${texts.filament_warning_title}:\n\n${warningLines}\n\n${texts.filament_warning_confirm}`;
 
-        showConfirmDialog(message, () => {
+        showConfirmDialog({ text: message, knopf: texts.confirm_schedule_anyway }, () => {
             console.log('User confirmed schedule with warnings - retrying with force=true');
             requestData.force = true;
 
@@ -13951,7 +14557,7 @@ class PrintSchedulerManager {
                 console.error('Error scheduling with force:', error);
                 const errorDiv = document.getElementById('schedule-error');
                 const errorText = document.getElementById('schedule-error-text');
-                errorText.textContent = `Fehler: ${error.message || error}`;
+                errorText.textContent = `${texts.error || 'Fehler'}: ${error.message || error}`;
                 errorDiv.style.display = 'block';
             });
         });
@@ -14176,8 +14782,7 @@ class PrintSchedulerManager {
 
         const datum = new Date(print.scheduled_time);
         const vorbei = datum < new Date();
-        const name = (window.cleanPrintName ? window.cleanPrintName(print.filename)
-                                            : print.filename.replace(/\.(gcode\.)?3mf$/, ''));
+        const name = window.cleanPrintName(print.filename);
 
         // Preview: the same source as the SD list.
         const bild = (datei && datei.has_thumbnail !== false)
@@ -14270,6 +14875,14 @@ class PrintSchedulerManager {
                     <h3 class="sched-sd-title">${icon} ${title}</h3>
                     <p class="sched-sd-subtitle">${subtitle}</p>
                 </div>
+                ${isKlipper ? '' : `
+                <button class="sd-header-btn${this.archivAktiv ? ' sd-header-btn--an' : ''}"
+                        onclick="schedArchivUmschalten()"
+                        title="${texts.sd_archive_hint || ''}">
+                    <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v9h14v-9M10 14h4"/></svg>
+                    <span>${this.archivAktiv ? (texts.sd_archive_live || 'Live')
+                                             : (texts.sd_archive || 'Archiv')}</span>
+                </button>`}
                 <button class="sd-header-btn" onclick="refreshSDInSchedule()">
                     <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg>
                     <span>${texts.refresh}</span>
@@ -14299,9 +14912,17 @@ class PrintSchedulerManager {
         // remap it — otherwise we lose the metadata and the cards look
         // different from the SD modal.
         // per_page=all: the file picker in the scheduler shows the entire set.
+        //
+        // The archive belongs in here as much as the live list does. Without
+        // it only what currently sits on the printer could be scheduled --
+        // and putting a file into the archive is exactly what one does with
+        // something that is to be printed again later. Klipper has no
+        // archive; there the switch does not exist.
         const fetchPromise = (window.isKlipperMode && window.isKlipperMode())
             ? window.printerAdapter.listFiles({ per_page: 'all' }).then(r => ({ files: r.files || [] }))
-            : apiCall('/api/mqtt/sdcard?per_page=all').then(r => r.json());
+            : this.archivAktiv
+                ? apiCall('/api/sd/archiv?per_page=all').then(r => r.json())
+                : apiCall('/api/mqtt/sdcard?per_page=all').then(r => r.json());
 
         fetchPromise
             .then(data => {
@@ -14479,7 +15100,7 @@ class PrintSchedulerManager {
     deleteScheduledPrint(printId) {
         const texts = window.texts || {};
 
-        showConfirmDialog(texts.confirm_delete_scheduled, function() {
+        showConfirmDialog({ text: texts.confirm_delete_scheduled, knopf: texts.confirm_ok, gefaehrlich: true }, function() {
             apiCall(`/api/scheduled_prints/${printId}`, {method: 'DELETE'})
                 .then(response => response.json())
                 .then(data => {
@@ -14706,6 +15327,47 @@ function showSDFilesInScheduleManager(container) { window.printScheduler.showSDF
 function loadSDFilesForScheduling() { window.printScheduler.loadSDFilesForScheduling(); }
 function refreshSDInSchedule() { window.printScheduler.refreshSDInSchedule(); }
 function schedulePrintFromScheduleManager(filename, location) { window.printScheduler.schedulePrintFromScheduleManager(filename, location); }
+
+/** Switch the file picker between the live list and the archive. */
+window.schedArchivUmschalten = function () {
+    const planer = window.printScheduler;
+    planer.archivAktiv = !planer.archivAktiv;
+    const behaelter = document.querySelector('.sched-sd-header')?.parentElement;
+    if (behaelter) planer.showSDFilesInScheduleManager(behaelter);
+};
+
+/**
+ * Schedule a file that lies in the archive.
+ *
+ * Fetch it back first, then the normal path. After that it is an ordinary
+ * cache file and travels the way a freshly uploaded one does: the sync at
+ * power-on carries it onto the printer. Archived it would stay put — the
+ * sync leaves the archive alone on purpose.
+ */
+window.schedulePrintFromArchive = async function (filename) {
+    const texts = window.texts || {};
+    try {
+        const antwort = await apiCall('/api/sd/archiv/zurueckholen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: filename })
+        });
+        const daten = await antwort.json();
+        if (!daten || !daten.success) {
+            skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
+            return;
+        }
+        skToast(texts.sched_archive_restored
+                || 'Aus dem Archiv geholt — geht beim Einschalten auf den Drucker', 'success');
+        // Back to the live list, otherwise the picker still shows the archive
+        // while the file is no longer in it.
+        window.printScheduler.archivAktiv = false;
+        schedulePrintFromScheduleManager(filename, 'root');
+    } catch (fehler) {
+        skToast(texts.error || 'Fehler', 'error');
+        console.error('Archiv/Planen:', fehler);
+    }
+};
 function editScheduledPrint(printId) { window.printScheduler.editScheduledPrint(printId); }
 function deleteScheduledPrint(printId) { window.printScheduler.deleteScheduledPrint(printId); }
 function sortScheduleSDFiles() { window.printScheduler.sortScheduleSDFiles(); }
@@ -14777,7 +15439,7 @@ window.skTeileKnopfZeigen = function (data) {
     if (!data) return;
     const laeuft = ['RUNNING', 'PAUSE'].includes(
         String(data.gcode_state || '').toUpperCase()) || data.paused === true;
-    const sichtbar = laeuft && data.kann_teile_ueberspringen === true;
+    const sichtbar = laeuft && data.can_skip_parts === true;
     // Three places: the print card (that's where you look during a print)
     // and the two button rows on the developer card.
     ['pcb-skip', 'skip-btn-mobile', 'skip-btn-desktop'].forEach(id => {
@@ -15023,13 +15685,13 @@ window.teileUeberspringenOeffnen = async function () {
             let text, art;
             if (erg.success) {
                 art = 'success';
-                text = erg.bestaetigt === false
+                text = erg.confirmed === false
                     ? t('skip_parts_sent_unconfirmed', 'Gesendet — der Drucker hat nicht geantwortet')
                     : t('skip_parts_done', 'Wird übersprungen');
             } else {
                 art = 'error';
-                text = erg.grund
-                    ? t('skip_parts_refused', 'Drucker hat abgelehnt') + ': ' + erg.grund
+                text = erg.reason
+                    ? t('skip_parts_refused', 'Drucker hat abgelehnt') + ': ' + erg.reason
                     : (erg.error || t('skip_parts_failed', 'Überspringen fehlgeschlagen'));
             }
             window.skToast && window.skToast(text, art);
@@ -15094,7 +15756,7 @@ class PrintActionsManager {
     // ========================================
     stopPrint() {
         const texts = window.texts || {};
-        showConfirmDialog(texts.confirm_stop_print, function() {
+        showConfirmDialog({ text: texts.confirm_stop_print, knopf: texts.confirm_stop, gefaehrlich: true }, function() {
             window.printerAdapter.stop();
         });
     }
@@ -15190,7 +15852,7 @@ class PrintActionsManager {
             const msg = (texts.confirm_start_print || 'Druck starten') + ': ' + filename + '?';
             // Custom styled modal instead of native confirm() (like in the Bambu path).
             if (window.showConfirmDialog) {
-                window.showConfirmDialog(msg, () => this._klipperStartWithSpoolCheck(filename));
+                window.showConfirmDialog({ text: msg, knopf: texts.confirm_start }, () => this._klipperStartWithSpoolCheck(filename));
             } else if (window.skConfirm) {
                 window.skConfirm(msg).then(ja => {
                     if (ja) this._klipperStartWithSpoolCheck(filename);
@@ -15253,11 +15915,11 @@ class PrintActionsManager {
         const id = parseInt(spoolId, 10);
         if (!Number.isFinite(id)) return null;
 
-        const offene = (feuchteStand.spulen || []).filter(s => s && s.spool_id == null);
+        const offene = (feuchteStand.spools || []).filter(s => s && s.spool_id == null);
         if (!offene.length) return null;
 
         const jeSlot = new Map();
-        (feuchteStand.verlauf_spulen || []).forEach(e => {
+        (feuchteStand.history_spools || []).forEach(e => {
             if (!e) return;
             jeSlot.set(`${e.ams_id}:${e.slot}`, e);
         });
@@ -15268,9 +15930,9 @@ class PrintActionsManager {
             const amsId = Number.isFinite(parseInt(s.ams_id, 10)) ? parseInt(s.ams_id, 10) : null;
             if (amsId == null) return;
             const verlauf = jeSlot.get(`${amsId}:${slot}`) || null;
-            const vorschlaege = Array.isArray((verlauf || {}).vorschlaege)
-                ? verlauf.vorschlaege
-                : (Array.isArray(s.vorschlaege) ? s.vorschlaege : []);
+            const vorschlaege = Array.isArray((verlauf || {}).suggestions)
+                ? verlauf.suggestions
+                : (Array.isArray(s.suggestions) ? s.suggestions : []);
             const passend = vorschlaege.find(v => {
                 const vid = parseInt((v && (v.spool_id != null ? v.spool_id : v.id)), 10);
                 return Number.isFinite(vid) && vid === id;
@@ -15279,8 +15941,8 @@ class PrintActionsManager {
             treffer.push({
                 ams_id: amsId,
                 slot: slot,
-                typ: s.typ || (verlauf && verlauf.typ) || '',
-                farbe: s.farbe || (verlauf && verlauf.farbe) || '',
+                type: s.type || (verlauf && verlauf.type) || '',
+                color: s.color || (verlauf && verlauf.color) || '',
                 name: s.name || (verlauf && verlauf.name) || '',
             });
         });
@@ -15289,31 +15951,64 @@ class PrintActionsManager {
     }
 
     async _confirmHumidityAssignmentBeforePrint(spoolId, spoolMapping) {
-        if (spoolMapping || spoolId == null || !window.amsFeuchte) return;
-        const spoolNum = parseInt(spoolId, 10);
-        if (!Number.isFinite(spoolNum)) return;
+        if (!window.amsHumidity) return;
+
+        // A multi-colour print carries one spool per filament index instead of
+        // a single spool id. Until 04sep26 the presence of that mapping made
+        // this method return on the spot -- so the one case where the user has
+        // just named every spool by hand was the one case nothing was
+        // remembered, and the material card kept the slot marked orange
+        // ("not assigned to any spool") until it was assigned a second time
+        // through the tray editor.
+        //
+        // Every entry is resolved the same way a single spool is, and a slot
+        // is only claimed when exactly one candidate fits it -- guessing stays
+        // out of this.
+        const rohIds = spoolMapping
+            ? Object.values(spoolMapping)
+            : (spoolId != null ? [spoolId] : []);
+        const ids = [...new Set(rohIds.map(v => parseInt(v, 10)).filter(Number.isFinite))];
+        if (!ids.length) return;
 
         let stand = null;
         try {
-            stand = await window.amsFeuchte.hole(14);
+            stand = await window.amsHumidity.hole(14);
         } catch (_) {
             return;
         }
-        const kandidat = this._findHumidityAssignmentCandidate(stand, spoolNum);
-        if (!kandidat) return;
 
         const texts = window.texts || {};
-        const spool = (window.spoolmanSpools || []).find(s => s.id === spoolNum);
-        const filament = (spool && spool.filament) || {};
-        const spoolName = [
-            filament.vendor && filament.vendor.name ? filament.vendor.name : '',
-            filament.name || ''
-        ].filter(Boolean).join(' ') || `#${spoolId}`;
-        const slotLabel = (kandidat.slot || 0) + 1;
-        const message = (texts.feuchte_assign_before_print
+        const namen = (nummer) => {
+            const spool = ((window.spoolmanManager && window.spoolmanManager.spools) || []).find(s => s.id === nummer);
+            const filament = (spool && spool.filament) || {};
+            return [
+                filament.vendor && filament.vendor.name ? filament.vendor.name : '',
+                filament.name || ''
+            ].filter(Boolean).join(' ') || `#${nummer}`;
+        };
+
+        const offen = [];
+        const belegteFaecher = new Set();
+        ids.forEach(nummer => {
+            const kandidat = this._findHumidityAssignmentCandidate(stand, nummer);
+            if (!kandidat) return;
+            const fach = kandidat.ams_id + ':' + kandidat.slot;
+            // Two spools pointing at the same slot means the suggestion is not
+            // unambiguous after all -- then neither of them gets it.
+            if (belegteFaecher.has(fach)) {
+                const i = offen.findIndex(e => e.tray === fach);
+                if (i >= 0) offen.splice(i, 1);
+                return;
+            }
+            belegteFaecher.add(fach);
+            offen.push({ fach, spoolNum: nummer, kandidat });
+        });
+        if (!offen.length) return;
+
+        const message = offen.map(e => (texts.humidity_assign_before_print
             || 'AMS slot {slot} has no spool assignment for humidity history. Assign {spool} now?')
-            .replace('{slot}', String(slotLabel))
-            .replace('{spool}', spoolName);
+            .replace('{slot}', String((e.kandidat.slot || 0) + 1))
+            .replace('{spool}', namen(e.spoolNum))).join('\n\n');
 
         const bestaetigt = await new Promise(resolve => {
             if (window.showConfirmDialog) {
@@ -15329,22 +16024,24 @@ class PrintActionsManager {
         if (!bestaetigt) return;
 
         try {
-            await window.apiCall('/api/filament/feuchte/zuordnung', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ams_id: kandidat.ams_id,
-                    slot: kandidat.slot,
-                    spool_id: spoolNum,
-                    typ: kandidat.typ || '',
-                    farbe: kandidat.farbe || '',
-                    name: kandidat.name || '',
-                }),
-            });
-            if (window.amsFeuchte) window.amsFeuchte.vergiss();
-            if (window.skToast) window.skToast(texts.feuchte_assignment_saved, 'success');
+            for (const e of offen) {
+                await window.apiCall('/api/filament/humidity/assign', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ams_id: e.kandidat.ams_id,
+                        slot: e.kandidat.slot,
+                        spool_id: e.spoolNum,
+                        type: e.kandidat.type || '',
+                        color: e.kandidat.color || '',
+                        name: e.kandidat.name || '',
+                    }),
+                });
+            }
+            if (window.amsHumidity) window.amsHumidity.vergiss();
+            if (window.skToast) window.skToast(texts.humidity_assignment_saved, 'success');
         } catch (e) {
-            if (window.skToast) window.skToast(texts.feuchte_assignment_save_failed, 'warning');
+            if (window.skToast) window.skToast(texts.humidity_assignment_save_failed, 'warning');
             console.warn('Failed to persist AMS humidity mapping before print:', e);
         }
     }
@@ -15415,7 +16112,7 @@ class PrintActionsManager {
                             .replace('{required}', Math.round(required))
                             .replace('{shortage}', shortage);
                         const okShort = window.showConfirmDialog
-                            ? await new Promise(res => window.showConfirmDialog(msg, () => res(true), () => res(false)))
+                            ? await new Promise(res => window.showConfirmDialog({ text: msg, knopf: texts.confirm_print_anyway }, () => res(true), () => res(false)))
                             : (window.skConfirm ? await window.skConfirm(msg) : true);
                         if (!okShort) return;
                     }
@@ -15516,7 +16213,14 @@ class PrintActionsManager {
             }
 
             if (data.success) {
-                closeMultiFilamentSpoolModal();
+                // The multi-filament dialog closes itself before it starts the
+                // print (print-scheduler.js, `modal.remove()` right before
+                // proceedWithPlateCheck). A `closeMultiFilamentSpoolModal()`
+                // stood here and was never defined anywhere -- it threw a
+                // ReferenceError on every multi-colour start, and everything
+                // below it was skipped: the two dialogs stayed open and the
+                // "print started" toast never appeared, while the print itself
+                // was already running.
                 document.getElementById('plateSelectModal').style.display = 'none';
                 closeSDModal();
                 // Only now — the job has been accepted.
@@ -15535,7 +16239,7 @@ class PrintActionsManager {
                 };
                 const timelapseInfo = printOptions.timelapse ? (' ' + texts.with_timelapse) : '';
                 skToast(texts.toast_print_started, {
-                    detail: (window.cleanPrintName ? window.cleanPrintName(filename) : filename)
+                    detail: (window.cleanPrintName(filename))
                             + timelapseInfo,
                     aktion: { text: texts.toast_show || 'Anzeigen', onClick: zeigeKarte },
                 });
@@ -15584,6 +16288,149 @@ class PrintActionsManager {
     // ========================================
     // showFilamentMismatchDialog (Option C: Single-Filament Spool-Confirm)
     // ========================================
+    /** The conflict dialog for a print we did NOT send.
+     *
+     *  showFilamentMismatchDialog below belongs to our own print command: it
+     *  asks BEFORE the start and its answer is "take this spool and go". A
+     *  job from the slicer is already running when we notice, so the answer
+     *  is a different one -- say which spool is really in the tray, or stop
+     *  the print. Everything else it shows is the same, so it looks the same.
+     */
+    zeigeFilamentKonflikt(konflikt, dateiname) {
+        const texts = window.texts || {};
+        const e = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+        const farbe = (c, s) => (c && /^#?[0-9a-fA-F]{6}$/.test(c))
+            ? (c[0] === '#' ? c : '#' + c) : s;
+
+        const will = konflikt.wanted || {};
+        const fach = konflikt.tray || {};
+        const kandidaten = Array.isArray(konflikt.candidates) ? konflikt.candidates : [];
+        const aktiv = konflikt.current_active;
+        const optionen = [];
+        const gesehen = new Set();
+        kandidaten.forEach(sp => { if (!gesehen.has(sp.id)) { optionen.push(sp); gesehen.add(sp.id); } });
+        if (aktiv && !gesehen.has(aktiv.id)) optionen.push(aktiv);
+
+        // Stopping is offered while the printer is still preparing. The
+        // check runs at the start, so the message is there in time -- but it
+        // waits in the stack, and opening it three hours later must not put
+        // a red button next to a print at 80 %. Then the answer is the
+        // assignment; whoever really wants to stop has the button on the
+        // card, where the whole context is.
+        const stand = window.lastPrintData || {};
+        const zustand = String(stand.gcode_state || '').toUpperCase();
+        const nochVorbereitung = zustand === 'PREPARE'
+            || (zustand === 'RUNNING' && Number(stand.progress || 0) <= 0);
+
+        const zeile = (sp, i) => {
+            const fil = sp.filament || {};
+            const hersteller = (fil.vendor || {}).name || '';
+            return `
+                <label class="ui-zeile ui-zeile--klick fm-option" data-spool-id="${sp.id}">
+                    <input type="radio" name="fk-spule" value="${sp.id}" class="fm-radio"${i === 0 ? ' checked' : ''}>
+                    <span class="mf-punkt" style="background:${farbe(fil.color_hex, '#888')};"></span>
+                    <span class="ui-zeile-name">
+                        <span class="mf-name">${e(hersteller ? hersteller + ' ' : '')}${e(fil.name || '')}</span>
+                        <span class="mf-typ">${e(fil.material || '')}</span>
+                    </span>
+                </label>`;
+        };
+
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;'
+            + 'background:rgba(0,0,0,0.6); z-index:10000; display:flex;'
+            + 'align-items:center; justify-content:center;';
+        const content = document.createElement('div');
+        content.className = 'modal-panel';
+        content.style.cssText = 'position:relative; width:92%; max-width:560px;'
+            + 'max-height:85vh; overflow-y:auto; border-radius:12px; padding:0;';
+
+        content.innerHTML = `
+            <div class="sd-modal-header">
+                <h2 class="sd-modal-title">
+                    <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg>
+                    <span>${e(texts.fk_title || 'Filament passt nicht')}</span>
+                </h2>
+            </div>
+            <div class="ui-koerper" style="padding:16px 20px 20px;">
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_file_wants || 'Die Datei braucht')}</span></div>
+                    <div class="ui-zeile">
+                        <span class="mf-punkt" style="background:${farbe(will.color, '#888')};"></span>
+                        <span class="ui-zeile-name">
+                            <span class="mf-name">${e(will.name || '—')}</span>
+                            <span class="mf-typ">${e(will.material || '')}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_tray_holds || 'Im Fach liegt')}</span></div>
+                    <div class="ui-zeile">
+                        <span class="mf-punkt" style="background:${farbe(fach.color, '#888')};"></span>
+                        <span class="ui-zeile-name">
+                            <span class="mf-name">${e(fach.name || '—')}</span>
+                            <span class="mf-typ">${e(fach.type || '')}</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="ui-karte">
+                    <div class="ui-karte-kopf"><span>${e(texts.fk_pick || 'Welche Spule liegt wirklich im Fach?')}</span></div>
+                    ${optionen.length ? `<div id="fk-options">${optionen.map(zeile).join('')}</div>`
+                        : `<div class="fm-hinweis">${e(texts.no_matching_spool || 'Keine passende Spule im Spoolman gefunden.')}</div>`}
+                </div>
+            </div>
+            <div class="ui-fuss">
+                <button class="modal-btn modal-btn-cancel" id="fk-zu">${e(texts.close || 'Schliessen')}</button>
+                ${nochVorbereitung ? `<button class="modal-btn modal-btn-danger" id="fk-stop">${e(texts.fk_abort_print || 'Druck abbrechen')}</button>` : ''}
+                <button class="modal-btn modal-btn-primary" id="fk-ok"${optionen.length ? '' : ' disabled'}>${e(texts.fk_assign || 'Zuordnen')}</button>
+            </div>`;
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        const zu = () => modal.remove();
+        content.querySelector('#fk-zu').addEventListener('click', zu);
+        modal.addEventListener('click', ev => { if (ev.target === modal) zu(); });
+
+        const stopKnopf = content.querySelector('#fk-stop');
+        if (stopKnopf) stopKnopf.addEventListener('click', () => {
+            // The same path and the same confirmation as the stop button on
+            // the card. Nothing here talks to the printer on its own.
+            zu();
+            showConfirmDialog({ text: texts.confirm_stop_print, knopf: texts.confirm_stop,
+                                gefaehrlich: true }, () => window.printerAdapter.stop());
+        });
+
+        content.querySelector('#fk-ok').addEventListener('click', async () => {
+            const gewaehlt = content.querySelector('input[name="fk-spule"]:checked');
+            if (!gewaehlt) return;
+            const id = parseInt(gewaehlt.value, 10);
+            const sp = optionen.find(o => o.id === id) || {};
+            const fil = sp.filament || {};
+            const ruf = window.apiCall || ((u, o) => fetch(u, Object.assign({ credentials: 'include' }, o)));
+            try {
+                // 1. Bind the spool to the tray -- that is the lasting answer.
+                await ruf('/api/filament/humidity/assign', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        ams_id: fach.ams_id, slot: fach.slot, spool_id: id,
+                        typ: fil.material || '', farbe: (fil.color_hex || ''),
+                        name: ((fil.vendor || {}).name ? (fil.vendor.name + ' ') : '') + (fil.name || '')
+                    })
+                });
+                // 2. Make it the active spool. The running print's history
+                //    follows along on the server (_history_for_spool).
+                await ruf(`/api/spoolman/spool/${id}/activate`, { method: 'POST' });
+                zu();
+                if (window.skToast) skToast(texts.fk_assigned || 'Zugeordnet', 'success');
+            } catch (err) {
+                if (window.skToast) skToast(texts.fk_assign_error || 'Zuordnen fehlgeschlagen', 'error');
+            }
+        });
+    }
+
     showFilamentMismatchDialog(filename, location, plate, printOptions, mismatch) {
         const self = this;
         const texts = window.texts || {};
@@ -15750,7 +16597,7 @@ class PrintActionsManager {
         console.log('Showing confirm dialog with message:', message);
 
         const self = this;
-        showConfirmDialog(message, function() {
+        showConfirmDialog({ text: message, knopf: texts.confirm_print_anyway }, function() {
             console.log('User confirmed, retrying with force=true');
             self.sendPrintCommand(filename, location, plate, spoolMapping, true);
         });
@@ -16001,7 +16848,7 @@ class PrintActionsManager {
             : window.lastSDFiles?.find(f => f.name === filename);
 
             if (fileData && fileData.weight) {
-                const activeSpool = window.spoolmanSpools?.find(s => s.id === spoolId);
+                const activeSpool = window.spoolmanManager?.spools?.find(s => s.id === spoolId);
                 if (activeSpool && activeSpool.remaining_weight) {
                     const printWeight = fileData.weight;
                     const remaining = activeSpool.remaining_weight;
@@ -16014,7 +16861,7 @@ class PrintActionsManager {
                             .replace('{shortage}', shortage.toFixed(0));
 
                         const self = this;
-                        showConfirmDialog(message, function() {
+                        showConfirmDialog({ text: message, knopf: texts.confirm_print_anyway }, function() {
                             // User confirmed — start the print anyway (skip check)
                             window._skipSpoolCheck = true;
                             // Continue straight on: the user already filled
@@ -16042,7 +16889,7 @@ class PrintActionsManager {
 
         // Multi-filament: use spool mapping
         if (spoolMapping) {
-            console.log('🔍 spoolMapping vorhanden:', spoolMapping);
+            console.log('🔍 spoolMapping present:', spoolMapping);
             console.log('🔍 spoolMapping type:', typeof spoolMapping);
             console.log('🔍 spoolMapping JSON:', JSON.stringify(spoolMapping));
             requestBody.spool_mapping = spoolMapping;
@@ -16163,7 +17010,7 @@ class PrintActionsManager {
             texts.confirm_print_without_timelapse.replace('{filename}', filename);
 
         const self = this;
-        showConfirmDialog(message, async function() {
+        showConfirmDialog({ text: message, knopf: texts.confirm_start }, async function() {
             await self._confirmHumidityAssignmentBeforePrint(window.activeSpoolId, null);
             apiCall('/api/mqtt/print', {
                 method: 'POST',
@@ -16239,18 +17086,18 @@ function startPrintWithoutPlateCheck(filename, location) { window.printActions.s
 
 ;/* ---- print-recovery.js ---- */
 /**
- * Power-Loss-Recovery
+ * Power loss recovery
  *
- * Der Companion schreibt waehrend jedes Drucks den byte-genauen Stand mit
- * (`virtual_sdcard.file_position` + Position, Temperaturen, Offsets, Profile).
- * Faellt der Strom aus oder stuerzt Klipper ab, bleibt dieser Stand liegen —
- * und sobald Klipper wieder steht und nichts druckt, bietet dieser Banner das
- * Fortsetzen an. Beim Fortsetzen werden X und Y gehomet (die real erreichte
- * Position ist nach einem Absturz nicht rekonstruierbar, die Move-Queue laeuft
- * bis zu 2s voraus), Z kommt per SET_KINEMATIC_POSITION aus dem Snapshot.
+ * During every print the companion records the byte-exact state
+ * (`virtual_sdcard.file_position` plus the position, temperatures, offsets and
+ * profiles). If the power fails or Klipper crashes, that state stays behind --
+ * and as soon as Klipper is back up and nothing is printing, this banner offers
+ * to resume. On resuming, X and Y are homed (the position really reached cannot
+ * be reconstructed after a crash, the move queue runs up to 2s ahead) and Z
+ * comes from the snapshot through SET_KINEMATIC_POSITION.
  *
- * Nur Klipper-Direct — beim Bambu-Backend gibt es keinen Companion, der den
- * Stand mitschreiben koennte. Dort wird gar nicht erst gefragt (siehe
+ * Klipper direct only -- with the Bambu backend there is no companion that
+ * could record the state. Nothing is asked there in the first place (see
  * _isDirectMode).
  */
 class PrintRecoveryManager {
@@ -16276,13 +17123,13 @@ class PrintRecoveryManager {
     }
 
     /**
-     * Laeuft die UI gegen den lokalen Direct-Adapter? Nur dort gibt es einen
-     * Companion. Beim Bambu-Backend existiert der Endpoint gar nicht — die
-     * Anfrage lief in einen 404, den Flask mit vollem Traceback protokolliert,
-     * und das alle 20 Sekunden. Also erst gar nicht fragen.
+     * Is the UI running against the local direct adapter? Only there is there a
+     * companion. With the Bambu backend the endpoint does not exist at all --
+     * the request ran into a 404 that Flask logs with a full traceback, every
+     * 20 seconds. So it does not ask in the first place.
      *
-     * Nutzt denselben dokumentweit gecachten /api/config-Abruf wie
-     * tab-bar-manager._applyDirectMode() — eine Abfrage fuer die ganze Seite.
+     * Uses the same document-wide cached /api/config call as
+     * tab-bar-manager._applyDirectMode() -- one query for the whole page.
      */
     _isDirectMode() {
         window.__directCfgPromise = window.__directCfgPromise ||
@@ -16298,8 +17145,8 @@ class PrintRecoveryManager {
     }
 
     async refresh() {
-        // Waehrend einer laufenden Wiederaufnahme nicht dazwischenfunken: der
-        // Companion antwortet erst nach Homing und Aufheizen, das dauert Minuten.
+        // Do not interfere while a resume is running: the companion only
+        // answers after homing and heating, which takes minutes.
         if (this.busy) return;
         try {
             const res = await this._call('/api/recovery');
@@ -16411,29 +17258,28 @@ window.dismissRecoveryBanner = () => window.printRecoveryManager.dismiss();
 
 ;/* ---- filament-amount.js ---- */
 /**
- * Filament-Mengen-Hinweis
+ * The filament amount hint
  *
- * Der Companion vergleicht waehrend eines laufenden Drucks das im Gcode
- * hinterlegte Gewicht (`filament_weight_total`) mit der Restmenge der aktiven
- * Spoolman-Rolle und legt das Ergebnis als `filament_amount` in seinen
- * Status-Snapshot.
+ * During a running print the companion compares the weight recorded in the
+ * gcode (`filament_weight_total`) with what is left on the active Spoolman
+ * spool and puts the result into its status snapshot as `filament_amount`.
  *
- * Der Hinweis existiert vor allem fuer Drucke, die direkt aus dem Slicer an den
- * Drucker gehen: dort laeuft kein Vorab-Check, die Datei wird erst sichtbar wenn
- * sie schon druckt. Die Vorbereitung dauert aber bis zu 20 Minuten — genug Zeit,
- * die Rolle zu tauschen und den Druck zu behalten.
+ * The hint exists above all for prints that go straight from the slicer to the
+ * printer: no pre-check runs there, and the file only becomes visible once it
+ * is already printing. The preparation takes up to 20 minutes, though -- enough
+ * time to swap the spool and keep the print.
  *
- * REIN INFORMATIV. Nichts hier greift in den Druck ein, es gibt keinen Abbruch.
- * Zu wenig Filament ist kein Fehler — der Druck darf trotzdem laufen.
+ * PURELY INFORMATIONAL. Nothing here interferes with the print, there is no
+ * abort. Too little filament is not an error -- the print may run anyway.
  *
- * Nur Klipper-Direct: beim Bambu-Backend gibt es keinen Companion, dort wird
- * gar nicht erst gefragt (siehe _isDirectMode).
+ * Klipper direct only: with the Bambu backend there is no companion, and
+ * nothing is asked there at all (see _isDirectMode).
  */
 class FilamentAmountManager {
     constructor() {
         this.POLL_MS = 30000;
-        // Pro Datei einmal weggeklickt bleibt es weg — der Wert aendert sich
-        // waehrend eines Drucks nicht mehr, ein Wiederauftauchen waere nur Laerm.
+        // Dismissed once per file, it stays dismissed -- the value no longer
+        // changes during a print, and coming back would be pure noise.
         this.dismissed = null;
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -16453,13 +17299,13 @@ class FilamentAmountManager {
     }
 
     /**
-     * Laeuft die UI gegen den lokalen Direct-Adapter? Nur dort gibt es einen
-     * Companion. Beim Bambu-Backend existiert der Endpoint gar nicht — die
-     * Anfrage lief in einen 404, den Flask mit vollem Traceback protokolliert,
-     * und das alle 30 Sekunden. Also erst gar nicht fragen.
+     * Is the UI running against the local direct adapter? Only there is there a
+     * companion. With the Bambu backend the endpoint does not exist at all --
+     * the request ran into a 404 that Flask logs with a full traceback, every
+     * 30 seconds. So it does not ask in the first place.
      *
-     * Nutzt denselben dokumentweit gecachten /api/config-Abruf wie
-     * tab-bar-manager._applyDirectMode() — eine Abfrage fuer die ganze Seite.
+     * Uses the same document-wide cached /api/config call as
+     * tab-bar-manager._applyDirectMode() -- one query for the whole page.
      */
     _isDirectMode() {
         window.__directCfgPromise = window.__directCfgPromise ||
@@ -16499,8 +17345,8 @@ class FilamentAmountManager {
         const t = (key, fallback) =>
             (typeof getText === 'function' && getText(key)) || fallback;
 
-        // "knapp": reicht rechnerisch noch, aber nicht mehr mit Reserve. Spoolman
-        // rechnet die Restmenge selbst nur hoch, darum ist der Puffer kein Luxus.
+        // "tight": it is enough on paper, but no longer with a reserve. Spoolman
+        // only extrapolates what is left, so the buffer is not a luxury.
         const tight = !!fa.tight;
         if (title) {
             title.textContent = tight
@@ -16537,8 +17383,8 @@ class FilamentAmountManager {
 
     dismiss() {
         const el = document.getElementById('filament-amount-message');
-        // Datei aus dem zuletzt gezeigten Zustand merken, damit derselbe Druck
-        // nicht beim naechsten Poll wieder aufpoppt.
+        // Remember the file from the state last shown, so the same print does
+        // not pop up again on the next poll.
         this._call('/api/companion/status')
             .then(r => (r.ok ? r.json() : null))
             .then(snap => {
@@ -16921,7 +17767,7 @@ class StatusManager {
         const texts = window.texts || {};
             // Preconditioning: has its own state banner, its own file.
             try {
-                if (window.vorkonditionierung) window.vorkonditionierung.aktualisiere(status);
+                if (window.preconditioning) window.preconditioning.aktualisiere(status);
             } catch (_) {}
             // Store the last known switch state
             if (status.switch !== null && status.switch !== undefined) {
@@ -17161,7 +18007,8 @@ class StatusManager {
             }
 
             if (data.needs_confirmation) {
-                showConfirmDialog(texts.confirm_printer_printing_poweroff, async () => {
+                showConfirmDialog({ text: texts.confirm_printer_printing_poweroff,
+                    knopf: texts.confirm_power_off, gefaehrlich: true }, async () => {
                     await apiCall('/api/switch?force=true', { method: 'POST' });
                     setTimeout(() => loadStatus(), 2000);
                 });
@@ -17612,7 +18459,7 @@ class AppInitManager {
             layoutToApply = defaultLayout;
         }
 
-        // Grid-Version speichern
+        // Store the grid version
         localStorage.setItem('dashboard-grid-version', String(GRID_VERSION));
 
         // Desktop-only code from here - mobile already returned above!
@@ -17800,7 +18647,8 @@ class AppInitManager {
 
     // Reset Dashboard Layout
     resetDashboardLayout() {
-        showConfirmDialog('Dashboard-Layout auf Standard zurücksetzen?', function() {
+        showConfirmDialog({ text: (window.texts || {}).confirm_reset_layout,
+            knopf: (window.texts || {}).confirm_reset }, function() {
             localStorage.removeItem('dashboard-layout');
             location.reload();
         });
@@ -18901,11 +19749,7 @@ class AppInitManager {
                 // Redirect to history page
                 window.location.href = '/static/history.html';
             } else if (hash === '#logs') {
-                setTimeout(() => {
-                    if (typeof openLogViewer === 'function') {
-                        openLogViewer();
-                    }
-                }, 100);
+                window.location.href = '/static/logs.html';
             } else if (hash === '#settings') {
                 setTimeout(() => {
                     if (typeof openSettings === 'function') {
@@ -18998,7 +19842,7 @@ class AppInitManager {
                     window.spoolmanEnabled = data.spoolman && data.spoolman.enabled;
                     // Card Visibility SOFORT anwenden (Layout)
                     self.applyCardVisibility(data.ui?.card_visibility);
-                    // Spoolman-Init danach auf Idle verschieben
+                    // Move the Spoolman init to idle afterwards
                     self.deferNonCritical(() => {
                         console.log(texts.console_call_init_spoolman);
                         initSpoolman();
@@ -19461,7 +20305,7 @@ class SocketManager {
                     && typeof window.sdCardManager._syncStand === 'function') {
                 window.sdCardManager._syncStand(data.percent || 0, window.texts || {});
             }
-            // NEW: also update the loading area on manual sync
+            // Also update the loading area on manual sync
             if (data.manual_sync) {
                 const loadingDiv = document.getElementById('sd-loading');
                 if (loadingDiv && loadingDiv.style.display !== 'none') {
@@ -19474,47 +20318,12 @@ class SocketManager {
                                     ${Math.round(data.percent || 0)}%
                                 </div>
                             </div>
-                            <p style="color: var(--text-secondary); text-align: center; margin: 0; font-size: 13px;">
-                                ${data.message || 'Lade Dateien...'}
-                            </p>
+                            <p style="color: var(--text-secondary); text-align: center; margin: 0; font-size: 13px;"></p>
                         </div>
                     `;
-                }
-            }
-            const progressDiv = document.getElementById('sync-progress');
-            const statusText = document.getElementById('sync-status');
-            const progressBar = document.getElementById('sync-progress-bar');
-            const detailsText = document.getElementById('sync-details');
-
-            if (progressDiv) {
-                progressDiv.style.display = 'block';
-
-                if (data.status === 'scanning') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '10%';
-                } else if (data.status === 'downloading') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = data.percent + '%';
-
-                    // Show details
-                    if (data.message.includes('/')) {
-                        detailsText.textContent = data.message;
-                    }
-                } else if (data.status === 'cleaning') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '95%';
-                } else if (data.status === 'complete') {
-                    statusText.textContent = data.message;
-                    progressBar.style.width = '100%';
-                    progressBar.style.background = 'var(--accent-green)';
-
-                    // Show files after 2 seconds
-                    setTimeout(() => {
-                        showSDFiles();
-                    }, 2000);
-                } else if (data.status === 'error') {
-                    statusText.textContent = data.message;
-                    progressBar.style.background = 'var(--accent-red)';
+                    // The message can carry a file name -- text, not markup.
+                    loadingDiv.querySelector('p').textContent =
+                        window.serverText(data) || (window.texts || {}).loading_files;
                 }
             }
         });
@@ -19533,10 +20342,11 @@ class SocketManager {
                     refreshBtn.style.cursor = 'not-allowed';
                     // Show only a generic hint, the percentage belongs in the progress bar
                     const operation = data.operation || '';
-                    let btnText = 'FTPS aktiv...';
-                    if (operation === 'upload') btnText = texts.uploading || 'Upload läuft...';
-                    else if (operation === 'download') btnText = 'Download läuft...';
-                    else if (operation === 'sync') btnText = 'Sync läuft...';
+                    const tx = window.texts || {};
+                    let btnText = tx.ftps_active;
+                    if (operation === 'upload') btnText = tx.uploading;
+                    else if (operation === 'download') btnText = tx.download_running;
+                    else if (operation === 'sync') btnText = tx.sync_running;
                     refreshBtn.innerHTML = window.skIcon('sanduhr') + `<span>${btnText}</span>`;
                 } else {
                     refreshBtn.disabled = false;
@@ -19715,12 +20525,40 @@ class SocketManager {
                 return;
             }
 
-            // ELECTRON APP: don't show WebSocket notifications!
-            // Electron gets notifications via FCM push (@eneris/push-receiver)
-            // The desktop notification is shown there in main.js.
+            // ELECTRON APP: the socket does not draw anything -- it wakes.
+            //
+            // It used to be thrown away here ("Electron gets notifications via
+            // FCM push"), so the socket carried a message the app already had
+            // and did nothing with it. Meanwhile two ways led into the stack:
+            // straight from the push payload, and out of the store. Neither
+            // knew about the other, and they only met at the silent duplicate
+            // check inside `zeige()`.
+            //
+            // Now the socket only says "something changed" and the stack
+            // fetches from `/api/notifications/recent` -- the same source the
+            // page load already uses. One source, one way in.
+            //
+            // The desktop popup for a closed window stays with main.js and is
+            // untouched: there is no renderer then that could fetch.
             if (window.electronAPI) {
-                console.log('🖥️ [Electron] WebSocket notification ignored - using FCM instead');
+                if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                    window.NotificationStack.holeOffene();
+                } else {
+                    console.log('🖥️ [Electron] no stack on this page — nothing to fetch');
+                }
                 return;
+            }
+
+            // The stack, in EVERY client — not just in Electron.
+            //
+            // The socket says WHEN, the store says WHAT: `holeOffene()` fetches
+            // from /api/notifications/recent, the same source a page load uses.
+            // Without this the browser got a system banner and the stack inside
+            // the app stayed empty until the next page load. Found 08sep26:
+            // printer switched on, the phone had it at once over FCM, the web
+            // only minutes later — when something else happened to refresh.
+            if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                window.NotificationStack.holeOffene();
             }
 
             if ('Notification' in window && Notification.permission === 'granted') {
@@ -19796,8 +20634,8 @@ class SocketManager {
             // after being swiped away on the phone.
             let weg = 0;
             try {
-                if (window.MeldungsStapel && window.MeldungsStapel.entferne) {
-                    weg = window.MeldungsStapel.entferne(data.id) || 0;
+                if (window.NotificationStack && window.NotificationStack.entferne) {
+                    weg = window.NotificationStack.entferne(data.id) || 0;
                 }
             } catch (_) {}
             return weg;
@@ -19843,11 +20681,11 @@ class SocketManager {
                 // Counted is what actually left the screen here — not
                 // what the server considers done. At startup the
                 // stack is empty, and no number belongs here then.
-                if (weg) console.log(`🔄 ${weg} Meldung(en) waren anderswo schon erledigt`);
+                if (weg) console.log(`🔄 ${weg} message(s) were already handled elsewhere`);
                 // Restoring is done by the stack module — it lives on EVERY
                 // page, this connector only on the start page.
-                if (window.MeldungsStapel && window.MeldungsStapel.holeOffene) {
-                    window.MeldungsStapel.holeOffene();
+                if (window.NotificationStack && window.NotificationStack.holeOffene) {
+                    window.NotificationStack.holeOffene();
                 }
             } catch (_) { /* without reconciliation it falls back to the old behavior */ }
         }
@@ -20166,7 +21004,7 @@ class SocketManager {
     /** Progress bar and percentage */
     _zeigeFortschritt(data, previousState) {
         const texts = window.texts || {};
-        // ========== Progress Bar + Percentage (HelixScreen-Layout) ==========
+        // ========== Progress Bar + Percentage (print card layout) ==========
         const progressPercentage = document.getElementById('progress-percentage');
         if (progressPercentage) progressPercentage.textContent = Math.round(data.progress) + '%';
 
@@ -20756,7 +21594,7 @@ class SocketManager {
                 });
             }
 
-            // Status pill (HelixScreen): compact "Status: <State>" WITHOUT stage suffix.
+            // Status pill: compact "Status: <State>" WITHOUT stage suffix.
             // ONE source = data.status_text (key, always set by the producer) →
             // translated, no trailing colon/dots appended. status_running is gone
             // (it was the "Running"-vs-"Printing" bug source). STATUS_CONTRACT §7.
@@ -21180,7 +22018,7 @@ class SocketManager {
     _setupBeforeUnloadHandler() {
         // Browser-close detection - cleanly close the WebSocket
         window.addEventListener('beforeunload', function(event) {
-            console.log('🔌 Browser schließt - WebSocket cleanup');
+            console.log('🔌 Browser closing - WebSocket cleanup');
             if (window.socket && window.socket.connected) {
                 window.socket.removeAllListeners();
                 window.socket.disconnect();
@@ -21475,7 +22313,7 @@ function reconnectWebSocket() {
         const remainingMin = Math.round((s.remaining_seconds || 0) / 60);
         const elapsedMin = Math.round((s.elapsed_seconds || 0) / 60);
 
-        // HelixScreen pattern: Klipper reports state=printing already during
+        // Klipper reports state=printing already during
         // the START_PRINT macro (heat-soak/QGL/mesh/purge). We override gcode_state
         // to PREPARE as long as the macro reports `preparation_done=false`.
         // When the variable is missing (slicer prints without START_PRINT), we
@@ -21499,10 +22337,10 @@ function reconnectWebSocket() {
             total_layers: s.layer_total || 0,
             remaining_time: remainingMin,
             print_time: elapsedMin,
-            // Raw seconds for the HelixScreen print card "1h 52m elapsed".
+            // Raw seconds for the print card's "1h 52m elapsed".
             // IMPORTANT: total_duration_seconds (from print start, including heat-soak/
             // QGL/mesh) — NOT print_duration_seconds (extrusion only).
-            // HelixScreen shows total_duration, which matches user expectation.
+            // The card shows total_duration, which matches what the user expects.
             elapsed_seconds: s.total_duration_seconds
                 || s.elapsed_seconds
                 || s.print_duration_seconds
@@ -21527,11 +22365,6 @@ function reconnectWebSocket() {
             // (Decision A). Just pass it through here, don't re-derive it.
             stage_code: s.stage_code || '',
             stage_custom: s.stage_custom || '',
-            nozzle_temp: s.nozzle_temp,
-            nozzle_target: s.nozzle_target,
-            bed_temp: s.bed_temp,
-            bed_target: s.bed_target,
-            chamber_temp: s.chamber_temp,
             // Extended live values (KlipperScreen parity)
             z_position: s.z_position,
             speed_factor_percent: s.speed_factor_percent,
@@ -21541,7 +22374,7 @@ function reconnectWebSocket() {
             total_duration_seconds: s.total_duration_seconds,
             z_offset_mm: s.z_offset_mm,
             display_message: s.display_message,
-            // HelixScreen parity: fan values + objects + heating status pills.
+            // Print card: fan values + objects + heating status pills.
             // The Klipper backend pushes them in the SocketIO klipper_state event,
             // we map them through 1:1.
             part_fan_percent: s.part_fan_percent != null
@@ -21994,8 +22827,8 @@ function reconnectWebSocket() {
 })();
 
 
-;/* ---- meldungs-stapel.js ---- */
-// meldungs-stapel.js — ordering and truncation of the printer notifications.
+;/* ---- notification-stack.js ---- */
+// notification-stack.js — ordering and truncation of the printer notifications.
 //
 // The six notifications sit as fixed DOM nodes in _banners.html and are
 // still toggled by their respective modules via classList.add('active')
@@ -22052,7 +22885,7 @@ function reconnectWebSocket() {
         if (griff || !stapel) return;
         griff = document.createElement('div');
         griff.className = 'mld-griff';
-        griff.title = (window.texts && window.texts.mld_schieben) || 'Verschieben';
+        griff.title = (window.texts && window.texts.msg_move) || 'Verschieben';
         let start = null;
         griff.addEventListener('pointerdown', function (e) {
             start = { x: e.clientX - schubX, y: e.clientY - schubY };
@@ -22098,6 +22931,13 @@ function reconnectWebSocket() {
         return 5;
     }
 
+    /** The next OPEN sibling — everything else may sit wherever it likes. */
+    function naechsterOffener(el, offen) {
+        let n = el.nextElementSibling;
+        while (n && offen.indexOf(n) === -1) n = n.nextElementSibling;
+        return n || null;
+    }
+
     // The observer gets switched off during the rebuild. classList.remove()
     // rewrites the class attribute even when the class wasn't set to begin
     // with — the observer would trigger itself right back and the page
@@ -22123,28 +22963,52 @@ function reconnectWebSocket() {
         try { baueAuf(); } finally { beobachte(); beobachteZuwachs(); }
     }
 
+    /** Open = shown and not already fading out. The one definition. */
+    function istOffen(el) {
+        return el.classList.contains('active') && !el.classList.contains('mld-geht');
+    }
+
     function baueAuf() {
         const alle = [...stapel.querySelectorAll('.mld:not(.mld-sammel)')];
         // The handle isn't a notification: it carries no .mld class and so
         // doesn't even show up here. It's only ever shown and hidden.
-        const offen = alle.filter(el => el.classList.contains('active'));
+        const offen = alle.filter(istOffen);
 
-        // Newly shown ones get their transition only on the next frame,
-        // otherwise the box jumps into view without animating.
+        // Fade a newly shown one in. The transition needs a rendered start
+        // state, which a forced layout provides — NOT a frame.
+        //
+        // It used to hang on requestAnimationFrame, and that does not run
+        // while the window is throttled: covered by other windows, or the
+        // app in the menu bar. Since `.mld` without `.active` is
+        // display:none, the notification then sat invisible in the page —
+        // and no popup came either, because the main process had already
+        // been told it was delivered.
         alle.forEach(el => {
-            const auf = el.classList.contains('active');
+            const auf = istOffen(el);
             const an = el.classList.contains('mld-an');
-            if (auf && !an) requestAnimationFrame(() => el.classList.add('mld-an'));
+            if (auf && !an) { void el.offsetWidth; el.classList.add('mld-an'); }
             else if (!auf && an) el.classList.remove('mld-an');
         });
 
         // Only move what really has to go somewhere else. `appendChild` on
-        // a node that already sits right takes it out anyway
-        // and re-inserts it — with everything attached to it.
-        const sortiert = offen.sort((a, b) => rangVon(a) - rangVon(b));
-        sortiert.forEach((el, i) => {
-            if (stapel.children[i] !== el) stapel.appendChild(el);
-        });
+        // a node that already sits right takes it out anyway and re-inserts
+        // it — with everything attached to it, and a `click` only counts
+        // when press and release hit the same node.
+        //
+        // The guard compares against the OPEN nodes, not against
+        // `stapel.children`: those also hold the inactive fixed nodes, the
+        // drag handle and the collector line, so `children[i]` was
+        // practically never the node in question — and every rebuild
+        // re-hung every notification. During a print that happens several
+        // times a second, and the cross had to be clicked twice.
+        const sortiert = offen.slice().sort((a, b) => rangVon(a) - rangVon(b));
+        // Work from the back: each node has to sit directly before its
+        // successor, ignoring everything that isn't open.
+        for (let i = sortiert.length - 1; i >= 0; i--) {
+            const el = sortiert[i];
+            const soll = sortiert[i + 1] || null;
+            if (naechsterOffener(el, offen) !== soll) stapel.insertBefore(el, soll);
+        }
 
         const alteSammel = stapel.querySelector('.mld-sammel');
         if (alteSammel) alteSammel.remove();
@@ -22161,14 +23025,14 @@ function reconnectWebSocket() {
         if (rest > 0 && !aufgeklappt) {
             const s = document.createElement('div');
             s.className = 'mld mld--info mld-sammel active mld-an';
-            const text = (window.texts && window.texts.mld_weitere) || '+{n} weitere Meldungen';
+            const text = (window.texts && window.texts.msg_more) || '+{n} weitere Meldungen';
             s.innerHTML =
                 '<span class="mld-ic"><svg viewBox="0 0 24 24" aria-hidden="true">' +
                 '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg></span>' +
                 '<div class="mld-t"><div class="mld-titel">' +
                 String(text).replace('{n}', rest) + '</div>' +
                 '<div class="mld-mehr">' +
-                ((window.texts && window.texts.mld_alle_zeigen) || 'Alle anzeigen') +
+                ((window.texts && window.texts.msg_show_all) || 'Alle anzeigen') +
                 '</div></div>';
             s.addEventListener('click', () => { aufgeklappt = true; anstossen(); });
             // Before the states: those always stay at the very end.
@@ -22182,7 +23046,27 @@ function reconnectWebSocket() {
     function beobachte() {
         if (!wache || !stapel) return;
         stapel.querySelectorAll('.mld:not(.mld-sammel)').forEach(el =>
-            wache.observe(el, { attributes: true, attributeFilter: ['class'] }));
+            wache.observe(el, { attributes: true, attributeFilter: ['class'],
+                                attributeOldValue: true }));
+    }
+
+    /**
+     * Did the class attribute actually change?
+     *
+     * `classList.remove()` rewrites the attribute even when the class was
+     * never set, and the observer fires on that. The printer status does
+     * exactly that on every single update — preconditioning.aktualisiere()
+     * clears a banner that isn't up — so the stack rebuilt several times a
+     * second while nothing about it had changed.
+     *
+     * The check sits HERE and not in the modules: every one of them writes
+     * this way, including the ones added later.
+     */
+    function wirklichGeaendert(eintraege) {
+        for (const e of eintraege) {
+            if (e.target.getAttribute('class') !== e.oldValue) return true;
+        }
+        return false;
     }
 
     // Not every notification is in the page from the start: the printer
@@ -22198,7 +23082,12 @@ function reconnectWebSocket() {
     }
 
     function start() {
-        stapel = document.getElementById('meldungs-stapel');
+        // Repeatable: behaelter() calls this again when the container is gone
+        // from the document. Without dropping the old observers each call
+        // would leave one behind, still watching a detached node.
+        if (wache) { wache.disconnect(); wache = null; }
+        if (zuwachs) { zuwachs.disconnect(); zuwachs = null; }
+        stapel = document.getElementById('notification-stack');
         if (!stapel) {
             // The container only exists as a fixture on the home page,
             // because it sits in a Jinja partial (_banners.html) and the
@@ -22210,14 +23099,16 @@ function reconnectWebSocket() {
             // belongs to a purpose that has no business on a settings
             // page. The styles are on every page anyway (meldungen.css).
             stapel = document.createElement('div');
-            stapel.id = 'meldungs-stapel';
+            stapel.id = 'notification-stack';
             stapel.className = 'mld-stapel';
             document.body.appendChild(stapel);
         }
         // The modules only set/remove the 'active' class — the observer
         // then runs ONCE per change, instead of adding a call in every
         // module (and forgetting it in the next one).
-        wache = new MutationObserver(anstossen);
+        wache = new MutationObserver((eintraege) => {
+            if (wirklichGeaendert(eintraege)) anstossen();
+        });
         beobachte();
         beobachteZuwachs();
         ordne();
@@ -22295,7 +23186,7 @@ function reconnectWebSocket() {
         // and without this guard the box would end up standing there
         // twice.
         if (meldung.kennung
-            && stapel.querySelector('.mld[data-kennung="'
+            && stapel.querySelector('.mld:not(.mld-geht)[data-kennung="'
                                     + String(meldung.kennung).replace(/"/g, '\\"') + '"]')) {
             return null;
         }
@@ -22306,7 +23197,7 @@ function reconnectWebSocket() {
         // What this is about (HMS code) — entferneSache uses it to recognize the copy.
         if (meldung.sache) knoten.dataset.sache = String(meldung.sache);
 
-        const zu = (window.texts && window.texts.mld_schliessen) || 'Ausblenden';
+        const zu = (window.texts && window.texts.msg_close) || 'Ausblenden';
         knoten.innerHTML =
             '<span class="mld-ic"><svg viewBox="0 0 24 24" aria-hidden="true">' +
             SYMBOL[klasse] + '</svg></span>' +
@@ -22317,15 +23208,42 @@ function reconnectWebSocket() {
         // server and can contain file names.
         knoten.querySelector('.mld-titel').textContent = meldung.titel || '';
         knoten.querySelector('.mld-detail').textContent = meldung.text || '';
+
+        // A message that can be ACTED on carries its button here. Until
+        // 04sep26 the stack could only report; the filament conflict of a
+        // slicer print said what was wrong and left you to find the place
+        // that fixes it yourself.
+        if (meldung.aktion && typeof meldung.aktion.tun === 'function') {
+            const knopf = document.createElement('button');
+            knopf.type = 'button';
+            knopf.className = 'mld-aktion';
+            knopf.textContent = meldung.aktion.text || '';
+            knopf.addEventListener('click', (ev) => {
+                ev.stopPropagation();
+                meldung.aktion.tun();
+            });
+            knoten.querySelector('.mld-t').appendChild(knopf);
+        }
         knoten.querySelector('.mld-zu').addEventListener('click', () => {
             meldeWeggeklickt(meldung.kennung);
             nimmWeg(knoten);
         });
 
         stapel.appendChild(knoten);
-        // Fade in only on the next frame, otherwise the box jumps into
-        // view instead of sliding in — same rule as in baueAuf().
-        requestAnimationFrame(() => { knoten.classList.add('active'); anstossen(); });
+        // Visible AT ONCE. `.mld` without `.active` is display:none, and
+        // this used to be set inside requestAnimationFrame — which does not
+        // run while the window is throttled (covered, or in the menu bar).
+        // The notification then hung invisible in the page, and the main
+        // process showed no popup either, because the page had confirmed
+        // delivery.
+        //
+        // The forced layout in between is what the transition needs: it
+        // gives the fade its start state, which is what the frame used to
+        // be there for.
+        knoten.classList.add('active');
+        void knoten.offsetWidth;
+        knoten.classList.add('mld-an');
+        anstossen();
 
         // NO self-hiding. Only things that arrived via FCM ever end up in
         // this stack (electron-app/push-receiver-init.js is the only
@@ -22350,6 +23268,27 @@ function reconnectWebSocket() {
     // has seen and handled it.
     function meldeWeggeklickt(kennung) {
         if (!kennung) return;
+        // Remember it HERE, before reporting.
+        //
+        // The set was only ever filled by the socket echo — that is, after
+        // the round trip. In that gap `/api/notifications/recent` still
+        // reports the notification as open, so a holeOffene() landing in it
+        // (reconnect, next push, page switch) put the box straight back on
+        // screen and it had to be dismissed a second time.
+        if (!window.__dismissedNotificationIds) {
+            window.__dismissedNotificationIds = new Set();
+        }
+        window.__dismissedNotificationIds.add(kennung);
+
+        // And the main process keeps the books for both ways of showing it:
+        // without this its cache would still hold the notification and hand
+        // it back to the stack when the window comes up again.
+        try {
+            if (window.electronAPI && window.electronAPI.notificationDismissed) {
+                window.electronAPI.notificationDismissed(String(kennung));
+            }
+        } catch (_) {}
+
         const ruf = window.apiCall
             || ((url, opt) => fetch(url, Object.assign({ credentials: 'include' }, opt)));
         ruf('/api/notifications/' + encodeURIComponent(kennung) + '/dismiss',
@@ -22357,11 +23296,21 @@ function reconnectWebSocket() {
     }
 
     function nimmWeg(knoten) {
-        if (!knoten || !knoten.parentNode) return;
+        if (!knoten || !knoten.parentNode) return false;
+        // Already on its way out — a second call must not count again.
+        if (knoten.classList.contains('mld-geht')) return false;
+        // `active` has to stay for the fade — it is what carries
+        // display:flex. So the node says separately that it is on its way
+        // out: without that it kept counting as a notification for another
+        // 200 ms (ranking, the limit, the "+N more" line), and baueAuf()
+        // faded it right back in because for it the node was still open.
+        knoten.classList.add('mld-geht');
         knoten.classList.remove('mld-an');
         // Remove it only after fading out, otherwise the box disappears
         // abruptly; 0.18s is the duration from components.css.
         setTimeout(() => { knoten.remove(); anstossen(); }, 200);
+        anstossen();
+        return true;
     }
 
     /** Remove a notification for this id again (dismissed elsewhere). */
@@ -22378,7 +23327,7 @@ function reconnectWebSocket() {
         if (!stapel || !kennung) return 0;
         let weg = 0;
         stapel.querySelectorAll('.mld[data-kennung]').forEach(el => {
-            if (el.dataset.kennung === kennung) { nimmWeg(el); weg++; }
+            if (el.dataset.kennung === kennung && nimmWeg(el)) weg++;
         });
         return weg;
     }
@@ -22401,8 +23350,8 @@ function reconnectWebSocket() {
         // error came in, it turned into a popup next to the window. On
         // opening it, it stood next to the state node saying the same thing.
         try {
-            if (window.electronAPI && window.electronAPI.schliesseMeldungFuerSache) {
-                window.electronAPI.schliesseMeldungFuerSache(String(sache));
+            if (window.electronAPI && window.electronAPI.closeNotificationsForSubject) {
+                window.electronAPI.closeNotificationsForSubject(String(sache));
             }
         } catch (_) {}
     }
@@ -22429,41 +23378,104 @@ function reconnectWebSocket() {
      */
     async function holeOffene() {
         if (!window.electronAPI || !stapel) return 0;
+
+        // The server is the source. The main process keeps a copy, and it
+        // is the one that answers when the server cannot be reached: the
+        // push came through, only the fetch did not, and an empty stack
+        // would be the one outcome the user must not get.
+        let offene = null;
         try {
             const ruf = window.apiCall
                 || ((url, opt) => fetch(url, Object.assign({ credentials: 'include' }, opt)));
             const antwort = await ruf('/api/notifications/recent?limit=50');
-            if (!antwort || !antwort.ok) return 0;
-            const { notifications } = await antwort.json();
-            const grenze = Date.now() / 1000 - WIEDER_STUNDEN * 3600;
-            const offene = (notifications || [])
-                .filter(n => !Object.keys(n.dismissed_by || {}).length
-                          && !Object.keys(n.read_by || {}).length
-                          && (n.created_at || 0) >= grenze)
-                .sort((a, b) => (a.created_at || 0) - (b.created_at || 0))
-                .slice(-WIEDER_HOECHSTENS);
-            let zurueck = 0;
-            for (const n of offene) {
-                const kennung = n.event_id || n.id;
-                if (!kennung) continue;
-                if (window.__dismissedNotificationIds
-                    && window.__dismissedNotificationIds.has(kennung)) continue;
-                const knoten = zeige({
-                    titel: n.title || '',
-                    text: n.body || '',
-                    art: n.event_type || '',
-                    kennung,
-                    sache: ((n.meta || {}).extra_data || {}).error_code || null,
-                });
-                if (knoten) zurueck++;
+            if (antwort && antwort.ok) {
+                const { notifications } = await antwort.json();
+                const grenze = Date.now() / 1000 - WIEDER_STUNDEN * 3600;
+                offene = (notifications || [])
+                    .filter(n => !Object.keys(n.dismissed_by || {}).length
+                              && !Object.keys(n.read_by || {}).length
+                              && (n.created_at || 0) >= grenze)
+                    .sort((a, b) => (a.created_at || 0) - (b.created_at || 0))
+                    .slice(-WIEDER_HOECHSTENS)
+                    .map(n => ({
+                        kennung: n.event_id || n.id,
+                        titel: n.title || '',
+                        text: n.body || '',
+                        art: n.event_type || '',
+                        extra: (n.meta || {}).extra_data || {},
+                    }));
+                // The answer is the truth — the books get corrected by it,
+                // so a notification handled on the phone doesn't come back
+                // out of the cache on the next start.
+                melde(offene);
             }
-            if (zurueck) {
-                console.log(`📥 ${zurueck} offene Meldung(en) wieder in den Stapel gelegt`);
+        } catch (_) { /* offene stays null -> the cache answers */ }
+
+        if (offene === null) offene = await ausDemSpeicher();
+
+        let zurueck = 0;
+        for (const n of offene) {
+            if (!n.kennung) continue;
+            // Say WHY nothing appears. The stack answered "0 open" for three
+            // different reasons and named none of them, and the difference
+            // matters: an id in the dismissed set is correct, a node already
+            // in the stack means it hangs there invisibly, and a fixed banner
+            // means the page shows the same thing elsewhere (08sep26 — on the
+            // home page nothing appeared, on every other page it did).
+            if (window.__dismissedNotificationIds
+                && window.__dismissedNotificationIds.has(n.kennung)) {
+                console.log('⏭️ Message stack: skipped, already dismissed here:', n.kennung);
+                continue;
             }
-            return zurueck;
-        } catch (_) {
-            return 0;
+            const zusatz = n.extra || {};
+            const schonDa = stapel.querySelector(
+                '.mld:not(.mld-geht)[data-kennung="'
+                + String(n.kennung).replace(/"/g, '\\"') + '"]');
+            if (schonDa) {
+                console.log('⏭️ Message stack: already in the stack:', n.kennung,
+                            'sichtbar=' + schonDa.classList.contains('mld-an'),
+                            'aktiv=' + schonDa.classList.contains('active'));
+                continue;
+            }
+            const knoten = zeige({
+                titel: n.titel,
+                text: n.text,
+                art: n.art,
+                kennung: n.kennung,
+                sache: zusatz.error_code || null,
+                aktion: konfliktAktion(n.art, zusatz),
+            });
+            if (knoten) zurueck++;
+            else console.log('⏭️ Message stack: zeige() built nothing:', n.kennung, n.art);
         }
+        if (zurueck) {
+            console.log(`📥 Message stack: ${zurueck} open message(s) put back`);
+        }
+        return zurueck;
+    }
+
+    /** Tell the main process what the server considers open. */
+    function melde(offene) {
+        try {
+            if (window.electronAPI && window.electronAPI.notificationsFetched) {
+                window.electronAPI.notificationsFetched(offene);
+            }
+        } catch (_) {}
+    }
+
+    /** The last known state, from the main process. */
+    async function ausDemSpeicher() {
+        try {
+            if (window.electronAPI && window.electronAPI.notificationsOpen) {
+                const liste = await window.electronAPI.notificationsOpen();
+                if (Array.isArray(liste) && liste.length) {
+                    console.log(`📴 Server unreachable — ${liste.length} message(s) `
+                                + 'from the cache');
+                    return liste;
+                }
+            }
+        } catch (_) {}
+        return [];
     }
 
     // Check in once on loading EVERY page — that's where the case in
@@ -22475,27 +23487,62 @@ function reconnectWebSocket() {
         holeOffene();
     }
 
-    window.MeldungsStapel = { ordne: anstossen, zeige, entferne, entferneSache, holeOffene };
+    /** The button for a message that can be fixed — or nothing.
+     *
+     *  Today only the filament conflict of a slicer print. It carries the
+     *  whole picture in `mismatch` (what the file wants, what the tray says,
+     *  which spools could be in there), and the dialog does the fixing.
+     */
+    function konfliktAktion(art, zusatz) {
+        if (art !== 'filament_mismatch' || !zusatz || !zusatz.mismatch) return null;
+        let konflikt = zusatz.mismatch;
+        if (typeof konflikt === 'string') {
+            try { konflikt = JSON.parse(konflikt); } catch (_) { return null; }
+        }
+        if (!konflikt || typeof konflikt !== 'object') return null;
+        return {
+            text: (window.texts && window.texts.fk_open) || 'Beheben',
+            tun: () => {
+                if (window.printActions && window.printActions.zeigeFilamentKonflikt) {
+                    window.printActions.zeigeFilamentKonflikt(konflikt, zusatz.filename || '');
+                }
+            },
+        };
+    }
+
+    /** The container — created on first ask if it is not in the page.
+     *
+     *  hms-banner.js used to carry its own copy of these four lines: same
+     *  id, same class, same parent. It worked, but two places had to stay
+     *  in step, and nothing said so. One owner now; the banner asks.
+     */
+    function behaelter() {
+        if (!stapel || !stapel.isConnected) start();
+        return stapel;
+    }
+
+    window.NotificationStack = { ordne: anstossen, zeige, entferne, entferneSache,
+                              holeOffene, behaelter };
 })();
 
 
-;/* ---- vorkonditionierung.js ---- */
+;/* ---- preconditioning.js ---- */
 /**
- * Thermische Vorkonditionierung — Restzeit anzeigen (Bambu, Stufe 58).
+ * Thermal preconditioning -- showing the remaining time (Bambu, stage 58).
  *
- * Der Drucker heizt vor der ersten Schicht die Kammer durch. Bei ASA sind
- * das echte zehn Minuten: bei Druck 1319 am 27aug26 startete `stg_cd` bei
- * 599 Sekunden und zaehlte sauber auf 0 herunter, exakt bis zum Wechsel auf
- * Stufe 14. Solange steht der Fortschritt auf 0 % und Schicht 0 — ohne
- * Anzeige sieht es aus, als haenge etwas.
+ * Before the first layer the printer heats the chamber through. With ASA that
+ * is a real ten minutes: on print 1319 `stg_cd` started at 599 seconds and
+ * counted cleanly down to 0, exactly up to the change to stage 14. All that
+ * time the progress reads 0% and layer 0 -- without a display it looks as if
+ * something has hung.
  *
- * Bewusst ein ZUSTANDSbanner im Meldungsstapel, keine fluechtige Meldung:
- * zehn Minuten sind zu lang, um nach zwoelf Sekunden zu verschwinden. Es
- * geht von selbst, sobald die Stufe wechselt.
+ * Deliberately a STATE banner in the message stack, not a fleeting message: ten
+ * minutes is too long to disappear after twelve seconds. It goes by itself as
+ * soon as the stage changes.
  *
- * Das Wegklicken merkt sich nur dieser Browser und nur fuer DIESEN Druck —
- * anders als bei HMS, wo die Quittung bewusst ueberall gilt. Das hier ist
- * eine Anzeige, kein Ereignis, das andere Geraete bestaetigen muessten.
+ * Dismissing it is remembered by this browser only, and only for THIS print --
+ * unlike HMS, where the acknowledgement deliberately applies everywhere. This
+ * is a display, not an event other devices would have to confirm.
  */
 (function () {
     'use strict';
@@ -22514,7 +23561,7 @@ function reconnectWebSocket() {
         return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
     }
 
-    /** Aus dem Status heraus aufgerufen — bei jedem Update. */
+    /** Called out of the status -- on every update. */
     function aktualisiere(status) {
         const el = knoten();
         if (!el || !status) return;
@@ -22524,12 +23571,12 @@ function reconnectWebSocket() {
         const laeuft = Number(status.stage) === STUFE_VORKONDITIONIERUNG;
         const rest = Number(status.stg_cd);
 
-        // Neuer Druck: ein frueheres Wegklicken gilt nicht mehr.
+        // A new print: an earlier dismissal no longer applies.
         if (druck && weggeklicktFuer && druck !== weggeklicktFuer) {
             weggeklicktFuer = null;
         }
 
-        // stg_cd 0 heisst "gleich fertig" — dann lohnt das Banner nicht mehr.
+        // stg_cd 0 means "about to finish" -- the banner is then not worth it.
         if (!laeuft || !(rest > 0) || (druck && druck === weggeklicktFuer)) {
             el.classList.remove('active');
             return;
@@ -22546,91 +23593,91 @@ function reconnectWebSocket() {
         weggeklicktFuer = letzteDrucknummer || 'unbekannt';
     }
 
-    window.vorkonditionierung = { aktualisiere, wegklicken };
+    window.preconditioning = { aktualisiere, wegklicken };
 })();
 
 
-;/* ---- banner-probe.js ---- */
+;/* ---- banner-test.js ---- */
 /**
- * Banner-Probe — alle Banner auf einmal sichtbar machen.
+ * The banner sample -- make every banner visible at once.
  *
- * Sonst bekommt man sie nie zusammen zu sehen: Recovery braucht einen
- * Stromausfall, HMS einen Druckerfehler, Auto-Aus einen fertigen Druck.
+ * Otherwise they are never seen together: recovery needs a power cut, HMS needs
+ * a printer error, auto-off needs a finished print.
  *
- * Aufruf in der Browser-Konsole:
- *     bannerProbe()            alle an, mit Beispieldaten
- *     bannerProbe('hms')       nur eines
- *     bannerProbe.aus()        alles wieder weg
- *     bannerProbe.liste()      welche es gibt
+ * Called from the browser console:
+ *     bannerTest()            all of them on, with sample data
+ *     bannerTest('hms')       only one
+ *     bannerTest.off()        everything off again
+ *     bannerTest.list()      which ones exist
  *
- * Die Probe fuellt die ECHTEN Knoten aus _banners.html — sie prueft also
- * wirklich das, was im Betrieb erscheint, und nicht eine Nachbildung.
- * Der naechste Status-Push ueberschreibt die Beispielwerte; zum Ansehen
- * reicht es, und nichts bleibt haengen.
+ * The sample fills the REAL nodes from _banners.html -- so it really checks what
+ * appears in operation, not a reproduction of it. The next status push
+ * overwrites the sample values; that is enough for a look, and nothing gets
+ * stuck.
  */
 (function () {
     'use strict';
 
-    // Knoten -> Beispielwerte. Die Schluessel sind die Element-IDs aus
+    // Node -> sample values. The keys are the element ids from
     // templates/partials/_banners.html.
-    const PROBEN = {
-        vorkonditionierung: {
-            knoten: 'precondition-banner',
-            texte: { 'precondition-banner-countdown': '6:12' },
+    const SAMPLES = {
+        preconditioning: {
+            node: 'precondition-banner',
+            texts: { 'precondition-banner-countdown': '6:12' },
         },
-        trocknung: {
-            knoten: 'filament-drying-banner',
-            texte: {
+        drying: {
+            node: 'filament-drying-banner',
+            texts: {
                 'filament-drying-title': 'Filamenttrocknung aktiv',
                 'filament-drying-details': 'Heizbett bei 55°C • Fertig um 14:20 • Druckersteuerung blockiert',
             },
         },
         autoaus: {
-            knoten: 'power-off-banner',
-            texte: {
+            node: 'power-off-banner',
+            texts: {
                 'power-off-banner-countdown': '29:41',
                 'power-off-banner-reason': 'Nach dem Druck',
             },
         },
         recovery: {
-            knoten: 'recovery-banner',
-            texte: { 'recovery-banner-message': 'Benchy.gcode bei 47 % — Schicht 118 bei Z 23.60 mm' },
+            node: 'recovery-banner',
+            texts: { 'recovery-banner-message': 'Benchy.gcode bei 47 % — Schicht 118 bei Z 23.60 mm' },
         },
         filament: {
-            knoten: 'filament-amount-banner',
-            texte: {
+            node: 'filament-amount-banner',
+            texts: {
                 'filament-amount-title': 'Filament reicht vermutlich nicht',
                 'filament-amount-message': 'Benötigt 240 g, vorhanden 195 g — 45 g zu wenig · Polymaker PolyLite ASA Dark Green Grey',
             },
         },
         hms: {
-            knoten: 'hms-error-banner',
-            texte: {
+            node: 'hms-error-banner',
+            texts: {
                 'hms-error-title': 'Fehler 0700-2002',
                 'hms-error-message': 'Der Filamentsensor meldet keinen Vorschub.',
                 'hms-error-code': '0700-2002',
             },
         },
         wartung: {
-            knoten: 'maintenance-banner',
-            texte: {
+            node: 'maintenance-banner',
+            texts: {
                 'maintenance-banner-title': 'Wartung heute fällig',
                 'maintenance-banner-message': 'Riemenspannung prüfen · zuletzt vor 412 Druckstunden',
             },
         },
     };
 
-    function setze(probe) {
-        // Die HMS-Meldung steht nicht mehr in der Seite, sie wird gebaut,
-        // sobald es etwas zu melden gibt (hms-banner.js). Fuer die Probe
-        // bauen wir sie hier an.
-        if (probe.knoten === 'hms-error-banner' && !document.getElementById(probe.knoten)
+    function setze(sample) {
+        // The HMS message no longer stands in the page; it is built as soon as
+        // there is something to report (hms-banner.js). For the sample it is
+        // built here.
+        if (sample.node === 'hms-error-banner' && !document.getElementById(sample.node)
                 && window.HmsBanner) {
-            window.HmsBanner.knoten();
+            window.HmsBanner.node();
         }
-        const el = document.getElementById(probe.knoten);
+        const el = document.getElementById(sample.node);
         if (!el) return false;
-        Object.entries(probe.texte).forEach(([id, wert]) => {
+        Object.entries(sample.texts).forEach(([id, wert]) => {
             const ziel = document.getElementById(id);
             if (ziel) ziel.textContent = wert;
         });
@@ -22638,32 +23685,32 @@ function reconnectWebSocket() {
         return true;
     }
 
-    function probe(name) {
-        const namen = name ? [name] : Object.keys(PROBEN);
+    function sample(name) {
+        const namen = name ? [name] : Object.keys(SAMPLES);
         const gezeigt = [];
         namen.forEach(n => {
-            const p = PROBEN[n];
-            if (!p) { console.warn(`Banner probe: "${n}" does not exist`); return; }
-            if (setze(p)) gezeigt.push(n); else console.warn(`Banner probe: node missing for "${n}"`);
+            const p = SAMPLES[n];
+            if (!p) { console.warn(`Banner sample: "${n}" does not exist`); return; }
+            if (setze(p)) gezeigt.push(n); else console.warn(`Banner sample: node missing for "${n}"`);
         });
-        console.log(`🎏 Banner probe on: ${gezeigt.join(', ') || '(nothing)'}`);
-        console.log('   Off again with  bannerProbe.aus()');
+        console.log(`🎏 Banner sample on: ${gezeigt.join(', ') || '(nothing)'}`);
+        console.log('   Off again with  bannerTest.off()');
         return gezeigt;
     }
 
-    probe.aus = function () {
-        Object.values(PROBEN).forEach(p => {
-            const el = document.getElementById(p.knoten);
+    sample.off = function () {
+        Object.values(SAMPLES).forEach(p => {
+            const el = document.getElementById(p.node);
             if (el) el.classList.remove('active');
         });
-        console.log('🎏 Banner probe off');
+        console.log('🎏 Banner sample off');
     };
 
-    probe.liste = function () {
-        console.log('🎏 Banner-Probe kennt:', Object.keys(PROBEN).join(', '));
-        return Object.keys(PROBEN);
+    sample.list = function () {
+        console.log('🎏 Banner-Sample kennt:', Object.keys(SAMPLES).join(', '));
+        return Object.keys(SAMPLES);
     };
 
-    window.bannerProbe = probe;
+    window.bannerTest = sample;
 })();
 

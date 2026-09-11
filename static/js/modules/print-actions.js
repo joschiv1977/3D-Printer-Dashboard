@@ -60,7 +60,7 @@ window.skTeileKnopfZeigen = function (data) {
     if (!data) return;
     const laeuft = ['RUNNING', 'PAUSE'].includes(
         String(data.gcode_state || '').toUpperCase()) || data.paused === true;
-    const sichtbar = laeuft && data.kann_teile_ueberspringen === true;
+    const sichtbar = laeuft && data.can_skip_parts === true;
     // Three places: the print card (that's where you look during a print)
     // and the two button rows on the developer card.
     ['pcb-skip', 'skip-btn-mobile', 'skip-btn-desktop'].forEach(id => {
@@ -306,13 +306,13 @@ window.teileUeberspringenOeffnen = async function () {
             let text, art;
             if (erg.success) {
                 art = 'success';
-                text = erg.bestaetigt === false
+                text = erg.confirmed === false
                     ? t('skip_parts_sent_unconfirmed', 'Gesendet — der Drucker hat nicht geantwortet')
                     : t('skip_parts_done', 'Wird übersprungen');
             } else {
                 art = 'error';
-                text = erg.grund
-                    ? t('skip_parts_refused', 'Drucker hat abgelehnt') + ': ' + erg.grund
+                text = erg.reason
+                    ? t('skip_parts_refused', 'Drucker hat abgelehnt') + ': ' + erg.reason
                     : (erg.error || t('skip_parts_failed', 'Überspringen fehlgeschlagen'));
             }
             window.skToast && window.skToast(text, art);
@@ -536,11 +536,11 @@ class PrintActionsManager {
         const id = parseInt(spoolId, 10);
         if (!Number.isFinite(id)) return null;
 
-        const offene = (feuchteStand.spulen || []).filter(s => s && s.spool_id == null);
+        const offene = (feuchteStand.spools || []).filter(s => s && s.spool_id == null);
         if (!offene.length) return null;
 
         const jeSlot = new Map();
-        (feuchteStand.verlauf_spulen || []).forEach(e => {
+        (feuchteStand.history_spools || []).forEach(e => {
             if (!e) return;
             jeSlot.set(`${e.ams_id}:${e.slot}`, e);
         });
@@ -551,9 +551,9 @@ class PrintActionsManager {
             const amsId = Number.isFinite(parseInt(s.ams_id, 10)) ? parseInt(s.ams_id, 10) : null;
             if (amsId == null) return;
             const verlauf = jeSlot.get(`${amsId}:${slot}`) || null;
-            const vorschlaege = Array.isArray((verlauf || {}).vorschlaege)
-                ? verlauf.vorschlaege
-                : (Array.isArray(s.vorschlaege) ? s.vorschlaege : []);
+            const vorschlaege = Array.isArray((verlauf || {}).suggestions)
+                ? verlauf.suggestions
+                : (Array.isArray(s.suggestions) ? s.suggestions : []);
             const passend = vorschlaege.find(v => {
                 const vid = parseInt((v && (v.spool_id != null ? v.spool_id : v.id)), 10);
                 return Number.isFinite(vid) && vid === id;
@@ -562,8 +562,8 @@ class PrintActionsManager {
             treffer.push({
                 ams_id: amsId,
                 slot: slot,
-                typ: s.typ || (verlauf && verlauf.typ) || '',
-                farbe: s.farbe || (verlauf && verlauf.farbe) || '',
+                type: s.type || (verlauf && verlauf.type) || '',
+                color: s.color || (verlauf && verlauf.color) || '',
                 name: s.name || (verlauf && verlauf.name) || '',
             });
         });
@@ -600,7 +600,7 @@ class PrintActionsManager {
 
         const texts = window.texts || {};
         const namen = (nummer) => {
-            const spool = (window.spoolmanSpools || []).find(s => s.id === nummer);
+            const spool = ((window.spoolmanManager && window.spoolmanManager.spools) || []).find(s => s.id === nummer);
             const filament = (spool && spool.filament) || {};
             return [
                 filament.vendor && filament.vendor.name ? filament.vendor.name : '',
@@ -617,7 +617,7 @@ class PrintActionsManager {
             // Two spools pointing at the same slot means the suggestion is not
             // unambiguous after all -- then neither of them gets it.
             if (belegteFaecher.has(fach)) {
-                const i = offen.findIndex(e => e.fach === fach);
+                const i = offen.findIndex(e => e.tray === fach);
                 if (i >= 0) offen.splice(i, 1);
                 return;
             }
@@ -626,7 +626,7 @@ class PrintActionsManager {
         });
         if (!offen.length) return;
 
-        const message = offen.map(e => (texts.feuchte_assign_before_print
+        const message = offen.map(e => (texts.humidity_assign_before_print
             || 'AMS slot {slot} has no spool assignment for humidity history. Assign {spool} now?')
             .replace('{slot}', String((e.kandidat.slot || 0) + 1))
             .replace('{spool}', namen(e.spoolNum))).join('\n\n');
@@ -646,23 +646,23 @@ class PrintActionsManager {
 
         try {
             for (const e of offen) {
-                await window.apiCall('/api/filament/feuchte/zuordnung', {
+                await window.apiCall('/api/filament/humidity/assign', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ams_id: e.kandidat.ams_id,
                         slot: e.kandidat.slot,
                         spool_id: e.spoolNum,
-                        typ: e.kandidat.typ || '',
-                        farbe: e.kandidat.farbe || '',
+                        type: e.kandidat.type || '',
+                        color: e.kandidat.color || '',
                         name: e.kandidat.name || '',
                     }),
                 });
             }
             if (window.amsHumidity) window.amsHumidity.vergiss();
-            if (window.skToast) window.skToast(texts.feuchte_assignment_saved, 'success');
+            if (window.skToast) window.skToast(texts.humidity_assignment_saved, 'success');
         } catch (e) {
-            if (window.skToast) window.skToast(texts.feuchte_assignment_save_failed, 'warning');
+            if (window.skToast) window.skToast(texts.humidity_assignment_save_failed, 'warning');
             console.warn('Failed to persist AMS humidity mapping before print:', e);
         }
     }
@@ -860,7 +860,7 @@ class PrintActionsManager {
                 };
                 const timelapseInfo = printOptions.timelapse ? (' ' + texts.with_timelapse) : '';
                 skToast(texts.toast_print_started, {
-                    detail: (window.cleanPrintName ? window.cleanPrintName(filename) : filename)
+                    detail: (window.cleanPrintName(filename))
                             + timelapseInfo,
                     aktion: { text: texts.toast_show || 'Anzeigen', onClick: zeigeKarte },
                 });
@@ -1033,7 +1033,7 @@ class PrintActionsManager {
             const ruf = window.apiCall || ((u, o) => fetch(u, Object.assign({ credentials: 'include' }, o)));
             try {
                 // 1. Bind the spool to the tray -- that is the lasting answer.
-                await ruf('/api/filament/feuchte/zuordnung', {
+                await ruf('/api/filament/humidity/assign', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ams_id: fach.ams_id, slot: fach.slot, spool_id: id,
@@ -1042,7 +1042,7 @@ class PrintActionsManager {
                     })
                 });
                 // 2. Make it the active spool. The running print's history
-                //    follows along on the server (_historie_auf_spule).
+                //    follows along on the server (_history_for_spool).
                 await ruf(`/api/spoolman/spool/${id}/activate`, { method: 'POST' });
                 zu();
                 if (window.skToast) skToast(texts.fk_assigned || 'Zugeordnet', 'success');
@@ -1469,7 +1469,7 @@ class PrintActionsManager {
             : window.lastSDFiles?.find(f => f.name === filename);
 
             if (fileData && fileData.weight) {
-                const activeSpool = window.spoolmanSpools?.find(s => s.id === spoolId);
+                const activeSpool = window.spoolmanManager?.spools?.find(s => s.id === spoolId);
                 if (activeSpool && activeSpool.remaining_weight) {
                     const printWeight = fileData.weight;
                     const remaining = activeSpool.remaining_weight;
@@ -1510,7 +1510,7 @@ class PrintActionsManager {
 
         // Multi-filament: use spool mapping
         if (spoolMapping) {
-            console.log('🔍 spoolMapping vorhanden:', spoolMapping);
+            console.log('🔍 spoolMapping present:', spoolMapping);
             console.log('🔍 spoolMapping type:', typeof spoolMapping);
             console.log('🔍 spoolMapping JSON:', JSON.stringify(spoolMapping));
             requestBody.spool_mapping = spoolMapping;

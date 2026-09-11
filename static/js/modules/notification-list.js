@@ -96,7 +96,7 @@
         if (!sekunden) return '';
         const d = new Date(sekunden * 1000);
         const diff = (Date.now() - d.getTime()) / 1000;
-        if (diff < 60) return t('nb_gerade', 'gerade eben');
+        if (diff < 60) return t('nb_just_now', 'gerade eben');
         if (diff < 3600) return `${Math.floor(diff / 60)}m`;
         if (diff < 86400) return `${Math.floor(diff / 3600)}h`;
         return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -139,7 +139,7 @@
             const k = geraet(did);
             if (!plattformen.includes(k)) plattformen.push(k);
         }
-        const wort = t('nb_gelesen_auf', 'gelesen auf');
+        const wort = t('nb_read_on', 'gelesen auf');
         if (plattformen.length <= 2) return `${wort} ${plattformen.join(', ')}`;
         return `${wort} ${plattformen.slice(0, 2).join(', ')} +${plattformen.length - 2}`;
     }
@@ -152,7 +152,7 @@
         if (!liste.length) {
             container.innerHTML = `<div class="nb-leer">
                     <svg viewBox="0 0 24 24" aria-hidden="true">${P.glocke}</svg>
-                    <span>${sicher(t('nb_leer', 'Keine Benachrichtigungen'))}</span>
+                    <span>${sicher(t('nb_empty', 'Keine Benachrichtigungen'))}</span>
                 </div>`;
             return;
         }
@@ -180,11 +180,11 @@
                     ${neu
                         ? `<button class="nb-weg" data-weg="${sicher(n.id)}">
                                <svg class="nb-ic" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-                               ${sicher(t('nb_weg', 'Weg'))}
+                               ${sicher(t('nb_dismiss', 'Weg'))}
                            </button>`
                         /* When the footer already says "read on web",
                            braucht es rechts kein zweites "gelesen". */
-                        : (gelesen ? '' : `<span class="nb-gelesen">${sicher(t('nb_gelesen', 'gelesen'))}</span>`)}
+                        : (gelesen ? '' : `<span class="nb-gelesen">${sicher(t('nb_read', 'gelesen'))}</span>`)}
                 </div>
             </div>`;
         }).join('');

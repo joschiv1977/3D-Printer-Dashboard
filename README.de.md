@@ -6,7 +6,9 @@
 **— Web, Desktop, iOS und Android, ein Server hinter allem**
 
 [![Python 3.13](https://img.shields.io/badge/Python-3.13-2563eb?style=flat-square&logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![Plattform](https://img.shields.io/badge/Plattform-aarch64-64748b?style=flat-square&logo=linux&logoColor=white)](#-plattformen)
+[![Linux](https://img.shields.io/badge/Linux-ARM64%20%C2%B7%20x86__64-64748b?style=flat-square&logo=linux&logoColor=white)](#-plattformen)
+[![macOS](https://img.shields.io/badge/macOS-App-000000?style=flat-square&logo=apple&logoColor=white)](#-plattformen)
+[![Windows](https://img.shields.io/badge/Windows-Zip-0078D4?style=flat-square&logo=windows&logoColor=white)](#-plattformen)
 [![Drucker](https://img.shields.io/badge/Bambu%20Lab-13%20Modelle-10b981?style=flat-square)](#unterstützte-drucker)
 [![Klipper](https://img.shields.io/badge/Klipper-Moonraker-10b981?style=flat-square)](#-betriebsarten)
 [![Sprachen](https://img.shields.io/badge/Sprachen-5-7c3aed?style=flat-square)](#-sprachen)
@@ -37,12 +39,31 @@ einem privaten Repo.
 | **Weboberfläche** | fünf Sprachen, je 2313 Texte |
 | **~130 MB** | das ganze Repo |
 
+Diese Aufstellung ist die **Linux**-Seite. macOS und Windows installieren nicht
+von hier — sie sind je ein einzelnes Paket unter [Releases](../../releases),
+jedes bringt sein eigenes Python mit, und auf deinem Rechner muss vorher nichts
+eingerichtet sein.
+
 ---
 
 ## 🚀 Einrichten — Schritt für Schritt
 
 Hier wird nichts vorausgesetzt. Jeder Schritt sagt, was zu sehen sein muss; steht
 etwas anderes da, hilft der Abschnitt [Wenn etwas klemmt](#-wenn-etwas-klemmt).
+
+### Welches Paket
+
+Derselbe Server, dieselben Funktionen, drei Wege hinein. Nimm die Zeile für deinen
+Rechner.
+
+| Dein Rechner | Was du bekommst | Wo |
+|---|---|---|
+| **Linux** (Pi 4/5, ARM64 oder x86_64) | Installer, systemd-Dienst | Schritt 1 weiter unten |
+| **macOS** (Apple Silicon) | eine App, die den Server startet und überwacht | [macOS](#-macos) |
+| **Windows** (10/11, x64) | ein Zip — auspacken, doppelklicken | [Windows](#-windows) |
+
+Oberfläche, Apps und jede Funktion sind auf allen dreien gleich. Verschieden ist
+nur, wie der Server auf den Rechner kommt und was im Paket liegt.
 
 ### Vorher
 
@@ -138,6 +159,64 @@ Danach startet der Server einmal neu, und du landest auf der Anmeldeseite.
 ### Schritt 4 — fertig
 
 Anmelden als `admin` mit dem Passwort, das du gerade gesetzt hast.
+
+---
+
+### 🍎 macOS
+
+Apple Silicon. Eine App, und der Server steckt darin.
+
+1. **`3D-Printer-Server-<Fassung>.zip`** unter [Releases](../../releases) laden,
+   auspacken, die App auf *Programme* ziehen.
+2. Starten. Sie ist signiert und beglaubigt, macOS fragt nichts.
+3. Beim ersten Start legt sie `~/Library/Application Support/PrinterWebApp` an und
+   stellt sich ihr Zertifikat aus.
+4. `https://localhost:5555` — dann derselbe Assistent wie oben, ab Schritt 3.
+
+Die App bringt ihr eigenes Python mit, dazu ffmpeg und go2rtc; kein Homebrew,
+nichts vorher zu installieren. Sie sieht beim Start und danach täglich nach einer
+neuen Fassung und meldet sich, wenn es eine gibt.
+
+**Dem Zertifikat muss man einmal vertrauen.** Bis dahin nennt der Browser die
+Verbindung unsicher, und das Dashboard läuft nicht offline — ein Service Worker
+meldet sich an einem nicht vertrauten Zertifikat nicht an.
+`~/Library/Application Support/PrinterWebApp/data/certs/ca-cert.pem`
+doppelklicken und im Schlüsselbund auf *Immer vertrauen* stellen. Danach erneuert
+es sich selbst.
+
+**Spoolman ist unter macOS nicht dabei.** Der Server spricht mit einem, der schon
+im Netz läuft; die Adresse steht in den Einstellungen.
+
+### 🪟 Windows
+
+Windows 10 oder 11, 64 Bit. Ein Zip mit allem drin — als einziges der drei bringt
+es auch die Spulenverwaltung mit.
+
+1. Das Windows-Zip holen und auspacken. Der Ordner darf überall liegen.
+   Es ist das jüngste der drei Pakete; steht unter [Releases](../../releases)
+   noch keins, frag danach.
+2. Doppelklick auf **`3D Printer Server.exe`**. Windows warnt einmal — *Weitere
+   Informationen*, dann *Trotzdem ausführen*. Das Programm ist nicht signiert; ein
+   Zertifikat kostet Geld und ändert nichts am Programm.
+3. **Beim ersten Start stehen vier Schritte auf einer Seite:** Netz freigeben, beim
+   Anmelden starten, Startmenü-Eintrag, Zertifikat vertrauen. Für das Netz fragt
+   Windows nach Administratorrechten. Wer ablehnt, dem läuft alles andere trotzdem
+   — nur die Handys erreichen den Server dann nicht.
+4. `https://localhost:5555` — dann derselbe Assistent wie oben, ab Schritt 3.
+
+Im Paket: Python 3.13, alle Pakete, ffmpeg, go2rtc **und Spoolman**. Nichts wird
+nachgeladen, nichts muss vorher installiert sein. Spoolman kommt auf `:7912` neben
+dem Server hoch — und tritt zur Seite, wenn dort schon etwas antwortet.
+
+| | |
+|---|---|
+| Dashboard | `https://localhost:5555` |
+| Spulenverwaltung | `http://localhost:7912` |
+| Deine Daten | `%APPDATA%\PrinterWebApp` |
+| Protokoll | `%APPDATA%\PrinterWebApp\data\printer.log` |
+
+**Aktualisieren:** Programm beenden (Rechtsklick auf das Symbol neben der Uhr),
+Ordner durch den neuen ersetzen. Die Daten liegen woanders und bleiben.
 
 ---
 
@@ -368,6 +447,7 @@ wackelige Mobilfunknetze deutlich besser.
 | **iOS** | Swift, UIKit + SwiftUI | Live Activities, Dynamic Island, Widgets, eingebautes WireGuard |
 | **Android** | Kotlin, Jetpack Compose | Layouts für Telefon und Tablet, Android 16 Live Updates |
 | **macOS-Server-App** | Swift | Startet und überwacht den Server selbst |
+| **Windows-Server-App** | C#, WPF | Dasselbe Fenster, dieselbe Aufgabe, dazu die Spulenverwaltung |
 
 ### 🍎 iOS
 
@@ -394,9 +474,10 @@ Anmeldeseite, bevor du dich anmeldest.
 
 ---
 
-## 🔧 Was der Installer tut
+## 🔧 Was der Linux-Installer tut
 
-In dieser Reihenfolge. Jeder Schritt sagt, was er gefunden und was er übersprungen
+macOS und Windows tun nichts davon — sie bringen mit, was sie brauchen. In dieser
+Reihenfolge. Jeder Schritt sagt, was er gefunden und was er übersprungen
 hat.
 
 1. **Systempakete** — Python 3.13 mit `venv` und `dev`, Bauwerkzeuge, Bild- und
@@ -421,10 +502,17 @@ lädt **nur** bei genauer Übereinstimmung — ein Modul für 3.13 wird von 3.12
 einmal *gefunden*. Der Installer liest die nötige Fassung aus den mitgelieferten
 Dateinamen und hält mit einer Anleitung an, wenn sie fehlt.
 
-| Architektur | Stand |
+| Plattform | Stand |
 |---|---|
-| `aarch64` — Raspberry Pi 4/5, ARM64-Bretter | liegt bei, Python 3.13 |
-| `x86_64`, `armv7l` | zurzeit nicht gebaut — sag Bescheid, wenn du eine brauchst |
+| **Linux `aarch64`** — Raspberry Pi 4/5, ARM64-Bretter | liegt bei, Python 3.13 |
+| **Linux `x86_64`** | liegt bei, Python 3.13 |
+| **macOS**, Apple Silicon | als App, Python 3.12 darin |
+| **Windows** 10/11 x64 | als Zip, Python 3.13 darin |
+| Linux `armv7l` | nicht gebaut — sag Bescheid, wenn du eine brauchst |
+
+Deshalb sind die Pakete nicht austauschbar: ein für 3.13 auf aarch64 übersetztes
+Modul wird von 3.12 auf einem Mac nicht einmal *angesehen*. Jede Plattform bekommt
+ihr eigenes.
 
 ### Zwei Einzelheiten, die man kennen sollte
 
@@ -449,6 +537,12 @@ cd /opt/printer-web-app && sudo ./manage.sh   # Menü: Update, Sicherung, Logs
 
 **Aktualisieren:** `sudo ./manage.sh` → *Update*, oder den Installer noch einmal
 laufen lassen. Er erkennt eine vorhandene Installation.
+
+**Unter macOS** gilt nichts davon: die App ist der Dienst. Sie hat einen
+Start/Stopp-Knopf, zeigt das Protokoll selbst und aktualisiert sich selbst.
+
+**Unter Windows** genauso — das Fenster führt den Server und zeigt sein Protokoll.
+Beendet wird im Menü hinter dem Symbol neben der Uhr, nicht mit dem X.
 
 ---
 
@@ -565,11 +659,14 @@ Messaging, WireGuard.
 | **CPU** | 1 Kern @ 1 GHz | 2+ Kerne @ 1,5 GHz |
 | **iOS** | — | 16.1+ für Live Activities |
 
+Unter macOS und Windows gilt die Python-Zeile nicht — das Paket bringt sein
+eigenes mit, und auf dem Rechner wird keines benutzt oder verändert.
+
 ---
 
 <div align="center">
 
-**Version 2.1.4** · 🇬🇧 [English version](README.md)
+**Version 2.3.0** · 🇬🇧 [English version](README.md)
 
 Für die 3D-Druck-Gemeinde gemacht
 
