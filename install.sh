@@ -55,9 +55,9 @@ CLOUD="☁️"
 # ============================================================================
 
 print_banner() {
-    # Ohne Terminal (ssh + sudo setzen TERM=unknown) meldet clear
-    # „'unknown': I need something more specific." — als allererste Zeile
-    # eines Installers ein denkbar schlechter Auftakt.
+    # Without a terminal (ssh plus sudo set TERM=unknown) clear reports
+    # "'unknown': I need something more specific." -- about the worst
+    # possible opening line for an installer.
     clear 2>/dev/null || true
     echo -e "${CYAN}"
     cat << "EOF"
@@ -360,21 +360,18 @@ check_root() {
     fi
 }
 
-# Der Interpreter, mit dem gearbeitet wird. Wird von require_python()
-# gesetzt und danach ueberall benutzt, wo frueher blank `python3` stand.
-# Der Interpreter, mit dem gearbeitet wird. Wird von require_python()
-# gesetzt und danach ueberall benutzt, wo frueher blank `python3` stand.
+# The interpreter everything runs on. require_python() sets it, and every
+# call site uses it from then on.
 PYTHON_BIN="python3"
 
 benoetigte_python_fassung() {
-    # Die Fassung steht in den Dateinamen der mitgelieferten Module:
-    # `web_app.cpython-313-aarch64-linux-gnu.so` heisst 3.13. Sie hier
-    # abzulesen statt eine Nummer ins Skript zu schreiben heisst: ein
-    # neuer Bau aendert die Anforderung von selbst mit.
-    # Zum Zeitpunkt der Pruefung ist noch nichts nach $APP_DIR kopiert —
-    # clone_repository laeuft spaeter. Also dort nachsehen, wo das Skript
-    # liegt; von da kommen die Module. $APP_DIR als Rueckfall, falls
-    # jemand die Pruefung spaeter noch einmal aufruft.
+    # The version sits in the shipped modules' file names:
+    # `web_app.cpython-313-aarch64-linux-gnu.so` means 3.13. Reading it here
+    # instead of writing a number into the script means a new build moves the
+    # requirement along with it.
+    # Nothing has been copied to $APP_DIR yet at check time — clone_repository
+    # runs later. So look where the script itself sits; that is where the
+    # modules come from. $APP_DIR is the fallback for a later re-run.
     local datei
     for ort in "$SCRIPT_DIR" "$APP_DIR"; do
         [ -n "$ort" ] && [ -d "$ort" ] || continue
@@ -390,11 +387,11 @@ require_python() {
     noetig=$(benoetigte_python_fassung)
 
     if [ -z "$noetig" ]; then
-        # Kein uebersetztes Modul gefunden — Quellinstallation. Die laeuft
-        # mit jeder halbwegs neuen Fassung.
+        # No compiled module found — source install. That runs on any
+        # reasonably recent version.
         local hier
-        hier=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "keins")
-        print_status "Quellinstallation, Python $hier"
+        hier=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "none")
+        print_status "Source installation, Python $hier"
         return 0
     fi
 
@@ -403,27 +400,27 @@ require_python() {
         command -v "$kandidat" > /dev/null 2>&1 || continue
         if [ "$("$kandidat" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null)" = "$noetig" ]; then
             PYTHON_BIN="$kandidat"
-            print_success "Python $noetig gefunden: $(command -v "$kandidat")"
+            print_success "Python $noetig found: $(command -v "$kandidat")"
             return 0
         fi
     done
 
     local gefunden
-    gefunden=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "keins")
-    print_error "Python $noetig wird gebraucht, hier laeuft $gefunden."
+    gefunden=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "none")
+    print_error "Python $noetig is required, this machine runs $gefunden."
     echo
-    echo -e "  Die mitgelieferten Module heissen ${CYAN}cpython-${noetig//./}-...so${NC} und laden"
-    echo -e "  NUR unter genau dieser Fassung — eine andere findet sie nicht einmal."
+    echo -e "  The shipped modules are named ${CYAN}cpython-${noetig//./}-...so${NC} and load"
+    echo -e "  ONLY under exactly that version — another one will not even see them."
     echo
-    echo -e "  ${WHITE}Debian/Ubuntu, falls die Fassung im Bestand ist:${NC}"
+    echo -e "  ${WHITE}Debian/Ubuntu, if that version is available:${NC}"
     echo -e "    ${CYAN}sudo apt-get install python$noetig python$noetig-venv python$noetig-dev${NC}"
-    echo -e "  ${WHITE}Ubuntu, falls nicht:${NC} das deadsnakes-PPA"
+    echo -e "  ${WHITE}Ubuntu, if not:${NC} the deadsnakes PPA"
     echo -e "    ${CYAN}sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt-get update${NC}"
-    echo -e "  ${WHITE}Debian, falls nicht:${NC} deadsnakes gibt es dort NICHT."
-    echo -e "    Entweder pyenv (${CYAN}curl https://pyenv.run | bash${NC}) oder selbst uebersetzen."
+    echo -e "  ${WHITE}Debian, if not:${NC} deadsnakes does NOT exist there."
+    echo -e "    Either pyenv (${CYAN}curl https://pyenv.run | bash${NC}) or compile it yourself."
     echo
-    echo -e "  Oder die Module fuer $gefunden neu bauen:"
-    echo -e "    ${CYAN}PY_FASSUNG=$gefunden ./build_docker.sh${NC}  (auf dem Entwicklungsrechner)"
+    echo -e "  Or rebuild the modules for $gefunden:"
+    echo -e "    ${CYAN}PY_FASSUNG=$gefunden ./build_docker.sh${NC}  (on the development machine)"
     return 1
 }
 
@@ -547,7 +544,7 @@ install_docker() {
 # ============================================================================
 
 install_go2rtc() {
-    print_step "${CAMERA:-📷} go2rtc (WebRTC-Kamera)"
+    print_step "${CAMERA:-📷} go2rtc (WebRTC camera)"
 
     # WHY
     # ---
@@ -566,7 +563,7 @@ install_go2rtc() {
     local ziel="$APP_DIR/bin/go2rtc"
 
     if [ -x "$ziel" ]; then
-        print_success "go2rtc bereits vorhanden: $("$ziel" --version 2>/dev/null | head -1)"
+        print_success "go2rtc already present: $("$ziel" --version 2>/dev/null | head -1)"
         return 0
     fi
 
@@ -576,23 +573,23 @@ install_go2rtc() {
         x86_64|amd64)   arch="amd64" ;;
         armv7l|armv6l)  arch="arm" ;;
         *)
-            print_warning "go2rtc: unbekannte Architektur $(uname -m) - uebersprungen"
-            print_status "   Die Kamera laeuft dann als MJPEG weiter."
+            print_warning "go2rtc: unknown architecture $(uname -m) - skipped"
+            print_status "   The camera then keeps running as MJPEG."
             return 0
             ;;
     esac
 
-    print_status "Lade go2rtc v${version} fuer ${arch}..."
+    print_status "Downloading go2rtc v${version} for ${arch}..."
     sudo mkdir -p "$APP_DIR/bin"
     if sudo curl -fsSL --retry 2 --max-time 120 \
         "https://github.com/AlexxIT/go2rtc/releases/download/v${version}/go2rtc_linux_${arch}" \
         -o "$ziel"; then
         sudo chmod +x "$ziel"
         sudo chown ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$ziel"
-        print_success "go2rtc installiert: $("$ziel" --version 2>/dev/null | head -1)"
+        print_success "go2rtc installed: $("$ziel" --version 2>/dev/null | head -1)"
     else
         sudo rm -f "$ziel"
-        print_warning "go2rtc konnte nicht geladen werden - Kamera laeuft als MJPEG"
+        print_warning "go2rtc could not be downloaded - the camera runs as MJPEG"
     fi
 }
 
@@ -621,7 +618,7 @@ install_spoolman() {
         return 1
     fi
 
-    print_status "Richte Spoolman ein..."
+    print_status "Setting up Spoolman..."
 
     # Create data directory
     sudo mkdir -p "$APP_DIR/spoolman_data"
@@ -629,7 +626,7 @@ install_spoolman() {
 
     # Check if docker-compose.yml exists
     if [ ! -f "$APP_DIR/docker-compose.yml" ]; then
-        print_status "Erstelle docker-compose.yml..."
+        print_status "Creating docker-compose.yml..."
         cat > "$APP_DIR/docker-compose.yml" << 'EOF'
 version: '3.8'
 
@@ -689,7 +686,7 @@ EOF
 # ============================================================================
 
 install_cloudflare_tunnel() {
-    print_step "${CLOUD} Cloudflare Tunnel einrichten"
+    print_step "${CLOUD} Setting up the Cloudflare tunnel"
 
     echo -e "${CYAN}Cloudflare Tunnel enables secure external access without port forwarding!${NC}"
     echo
@@ -718,17 +715,17 @@ install_cloudflare_tunnel() {
     echo -e "${CYAN}   CLOUDFLARE TUNNEL SETUP${NC}"
     echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
     echo
-    echo -e "${WHITE}Folge diesen Schritten:${NC}"
+    echo -e "${WHITE}Follow these steps:${NC}"
     echo
-    echo -e "${GREEN}1.${NC} Gehe zu: ${CYAN}https://one.dash.cloudflare.com${NC}"
+    echo -e "${GREEN}1.${NC} Go to: ${CYAN}https://one.dash.cloudflare.com${NC}"
     echo -e "${GREEN}2.${NC} Log in or create an account (free)"
     echo -e "${GREEN}3.${NC} Zero Trust → Networks → Tunnels → Create a tunnel"
-    echo -e "${GREEN}4.${NC} Benenne den Tunnel (z.B. 'printer-dashboard')"
+    echo -e "${GREEN}4.${NC} Name the tunnel (e.g. 'printer-dashboard')"
     echo -e "${GREEN}5.${NC} Choose: ${YELLOW}Debian (64-bit)${NC}"
-    echo -e "${GREEN}6.${NC} Kopiere den Befehl: ${CYAN}cloudflared service install <TOKEN>${NC}"
+    echo -e "${GREEN}6.${NC} Copy the command: ${CYAN}cloudflared service install <TOKEN>${NC}"
     echo
     echo -e "${YELLOW}Execute the command now:${NC}"
-    echo -e "${WHITE}(Der Befehl sieht aus wie: cloudflared service install eyJh...)${NC}"
+    echo -e "${WHITE}(The command looks like: cloudflared service install eyJh...)${NC}"
     echo
     read -p "Press Enter when you are ready..."
 
@@ -743,41 +740,48 @@ install_cloudflare_tunnel() {
         echo -e "${GREEN}7.${NC} Back in dashboard: Configure the Public Hostnames:"
         echo
         echo -e "${CYAN}   Route 1 - Web Dashboard:${NC}"
-        echo -e "    ${YELLOW}Subdomain:${NC} printer (oder wunschname)"
+        echo -e "    ${YELLOW}Subdomain:${NC} printer (or a name of your choice)"
         echo -e "    ${YELLOW}Domain:${NC} Choose your domain (e.g. example.com)"
         echo -e "    ${YELLOW}Service Type:${NC} HTTPS"
         echo -e "    ${YELLOW}URL:${NC} localhost:5555"
-        echo -e "    ${YELLOW}No TLS Verify:${NC} ✓ (aktivieren)"
+        echo -e "    ${YELLOW}No TLS Verify:${NC} ✓ (enable)"
         echo
-        echo -e "${CYAN}   Route 2 - License Server (WICHTIG!):${NC}"
+        echo -e "${CYAN}   Route 2 - License Server (IMPORTANT!):${NC}"
         echo -e "    ${YELLOW}Subdomain:${NC} license"
-        echo -e "    ${YELLOW}Domain:${NC} Gleiche Domain wie oben"
+        echo -e "    ${YELLOW}Domain:${NC} Same domain as above"
         echo -e "    ${YELLOW}Service Type:${NC} HTTPS"
         echo -e "    ${YELLOW}URL:${NC} localhost:5556"
-        echo -e "    ${YELLOW}No TLS Verify:${NC} ✓ (aktivieren)"
+        echo -e "    ${YELLOW}No TLS Verify:${NC} ✓ (enable)"
         echo
         echo -e "${GREEN}8.${NC} Click 'Save tunnel' for both routes"
         echo
 
-        # Externe Domain abfragen
+        # Ask for the external domain
         echo
-        echo -e "${CYAN}Externe Domain konfigurieren:${NC}"
-        read -p "Gib deine externe Domain ein (z.B. printer.meinedomain.com): " EXTERNAL_DOMAIN
+        echo -e "${CYAN}Configure the external domain:${NC}"
+        read -p "Enter your external domain (for instance printer.mydomain.com): " EXTERNAL_DOMAIN
+        # No fallback. What stood here was ONE domain -- the developer's --
+        # and every installation that skipped the question got it written in.
+        # Without an answer the tunnel simply stays unconfigured; the server
+        # is reachable on the local network, which is what an installation
+        # without a domain can be.
         if [ -z "$EXTERNAL_DOMAIN" ]; then
-            EXTERNAL_DOMAIN="printer.example.com"
-            print_warning "Keine Domain angegeben - verwende Fallback: printer.example.com"
+            print_warning "No domain given - the tunnel stays unconfigured."
+            print_warning "The server remains reachable on the local network."
         fi
 
         # Enable and start service
         sudo systemctl enable cloudflared > /dev/null 2>&1
         sudo systemctl start cloudflared
 
-        print_success "Cloudflare Tunnel eingerichtet!"
-        echo -e "${GREEN}   ${ARROW} Web Dashboard: ${WHITE}https://$EXTERNAL_DOMAIN${NC}"
-        # Extract base domain for license server
-        BASE_DOMAIN=$(echo "$EXTERNAL_DOMAIN" | sed 's/^[^.]*\.//')
-        if [ -n "$BASE_DOMAIN" ] && [ "$BASE_DOMAIN" != "$EXTERNAL_DOMAIN" ]; then
-            echo -e "${GREEN}   ${ARROW} License Server: ${WHITE}https://license.$BASE_DOMAIN${NC}"
+        print_success "Cloudflare tunnel set up!"
+        if [ -n "$EXTERNAL_DOMAIN" ]; then
+            echo -e "${GREEN}   ${ARROW} Web Dashboard: ${WHITE}https://$EXTERNAL_DOMAIN${NC}"
+            # Extract base domain for license server
+            BASE_DOMAIN=$(echo "$EXTERNAL_DOMAIN" | sed 's/^[^.]*\.//')
+            if [ -n "$BASE_DOMAIN" ] && [ "$BASE_DOMAIN" != "$EXTERNAL_DOMAIN" ]; then
+                echo -e "${GREEN}   ${ARROW} License Server: ${WHITE}https://license.$BASE_DOMAIN${NC}"
+            fi
         fi
 
     else
@@ -807,7 +811,7 @@ wait_for_apt() {
         return 0
     fi
 
-    # apt IST blockiert - zeige Warnung
+    # apt IS blocked - show a warning
     print_warning "apt is blocked (probably unattended-upgrades)"
     print_status "Waiting for apt to become available (max. 5 minutes)..."
 
@@ -864,7 +868,12 @@ install_system_deps() {
     PACKAGES="$PACKAGES build-essential gcc g++ cmake libssl-dev libffi-dev"
     PACKAGES="$PACKAGES libjpeg-dev zlib1g-dev libfreetype6-dev"
     PACKAGES="$PACKAGES ffmpeg libgpiod-dev python3-pil"
-    PACKAGES="$PACKAGES xvfb libgl1-mesa-glx"  # For OrcaSlicer headless thumbnail generation
+    # For OrcaSlicer headless thumbnail generation. libgl1, not
+    # libgl1-mesa-glx: that one was a transitional package and is gone from
+    # Debian 13 and Ubuntu 24.04 -- and a single unknown name makes apt drop
+    # the WHOLE transaction ("has no installation candidate", exit 100), so
+    # nothing on this list got installed at all (14sep26).
+    PACKAGES="$PACKAGES xvfb libgl1"
 
     print_status "Packages to install:"
     echo -e "${CYAN}   Python: python${PYTHON_VERSION}-venv, python${PYTHON_VERSION}-dev${NC}"
@@ -879,8 +888,10 @@ install_system_deps() {
     while [ $retry -lt $max_retries ]; do
         print_status "Trying apt-get update (attempt $((retry + 1))/$max_retries)..."
 
-        # Zeige Ausgabe UND logge sie
-        if sudo apt-get update 2>&1 | tee "$update_log"; then
+        # Show the output AND log it
+        sudo apt-get update 2>&1 | tee "$update_log"
+        # PIPESTATUS, not the pipeline -- `if cmd | tee` only ever sees tee.
+        if [ "${PIPESTATUS[0]}" -eq 0 ]; then
             print_success "Package lists updated"
             rm -f "$update_log"
             break
@@ -889,7 +900,6 @@ install_system_deps() {
             if [ $retry -lt $max_retries ]; then
                 print_warning "Update failed, attempt $retry/$max_retries"
 
-                # Zeige die letzten Fehlerzeilen
                 echo -e "${YELLOW}Recent errors:${NC}"
                 tail -5 "$update_log" 2>/dev/null || echo "No error details available"
 
@@ -918,7 +928,12 @@ install_system_deps() {
     # Install packages with retry logic
     retry=0
     while [ $retry -lt $max_retries ]; do
-        if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $PACKAGES 2>&1 | tee -a "$LOG_FILE"; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y $PACKAGES 2>&1 | tee -a "$LOG_FILE"
+        # PIPESTATUS, not the pipeline: `if apt ... | tee` tests tee, which
+        # always succeeds. Without pipefail a failed install was reported as
+        # "Packages installed" and the script carried on with nothing
+        # installed (14sep26).
+        if [ "${PIPESTATUS[0]}" -eq 0 ]; then
             print_success "Packages installed"
             break
         else
@@ -956,7 +971,8 @@ install_system_deps() {
         print_status "Installing python${PYTHON_VERSION}-venv and python3-venv..."
 
         # Install both version-specific and generic packages
-        if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "python${PYTHON_VERSION}-venv" python3-venv 2>&1 | tee -a "$LOG_FILE"; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "python${PYTHON_VERSION}-venv" python3-venv 2>&1 | tee -a "$LOG_FILE"
+        if [ "${PIPESTATUS[0]}" -eq 0 ]; then
             print_success "python3-venv Packages installed"
         else
             print_error "Could not install python3-venv!"
@@ -994,7 +1010,8 @@ install_system_deps() {
         print_warning "Python.h not found - python${PYTHON_VERSION}-dev may be missing"
         print_status "Trying to install python${PYTHON_VERSION}-dev..."
 
-        if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "python${PYTHON_VERSION}-dev" 2>&1 | tee -a "$LOG_FILE"; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "python${PYTHON_VERSION}-dev" 2>&1 | tee -a "$LOG_FILE"
+        if [ "${PIPESTATUS[0]}" -eq 0 ]; then
             if [ -f "/usr/include/python${PYTHON_VERSION}/Python.h" ]; then
                 print_success "python${PYTHON_VERSION}-dev installed"
             else
@@ -1018,7 +1035,8 @@ install_system_deps() {
             return 1
         fi
 
-        if sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg 2>&1 | tee -a "$LOG_FILE"; then
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg 2>&1 | tee -a "$LOG_FILE"
+        if [ "${PIPESTATUS[0]}" -eq 0 ]; then
             if command -v ffmpeg &> /dev/null; then
                 print_success "ffmpeg installed"
             else
@@ -1037,174 +1055,33 @@ install_system_deps() {
     print_success "System-Packages installed"
 }
 
-install_orcaslicer() {
-    print_step "🔪 Install OrcaSlicer"
-
-    # Detect if desktop environment is available
-    local HAS_DESKTOP=false
-    if [ -n "$DISPLAY" ] || [ -n "$WAYLAND_DISPLAY" ] || systemctl is-active --quiet graphical.target 2>/dev/null; then
-        HAS_DESKTOP=true
+# ============================================================================
+# BAMBU STUDIO (Flatpak) -- slices MakerWorld models on the server
+# ============================================================================
+# The MakerWorld import slices with Bambu Studio and its own printer profiles
+# (services/slice_bambu.py). GitHub ships it for x86 Linux only; Flathub
+# carries x86_64 and aarch64, so a Pi gets it the same way. The server finds
+# it by itself (flatpak run, current/active). Measured on the Pi 5, 13sep26:
+# a real MakerWorld project sliced headless in 3 s, same result as on a Mac.
+install_bambustudio() {
+    print_step "🔪 Bambu Studio (MakerWorld slicing)"
+    if command -v flatpak &>/dev/null && flatpak info com.bambulab.BambuStudio &>/dev/null; then
+        print_success "Bambu Studio already installed: $(flatpak info com.bambulab.BambuStudio | awk -F': *' '/Version/ {print $2; exit}')"
+        return 0
     fi
-
-    local ARCH=$(uname -m)
-
-    echo
-    echo -e "${CYAN}Two installation methods available:${NC}"
-    echo -e "  ${GREEN}1)${NC} ${YELLOW}DEB-Paket${NC} - System installation with desktop icon (Ubuntu Desktop)"
-    echo -e "  ${GREEN}2)${NC} ${YELLOW}AppImage${NC}   - Portable version without desktop integration (Headless/Pi5)"
-    echo
-
-    if [ "$HAS_DESKTOP" = true ]; then
-        print_status "Desktop environment detected - DEB package recommended"
-        local DEFAULT_METHOD="deb"
+    if ! prompt_yes_no "Install Bambu Studio to slice MakerWorld models on the server (~1.2 GB)?" "y"; then
+        print_warning "Bambu Studio skipped - MakerWorld models can be fetched, not sliced"
+        return 0
+    fi
+    print_status "Installing Flatpak and Bambu Studio from Flathub (takes a few minutes)..."
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y flatpak >> "$LOG_FILE" 2>&1
+    sudo flatpak remote-add --if-not-exists flathub \
+        https://dl.flathub.org/repo/flathub.flatpakrepo >> "$LOG_FILE" 2>&1
+    sudo flatpak install -y --noninteractive flathub com.bambulab.BambuStudio >> "$LOG_FILE" 2>&1
+    if flatpak info com.bambulab.BambuStudio &>/dev/null; then
+        print_success "Bambu Studio installed: $(flatpak info com.bambulab.BambuStudio | awk -F': *' '/Version/ {print $2; exit}')"
     else
-        print_status "Headless system detected - AppImage recommended"
-        local DEFAULT_METHOD="appimage"
-    fi
-
-    echo
-    echo -e "${CYAN}Which method do you want to use?${NC}"
-    read -p "Choose [1=DEB, 2=AppImage, Enter=Default]: " -n 1 -r INSTALL_METHOD
-    echo
-
-    case "$INSTALL_METHOD" in
-        1)
-            INSTALL_METHOD="deb"
-            ;;
-        2)
-            INSTALL_METHOD="appimage"
-            ;;
-        "")
-            INSTALL_METHOD="$DEFAULT_METHOD"
-            print_status "Using default: $DEFAULT_METHOD"
-            ;;
-        *)
-            print_warning "Invalid choice, using default: $DEFAULT_METHOD"
-            INSTALL_METHOD="$DEFAULT_METHOD"
-            ;;
-    esac
-
-    echo
-
-    # DEB-Installation
-    if [ "$INSTALL_METHOD" = "deb" ]; then
-        print_status "DEB installation selected - with desktop integration"
-
-        local ORCA_SCRIPT="$SCRIPT_DIR/install-orca-ubuntu.sh"
-
-        if [ ! -f "$ORCA_SCRIPT" ]; then
-            print_error "install-orca-ubuntu.sh not found in $SCRIPT_DIR"
-            print_warning "Falling back to AppImage..."
-            INSTALL_METHOD="appimage"
-        else
-            # Make sure the script is executable
-            if [ ! -x "$ORCA_SCRIPT" ]; then
-                chmod +x "$ORCA_SCRIPT"
-            fi
-
-            # Run the installation script
-            if bash "$ORCA_SCRIPT"; then
-                echo
-                print_success "OrcaSlicer DEB package successfully installed"
-                return 0
-            else
-                print_error "DEB installation failed"
-                print_warning "Falling back to AppImage..."
-                INSTALL_METHOD="appimage"
-            fi
-        fi
-    fi
-
-    # AppImage-Installation (default for headless/fallback)
-    if [ "$INSTALL_METHOD" = "appimage" ]; then
-        print_status "AppImage installation selected - portable version"
-
-        local ORCASLICER_URL=""
-        local ORCASLICER_FILE=""
-        local ORCA_MUSTER=""
-
-        # Bis 01sep26 kam die ARM64-Fassung von einem fremden Konto
-        # (CodeMasterCody3D). Die Veroeffentlichung ist verschwunden, die
-        # Adresse antwortete 404 — auf dem Pi genau so gemessen.
-        # SoftFever baut inzwischen selbst fuer aarch64; damit kommen beide
-        # Architekturen aus derselben, offiziellen Quelle.
-        case "$ARCH" in
-            aarch64|arm64)
-                ORCA_MUSTER="Ubuntu2404_aarch64"
-                ORCASLICER_FILE="OrcaSlicer_ARM64.AppImage"
-                print_status "Detected architecture: ARM64 (Raspberry Pi)"
-                ;;
-            x86_64|amd64)
-                # Without "aarch64" in the name -- otherwise the pattern
-                # catches both.
-                ORCA_MUSTER="Ubuntu2404_V"
-                ORCASLICER_FILE="OrcaSlicer_x64.AppImage"
-                print_status "Detected architecture: x86_64"
-                ;;
-            *)
-                print_error "Unsupported architecture: $ARCH"
-                print_warning "OrcaSlicer must be installed manually"
-                return 0
-                ;;
-        esac
-
-        # Die neueste Veroeffentlichung erfragen statt eine Nummer
-        # einzufrieren — die veraltet sonst wie die alte.
-        print_status "Suche neueste OrcaSlicer-Veroeffentlichung..."
-        ORCASLICER_URL=$(curl -sSL --max-time 25 \
-            "https://api.github.com/repos/SoftFever/OrcaSlicer/releases/latest" 2>/dev/null \
-            | grep -o "https://[^\"]*${ORCA_MUSTER}[^\"]*\.AppImage" | head -1)
-
-        if [ -z "$ORCASLICER_URL" ]; then
-            print_warning "Veroeffentlichungsliste nicht erreichbar — nehme eine bekannte Fassung"
-            case "$ARCH" in
-                aarch64|arm64) ORCASLICER_URL="https://github.com/SoftFever/OrcaSlicer/releases/download/v2.4.2/OrcaSlicer_Linux_AppImage_Ubuntu2404_aarch64_V2.4.2.AppImage" ;;
-                *)             ORCASLICER_URL="https://github.com/SoftFever/OrcaSlicer/releases/download/v2.4.2/OrcaSlicer_Linux_AppImage_Ubuntu2404_V2.4.2.AppImage" ;;
-            esac
-        fi
-        print_status "Fassung: $(basename "$ORCASLICER_URL")"
-
-        # Check if already installed
-        if [ -f "$APP_DIR/orca-slicer" ]; then
-            print_warning "OrcaSlicer AppImage is already installed: $APP_DIR/orca-slicer"
-            if ! prompt_yes_no "Download and replace?" "n"; then
-                print_status "OrcaSlicer will not be replaced"
-                return 0
-            fi
-        fi
-
-        # Download OrcaSlicer
-        print_status "Downloading OrcaSlicer AppImage..."
-        local TEMP_FILE="/tmp/$ORCASLICER_FILE"
-
-        if ! wget -q --show-progress -O "$TEMP_FILE" "$ORCASLICER_URL"; then
-            print_error "Download failed: $ORCASLICER_URL"
-            print_warning "OrcaSlicer can be downloaded manually"
-            return 0
-        fi
-
-        # Make executable
-        chmod +x "$TEMP_FILE"
-
-        # Move to app directory
-        sudo mkdir -p "$APP_DIR"
-        sudo mv "$TEMP_FILE" "$APP_DIR/orca-slicer"
-        sudo chown ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR/orca-slicer"
-
-        # Verify installation
-        if [ -f "$APP_DIR/orca-slicer" ] && [ -x "$APP_DIR/orca-slicer" ]; then
-            print_success "OrcaSlicer AppImage installed: $APP_DIR/orca-slicer"
-
-            # Test if it runs
-            if "$APP_DIR/orca-slicer" --help &> /dev/null; then
-                print_success "OrcaSlicer CLI works"
-            else
-                print_warning "OrcaSlicer CLI test failed (may be normal on headless systems)"
-            fi
-        else
-            print_error "OrcaSlicer installation failed"
-            return 1
-        fi
+        print_warning "Bambu Studio could not be installed - MakerWorld models can be fetched, not sliced (log: $LOG_FILE)"
     fi
 }
 
@@ -1213,25 +1090,23 @@ install_orcaslicer() {
 # ============================================================================
 
 setup_app_directory() {
-    print_step "${WRENCH} App-Verzeichnis einrichten"
+    print_step "${WRENCH} Setting up the app directory"
 
-    # Auf das Vorhandensein einer INSTALLATION pruefen, nicht auf das
-    # Verzeichnis. install_spoolman und install_orcaslicer legen $APP_DIR
-    # naemlich selbst an, und beide laufen vorher — auf einer frischen
-    # Maschine fand dieser Schritt also stets „seine eigene" Altinstallation
-    # und brach ab. Genau so am 01sep26 auf dem Pi passiert.
+    # Check for an INSTALLATION, not for the directory. install_spoolman
+    # creates $APP_DIR itself and runs earlier, so on a fresh machine this
+    # step would find "its own" old installation and bail out.
     local alt_vorhanden=false
     for beleg in start.py web_app.py dist venv; do
         [ -e "$APP_DIR/$beleg" ] && alt_vorhanden=true && break
     done
 
     if [ "$alt_vorhanden" = true ]; then
-        print_warning "Es liegt bereits eine Installation in $APP_DIR"
+        print_warning "An installation already exists in $APP_DIR"
         if prompt_yes_no "Overwrite existing installation?" "n"; then
-            print_status "Erstelle Backup..."
+            print_status "Creating a backup..."
             sudo mv "$APP_DIR" "$APP_DIR.backup.$(date +%Y%m%d_%H%M%S)"
         else
-            print_error "Installation abgebrochen"
+            print_error "Installation cancelled"
             exit 1
         fi
     fi
@@ -1244,7 +1119,7 @@ setup_app_directory() {
     sudo mkdir -p "$APP_DIR/data"
     sudo chown -R ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR/data"
 
-    print_success "Verzeichnis erstellt"
+    print_success "Directory created"
 }
 
 install_font_awesome() {
@@ -1260,7 +1135,7 @@ install_font_awesome() {
     # Download Font-Awesome if not present
     if [ ! -f "static/font-awesome.min.css" ]; then
         cd /tmp
-        print_status "Lade Font-Awesome 6.5.1 herunter..."
+        print_status "Downloading Font Awesome 6.5.1..."
         curl -L "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" \
             -o font-awesome.min.css > /dev/null 2>&1
 
@@ -1287,19 +1162,19 @@ install_font_awesome() {
 }
 
 clone_repository() {
-    print_step "Repository klonen"
+    print_step "Cloning the repository"
 
     # Check if script was started FROM a repo directory
     # Support both source (.py) and obfuscated (dist/.so) installations
     if [ -f "$SCRIPT_DIR/install.sh" ] && { [ -f "$SCRIPT_DIR/web_app.py" ] || [ -f "$SCRIPT_DIR/start.py" ] || [ -d "$SCRIPT_DIR/dist" ]; }; then
         print_status "Script is running from repository - copying files..."
-        print_status "Quelle: $SCRIPT_DIR"
+        print_status "Source: $SCRIPT_DIR"
 
         # Detect installation type
         if [ -d "$SCRIPT_DIR/dist" ] && [ -f "$SCRIPT_DIR/start.py" ]; then
-            print_status "Erkannt: Obfuscated Installation (.so Dateien)"
+            print_status "Detected: an obfuscated installation (.so files)"
         elif [ -f "$SCRIPT_DIR/web_app.py" ]; then
-            print_status "Erkannt: Source Installation (.py Dateien)"
+            print_status "Detected: a source installation (.py files)"
         fi
 
         # Copy from the script directory to APP_DIR
@@ -1310,7 +1185,7 @@ clone_repository() {
         fi
 
         # Create temp copy to avoid issues
-        print_status "Kopiere Repository nach $APP_DIR..."
+        print_status "Copying the repository to $APP_DIR..."
         sudo cp -r "$SCRIPT_DIR"/* "$APP_DIR/"
 
         # Copy hidden files too (like .git if present)
@@ -1319,16 +1194,19 @@ clone_repository() {
         sudo chown -R ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR"
 
         cd "$APP_DIR"
-        print_success "Repository-Dateien kopiert"
+        print_success "Repository files copied"
         return 0
     fi
 
     # Try to clone from GitHub
-    print_status "Klone von GitHub..."
+    print_status "Cloning from GitHub..."
 
-    if git clone "$REPO_URL" "$APP_DIR" 2>&1 | tee -a "$LOG_FILE"; then
+    git clone "$REPO_URL" "$APP_DIR" 2>&1 | tee -a "$LOG_FILE"
+    # PIPESTATUS: a failed clone used to count as success, and the rest of
+    # the installation then ran against an empty folder.
+    if [ "${PIPESTATUS[0]}" -eq 0 ]; then
         cd "$APP_DIR"
-        print_success "Repository geklont"
+        print_success "Repository cloned"
     else
         print_warning "GitHub clone failed (private repo?)"
 
@@ -1342,11 +1220,11 @@ clone_repository() {
         for path in "${POSSIBLE_PATHS[@]}"; do
             # Check for both source and obfuscated installations
             if [ -d "$path" ] && { [ -f "$path/web_app.py" ] || [ -f "$path/start.py" ] || [ -d "$path/dist" ]; }; then
-                print_status "Gefunden: $path - kopiere Dateien..."
+                print_status "Found: $path - copying the files..."
                 sudo cp -r "$path" "$APP_DIR"
                 sudo chown -R ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR"
                 cd "$APP_DIR"
-                print_success "Repository-Dateien kopiert"
+                print_success "Repository files copied"
                 return 0
             fi
         done
@@ -1355,14 +1233,14 @@ clone_repository() {
         echo
         echo -e "${YELLOW}Solutions:${NC}"
         echo -e "  1. Use quick-install.sh (downloads obfuscated .so files):"
-        echo -e "     ${CYAN}bash <(curl -s https://raw.githubusercontent.com/.../quick-install.sh)${NC}"
+        echo -e "     ${CYAN}curl -fsSL ${REPO_URL/github.com/raw.githubusercontent.com}/main/quick-install.sh -o quick-install.sh && bash quick-install.sh${NC}"
         echo
-        echo -e "  2. Oder klone das Repo vorher:"
-        echo -e "     ${CYAN}git clone https://github.com/joschiv1977/3d-printer-web-app.git${NC}"
-        echo -e "     ${CYAN}cd 3d-printer-web-app${NC}"
+        echo -e "  2. Or clone the repo beforehand:"
+        echo -e "     ${CYAN}git clone ${REPO_URL}.git${NC}"
+        echo -e "     ${CYAN}cd $(basename "$REPO_URL")${NC}"
         echo -e "     ${CYAN}sudo ./install.sh${NC}"
         echo
-        echo -e "  3. Oder kopiere es nach /tmp:"
+        echo -e "  3. Or copy it into /tmp:"
         echo -e "     ${CYAN}cp -r /path/to/repo /tmp/3d-printer-web-app${NC}"
         echo -e "     ${CYAN}sudo /tmp/3d-printer-web-app/install.sh${NC}"
         echo
@@ -1371,7 +1249,7 @@ clone_repository() {
 }
 
 set_script_permissions() {
-    print_step "Script-Berechtigungen setzen"
+    print_step "Setting the script permissions"
 
     cd "$APP_DIR"
 
@@ -1437,7 +1315,7 @@ deploy_obfuscated_files() {
 }
 
 setup_python_env() {
-    print_step "Python Virtual Environment einrichten"
+    print_step "Setting up the Python virtual environment"
 
     cd "$APP_DIR"
 
@@ -1471,7 +1349,7 @@ setup_python_env() {
     if [ "$venv_ok" = false ]; then
         print_error "python3-venv was not correctly installed in install_system_deps()."
 
-        echo -e "${YELLOW}Letzter Versuch: Installing python3-venv Pakete...${NC}"
+        echo -e "${YELLOW}Last attempt: installing python3-venv packages...${NC}"
         echo -e "${CYAN}Trying the following packages:${NC}"
         echo -e "  1. python${PYTHON_VERSION}-venv (version-specific)"
         echo -e "  2. python3-venv (generic)"
@@ -1522,7 +1400,10 @@ setup_python_env() {
 
     # Create venv
     print_status "Creating virtual environment..."
-    if ! "$PYTHON_BIN" -m venv venv 2>&1 | tee -a "$LOG_FILE"; then
+    "$PYTHON_BIN" -m venv venv 2>&1 | tee -a "$LOG_FILE"
+    # PIPESTATUS: `if ! cmd | tee` negated tee, so a failed venv was never
+    # noticed at all.
+    if [ "${PIPESTATUS[0]}" -ne 0 ]; then
         print_error "VEnv could not be created"
         echo
         echo -e "${RED}Error diagnosis:${NC}"
@@ -1618,9 +1499,9 @@ setup_python_env() {
 # ============================================================================
 
 configure_app() {
-    print_step "${WRENCH} Konfiguration"
+    print_step "${WRENCH} Configuration"
 
-    echo -e "${CYAN}Erstelle initiale Konfigurationsdatei...${NC}"
+    echo -e "${CYAN}Creating the initial configuration file...${NC}"
     echo -e "${YELLOW}⚠️  Printer and HomeAssistant will be configured later in web setup!${NC}"
     echo
 
@@ -1634,7 +1515,7 @@ configure_app() {
 
     if sudo docker ps | grep -q spoolman; then
         SPOOLMAN_URL="http://${LOCAL_IP}:7912"
-        print_success "Spoolman erkannt auf: $SPOOLMAN_URL"
+        print_success "Spoolman detected at: $SPOOLMAN_URL"
         echo -e "${GREEN}   ✓ Container is running${NC}"
 
         # Verify it's actually responding
@@ -1650,11 +1531,10 @@ configure_app() {
         SPOOLMAN_URL=${CUSTOM_URL:-"http://192.168.1.10:7912"}
     fi
 
-    # Create minimal config - Drucker und HA werden im Web-Setup konfiguriert
-    print_status "Erstelle minimale Konfigurationsdatei..."
+    # Create minimal config - printer and HA are configured in the web setup
+    print_status "Creating a minimal configuration file..."
 
-    # Ermittle lokale Server IP für CORS Origins
-    # Versuche die primäre nicht-localhost IP zu finden
+    # Local server IP for the CORS origins — the primary non-localhost one.
     SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}' | grep -v '^127\.' || echo "")
 
     # Fallback: Versuche ip route
@@ -1662,7 +1542,7 @@ configure_app() {
         SERVER_IP=$(ip route get 1.1.1.1 2>/dev/null | grep -oP 'src \K[0-9.]+' || echo "")
     fi
 
-    # Erstelle CORS Origins Array
+    # Build the CORS origins array
     CORS_ORIGINS=""
     if [ -n "$SERVER_IP" ]; then
         print_status "Server IP detected: $SERVER_IP"
@@ -1741,18 +1621,18 @@ configure_app() {
 }
 EOF
 
-    # Auf macOS wandern Zugangsdaten in den Schluesselbund
-    # (services/keychain_service.py). Auf Linux gibt es den nicht — dort
-    # gibt `keychain_get` schlicht None zurueck, und Drucker-Access-Code,
-    # Meross-Passwort und HA-Token bleiben im Klartext in dieser Datei.
-    # Deshalb gehoert sie niemandem sonst.
+    # On macOS credentials go into the keychain
+    # (services/keychain_service.py). Linux has none — there `keychain_get`
+    # simply returns None, and the printer access code, the Meross password
+    # and the HA token stay in clear text in this file. That is why it
+    # belongs to nobody else.
     chmod 600 "$APP_DIR/data/config.json"
     sudo chown ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR/data/config.json"
 
-    print_success "Minimale Konfiguration erstellt"
+    print_success "Minimal configuration created"
     print_status "Printer and HomeAssistant will be configured in web setup"
-    print_warning "Auf Linux gibt es keinen Schluesselbund: Zugangsdaten stehen"
-    print_warning "im Klartext in data/config.json (auf 600 gesetzt)."
+    print_warning "Linux has no keychain: credentials are stored"
+    print_warning "in clear text in data/config.json (set to 600)."
 }
 
 # ============================================================================
@@ -1760,54 +1640,46 @@ EOF
 # ============================================================================
 
 generate_ssl_certificates() {
-    print_step "${LOCK} SSL-Zertifikate erzeugen"
+    print_step "${LOCK} Create SSL certificates"
 
-    # Erzeugt wird an EINER Stelle: services/cert_manager.py — dieselbe, die
-    # der Server beim Start benutzt, um ein ablaufendes Zertifikat automatisch
-    # zu erneuern (services/ssl_context.py). Bis 31aug26 stand hier ein
-    # eigenes `openssl req -x509` mit 365 Tagen und ohne CA. Das lief am
-    # Automatismus vorbei: die Erneuerung greift nur bei einer eigenen
-    # Root-CA, und `ca-cert.p12` fuer das Android-Vertrauen entstand nie.
+    # Generated in ONE place: services/cert_manager.py — the same one the
+    # server uses at startup to renew an expiring certificate automatically
+    # (services/ssl_context.py). The renewal only works off our own root CA,
+    # so the certificate has to come from there.
     #
-    # Was erzeugt wird:
-    #   ca-cert.pem / ca-key.pem       die eigene Root-CA (10 Jahre)
-    #   cert.pem / key.pem             das Server-Zertifikat (825 Tage)
-    #   server-cert.p12 / ca-cert.p12  fuer Android
+    # What gets generated:
+    #   ca-cert.pem / ca-key.pem       our own root CA (10 years)
+    #   cert.pem / key.pem             the server certificate (825 days)
+    #   server-cert.p12 / ca-cert.p12  for Android
 
-    mkdir -p "$APP_DIR/data"
-
-    # Aeltere Installationen haben die Dateien noch im Wurzelverzeichnis.
-    if [ -f "$APP_DIR/cert.pem" ] && [ ! -f "$APP_DIR/data/cert.pem" ]; then
-        print_status "Verschiebe alte Zertifikate nach data/..."
-        mv "$APP_DIR/cert.pem" "$APP_DIR/data/cert.pem" 2>/dev/null || true
-        mv "$APP_DIR/key.pem" "$APP_DIR/data/key.pem" 2>/dev/null || true
-    fi
-
-    if [ -f "$APP_DIR/data/ca-cert.pem" ] && [ -f "$APP_DIR/data/cert.pem" ]; then
-        print_warning "Zertifikate samt eigener CA sind schon da — der Server "
-        print_warning "erneuert sie selbst, 30 Tage vor Ablauf."
-        return
-    fi
-
-    if [ -f "$APP_DIR/data/cert.pem" ] && [ ! -f "$APP_DIR/data/ca-cert.pem" ]; then
-        # Ein Zertifikat ohne CA stammt aus der alten Machart. Es wird
-        # ersetzt, sonst faellt die automatische Erneuerung aus.
-        print_status "Vorhandenes Zertifikat hat keine CA — wird ersetzt"
-    fi
-
+    # The certificates live in data/certs/ (services/paths.py,
+    # zertifikatsordner). They used to be looked for loose in data/, and they
+    # were made by tools/create_cert.py -- which ships in NO installation, so
+    # on every fresh install that call failed, and `if cmd | tee` reported it
+    # as success (14sep26). Now the installer calls the very module the
+    # server uses at start: it creates what is missing and leaves a valid
+    # certificate alone, so running it again is harmless.
+    local CERTS="$APP_DIR/data/certs"
     local PY="$APP_DIR/venv/bin/python"
     [ -x "$PY" ] || PY="python3"
 
-    if "$PY" "$APP_DIR/tools/create_cert.py" --data-dir "$APP_DIR/data" 2>&1 | tee -a "$LOG_FILE"; then
-        chmod 600 "$APP_DIR/data/key.pem" "$APP_DIR/data/ca-key.pem" 2>/dev/null || true
-        chmod 644 "$APP_DIR/data/cert.pem" "$APP_DIR/data/ca-cert.pem" 2>/dev/null || true
+    (cd "$APP_DIR" && "$PY" -c "
+import sys
+sys.path.insert(0, '.')
+from services.cert_manager import ensure_certificate
+ensure_certificate('')
+") 2>&1 | tee -a "$LOG_FILE"
+
+    if [ "${PIPESTATUS[0]}" -eq 0 ] && [ -f "$CERTS/cert.pem" ] && [ -f "$CERTS/ca-cert.pem" ]; then
         sudo chown -R ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR/data" 2>/dev/null || true
-        print_success "Zertifikate erzeugt in $APP_DIR/data"
-        print_status "Fuer Browser ohne Warnung: ca-cert.pem einmal vertrauen"
+        print_success "Certificates ready in $CERTS"
+        print_status "For a browser without warnings: trust $CERTS/ca-cert.pem once"
+        print_status "The server renews them itself, 30 days before they expire."
     else
-        print_error "Zertifikate konnten nicht erzeugt werden"
-        print_status "Von Hand: $PY tools/create_cert.py --data-dir $APP_DIR/data"
-        return 1
+        # Not fatal: the server makes them itself on its first start
+        # (services/ssl_context.py). Saying so beats a silent gap.
+        print_warning "Certificates were not created now — the server creates them on its first start"
+        print_status "They will then be in $CERTS"
     fi
 }
 
@@ -1816,9 +1688,9 @@ generate_ssl_certificates() {
 # ============================================================================
 
 setup_systemd_service() {
-    print_step "Systemd Service einrichten"
+    print_step "Setting up the systemd service"
 
-    print_status "Erstelle Service..."
+    print_status "Creating the service..."
 
     # Determine which Python file to use (support both source and obfuscated)
     local PYTHON_MAIN
@@ -1851,7 +1723,13 @@ Restart=always
 # at all after five restarts in a row: the server stays down until someone
 # runs `systemctl reset-failed` by hand (01sep26, seen on the Pi).
 SuccessExitStatus=42
-RestartSec=10
+# One second, the same as the macOS app waits after exit 42
+# (PrinterWebApp.swift). Ten stood here: of a 12.7 s restart on the Pi
+# (14sep26) ten were this wait, the server itself is up 1.3 s after systemd
+# starts it. A crash loop is still caught -- by the default StartLimitBurst=5
+# in 10 s, after which the service stays down, as the macOS app does after any
+# crash.
+RestartSec=1
 
 [Install]
 WantedBy=multi-user.target
@@ -1861,7 +1739,7 @@ EOF
     sudo systemctl daemon-reload
     sudo systemctl enable $SERVICE_NAME > /dev/null 2>&1
 
-    print_success "Service erstellt ($PYTHON_MAIN)"
+    print_success "Service created ($PYTHON_MAIN)"
 }
 
 # ============================================================================
@@ -1869,7 +1747,7 @@ EOF
 # ============================================================================
 
 configure_firewall() {
-    print_step "Firewall konfigurieren"
+    print_step "Configuring the firewall"
 
     if ! command -v ufw &> /dev/null; then
         print_warning "UFW not installed, skipping firewall setup"
@@ -1881,7 +1759,7 @@ configure_firewall() {
     sudo ufw allow 5555/tcp comment 'Printer Dashboard HTTPS' > /dev/null 2>&1
     sudo ufw allow 7912/tcp comment 'Spoolman' > /dev/null 2>&1
 
-    print_success "Firewall konfiguriert"
+    print_success "Firewall configured"
 }
 
 # ============================================================================
@@ -1902,34 +1780,34 @@ show_firebase_guide() {
 
     echo
     echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}   FIREBASE SETUP ANLEITUNG${NC}"
+    echo -e "${CYAN}   FIREBASE SETUP GUIDE${NC}"
     echo -e "${YELLOW}═══════════════════════════════════════════════════════════${NC}"
     echo
     echo -e "${WHITE}Step-by-step guide:${NC}"
     echo
-    echo -e "${GREEN}1.${NC} Öffne: ${CYAN}https://console.firebase.google.com${NC}"
+    echo -e "${GREEN}1.${NC} Open: ${CYAN}https://console.firebase.google.com${NC}"
     echo -e "${GREEN}2.${NC} Click 'Add project' (or select existing)"
-    echo -e "${GREEN}3.${NC} Projektnamen eingeben (z.B. 'printer-dashboard')"
-    echo -e "${GREEN}4.${NC} Google Analytics: ${YELLOW}Optional${NC} (kann deaktiviert werden)"
+    echo -e "${GREEN}3.${NC} Enter a project name (e.g. 'printer-dashboard')"
+    echo -e "${GREEN}4.${NC} Google Analytics: ${YELLOW}optional${NC} (can be disabled)"
     echo -e "${GREEN}5.${NC} Wait until project is created"
     echo
-    echo -e "${CYAN}Service Account Key erstellen:${NC}"
-    echo -e "${GREEN}6.${NC} Projekteinstellungen ${YELLOW}(Zahnrad-Icon)${NC}"
-    echo -e "${GREEN}7.${NC} Tab: ${YELLOW}Dienstkonten${NC}"
-    echo -e "${GREEN}8.${NC} Klicke: ${YELLOW}Generate new private key${NC}"
+    echo -e "${CYAN}Create the service account key:${NC}"
+    echo -e "${GREEN}6.${NC} Project settings ${YELLOW}(gear icon)${NC}"
+    echo -e "${GREEN}7.${NC} Tab: ${YELLOW}Service accounts${NC}"
+    echo -e "${GREEN}8.${NC} Click: ${YELLOW}Generate new private key${NC}"
     echo -e "${GREEN}9.${NC} Confirm with ${YELLOW}'Generate key'${NC}"
-    echo -e "${GREEN}10.${NC} JSON-Datei wird heruntergeladen"
+    echo -e "${GREEN}10.${NC} The JSON file is downloaded"
     echo
-    echo -e "${CYAN}Cloud Messaging API aktivieren:${NC}"
-    echo -e "${GREEN}11.${NC} Projekteinstellungen → ${YELLOW}Cloud Messaging${NC}"
-    echo -e "${GREEN}12.${NC} Bei Bedarf: ${YELLOW}Cloud Messaging API aktivieren${NC}"
+    echo -e "${CYAN}Enable the Cloud Messaging API:${NC}"
+    echo -e "${GREEN}11.${NC} Project settings → ${YELLOW}Cloud Messaging${NC}"
+    echo -e "${GREEN}12.${NC} If needed: ${YELLOW}enable the Cloud Messaging API${NC}"
     echo
 
     read -p "Press Enter when you have downloaded the JSON file..."
 
     echo
-    echo -e "${CYAN}Gib den Pfad zur heruntergeladenen JSON-Datei ein:${NC}"
-    echo -e "${YELLOW}(Beispiel: ~/Downloads/projektname-firebase-adminsdk-xxxxx.json)${NC}"
+    echo -e "${CYAN}Enter the path to the downloaded JSON file:${NC}"
+    echo -e "${YELLOW}(For instance: ~/Downloads/projectname-firebase-adminsdk-xxxxx.json)${NC}"
     read -p "> " FIREBASE_KEY
 
     if [ -n "$FIREBASE_KEY" ] && [ -f "$FIREBASE_KEY" ]; then
@@ -1939,7 +1817,7 @@ show_firebase_guide() {
 
         echo
         echo -e "${GREEN}   ${ARROW} Mobile App Setup:${NC}"
-        echo -e "${WHITE}   Siehe: $APP_DIR/docs/SETUP_FIREBASE.md${NC}"
+        echo -e "${WHITE}   See: $APP_DIR/docs/SETUP_FIREBASE.md${NC}"
         echo -e "${WHITE}   For iOS App: $APP_DIR/docs/SETUP_IOS_APP.md${NC}"
         echo -e "${WHITE}   For Android App: $APP_DIR/docs/SETUP_ANDROID_APP.md${NC}"
     else
@@ -1953,7 +1831,7 @@ show_firebase_guide() {
 # ============================================================================
 
 start_application() {
-    print_step "${ROCKET} Anwendung starten"
+    print_step "${ROCKET} Starting the application"
 
     print_status "Starting services..."
 
@@ -1969,7 +1847,7 @@ start_application() {
     sleep 3
 
     if sudo systemctl is-active --quiet $SERVICE_NAME; then
-        print_success "Alle Services laufen!"
+        print_success "All services running!"
     else
         print_error "Service could not be started"
         echo -e "${YELLOW}   Logs: sudo journalctl -u $SERVICE_NAME -f${NC}"
@@ -1995,19 +1873,19 @@ show_completion_message() {
     fi
 
     echo
-    echo -e "${CYAN}📷 Kamera:${NC}"
+    echo -e "${CYAN}📷 Camera:${NC}"
     if [ -x "$APP_DIR/bin/go2rtc" ]; then
-        echo -e "${WHITE}   WebRTC via go2rtc. Der Server startet und stoppt es selbst,${NC}"
-        echo -e "${WHITE}   passend zum Druckerstrom. MJPEG bleibt der Rueckfall.${NC}"
+        echo -e "${WHITE}   WebRTC via go2rtc. The server starts and stops it itself,${NC}"
+        echo -e "${WHITE}   following the printer power. MJPEG stays the fallback.${NC}"
     else
-        echo -e "${WHITE}   MJPEG ueber ffmpeg — go2rtc ist nicht installiert.${NC}"
-        echo -e "${WHITE}   Nachruesten: ${YELLOW}sudo ./install.sh${WHITE} erneut laufen lassen.${NC}"
+        echo -e "${WHITE}   MJPEG via ffmpeg — go2rtc is not installed.${NC}"
+        echo -e "${WHITE}   To add it later: run ${YELLOW}sudo ./install.sh${WHITE} again.${NC}"
     fi
     echo
 
-    echo -e "${CYAN}🔐 Zugangsdaten:${NC}"
-    echo -e "${WHITE}   Kein Schluesselbund unter Linux — Access-Code, Meross-Passwort${NC}"
-    echo -e "${WHITE}   und HA-Token liegen im Klartext in ${YELLOW}data/config.json${WHITE} (chmod 600).${NC}"
+    echo -e "${CYAN}🔐 Credentials:${NC}"
+    echo -e "${WHITE}   No keychain on Linux — access code, Meross password${NC}"
+    echo -e "${WHITE}   and HA token sit in clear text in ${YELLOW}data/config.json${WHITE} (chmod 600).${NC}"
     echo
 
     echo -e "${CYAN}💻 Useful Commands:${NC}"
@@ -2144,12 +2022,12 @@ main() {
 
     # Installation steps
     if ! require_python; then
-        print_error "Installation abgebrochen."
+        print_error "Installation cancelled."
         exit 1
     fi
 
     install_system_deps
-    install_orcaslicer
+    install_bambustudio
     install_docker
 
     # Install Docker services FIRST (before config, so we know the URLs)

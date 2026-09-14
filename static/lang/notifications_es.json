@@ -397,7 +397,18 @@
     },
     "mismatch": {
       "title": "El filamento no coincide",
-      "body": "{file} necesita {wanted}: en la bandeja hay {loaded}."
+      "body": "{file} necesita {wanted}: en la bandeja hay {loaded}.",
+      "body_colour": "{file} necesita {wanted} en otro color que el de la bandeja."
+    }
+  },
+  "vent": {
+    "close": {
+      "title": "Cerrar las rejillas de ventilación",
+      "body": "Ahora {now}, antes {before} — {file}"
+    },
+    "open": {
+      "title": "Volver a abrir las rejillas de ventilación",
+      "body": "Ahora {now}, antes {before} — {file}"
     }
   },
   "maintenance": {
@@ -525,6 +536,9 @@
     "unknown_model": "Modelo desconocido: {model}",
     "file_param_missing": "falta file",
     "makerworld_maintenance": "MakerWorld está en mantenimiento — volverá pronto",
+    "makerworld_blocked": "MakerWorld rechaza ahora las solicitudes automáticas (control de Cloudflare) — inténtalo más tarde",
+    "makerworld_url_missing": "No se envió ninguna dirección de descarga",
+    "makerworld_bad_download_url": "Esa dirección no es de MakerWorld — rechazada",
     "makerworld_unreachable": "MakerWorld no accesible: {error}",
     "makerworld_sign_in": "MakerWorld lo ha rechazado — inicia sesión primero en la cuenta de Bambu",
     "makerworld_captcha": "MakerWorld pide un captcha — demasiadas descargas en poco tiempo. Se resuelve solo al cabo de un rato; los modelos ya descargados siguen funcionando.",
@@ -539,6 +553,9 @@
     "makerworld_instance_missing": "Falta el número de perfil (instance_id)",
     "makerworld_no_slicer": "Bambu Studio no encontrado — no hay ningún slicer disponible",
     "makerworld_no_mirror": "La copia de la tarjeta SD no está disponible",
-    "makerworld_upload_failed": "Laminado, pero el archivo no llegó a la impresora"
+    "makerworld_upload_failed": "Laminado, pero el archivo no llegó a la impresora",
+    "device_on": "{browser} en {os}",
+    "device_unknown_browser": "Navegador desconocido",
+    "device_unknown_os": "un sistema desconocido"
   }
 }

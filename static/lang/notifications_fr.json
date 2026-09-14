@@ -397,7 +397,18 @@
     },
     "mismatch": {
       "title": "Le filament ne correspond pas",
-      "body": "{file} demande {wanted} — le bac contient {loaded}."
+      "body": "{file} demande {wanted} — le bac contient {loaded}.",
+      "body_colour": "{file} demande {wanted} dans une autre couleur que celle du bac."
+    }
+  },
+  "vent": {
+    "close": {
+      "title": "Fermer les fentes d'aération",
+      "body": "Maintenant {now}, avant {before} — {file}"
+    },
+    "open": {
+      "title": "Rouvrir les fentes d'aération",
+      "body": "Maintenant {now}, avant {before} — {file}"
     }
   },
   "maintenance": {
@@ -525,6 +536,9 @@
     "unknown_model": "Modèle inconnu : {model}",
     "file_param_missing": "file manquant",
     "makerworld_maintenance": "MakerWorld est en maintenance — de retour bientôt",
+    "makerworld_blocked": "MakerWorld refuse en ce moment les requêtes automatiques (contrôle Cloudflare) — réessaie plus tard",
+    "makerworld_url_missing": "Aucune adresse de téléchargement transmise",
+    "makerworld_bad_download_url": "Cette adresse n'est pas celle de MakerWorld — refusée",
     "makerworld_unreachable": "MakerWorld injoignable : {error}",
     "makerworld_sign_in": "MakerWorld a refusé — connecte-toi d'abord au compte Bambu",
     "makerworld_captcha": "MakerWorld demande un captcha — trop de téléchargements en peu de temps. Cela se règle tout seul après un moment ; les modèles déjà récupérés restent disponibles.",
@@ -539,6 +553,9 @@
     "makerworld_instance_missing": "Le numéro de profil (instance_id) manque",
     "makerworld_no_slicer": "Bambu Studio introuvable — aucun slicer disponible",
     "makerworld_no_mirror": "La copie de la carte SD n'est pas disponible",
-    "makerworld_upload_failed": "Tranché, mais le fichier n'est pas arrivé à l'imprimante"
+    "makerworld_upload_failed": "Tranché, mais le fichier n'est pas arrivé à l'imprimante",
+    "device_on": "{browser} sur {os}",
+    "device_unknown_browser": "Navigateur inconnu",
+    "device_unknown_os": "un système inconnu"
   }
 }

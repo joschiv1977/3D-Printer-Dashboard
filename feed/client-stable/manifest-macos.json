@@ -1,0 +1,19 @@
+{
+  "manifest": {
+    "product": "client",
+    "channel": "stable",
+    "platform": "macos",
+    "version": "2.3.3",
+    "files": [
+      {
+        "name": "3D-Printer-Client-2.3.3.zip",
+        "sha256": "39292f22d78ee942b3411d816f3303953731ecfeb3c1a42961da0d21eff05c27",
+        "size": 2479229,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/client-stable-2.3.3/3D-Printer-Client-2.3.3.zip"
+      }
+    ],
+    "notes": null,
+    "issued": 1789413797
+  },
+  "signature": "QOpAS8/tsBXBBSNMTIPajg1uJlgEl+81mWk4/PpKh06OmLYRTvtbkWW6RiS2NRe4QxewuH3F63ZD/LF6MZbEDg=="
+}

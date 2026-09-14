@@ -407,13 +407,15 @@
                         </div>
                         <div class="sl-feld">
                             <label for="bedType" id="sl-l-bett">Druckbett</label>
+                            <!--Fallback for an older server without bed_types in
+                                 /api/slicer/profiles -- populateBedTypes() replaces
+                                 these with the live list once profiles are loaded.-->
                             <select id="bedType">
                                 <option value="Cool Plate">Cool Plate</option>
-                                <option value="Textured Cool Plate">Textured Cool Plate</option>
-                                <option value="Textured PEI Plate">Textured PEI Plate</option>
-                                <option value="Smoothie High Temp Plate">Smoothie High Temp Plate</option>
                                 <option value="Engineering Plate">Engineering Plate</option>
-                                <option value="Smoothie Cool Plate">Smoothie Cool Plate</option>
+                                <option value="High Temp Plate">Smooth PEI / High Temp Plate</option>
+                                <option value="Textured PEI Plate">Textured PEI Plate</option>
+                                <option value="Supertack Plate">Cool Plate SuperTack</option>
                             </select>
                         </div>
                         <div class="sl-feld">
@@ -451,69 +453,50 @@
                 </div>
             </div>
 
-            <!--Profiles: below the workflow, not in an overlay --
-                 the space is there, so you see the state without a click.-->
-            <div class="sl-karte sl-profile">
+            <!--Bambu's own vendor profile set (services/bambu_system_presets):
+                 which version slices, where it came from, and the "check now"
+                 button. Sits in the spot the old OrcaSlicer profile-management
+                 card used (sl-profile keeps that CSS), full width below the
+                 workflow.-->
+            <div class="sl-karte sl-profile" id="presetsCard">
                 <div class="sl-karte-kopf">
                     <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>
-                    <span id="profileManagementTitle">Profile</span>
+                    <span id="presetsTitle">Bambu-Profile</span>
                     <span class="sl-karte-luft"></span>
                     <span class="sl-p-akt">
-                        <button class="sl-btn sl-btn--klein" id="checkUpdatesBtn" onclick="checkProfileUpdates()">
+                        <button class="sl-btn sl-btn--klein" id="presetsCheckBtn" onclick="checkBambuPresets()">
                             <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
-                            <span id="slicer-check-updates">Auf Updates prüfen</span>
-                        </button>
-                        <button class="sl-btn sl-btn--klein" id="updateProfilesBtn" onclick="updateProfiles()" style="display:none;">
-                            <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
-                            <span id="slicer-update-profiles">Profile aktualisieren</span>
-                        </button>
-                        <button class="sl-btn sl-btn--klein" id="restoreBackupBtn" onclick="restoreBackup()" style="display:none;">
-                            <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.4"/><path d="M3 3v6h6"/></svg>
-                            <span id="slicer-restore-backup">Backup wiederherstellen</span>
+                            <span id="presetsCheckBtnText">Jetzt prüfen</span>
                         </button>
                     </span>
                 </div>
 
                 <div class="sl-werte">
-                    <span class="sl-wert"><span id="localProfilesLabel">Lokale Profile</span><b id="profileCount">–</b></span>
-                    <span class="sl-wert" id="backupInfo" style="display:none;"><span id="backupLabel">Sicherung</span><b id="backupDate">–</b></span>
-                    <span class="sl-wert" id="lastCheckInfo" style="display:none;"><span id="lastUpdateCheckLabel">Letzte Prüfung</span><b id="lastCheckDate">–</b></span>
+                    <span class="sl-wert"><span id="presetsVersionLabel">Version</span><b id="presetsVersion">–</b></span>
+                    <span class="sl-wert"><span id="presetsCheckedLabel">Zuletzt geprüft</span><b id="presetsChecked">–</b></span>
                 </div>
                 <div class="sl-wert" style="margin-top:9px;">
-                    <span id="supportedPrintersLabel">Unterstützte Drucker</span>
-                    <b id="supportedPrinters" style="font-size:12.5px;font-weight:500;">–</b>
+                    <span id="presetsSourceLabel">Quelle</span>
+                    <b id="presetsSourceHint" style="font-size:12.5px;font-weight:500;">–</b>
                 </div>
 
-                <div id="updateResult" style="display:none; margin-top:11px;"></div>
+                <div class="sl-hinweis" id="presetsFailedHint" style="display:none; margin-top:10px;">
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true" style="color:var(--color-orange);"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>
+                    <span id="presetsFailedText"></span>
+                </div>
 
-                <details class="sl-aufklapp" id="githubTokenSettings" style="margin-top:12px;">
-                    <summary onclick="setTimeout(() =&gt; loadGithubTokenSettings(), 0)">
+                <details class="sl-aufklapp" id="presetsNotesDetails" style="display:none; margin-top:10px;">
+                    <summary>
                         <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-                        <span id="githubSettingsLabel">GitHub-Zugriff</span>
-                        <span id="githubTokenBadge" class="sl-marke" style="display:none;">Token aktiv</span>
+                        <span id="presetsNotesLabel">Was ist neu</span>
                     </summary>
-                    <div id="githubTokenContent">
-                        <p id="githubRateLimitInfo">Ohne Token erlaubt GitHub 60 Anfragen pro Stunde, mit Token 5000. Nur zum Abholen der Profile — es werden keine Berechtigungen gebraucht.</p>
-                        <label class="sl-schalter">
-                            <input type="checkbox" id="githubTokenEnabled" onchange="toggleGithubTokenInput()">
-                            <span id="githubUseTokenLabel">GitHub-Token verwenden</span>
-                        </label>
-                        <div id="githubTokenInputContainer" style="display:none; margin-top:9px;">
-                            <div style="display:flex; gap:8px; max-width:460px;">
-                                <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxx" style="flex:1;">
-                                <button class="sl-btn sl-btn--klein" id="githubSaveBtn" onclick="saveGithubToken()">
-                                    <span id="sl-save-text">Speichern</span>
-                                </button>
-                            </div>
-                            <p style="font-size:11.5px; margin:8px 0 0;">
-                                <span id="githubCreateTokenLabel">Token erstellen unter</span>
-                                <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>
-                                <span id="githubNoPermissionsLabel"></span>
-                            </p>
-                        </div>
-                        <div id="githubTokenStatus" style="margin-top:10px; font-size:12px; display:none;"></div>
-                    </div>
+                    <div><p id="presetsNotesText" style="white-space:pre-wrap;"></p></div>
                 </details>
+
+                <div class="sl-hinweis" id="presetsLoadFailedHint" style="display:none; margin-top:10px;">
+                    <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.5"/></svg>
+                    <span id="presetsLoadFailedText">Stand nicht abrufbar</span>
+                </div>
             </div>
         </div>
     </div>
@@ -588,24 +571,14 @@
             // Start bar
             setz('sl-slice-text', 'slicer_btn_slice_short', 'Slicen und auf SD-Karte legen');
 
-            // Profile card
-            setz('profileManagementTitle','slicer_profiles',        'Profile');
-            setz('slicer-check-updates',  'slicer_check_updates',   'Auf Updates prüfen');
-            setz('slicer-update-profiles','slicer_update_profiles', 'Profile aktualisieren');
-            setz('slicer-restore-backup', 'slicer_restore_backup',  'Backup wiederherstellen');
-            setz('localProfilesLabel',    'slicer_local_profiles',  'Lokale Profile');
-            setz('backupLabel',           'slicer_backup',          'Sicherung');
-            setz('lastUpdateCheckLabel',  'slicer_last_update_check','Letzte Prüfung');
-            setz('supportedPrintersLabel','slicer_supported_printers','Unterstützte Drucker');
-
-            // GitHub
-            setz('githubSettingsLabel',    'slicer_github_short',        'GitHub-Zugriff');
-            setz('githubTokenBadge',       'slicer_github_token_active', 'Token aktiv');
-            setz('githubRateLimitInfo',    'slicer_github_rate_short',
-                 'Ohne Token erlaubt GitHub 60 Anfragen pro Stunde, mit Token 5000. Nur zum Abholen der Profile — es werden keine Berechtigungen gebraucht.');
-            setz('githubUseTokenLabel',    'slicer_github_use_token',    'GitHub-Token verwenden');
-            setz('sl-save-text',           'save',                       'Speichern');
-            setz('githubCreateTokenLabel', 'slicer_github_create_short', 'Token erstellen unter');
+            // Bambu profiles card
+            setz('presetsTitle',        'slicer_presets_title',         'Bambu-Profile');
+            setz('presetsCheckBtnText', 'slicer_presets_check_button',  'Jetzt prüfen');
+            setz('presetsVersionLabel', 'slicer_presets_version_label', 'Version');
+            setz('presetsCheckedLabel', 'slicer_presets_checked_label', 'Zuletzt geprüft');
+            setz('presetsSourceLabel',  'slicer_presets_source_label',  'Quelle');
+            setz('presetsNotesLabel',   'slicer_presets_notes_summary', 'Was ist neu');
+            setz('presetsLoadFailedText', 'slicer_presets_load_error',  'Stand nicht abrufbar');
         }
 
         // Clears the selected file without reloading the page.
@@ -644,7 +617,21 @@
                         document.getElementById('nozzleSize').value = settings.nozzleSize;
                     }
                     if (settings.bedType) {
-                        document.getElementById('bedType').value = settings.bedType;
+                        // Names saved while the slicer was still OrcaSlicer -- map
+                        // them to today's Bambu Studio plate ids (Task A). A value
+                        // that still matches nothing (e.g. "Textured Cool Plate",
+                        // which has no counterpart) leaves the default selected.
+                        const legacyBedTypes = {
+                            'Smoothie High Temp Plate': 'High Temp Plate',
+                            'Smooth PEI Plate': 'High Temp Plate',
+                            'Smoothie Cool Plate': 'Supertack Plate',
+                            'Cool Plate SuperTack': 'Supertack Plate'
+                        };
+                        const bedTypeSelect = document.getElementById('bedType');
+                        const bedTypeValue = legacyBedTypes[settings.bedType] || settings.bedType;
+                        if (bedTypeSelect.querySelector(`option[value="${bedTypeValue}"]`)) {
+                            bedTypeSelect.value = bedTypeValue;
+                        }
                     }
 
                     // Store for later restoration
@@ -663,6 +650,7 @@
                     const printerSelect = document.getElementById('printerSelect');
                     if (printerSelect.querySelector(`option[value="${settings.printer}"]`)) {
                         printerSelect.value = settings.printer;
+                        updateFilamentTypeList(); // Filaments are filtered by printer too (Task B)
                         updateProcessList(); // Update process list based on printer
                     }
                 }
@@ -796,6 +784,104 @@
             return zahl(bytes / (1024 * 1024)) + ' MB';
         }
 
+        // ========== BAMBU'S VENDOR PROFILE SET (services/bambu_system_presets) ==========
+        // Bambu Studio ships a profile set with every release, and Bambu
+        // publishes newer sets in between ("Check for Presets Update" in the
+        // Bambu Studio GUI). The server fetches those weekly and on this
+        // button, and slices with the newer set once it has one.
+        const PRESETS_REASON_KEYS = {
+            unreachable: 'slicer_presets_reason_unreachable',
+            bad_answer: 'slicer_presets_reason_bad_answer',
+            bad_package: 'slicer_presets_reason_bad_package',
+            no_bundle: 'slicer_presets_reason_no_bundle'
+        };
+
+        function presetsReasonText(reason) {
+            const key = PRESETS_REASON_KEYS[reason];
+            return (key && t(key)) || reason || '';
+        }
+
+        // Fills the card from one /api/slicer/presets (or .../check) answer.
+        function renderBambuPresetsCard(data) {
+            document.getElementById('presetsLoadFailedHint').style.display = 'none';
+
+            document.getElementById('presetsVersion').textContent = data.version || '–';
+
+            const sourceHintEl = document.getElementById('presetsSourceHint');
+            if (data.source === 'update') {
+                sourceHintEl.textContent = t('slicer_presets_source_update') || 'von Bambu nachgeladen';
+            } else {
+                sourceHintEl.textContent = t('slicer_presets_source_bundled') || 'mit Bambu Studio geliefert';
+            }
+
+            const checkedEl = document.getElementById('presetsChecked');
+            checkedEl.textContent = data.checked
+                ? new Date(data.checked * 1000).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+                : (t('slicer_presets_never_checked') || 'noch nie geprüft');
+
+            const failedHint = document.getElementById('presetsFailedHint');
+            if (data.result === 'failed' && data.reason) {
+                document.getElementById('presetsFailedText').textContent = presetsReasonText(data.reason);
+                failedHint.style.display = '';
+            } else {
+                failedHint.style.display = 'none';
+            }
+
+            const notesDetails = document.getElementById('presetsNotesDetails');
+            if (data.notes && data.source === 'update') {
+                // textContent, never innerHTML -- Bambu's own release note is external content.
+                document.getElementById('presetsNotesText').textContent = data.notes;
+                notesDetails.style.display = '';
+            } else {
+                notesDetails.style.display = 'none';
+            }
+        }
+
+        // GET on page init -- never blocks the rest of the page, a failed
+        // fetch just leaves the card saying the status is unavailable.
+        async function loadBambuPresets() {
+            try {
+                const response = await apiCall('/api/slicer/presets');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (!data.ok) throw new Error('answer not ok');
+                renderBambuPresetsCard(data);
+            } catch (error) {
+                console.error('Error loading Bambu preset status:', error);
+                document.getElementById('presetsLoadFailedHint').style.display = '';
+            }
+        }
+
+        // The "Jetzt prüfen" button -- asks Bambu now, which can take a few
+        // seconds while a package downloads.
+        async function checkBambuPresets() {
+            const btn = document.getElementById('presetsCheckBtn');
+            const btnText = document.getElementById('presetsCheckBtnText');
+            btn.disabled = true;
+            btnText.textContent = t('slicer_presets_checking') || 'Wird geprüft …';
+            try {
+                const response = await apiCall('/api/slicer/presets/check', { method: 'POST' });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (!data.ok) throw new Error('answer not ok');
+                renderBambuPresetsCard(data);
+
+                if (data.result === 'updated') {
+                    showSuccess(t('slicer_presets_updated', { version: data.version }) || `Neue Profile ${data.version} übernommen`);
+                } else if (data.result === 'current') {
+                    showSuccess(t('slicer_presets_current') || 'Profile sind aktuell');
+                } else if (data.result === 'failed') {
+                    showError(presetsReasonText(data.reason));
+                }
+            } catch (error) {
+                console.error('Error checking Bambu presets:', error);
+                showError(t('slicer_error_network') || 'Netzwerkfehler');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = t('slicer_presets_check_button') || 'Jetzt prüfen';
+            }
+        }
+
         // Load Profiles
         async function loadProfiles() {
             try {
@@ -817,6 +903,10 @@
                     allFilaments = data.filaments;
                     allProcesses = data.processes;
 
+                    // Bed plates (Task A) -- keeps the hardcoded fallback from the
+                    // markup when an older server sends no bed_types at all.
+                    populateBedTypes(data.bed_types);
+
                     // Initial population (with default nozzle size)
                     updateFilamentTypeList(); // Fills type dropdown, which triggers updateFilamentList
                     updateProcessList();
@@ -826,6 +916,7 @@
                     // visit overrides it (restoreSelectionsAfterLoad runs afterward).
                     if (data.current_printer) {
                         printerSelect.value = data.current_printer;
+                        updateFilamentTypeList(); // Filaments are also filtered by printer now
                         updateProcessList();
                     }
 
@@ -837,6 +928,27 @@
             } catch (error) {
                 console.error('Error loading profiles:', error);
                 showError(t('slicer_error_network') || 'Netzwerkfehler');
+            }
+        }
+
+        // Populate the plate dropdown from the server (Task A). An older server
+        // (or a 503 with empty lists) sends nothing here, so the five hardcoded
+        // <option>s already in the markup stay untouched in that case.
+        function populateBedTypes(bedTypes) {
+            if (!Array.isArray(bedTypes) || bedTypes.length === 0) return;
+            const bedTypeSelect = document.getElementById('bedType');
+            const currentValue = bedTypeSelect.value;
+            bedTypeSelect.innerHTML = '';
+            bedTypes.forEach(b => {
+                const option = document.createElement('option');
+                option.value = b.id;
+                option.textContent = b.name;
+                bedTypeSelect.appendChild(option);
+            });
+            // Keep whatever loadSlicerSettings() already selected, if it's
+            // still a valid option.
+            if (currentValue && bedTypeSelect.querySelector(`option[value="${currentValue}"]`)) {
+                bedTypeSelect.value = currentValue;
             }
         }
 
@@ -873,17 +985,25 @@
             return 'Andere'; // Fallback for unknown types
         }
 
+        // The material type the server resolved from the profile itself
+        // (inherited from its @base); the name is only a last resort --
+        // guessed from it, "Extrudr XPETG MATT" landed under 'Andere'.
+        function filamentTypeOf(f) {
+            return (f && f.type) ? f.type : extractFilamentType((f && f.name) || '');
+        }
+
         // Extracts all unique filament types from the profiles
         function extractFilamentTypes() {
+            const printer = document.getElementById('printerSelect').value;
             const nozzleSize = document.getElementById('nozzleSize').value;
 
-            // Filter filaments based on nozzle size first
-            const filteredFilaments = filterFilamentsByNozzle(allFilaments, nozzleSize);
+            // Filter filaments based on printer and nozzle size first
+            const filteredFilaments = filterFilamentsByPrinterAndNozzle(allFilaments, printer, nozzleSize);
 
             // Extract types
             const typesSet = new Set();
             filteredFilaments.forEach(f => {
-                const type = extractFilamentType(f.name);
+                const type = filamentTypeOf(f);
                 typesSet.add(type);
             });
 
@@ -923,6 +1043,20 @@
             });
         }
 
+        // Filter filaments by printer on top of the nozzle filter above. A
+        // filament whose compatible_printers is missing or empty is unknown
+        // rather than incompatible, so it stays in the list either way.
+        function filterFilamentsByPrinterAndNozzle(filaments, printer, nozzleSize) {
+            const nozzleFiltered = filterFilamentsByNozzle(filaments, nozzleSize);
+            if (!printer) return nozzleFiltered; // no printer chosen yet - nothing to narrow by
+
+            const machineProfileName = `${printer} ${nozzleSize} nozzle`;
+            return nozzleFiltered.filter(f => {
+                const compatiblePrinters = f.compatible_printers || [];
+                return compatiblePrinters.length === 0 || compatiblePrinters.includes(machineProfileName);
+            });
+        }
+
         // Update filament type dropdown
         function updateFilamentTypeList() {
             const filamentTypeSelect = document.getElementById('filamentTypeSelect');
@@ -948,8 +1082,9 @@
             updateFilamentList();
         }
 
-        // Filter and update filament list based on selected type and nozzle size
+        // Filter and update filament list based on selected type, printer and nozzle size
         function updateFilamentList() {
+            const printer = document.getElementById('printerSelect').value;
             const nozzleSize = document.getElementById('nozzleSize').value;
             const selectedType = document.getElementById('filamentTypeSelect').value;
             const filamentSelect = document.getElementById('filamentSelect');
@@ -964,25 +1099,30 @@
 
             filamentSelect.innerHTML = `<option value="">${t('slicer_select_filament') || 'Filament wählen...'}</option>`;
 
-            // Filter by nozzle size first
-            const nozzleFiltered = filterFilamentsByNozzle(allFilaments, nozzleSize);
+            // Filter by printer and nozzle size first
+            const compatibleFiltered = filterFilamentsByPrinterAndNozzle(allFilaments, printer, nozzleSize);
 
             // Then filter by type
-            const filteredFilaments = nozzleFiltered.filter(f => {
-                const type = extractFilamentType(f.name);
+            const filteredFilaments = compatibleFiltered.filter(f => {
+                const type = filamentTypeOf(f);
                 return type === selectedType;
             });
 
-            // Sort alphabetically by name
-            filteredFilaments.sort((a, b) => a.name.localeCompare(b.name));
+            // Sort alphabetically by name, but within each group only -- the
+            // user's own presets (own === true) stay first, as the server
+            // already sends them (Task C).
+            const eigeneFilamente = filteredFilaments.filter(f => f.own);
+            const andereFilamente = filteredFilaments.filter(f => !f.own);
+            eigeneFilamente.sort((a, b) => a.name.localeCompare(b.name));
+            andereFilamente.sort((a, b) => a.name.localeCompare(b.name));
+            const sortedFilaments = eigeneFilamente.concat(andereFilamente);
 
             // Populate filtered filaments
-            filteredFilaments.forEach(f => {
+            sortedFilaments.forEach(f => {
                 const option = document.createElement('option');
                 option.value = f.id;
-                // Remove redundant type info from display name
-                let displayName = f.name;
-                option.textContent = displayName;
+                // Own presets get a star, so they stand out from the shipped ones
+                option.textContent = (f.own ? '★ ' : '') + f.name;
                 filamentSelect.appendChild(option);
             });
 
@@ -1024,11 +1164,12 @@
                 return compatiblePrinters.includes(machineProfileName);
             });
 
-            // Populate filtered process profiles
+            // Populate filtered process profiles -- own presets keep the position
+            // the server already put them in (first), just get the star (Task C)
             filteredProcesses.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
-                option.textContent = p.name;
+                option.textContent = (p.own ? '★ ' : '') + p.name;
                 processSelect.appendChild(option);
             });
 
@@ -1187,61 +1328,48 @@
                 updateSlicingProgress(10, t('slicer_upload_complete') || 'Upload abgeschlossen', t('slicer_preparing_slice') || 'Slicing wird vorbereitet');
                 updateSlicingStep('step-upload', 'completed');
 
-                // Step 2: Slicing + Thumbnail (10-90%)
+                // Step 2: Slicing (10-90%) -- Bambu Studio reports its own progress,
+                // polled from the server below, instead of a simulated ramp-up.
                 updateSlicingStep('step-slicing', 'active');
-                updateSlicingProgress(15, t('slicer_slicing_stl') || 'STL wird gesliced', t('slicer_orcaslicer_processing') || 'OrcaSlicer verarbeitet');
+                updateSlicingProgress(15, t('slicer_slicing_stl') || 'STL wird gesliced', t('slicer_processing') || 'Bambu Studio verarbeitet die Datei');
 
-                // Simulate progress during entire backend process (slicing + thumbnail)
-                let progressSimulationTime = 0;
-                const slicingInterval = setInterval(() => {
-                    progressSimulationTime += 1500; // 1.5 seconds per tick
-                    const currentProgress = parseFloat(document.getElementById('slicingProgressFill').style.width) || 15;
-
-                    if (currentProgress < 90) {
-                        const newProgress = currentProgress + 2; // +2% every 1.5 seconds
-
-                        // Switch from slicing to thumbnail step at 40%
-                        if (currentProgress >= 40 && !document.getElementById('step-thumbnail').classList.contains('active')) {
-                            updateSlicingStep('step-slicing', 'completed');
-                            updateSlicingStep('step-thumbnail', 'active');
-                            updateSlicingProgress(newProgress, t('slicer_generating_thumbnail') || 'Thumbnail wird generiert', t('slicer_creating_preview') || 'Vorschau wird erstellt');
-                        } else if (currentProgress < 40) {
-                            updateSlicingProgress(newProgress, t('slicer_slicing_stl') || 'STL wird gesliced', t('slicer_orcaslicer_processing') || 'OrcaSlicer verarbeitet');
-                        } else {
-                            updateSlicingProgress(newProgress, t('slicer_generating_thumbnail') || 'Thumbnail wird generiert', t('slicer_creating_preview') || 'Vorschau wird erstellt');
+                // Poll the real progress once a second while the request is in
+                // flight. A failed poll is ignored -- the next tick tries again.
+                const progressPoll = setInterval(async () => {
+                    try {
+                        const progressResponse = await apiCall('/api/slicer/progress');
+                        if (progressResponse.ok) {
+                            const progressData = await progressResponse.json();
+                            if (progressData.aktiv) {
+                                updateSlicingProgress(progressData.prozent, `${progressData.prozent}%`, progressData.schritt || '');
+                            }
                         }
+                    } catch (pollError) {
+                        // Ignore silently, keep polling until the request itself finishes
                     }
-                }, 1500); // Update every 1.5 seconds
+                }, 1000);
 
-                // Send request to backend
-                const response = await apiCall('/api/slicer/slice', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                // Stop simulated progress
-                clearInterval(slicingInterval);
+                let response;
+                try {
+                    // Send request to backend -- blocks until the slice is done
+                    response = await apiCall('/api/slicer/slice', {
+                        method: 'POST',
+                        body: formData
+                    });
+                } finally {
+                    clearInterval(progressPoll);
+                }
 
                 if (response.ok) {
                     const result = await response.json();
                     if (result.success) {
-                        // Backend is done - ensure we're at least at 90%
-                        const currentProgress = parseFloat(document.getElementById('slicingProgressFill').style.width) || 90;
-                        if (currentProgress < 90) {
-                            updateSlicingProgress(90, t('slicer_thumbnail_complete') || 'Thumbnail fertig', t('slicer_thumbnail_created') || 'Thumbnail erstellt');
-                        }
+                        // The backend call has returned - slicing (and thumbnail
+                        // generation, which Bambu Studio does not report as its
+                        // own phase) is done.
+                        updateSlicingStep('step-slicing', 'completed');
+                        updateSlicingStep('step-thumbnail', 'completed');
 
-                        // Mark thumbnail as completed if not already
-                        if (document.getElementById('step-thumbnail').classList.contains('active')) {
-                            updateSlicingStep('step-thumbnail', 'completed');
-                        }
-
-                        // Ensure slicing is marked completed
-                        if (!document.getElementById('step-slicing').classList.contains('completed')) {
-                            updateSlicingStep('step-slicing', 'completed');
-                        }
-
-                        // Step 5: Saving (90-100%)
+                        // Step: Saving (90-100%)
                         updateSlicingStep('step-saving', 'active');
                         updateSlicingProgress(95, t('slicer_saving_file') || 'Datei wird gespeichert', t('slicer_writing_to_sd') || 'Schreibe auf SD-Karte');
 
@@ -1249,8 +1377,14 @@
                         updateSlicingProgress(100, t('slicer_complete') || 'Fertig!', t('slicer_file_created', { filename: result.filename }) || `Datei erstellt: ${result.filename}`);
                         updateSlicingStep('step-saving', 'completed');
 
-                        // Show success message
-                        showSuccess(t('slicer_success_message', { filename: result.filename, size: formatFileSize(result.size) }) || `Erfolgreich! Datei: ${result.filename} (${formatFileSize(result.size)})`);
+                        // Show success message -- a pending upload gets its own text,
+                        // since the file has not reached the printer yet (Task E).
+                        if (result.upload_pending) {
+                            showSuccess(t('slicer_upload_pending', { filename: result.filename }) ||
+                                `${result.filename} wartet im SD-Karten-Abgleich und wird an den Drucker gesendet, sobald er eingeschaltet ist.`);
+                        } else {
+                            showSuccess(t('slicer_success_message', { filename: result.filename, size: formatFileSize(result.size) }) || `Erfolgreich! Datei: ${result.filename} (${formatFileSize(result.size)})`);
+                        }
 
                         // Reset form after 3 seconds
                         setTimeout(() => {
@@ -1296,571 +1430,6 @@
         window.showInfo    = (msg) => window.skHinweis.info(msg);
         // Use window.* directly throughout code - no local const needed
 
-        // ========== PROFILE MANAGEMENT ==========
-
-        async function loadProfileStatus() {
-            try {
-                const response = await apiCall('/api/slicer/profiles/status');
-                if (response.ok) {
-                    const data = await response.json();
-
-                    // Update profile count
-                    const total = data.local_profiles?.total || 0;
-                    const machine = data.local_profiles?.machine || 0;
-                    const filament = data.local_profiles?.filament || 0;
-                    const process = data.local_profiles?.process || 0;
-                    document.getElementById('profileCount').textContent =
-                        t('slicer_profile_count', { total, machine, filament, process })
-                        || `${total} (${machine} Drucker, ${filament} Filamente, ${process} Prozess)`;
-
-                    // Update supported printers
-                    if (data.supported_printers) {
-                        document.getElementById('supportedPrinters').textContent =
-                            data.supported_printers.join(', ');
-                    }
-
-                    // Show backup info if exists
-                    if (data.backup?.exists) {
-                        document.getElementById('backupInfo').style.display = 'flex';
-                        if (data.backup.created) {
-                            // No seconds, and in the user's own language — hardcoding
-                            // 'de-DE' ignored that, and seconds add no value here.
-                            document.getElementById('backupDate').textContent =
-                                new Date(data.backup.created).toLocaleString(undefined,
-                                    { day: '2-digit', month: '2-digit', year: 'numeric',
-                                      hour: '2-digit', minute: '2-digit' });
-                        } else {
-                            document.getElementById('backupDate').textContent = t('slicer_backup_present') || 'Vorhanden';
-                        }
-                        document.getElementById('restoreBackupBtn').style.display = 'inline-block';
-                    } else {
-                        document.getElementById('backupInfo').style.display = 'none';
-                        document.getElementById('restoreBackupBtn').style.display = 'none';
-                    }
-
-                    // Show last update check time if exists
-                    if (data.last_update_check) {
-                        document.getElementById('lastCheckInfo').style.display = 'flex';
-                        document.getElementById('lastCheckDate').textContent =
-                            new Date(data.last_update_check).toLocaleString(undefined,
-                                { day: '2-digit', month: '2-digit', year: 'numeric',
-                                  hour: '2-digit', minute: '2-digit' });
-                    } else {
-                        document.getElementById('lastCheckInfo').style.display = 'none';
-                    }
-
-                    // Check whether an update is running and restore the progress display
-                    if (data.update_in_progress && data.current_progress) {
-                        reconnectToUpdateStream(data.current_progress);
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading profile status:', error);
-                document.getElementById('profileCount').textContent =
-                        t('slicer_profiles_load_error') || 'Fehler beim Laden';
-            }
-        }
-
-        // Reconnects to a currently running update stream
-        function reconnectToUpdateStream(initialProgress) {
-            const btn = document.getElementById('updateProfilesBtn');
-            const checkBtn = document.getElementById('checkUpdatesBtn');
-            const resultDiv = document.getElementById('updateResult');
-
-            // Put the UI into update mode
-            btn.disabled = true;
-            checkBtn.disabled = true;
-            btn.innerHTML = '⏳ Aktualisiere...';
-            btn.style.display = 'inline-block';
-
-            // Progress HTML with the current state
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
-            resultDiv.innerHTML = updateFortschrittHtml(true);
-
-            // Show initial progress immediately
-            if (initialProgress.phase) {
-                updateProgressUI(initialProgress);
-            }
-
-            // Connect to the SSE stream
-            connectToUpdateStream(btn, checkBtn, resultDiv);
-        }
-
-        // Connects to the update stream
-        async function connectToUpdateStream(btn, checkBtn, resultDiv) {
-            // Get a token from the server for EventSource (an HttpOnly cookie can't be read from JS)
-            // The server returns the token when the user is authenticated via cookie
-            let tokenParam = '';
-            try {
-                const tokenResponse = await fetch('/api/auth/sse-token', {
-                    method: 'GET',
-                    credentials: 'include'
-                });
-                if (tokenResponse.ok) {
-                    const tokenData = await tokenResponse.json();
-                    if (tokenData.token) {
-                        tokenParam = `?token=${encodeURIComponent(tokenData.token)}`;
-                    }
-                }
-            } catch (e) {
-                console.warn('Could not get SSE token, trying without:', e);
-            }
-
-            const eventSource = new EventSource(`/api/slicer/profiles/update-stream${tokenParam}`);
-
-            eventSource.onmessage = function(event) {
-                const msg = JSON.parse(event.data);
-
-                if (msg.type === 'progress') {
-                    updateProgressUI(msg.data);
-                } else if (msg.type === 'result') {
-                    eventSource.close();
-                    handleUpdateResult(msg.data, btn, checkBtn, resultDiv);
-                }
-            };
-
-            eventSource.onerror = function(error) {
-                console.error('EventSource error:', error);
-                eventSource.close();
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>${t('slicer_connection_error') || 'Verbindungsfehler'}</strong><br><br>${t('slicer_connection_lost') || 'Die Verbindung zum Server wurde unterbrochen.'}<br><br>
-                    <button class="btn" onclick="updateProfiles()" style="background: #2196f3;">
-                        ${t('slicer_retry') || 'Erneut versuchen'}
-                    </button>`;
-                btn.disabled = false;
-                checkBtn.disabled = false;
-                btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
-            };
-        }
-
-        // Updates the progress UI
-        // Single template for the progress display, avoiding duplicate markup —
-        // including the purple gradient and hardcoded colors that weren't
-        // readable in dark mode.
-        function updateFortschrittHtml(wiederverbunden) {
-            const zusatz = wiederverbunden
-                ? ` <span class="sl-fort-zusatz">${t('slicer_reconnected') || '(wieder verbunden)'}</span>` : '';
-            return `
-                <div id="updateProgressContainer" class="sl-fortschritt">
-                    <div class="sl-fort-kopf">
-                        <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
-                        <span>${t('slicer_update_running') || 'Profile werden geladen'}</span>${zusatz}
-                        <b class="sl-fort-prozent" id="updateProgressText">0 %</b>
-                    </div>
-                    <div id="updatePhase" class="sl-fort-phase">${t('slicer_update_starting') || 'Starte…'}</div>
-                    <div class="sl-fort-bahn"><i id="updateProgressBar" style="width:0%"></i></div>
-                    <div id="updateCurrentFile" class="sl-fort-datei">–</div>
-                </div>`;
-        }
-
-        function updateProgressUI(data) {
-            const phaseNames = {
-                'backup':   t('slicer_phase_backup')   || 'Sicherung',
-                'machine':  t('slicer_phase_machine')  || 'Drucker-Profile',
-                'filament': t('slicer_phase_filament') || 'Filament-Profile',
-                'process':  t('slicer_phase_process')  || 'Prozess-Profile',
-                'done':     t('slicer_phase_done')     || 'Fertig'
-            };
-
-            const phaseEl = document.getElementById('updatePhase');
-            if (phaseEl) phaseEl.textContent = phaseNames[data.phase] || data.phase;
-
-            // Calculate overall progress
-            let progress = 0;
-            if (data.phase === 'backup') {
-                progress = data.current * 5;
-            } else if (data.phase === 'machine') {
-                progress = 5 + (data.total > 0 ? (data.current / data.total) * 15 : 0);
-            } else if (data.phase === 'filament') {
-                progress = 20 + (data.total > 0 ? (data.current / data.total) * 30 : 0);
-            } else if (data.phase === 'process') {
-                progress = 50 + (data.total > 0 ? (data.current / data.total) * 50 : 0);
-            } else if (data.phase === 'done') {
-                progress = 100;
-            }
-
-            const progressBar = document.getElementById('updateProgressBar');
-            if (progressBar) progressBar.style.width = progress + '%';
-            // The number sits next to the heading, not inside the bar: the bar
-            // is eight pixels tall, so no text fits in it.
-            const prozentEl = document.getElementById('updateProgressText');
-            if (prozentEl) prozentEl.textContent = Math.round(progress) + ' %';
-
-            const currentFile = document.getElementById('updateCurrentFile');
-            if (currentFile) {
-                currentFile.textContent = data.message;
-            }
-        }
-
-        // Handles the update result
-        function handleUpdateResult(data, btn, checkBtn, resultDiv) {
-            if (data.success) {
-                resultDiv.style.background = '#d4edda';
-                resultDiv.style.color = '#155724';
-                resultDiv.innerHTML = `<strong>${t('slicer_update_success') || 'Update erfolgreich!'}</strong><br><br>
-                    <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
-                    • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
-                    • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
-                    • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
-                    <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
-                    ${data.backup_created ? (t('slicer_backup_created') || 'Backup wurde erstellt') : (t('slicer_backup_failed') || 'Backup konnte nicht erstellt werden')}`;
-
-                loadProfileStatus();
-                loadProfiles();
-            } else {
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-
-                let errorMsg = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong><br><br>`;
-                if (data.error) {
-                    errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
-                }
-                if (data.total_errors > 0) {
-                    errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
-                    data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                    data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                    data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                }
-                resultDiv.innerHTML = errorMsg;
-            }
-
-            btn.disabled = false;
-            checkBtn.disabled = false;
-            btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
-        }
-
-        async function checkProfileUpdates() {
-            const btn = document.getElementById('checkUpdatesBtn');
-            const resultDiv = document.getElementById('updateResult');
-
-            btn.disabled = true;
-            btn.innerHTML = t('slicer_checking_updates') || 'Prüfe...';
-            resultDiv.style.display = 'none';
-
-            try {
-                const response = await apiCall('/api/slicer/profiles/check-updates');
-                const data = await response.json();
-
-                if (data.error) {
-                    resultDiv.style.display = 'block';
-                    resultDiv.style.background = '#f8d7da';
-                    resultDiv.style.color = '#721c24';
-                    resultDiv.innerHTML = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong> ${data.error}<br><br>
-                        <button class="btn" onclick="checkProfileUpdates()" style="background: #2196f3;">
-                            ${t('slicer_retry') || 'Erneut versuchen'}
-                        </button>`;
-                    document.getElementById('updateProfilesBtn').style.display = 'none';
-                } else {
-                    const totalNew = (data.machine?.new || 0) + (data.filament?.new || 0) + (data.process?.new || 0);
-                    const machineFiles = data.machine?.files?.length || 0;
-                    const filamentFiles = data.filament?.files?.length || 0;
-                    const processFiles = data.process?.files?.length || 0;
-
-                    resultDiv.style.display = 'block';
-
-                    // Result in the card's own style instead of a solid green block
-                    // with bullet points: three numbers form a table, not
-                    // running text.
-                    const zeile = (name, wert) =>
-                        `<span class="sl-erg-zeile"><span>${name}</span><b>${wert}</b></span>`;
-
-                    if (totalNew > 0) {
-                        resultDiv.className = 'sl-ergebnis sl-ergebnis--neu';
-                        resultDiv.innerHTML = `
-                            <div class="sl-erg-kopf">
-                                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 20h16"/></svg>
-                                ${t('slicer_updates_available') || 'Updates verfügbar'}
-                                <b class="sl-erg-zahl">${totalNew}</b>
-                            </div>
-                            <div class="sl-erg-tabelle">
-                                ${zeile(t('slicer_machine_profiles_count') || 'Drucker-Profile',
-                                        `${data.machine?.new || 0} / ${machineFiles}`)}
-                                ${zeile(t('slicer_filament_profiles_count') || 'Filament-Profile',
-                                        `${data.filament?.new || 0} / ${filamentFiles}`)}
-                                ${zeile(t('slicer_process_profiles_count') || 'Prozess-Profile',
-                                        `${data.process?.new || 0} / ${processFiles}`)}
-                            </div>
-                            <div class="sl-erg-fuss">${t('slicer_update_hint')
-                                || 'Über „Profile aktualisieren" werden sie heruntergeladen.'}
-                                <span class="sl-erg-legende">${t('slicer_result_legend')
-                                    || 'neu / auf GitHub'}</span></div>`;
-                        document.getElementById('updateProfilesBtn').style.display = 'inline-flex';
-                    } else {
-                        resultDiv.className = 'sl-ergebnis sl-ergebnis--ok';
-                        const gesamt = machineFiles + filamentFiles + processFiles;
-                        resultDiv.innerHTML = `
-                            <div class="sl-erg-kopf">
-                                <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
-                                ${t('slicer_up_to_date') || 'Alles aktuell'}
-                            </div>
-                            <div class="sl-erg-fuss">${
-                                t('slicer_all_profiles_present', { count: gesamt })
-                                || `Alle ${gesamt} verfügbaren Profile sind bereits vorhanden.`}</div>`;
-                        document.getElementById('updateProfilesBtn').style.display = 'inline-flex';
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking updates:', error);
-                resultDiv.style.display = 'block';
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = t('slicer_check_updates') || 'Auf Updates prüfen';
-            }
-        }
-
-        async function updateProfiles() {
-            const btn = document.getElementById('updateProfilesBtn');
-            const checkBtn = document.getElementById('checkUpdatesBtn');
-            const resultDiv = document.getElementById('updateResult');
-
-            if (!await window.skConfirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
-                return;
-            }
-
-            btn.disabled = true;
-            checkBtn.disabled = true;
-            btn.innerHTML = t('slicer_updating_profiles') || 'Aktualisiere...';
-
-            // Prepare the progress HTML
-            resultDiv.style.display = 'block';
-            resultDiv.className = 'sl-ergebnis sl-ergebnis--laeuft';
-            resultDiv.innerHTML = updateFortschrittHtml(false);
-
-            // Connect to the update stream (uses shared functions)
-            connectToUpdateStream(btn, checkBtn, resultDiv);
-        }
-
-        // Old updateProfiles function, kept as a fallback (no SSE)
-        async function updateProfilesFallback() {
-            const btn = document.getElementById('updateProfilesBtn');
-            const resultDiv = document.getElementById('updateResult');
-
-            if (!await window.skConfirm(t('slicer_confirm_update') || 'Profile aktualisieren?\n\nEs wird automatisch ein Backup der aktuellen Profile erstellt.')) {
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = t('slicer_updating_profiles') || 'Aktualisiere...';
-
-            try {
-                const response = await apiCall('/api/slicer/profiles/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ create_backup: true })
-                });
-                const data = await response.json();
-
-                resultDiv.style.display = 'block';
-
-                if (data.success) {
-                    resultDiv.style.background = '#d4edda';
-                    resultDiv.style.color = '#155724';
-                    resultDiv.innerHTML = `<strong>${t('slicer_update_success') || 'Update erfolgreich!'}</strong><br><br>
-                        <strong>${t('slicer_downloaded') || 'Heruntergeladen:'}</strong><br>
-                        • ${data.machine?.downloaded || 0} ${t('slicer_machine_profiles_count') || 'Drucker-Profile'}<br>
-                        • ${data.filament?.downloaded || 0} ${t('slicer_filament_profiles_count') || 'Filament-Profile'}<br>
-                        • ${data.process?.downloaded || 0} ${t('slicer_process_profiles_count') || 'Prozess-Profile'}<br>
-                        <strong>${t('slicer_total_files') || 'Gesamt:'}</strong> ${data.total_downloaded || 0} ${t('slicer_files') || 'Dateien'}<br><br>
-                        ${data.backup_created ? (t('slicer_backup_created') || 'Backup wurde erstellt') : (t('slicer_backup_failed') || 'Backup konnte nicht erstellt werden')}`;
-
-                    // Reload profile status and profiles list
-                    loadProfileStatus();
-                    loadProfiles();
-                } else {
-                    resultDiv.style.background = '#f8d7da';
-                    resultDiv.style.color = '#721c24';
-
-                    let errorMsg = `<strong>${t('slicer_update_failed') || 'Update fehlgeschlagen'}</strong><br><br>`;
-                    if (data.error) {
-                        errorMsg += `<strong>${t('slicer_error') || 'Fehler:'}</strong> ${data.error}<br><br>`;
-                    }
-                    if (data.total_errors > 0) {
-                        errorMsg += `<strong>${t('slicer_errors_at') || 'Fehler bei:'}</strong><br>`;
-                        data.machine?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                        data.filament?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                        data.process?.errors?.forEach(e => errorMsg += `• ${e}<br>`);
-                    }
-                    resultDiv.innerHTML = errorMsg;
-                }
-            } catch (error) {
-                console.error('Error updating profiles:', error);
-                resultDiv.style.display = 'block';
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = t('slicer_update_profiles') || 'Profile aktualisieren';
-            }
-        }
-
-        async function restoreBackup() {
-            if (!await window.skConfirm(t('slicer_confirm_restore') || 'Backup wiederherstellen?\n\nDie aktuellen Profile werden durch das Backup ersetzt.')) {
-                return;
-            }
-
-            const btn = document.getElementById('restoreBackupBtn');
-            const resultDiv = document.getElementById('updateResult');
-
-            btn.disabled = true;
-            btn.innerHTML = t('slicer_restoring_backup') || 'Wiederherstellen...';
-
-            try {
-                const response = await apiCall('/api/slicer/profiles/restore', {
-                    method: 'POST'
-                });
-                const data = await response.json();
-
-                resultDiv.style.display = 'block';
-
-                if (data.success) {
-                    resultDiv.style.background = '#d4edda';
-                    resultDiv.style.color = '#155724';
-                    resultDiv.innerHTML = `<strong>${t('slicer_restore_success') || 'Backup wiederhergestellt!'}</strong><br><br>${data.message}`;
-
-                    // Reload profile status and profiles list
-                    loadProfileStatus();
-                    loadProfiles();
-                } else {
-                    resultDiv.style.background = '#f8d7da';
-                    resultDiv.style.color = '#721c24';
-                    resultDiv.innerHTML = `<strong>${t('slicer_restore_failed') || 'Wiederherstellung fehlgeschlagen'}</strong><br><br>${data.message || data.error}`;
-                }
-            } catch (error) {
-                console.error('Error restoring backup:', error);
-                resultDiv.style.display = 'block';
-                resultDiv.style.background = '#f8d7da';
-                resultDiv.style.color = '#721c24';
-                resultDiv.innerHTML = `<strong>${t('slicer_network_error') || 'Netzwerkfehler:'}</strong> ${error.message}`;
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = t('slicer_restore_backup') || 'Backup wiederherstellen';
-            }
-        }
-
-        // ========== GITHUB TOKEN SETTINGS ==========
-
-        // Expanding/collapsing is handled by the <details> element itself. Only
-        // at page build time does the server state decide whether the section
-        // starts open — after that, loadGithubTokenSettings() runs on every click
-        // on the row and would otherwise re-open it against the user's will.
-        function githubKarteOeffnen(auf) {
-            const karte = document.getElementById('githubTokenSettings');
-            if (karte) karte.open = auf;
-        }
-
-        async function loadGithubTokenSettings(beimStart = false) {
-            try {
-                const response = await apiCall('/api/slicer/profiles/settings');
-                if (response.ok) {
-                    const data = await response.json();
-
-                    const checkbox = document.getElementById('githubTokenEnabled');
-                    const container = document.getElementById('githubTokenInputContainer');
-                    const statusDiv = document.getElementById('githubTokenStatus');
-                    const badge = document.getElementById('githubTokenBadge');
-
-                    checkbox.checked = data.github_token_enabled;
-                    container.style.display = data.github_token_enabled ? 'block' : 'none';
-
-                    // Show badge and collapse if token is set
-                    if (data.github_token_enabled && data.github_token_set) {
-                        badge.style.display = 'inline';
-                        if (beimStart) githubKarteOeffnen(false);   // token is active — nothing to do
-                        statusDiv.style.display = 'block';
-                        statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || 'Token ist gespeichert und aktiv'}</span>`;
-                    } else if (data.github_token_enabled && !data.github_token_set) {
-                        badge.style.display = 'none';
-                        if (beimStart) githubKarteOeffnen(true);    // token is missing
-                        statusDiv.style.display = 'block';
-                        statusDiv.innerHTML = `<span style="color: #ff9800;">${t('slicer_github_token_enter') || 'Bitte Token eingeben'}</span>`;
-                    } else {
-                        badge.style.display = 'none';
-                        if (beimStart) githubKarteOeffnen(false);   // not enabled at all
-                        statusDiv.style.display = 'none';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading GitHub token settings:', error);
-                if (beimStart) githubKarteOeffnen(true);
-            }
-        }
-
-        function toggleGithubTokenInput() {
-            const checkbox = document.getElementById('githubTokenEnabled');
-            const container = document.getElementById('githubTokenInputContainer');
-            const statusDiv = document.getElementById('githubTokenStatus');
-            const badge = document.getElementById('githubTokenBadge');
-
-            container.style.display = checkbox.checked ? 'block' : 'none';
-
-            // If disabled, also disable the token in the backend
-            if (!checkbox.checked) {
-                badge.style.display = 'none';
-                saveGithubToken(false);
-            }
-        }
-
-        async function saveGithubToken(showAlert = true) {
-            const checkbox = document.getElementById('githubTokenEnabled');
-            const tokenInput = document.getElementById('githubTokenInput');
-            const statusDiv = document.getElementById('githubTokenStatus');
-
-            const enabled = checkbox.checked;
-            const token = tokenInput.value.trim();
-
-            // Validation
-            if (enabled && !token) {
-                statusDiv.style.display = 'block';
-                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_github_token_enter') || 'Bitte Token eingeben'}</span>`;
-                return;
-            }
-
-            try {
-                const response = await apiCall('/api/slicer/profiles/settings', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        github_token_enabled: enabled,
-                        github_token: enabled ? token : null
-                    })
-                });
-
-                const data = await response.json();
-
-                statusDiv.style.display = 'block';
-                if (data.success) {
-                    if (enabled) {
-                        statusDiv.innerHTML = `<span style="color: #4caf50;">${t('slicer_github_token_saved') || 'Token ist gespeichert und aktiv'}</span>`;
-                        tokenInput.value = ''; // Clear the token from the input (security)
-                        tokenInput.placeholder = '••••••••••••••••';
-                    } else {
-                        statusDiv.innerHTML = `<span style="color: var(--text-secondary);">${t('slicer_github_token_deactivated') || 'Token deaktiviert'}</span>`;
-                    }
-                    if (showAlert) {
-                        showSuccess(enabled ? (t('slicer_github_token_success') || 'GitHub Token gespeichert!') : (t('slicer_github_token_disabled') || 'GitHub Token deaktiviert'));
-                    }
-                } else {
-                    statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_error') || 'Fehler:'} ${data.error}</span>`;
-                    if (showAlert) {
-                        showError(`${t('slicer_error') || 'Fehler:'} ${data.error}`);
-                    }
-                }
-            } catch (error) {
-                console.error('Error saving GitHub token:', error);
-                statusDiv.style.display = 'block';
-                statusDiv.innerHTML = `<span style="color: #f44336;">${t('slicer_network_error') || 'Netzwerkfehler:'}</span>`;
-                if (showAlert) {
-                    showError(t('slicer_network_error') || 'Netzwerkfehler beim Speichern');
-                }
-            }
-        }
-
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             // Render Sidebar
@@ -1877,11 +1446,9 @@
             // Load profiles from server
             loadProfiles();
 
-            // Load profile management status
-            loadProfileStatus();
-
-            // Load GitHub token settings
-            loadGithubTokenSettings(true);
+            // Bambu's own vendor profile set -- independent of the printing
+            // profiles above, so it never blocks the rest of the page.
+            loadBambuPresets();
 
             // Add event listener for nozzle size change
             document.getElementById('nozzleSize').addEventListener('change', () => {
@@ -1893,6 +1460,7 @@
 
             // Add event listeners for printer selection
             document.getElementById('printerSelect').addEventListener('change', () => {
+                updateFilamentTypeList(); // Filaments are filtered by printer too (Task B)
                 updateProcessList();
                 validateSliceButton();
                 saveSlicerSettings();

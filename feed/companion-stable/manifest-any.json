@@ -3,17 +3,17 @@
     "product": "companion",
     "channel": "stable",
     "platform": "any",
-    "version": "2.3.0",
+    "version": "2.3.3",
     "files": [
       {
-        "name": "companion-2.3.0.tar.gz",
-        "sha256": "20d209ca351117425e857cfe1b783ccb30f2f9e64252c6c5cb25bf117f2fe380",
-        "size": 738687,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/companion-stable-2.3.0/companion-2.3.0.tar.gz"
+        "name": "companion-2.3.3.tar.gz",
+        "sha256": "8a9ea9ee7cb8af938c35844fb4a653ce164f7fa258b8a8615c78c50e067263db",
+        "size": 732454,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/companion-stable-2.3.3/companion-2.3.3.tar.gz"
       }
     ],
     "notes": null,
-    "issued": 1789146759
+    "issued": 1789415730
   },
-  "signature": "WXqawtHI0cXoVlIPms1TD4OQ/z4qelb3eeTUy94ec12Z5Pg//wWgOkIJABNp1A0eYXHhSZOwncfBdGmf/o+sCg=="
+  "signature": "zTZ2aB+G15n14vooilAlmLCpLxWlyuiImhtoELUKV1ZcwEGLAi+49LpDfab8fhuRkeDs51rva1e+jZbsopNACQ=="
 }

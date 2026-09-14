@@ -34,7 +34,6 @@ repository.
 | What ships | |
 |---|---|
 | **149** compiled modules | `dist_aarch64/`, built for Python 3.13 |
-| **765** slicer profiles | so a fresh install can slice immediately |
 | **4** Bambu root certificates | so the printer connection is really verified |
 | **Web interface** | five languages, 2313 strings each |
 | **~130 MB** | the whole repository |
@@ -327,11 +326,11 @@ options, multi-filament mapping and thumbnails.
 
 <img src="docs/screenshots/slicer.png" width="380" align="right" alt="Slicer"/>
 
-OrcaSlicer runs on the server. Drop in an STL or STEP, pick printer, nozzle and
-quality, and the result goes straight to the SD card.
+Bambu Studio runs on the server. Drop in an STL or STEP, pick printer, nozzle,
+filament and quality, and the result goes straight to the SD card.
 
-The 765 profiles ship with this repository, so a fresh install can slice at once —
-no waiting for 965 downloads from GitHub. The updater then only compares.
+The profiles are Bambu Studio's own, so there is nothing to download first. Your
+own presets from the Bambu account can be fetched in with one button.
 
 ### 🔔 Notifications
 
@@ -477,7 +476,7 @@ macOS and Windows do none of this — they bring what they need. In this order. 
 
 1. **System packages** — Python 3.13 with `venv` and `dev`, build tools, image and
    GPIO libraries
-2. **OrcaSlicer** — current release, for slicing on the server
+2. **Bambu Studio** — from Flathub, for slicing on the server
 3. **Docker** — only if it is not already there
 4. **Spoolman** — **an existing installation is left alone.** If a container named
    `spoolman` runs, or something answers on port 7912, the step stands aside and
@@ -658,7 +657,7 @@ and nothing on the machine is used or changed.
 
 <div align="center">
 
-**Version 2.3.0** · 🇩🇪 [Deutsche Fassung](README.de.md)
+**Version 2.3.3** · 🇩🇪 [Deutsche Fassung](README.de.md)
 
 Made for the 3D printing community
 

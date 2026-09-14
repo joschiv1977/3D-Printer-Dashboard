@@ -591,11 +591,15 @@ class SDCardManager {
             && window.isPrintFile(file.name);
         const printState = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
         const printActive = ['RUNNING', 'PAUSE', 'PREPARE'].includes(printState);
-        // With the printer off, the list stays readable, but printing
-        // and deleting don't work — both touch the printer.
+        // With the printer off, printing does not work — it needs the
+        // printer. Deleting DOES: the server removes the file here and notes
+        // a tombstone, and the sync at power-on removes it from the printer
+        // as well (routes/mqtt.py delete_file_from_printer, sd_tombstones).
+        // Until 14sep26 the button was disabled here all the same, so a click
+        // with the printer off did nothing at all.
         const druckerAus = window.lastKnownSwitchState === 'off';
         const printDisabled = (printActive || druckerAus) ? ' disabled aria-disabled="true"' : '';
-        const deleteDisabled = druckerAus ? ' disabled aria-disabled="true"' : '';
+        const deleteDisabled = '';
         const meta = file.extended_meta || {};
         const mdata = file.metadata || {};
 
@@ -1168,13 +1172,19 @@ class SDCardManager {
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
                             filename: filename,
-                            location: location || 'cache'
+                            // The server knows 'root' and 'intern' only and
+                            // quietly turned the old 'cache' into 'root'.
+                            location: location || 'root'
                         })
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            let meldung = texts.file_deleted_ok || 'Datei gelöscht';
+                            // Printer off: gone here, and the sync at
+                            // power-on removes it from the printer too.
+                            let meldung = data.vorgemerkt
+                                ? texts.sd_delete_queued
+                                : (texts.file_deleted_ok || 'Datei gelöscht');
                             if (checkData.count > 0) {
                                 meldung += ' · ' + (texts.scheduled_removed
                                     || '{count} geplante Drucke entfernt')

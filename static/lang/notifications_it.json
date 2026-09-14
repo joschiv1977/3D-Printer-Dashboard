@@ -397,7 +397,18 @@
     },
     "mismatch": {
       "title": "Il filamento non corrisponde",
-      "body": "{file} richiede {wanted}: nel vassoio c'è {loaded}."
+      "body": "{file} richiede {wanted}: nel vassoio c'è {loaded}.",
+      "body_colour": "{file} richiede {wanted} in un colore diverso da quello nel vassoio."
+    }
+  },
+  "vent": {
+    "close": {
+      "title": "Chiudere le feritoie di ventilazione",
+      "body": "Ora {now}, prima {before} — {file}"
+    },
+    "open": {
+      "title": "Riaprire le feritoie di ventilazione",
+      "body": "Ora {now}, prima {before} — {file}"
     }
   },
   "maintenance": {
@@ -525,6 +536,9 @@
     "unknown_model": "Modello sconosciuto: {model}",
     "file_param_missing": "manca file",
     "makerworld_maintenance": "MakerWorld è in manutenzione — tornerà presto",
+    "makerworld_blocked": "MakerWorld al momento rifiuta le richieste automatiche (controllo Cloudflare) — riprova più tardi",
+    "makerworld_url_missing": "Nessun indirizzo di download inviato",
+    "makerworld_bad_download_url": "Questo indirizzo non è di MakerWorld — rifiutato",
     "makerworld_unreachable": "MakerWorld non raggiungibile: {error}",
     "makerworld_sign_in": "MakerWorld ha rifiutato — accedi prima all'account Bambu",
     "makerworld_captcha": "MakerWorld chiede un captcha — troppi download in poco tempo. Si risolve da solo dopo un po'; i modelli già scaricati funzionano ancora.",
@@ -539,6 +553,9 @@
     "makerworld_instance_missing": "Manca il numero del profilo (instance_id)",
     "makerworld_no_slicer": "Bambu Studio non trovato — nessuno slicer disponibile",
     "makerworld_no_mirror": "La copia della scheda SD non è disponibile",
-    "makerworld_upload_failed": "Slicing eseguito, ma il file non è arrivato alla stampante"
+    "makerworld_upload_failed": "Slicing eseguito, ma il file non è arrivato alla stampante",
+    "device_on": "{browser} su {os}",
+    "device_unknown_browser": "Browser sconosciuto",
+    "device_unknown_os": "un sistema sconosciuto"
   }
 }

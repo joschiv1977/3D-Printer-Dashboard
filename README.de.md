@@ -34,7 +34,6 @@ einem privaten Repo.
 | Was mitkommt | |
 |---|---|
 | **149** übersetzte Module | `dist_aarch64/`, gebaut für Python 3.13 |
-| **765** Slicer-Profile | damit eine frische Installation sofort schneiden kann |
 | **4** Bambu-Wurzelzertifikate | damit die Druckerverbindung wirklich geprüft wird |
 | **Weboberfläche** | fünf Sprachen, je 2313 Texte |
 | **~130 MB** | das ganze Repo |
@@ -327,12 +326,11 @@ Druckers mit Druckoptionen, Mehrfarb-Zuordnung und Vorschaubildern.
 
 <img src="docs/screenshots/slicer.png" width="380" align="right" alt="Slicer"/>
 
-OrcaSlicer läuft auf dem Server. STL oder STEP hineinziehen, Drucker, Düse und
-Qualität wählen — das Ergebnis geht direkt auf die SD-Karte.
+Bambu Studio läuft auf dem Server. STL oder STEP hineinziehen, Drucker, Düse,
+Filament und Qualität wählen — das Ergebnis geht direkt auf die SD-Karte.
 
-Die 765 Profile liegen diesem Repo bei, damit eine frische Installation sofort
-schneiden kann — kein Warten auf 965 Einzeldownloads von GitHub. Der Aktualisierer
-vergleicht danach nur noch.
+Die Profile sind die von Bambu Studio selbst, es muss vorher nichts geladen werden.
+Eigene Vorlagen aus dem Bambu-Konto holt ein Knopf dazu.
 
 ### 🔔 Benachrichtigungen
 
@@ -482,7 +480,7 @@ hat.
 
 1. **Systempakete** — Python 3.13 mit `venv` und `dev`, Bauwerkzeuge, Bild- und
    GPIO-Bibliotheken
-2. **OrcaSlicer** — aktuelle Fassung, zum Schneiden auf dem Server
+2. **Bambu Studio** — von Flathub, zum Schneiden auf dem Server
 3. **Docker** — nur, wenn es noch nicht da ist
 4. **Spoolman** — **eine vorhandene Installation bleibt unangetastet.** Läuft ein
    Container namens `spoolman`, oder antwortet etwas auf Port 7912, tritt der
@@ -666,7 +664,7 @@ eigenes mit, und auf dem Rechner wird keines benutzt oder verändert.
 
 <div align="center">
 
-**Version 2.3.0** · 🇬🇧 [English version](README.md)
+**Version 2.3.3** · 🇬🇧 [English version](README.md)
 
 Für die 3D-Druck-Gemeinde gemacht
 

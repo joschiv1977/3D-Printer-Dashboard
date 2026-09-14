@@ -2287,6 +2287,23 @@
                             <span id="maintenance-notification-info" data-i18n="settings_maintenance_info">Beispiel: alle 6 Stunden ab 00:00 meldet der Drucker um 00:00, 06:00, 12:00 und 18:00.</span>
                         </div>
                     </div>
+                    <!-- Vent reminder at print start: a server setting
+                         (notifications.vent_reminder), off by default. -->
+                    <div class="es-karte" data-requires="server" id="card-vent-reminder">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9.5h10M7 12h10M7 14.5h10"/></svg>
+                            <span data-i18n="settings_cover_card">Druckerabdeckung</span>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <b data-i18n="settings_vent_reminder">Lüftungs-Hinweis beim Druckstart</b>
+                                <span data-i18n="settings_vent_reminder_hint">Lüftungsschlitze der Abdeckung: zu bei ASA/ABS, auf bei PLA/PETG</span>
+                            </div>
+                            <div class="es-zeile-wert">
+                                <label class="es-schalter"><input type="checkbox" id="vent_reminder_enabled"><span></span></label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!------------ Appearance ------------>
                 <div class="es-abschnitt" id="section-darstellung">
@@ -2699,6 +2716,24 @@
                         <div class="es-block"><div id="health-issues-list" style="display:grid; gap:8px;"></div></div>
                     </div>
 
+                    <!--Server machine: what the server runs on. Read-only and
+                        for admins -- hidden until /api/system/host answers, and
+                        that answers admins only. Rows come from loadHostInfo();
+                        what the platform does not have, the server leaves out.-->
+                    <div class="es-karte" data-requires="server" id="host-info-card" style="display:none;">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="7" rx="1.5"/><rect x="4" y="14" width="16" height="7" rx="1.5"/><path d="M8 6.5h.01M8 17.5h.01"/></svg>
+                            <span data-i18n="host_title">Server-Rechner</span>
+                            <span class="es-rechts">
+                                <button class="es-knopf" onclick="loadHostInfo()">
+                                    <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+                                    <span data-i18n="refresh">Aktualisieren</span>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="host-info-rows"></div>
+                    </div>
+
                     <div class="es-raster">
                         <!--License-->
                         <div class="es-karte" data-requires="server" id="karte-lizenz">
@@ -3096,6 +3131,7 @@
             if (sectionId === 'system' && typeof loadHealthStatus === 'function') {
                 loadHealthStatus();
             }
+            if (sectionId === 'system') loadHostInfo();
             if (sectionId === 'aktualisierung') ladeUpdateStand();
             // The printer camera state is only polled while someone is
             // looking — otherwise a request would run every five seconds.
@@ -4674,6 +4710,9 @@
                 druckerSucheLaden();
             }
 
+            // Vent reminder at print start (server setting, off by default)
+            document.getElementById('vent_reminder_enabled').checked = config.notifications?.vent_reminder === true;
+
             // The Klipper printer (in single-printer mode: the first entry)
             const klipperList = config.klipper_printers || [];
             const klipperFirst = klipperList[0] || {};
@@ -5031,6 +5070,9 @@
                 hardware_button: {
                     enabled: document.getElementById('hardware_button_enabled').checked
                 },
+                notifications: {
+                    vent_reminder: document.getElementById('vent_reminder_enabled').checked
+                },
                 ustreamer: {
                     enabled: document.getElementById('camera_enabled').checked
                 },
@@ -5152,10 +5194,11 @@
             knopf.disabled = true;
             knopf.textContent = texts.settings_backup_running || 'Wird erstellt …';
             try {
-                const antwort = await fetch('/api/backup/create', {
+                // apiCall and not fetch: POST needs the CSRF token, and only
+                // apiCall sets one. A plain fetch got a 403 here (13sep26).
+                const antwort = await apiCall('/api/backup/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'same-origin',
                     body: JSON.stringify({ password: pw })
                 });
                 if (!antwort.ok) {
@@ -5196,6 +5239,20 @@
             }
         }
 
+        // The server names a stable code (`error_key` / `hint_key`) plus the
+        // values it needs (`name`, `found`, `supported`, `detail`) instead of
+        // a finished sentence -- built here from static/lang/*.js, exactly
+        // like the schedule-conflict messages elsewhere on this page.
+        function sicherungCodeText(schluessel, daten) {
+            const vorlage = schluessel && texts[schluessel];
+            if (!vorlage) return null;
+            return vorlage
+                .replace('{name}', daten.name ?? '')
+                .replace('{found}', daten.found ?? '?')
+                .replace('{supported}', daten.supported ?? '?')
+                .replace('{detail}', daten.detail ?? '');
+        }
+
         async function sicherungEinspielen() {
             const feld = document.getElementById('sicherung-datei');
             if (!feld.files || !feld.files.length) {
@@ -5210,16 +5267,20 @@
                 paket.append('file', feld.files[0]);
                 paket.append('password',
                     document.getElementById('sicherung-passwort-ein').value || '');
-                const antwort = await fetch('/api/backup/restore', {
-                    method: 'POST', credentials: 'same-origin', body: paket
+                // apiCall for the CSRF token; it leaves the multipart
+                // Content-Type to the browser.
+                const antwort = await apiCall('/api/backup/restore', {
+                    method: 'POST', body: paket
                 });
                 const e = await antwort.json();
                 if (!e.ok) {
-                    showError(e.error || texts.set_error || 'Fehler');
+                    showError(sicherungCodeText(e.error_key, e) || e.error
+                              || texts.set_error || 'Fehler');
                     return;
                 }
                 showSuccess(texts.settings_backup_staged || 'Sicherung liegt bereit');
-                if (e.hint) window.skToast && window.skToast(e.hint, 'info');
+                const hinweis = sicherungCodeText(e.hint_key, e);
+                if (hinweis) window.skToast && window.skToast(hinweis, 'info');
                 feld.value = '';
                 document.getElementById('sicherung-passwort-ein').value = '';
                 await sicherungStand();
@@ -5252,8 +5313,7 @@
 
         async function sicherungVerwerfen() {
             try {
-                await fetch('/api/backup/state',
-                            { method: 'DELETE', credentials: 'same-origin' });
+                await apiCall('/api/backup/state', { method: 'DELETE' });
                 await sicherungStand();
             } catch (e) {
                 showError(String(e));
@@ -5327,8 +5387,18 @@
                 ? (getText(schluessel, ersatz) || ersatz) : ersatz;
         }
 
-        function updateZustandText(zustand) {
-            const paar = UPDATE_TEXTE[zustand] || UPDATE_TEXTE.unknown;
+        // Why a check got no answer. Without it a licence the feed refused
+        // could only read "failed" -- and the server used to call it "up to
+        // date".
+        const UPDATE_GRUENDE = {
+            license_refused: ['update_failed_license_refused', 'abgelehnt – Lizenz für dieses Gerät nicht aktiv'],
+            unreachable:     ['update_failed_unreachable', 'Update-Server nicht erreichbar'],
+            bad_answer:      ['update_failed_bad_answer', 'ungültige Antwort vom Update-Server'],
+        };
+
+        function updateZustandText(zustand, grund) {
+            const paar = (zustand === 'failed' && UPDATE_GRUENDE[grund])
+                || UPDATE_TEXTE[zustand] || UPDATE_TEXTE.unknown;
             return uText(paar[0], paar[1]);
         }
 
@@ -5387,7 +5457,7 @@
             const suchen = document.getElementById('update-suchen');
             if (!marke) return;
 
-            marke.textContent = updateZustandText(stand.state);
+            marke.textContent = updateZustandText(stand.state, stand.reason);
             marke.className = updateMarkenKlasse(stand.state);
 
             if (stand.busy) {
@@ -5457,7 +5527,7 @@
             if (!zeile || !marke) return;
             clientStand = stand;
             zeile.style.display = '';
-            marke.textContent = updateZustandText(stand.state);
+            marke.textContent = updateZustandText(stand.state, stand.reason);
             marke.className = updateMarkenKlasse(stand.state);
 
             if (stand.busy) {
@@ -5700,6 +5770,170 @@
         }
 
         function spieleUpdateEin() { sucheUpdate(true); }
+
+        // ===== Server machine ================================================
+        // What the server runs on (services/host_info.py): machine, storage,
+        // certificate, tunnel, access, logs. Read-only and for admins -- the
+        // card stays hidden until /api/system/host answers, and it answers
+        // admins only. A fact the platform does not have is missing from the
+        // answer, and so its row is missing here: nothing reads "n/a".
+        function hostGroesse(bytes) {
+            const stufen = [['terabyte', 1e12], ['gigabyte', 1e9], ['megabyte', 1e6], ['kilobyte', 1e3]];
+            for (const [einheit, faktor] of stufen) {
+                if (bytes >= faktor) {
+                    return new Intl.NumberFormat(currentLang, { style: 'unit', unit: einheit, maximumFractionDigits: 1 })
+                        .format(bytes / faktor);
+                }
+            }
+            return new Intl.NumberFormat(currentLang, { style: 'unit', unit: 'byte' }).format(bytes);
+        }
+
+        function hostDauer(sekunden) {
+            const tage = Math.floor(sekunden / 86400);
+            const stunden = Math.floor((sekunden % 86400) / 3600);
+            const minuten = Math.floor((sekunden % 3600) / 60);
+            if (tage > 0) {
+                return getText('host_duration_dh', '{d} T. {h} Std.')
+                    .replace('{d}', tage).replace('{h}', stunden);
+            }
+            return getText('host_duration_hm', '{h} Std. {m} Min.')
+                .replace('{h}', stunden).replace('{m}', minuten);
+        }
+
+        async function loadHostInfo() {
+            const karte = document.getElementById('host-info-card');
+            const ziel = document.getElementById('host-info-rows');
+            if (!karte || !ziel) return;
+            let daten;
+            try {
+                const antwort = await apiCall('/api/system/host');
+                // 403 for everyone but admins, 404 from a server without the
+                // route: the card is not for them.
+                if (!antwort.ok) {
+                    karte.style.display = 'none';
+                    return;
+                }
+                daten = await antwort.json();
+            } catch (e) {
+                console.warn('Server machine info not loaded:', e);
+                return;
+            }
+
+            const hat = (wert) => wert !== undefined && wert !== null && wert !== '';
+            const marke = (text, art) => {
+                const m = document.createElement('span');
+                m.className = 'es-marke' + (art ? ' es-marke--' + art : '');
+                m.textContent = text;
+                return m;
+            };
+            // One row: the name (and a small line under it) left, the value
+            // or a badge/button right -- the rows of the health card.
+            const zeile = (name, wert, unten, rechts) => {
+                const reihe = document.createElement('div');
+                reihe.className = 'es-zeile';
+                const links = document.createElement('div');
+                links.className = 'es-zeile-name';
+                const b = document.createElement('b');
+                b.textContent = name;
+                links.appendChild(b);
+                if (hat(unten)) {
+                    const s = document.createElement('span');
+                    s.textContent = unten;
+                    links.appendChild(s);
+                }
+                reihe.appendChild(links);
+                const wertTeil = document.createElement('div');
+                wertTeil.className = 'es-zeile-wert';
+                if (hat(wert)) {
+                    const w = document.createElement('span');
+                    w.className = 'es-wert';
+                    w.textContent = wert;
+                    wertTeil.appendChild(w);
+                }
+                if (rechts) wertTeil.appendChild(rechts);
+                reihe.appendChild(wertTeil);
+                return reihe;
+            };
+            const teile = [];
+            // A group heading only when at least one of its rows is there.
+            const gruppe = (titel, zeilen) => {
+                const echte = zeilen.filter(Boolean);
+                if (!echte.length) return;
+                const kopf = document.createElement('div');
+                kopf.textContent = titel;
+                kopf.style.cssText = 'padding:12px 14px 4px; font-size:11px; font-weight:600; '
+                    + 'color:var(--text-secondary); text-transform:uppercase; letter-spacing:.05em;';
+                teile.push(kopf, ...echte);
+            };
+
+            const r = daten.machine || {};
+            gruppe(getText('host_group_machine', 'Rechner'), [
+                hat(r.hostname) && zeile(getText('host_name', 'Name'), r.hostname),
+                hat(r.os) && zeile(getText('host_os', 'System'), r.os),
+                hat(r.kernel) && zeile(getText('host_kernel', 'Kernel'), r.kernel),
+                hat(r.architecture) && zeile(getText('host_architecture', 'Architektur'), r.architecture),
+                hat(r.python) && zeile(getText('host_python', 'Python'), r.python),
+                hat(r.app_version) && zeile(getText('host_app_version', 'App-Fassung'), r.app_version),
+                hat(r.uptime_seconds) && zeile(getText('host_uptime_machine', 'Laufzeit Rechner'),
+                                               hostDauer(r.uptime_seconds)),
+                hat(r.service_uptime_seconds) && zeile(getText('host_uptime_service', 'Laufzeit Dienst'),
+                                                       hostDauer(r.service_uptime_seconds)),
+            ]);
+
+            const s = daten.storage || {};
+            const freiVon = (frei, gesamt) => getText('host_free_of', '{free} frei von {total}')
+                .replace('{free}', hostGroesse(frei)).replace('{total}', hostGroesse(gesamt));
+            gruppe(getText('host_group_storage', 'Speicher'), [
+                hat(s.disk_free) && hat(s.disk_total)
+                    && zeile(getText('host_disk', 'Datenträger'), freiVon(s.disk_free, s.disk_total)),
+                hat(s.ram_available) && hat(s.ram_total)
+                    && zeile(getText('host_ram', 'Arbeitsspeicher'), freiVon(s.ram_available, s.ram_total)),
+            ]);
+
+            const c = daten.certificate || {};
+            const namen = [...(c.names || []), ...(c.ips || [])];
+            gruppe(getText('host_group_certificate', 'Zertifikat'), [
+                hat(c.valid_until) && zeile(
+                    getText('host_valid_until', 'Gültig bis'), null,
+                    new Date(c.valid_until * 1000).toLocaleDateString(currentLang,
+                        { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                    c.needs_renewal
+                        ? marke(getText('host_renew_due', 'Erneuerung fällig'), 'warn')
+                        : (hat(c.days_left)
+                            ? marke(getText('host_days_left', 'noch {n} Tage').replace('{n}', c.days_left), 'gut')
+                            : null)),
+                namen.length > 0 && zeile(getText('host_cert_names', 'Adressen'), null, namen.join(', ')),
+            ]);
+
+            const tunnel = daten.tunnel || {};
+            gruppe(getText('host_group_tunnel', 'Tunnel'), [
+                hat(tunnel.running) && zeile(getText('host_cloudflared', 'cloudflared'), null, null,
+                    tunnel.running ? marke(getText('host_running', 'läuft'), 'gut')
+                                   : marke(getText('host_stopped', 'aus'))),
+            ]);
+
+            const zugang = daten.access || {};
+            const lan = (zugang.lan_addresses || [])
+                .map(a => (a.interface ? `${a.address} (${a.interface})` : a.address));
+            gruppe(getText('host_group_access', 'Zugang'), [
+                lan.length > 0 && zeile(getText('host_lan', 'Adressen im Heimnetz'), null, lan.join(' · ')),
+                hat(zugang.port) && zeile(getText('host_port', 'Port'), String(zugang.port)),
+                hat(zugang.external_domain)
+                    && zeile(getText('host_external_domain', 'Externe Domain'), zugang.external_domain),
+            ]);
+
+            const knopf = document.createElement('button');
+            knopf.className = 'es-knopf';
+            knopf.textContent = getText('host_logs_open', 'Öffnen');
+            knopf.onclick = () => { window.location.href = '/static/logs.html'; };
+            gruppe(getText('host_group_logs', 'Logs'), [
+                ...(daten.logs || []).map(l => zeile(l.name, hostGroesse(l.bytes || 0))),
+                zeile(getText('host_log_page', 'Log-Seite'), null, null, knopf),
+            ]);
+
+            ziel.replaceChildren(...teile);
+            karte.style.display = '';
+        }
 
         async function loadHealthStatus() {
             try {

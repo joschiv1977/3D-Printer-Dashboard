@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+  <channel>
+    <title>client (stable)</title>
+    <item>
+      <title>2.3.3</title>
+      <sparkle:version>2.3.3</sparkle:version>
+      <sparkle:shortVersionString>2.3.3</sparkle:shortVersionString>
+      <pubDate>Mon, 14 Sep 2026 19:23:17 +0000</pubDate>
+      <enclosure url="https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/client-stable-2.3.3/3D-Printer-Client-2.3.3.zip"
+                 length="2479229"
+                 type="application/octet-stream"
+                 sparkle:edSignature="2oo5PpoVCFojv5EP5qWHloea0PfjPif8sRgNK3+oA8sRzPgxOacKlMkQvjfMUiYS2Vqi3v1IeH/PgTXAZ1HJBw==" />
+    </item>
+  </channel>
+</rss>

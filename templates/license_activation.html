@@ -163,6 +163,13 @@
     yet exist. -->
 <script src="/static/js/modules/icons.js"></script>
 <script src="/static/js/modules/theme-manager.js"></script>
+{% if setup_completed %}
+<!-- Signed in: auth-handler supplies apiCall, which carries the CSRF token the
+     server demands of every write, as on every other page. Before the
+     first-run setup there is no user yet and the endpoints are open, while
+     auth-handler would send the visitor off to the login page. -->
+<script src="/static/auth-handler.js"></script>
+{% endif %}
 <script>
 // ─────────────────────────────────────────────────────────────────────
 // Sprache
@@ -255,6 +262,15 @@ async function kennungKopieren() {
     }
 }
 
+// Writes go through apiCall once auth-handler is loaded (after the setup):
+// it adds the CSRF token and renews it once on a 403. Before the setup
+// there is no user and no token, and plain fetch is all the open endpoints
+// need.
+function senden(adresse, optionen) {
+    return window.apiCall ? window.apiCall(adresse, optionen)
+                          : fetch(adresse, optionen);
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Aktivieren
 // ─────────────────────────────────────────────────────────────────────
@@ -269,7 +285,7 @@ async function lizenzAktivieren(e) {
     }
     arbeitet(knopf, true, ruhe);
     try {
-        const a = await fetch('/license/api/activate', {
+        const a = await senden('/license/api/activate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -293,7 +309,7 @@ async function lizenzDatei(e) {
     const daten = new FormData();
     daten.append('file', datei);
     try {
-        const a = await fetch('/license/api/upload', {
+        const a = await senden('/license/api/upload', {
             method: 'POST', credentials: 'include', body: daten
         });
         const d = await a.json().catch(function () { return {}; });
@@ -316,7 +332,7 @@ async function lizenzLoesen() {
         return;
     }
     try {
-        const a = await fetch('/license/api/deactivate', {
+        const a = await senden('/license/api/deactivate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'

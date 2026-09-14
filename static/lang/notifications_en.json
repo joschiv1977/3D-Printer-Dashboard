@@ -397,7 +397,18 @@
     },
     "mismatch": {
       "title": "Filament doesn't match",
-      "body": "{file} needs {wanted} — the tray holds {loaded}."
+      "body": "{file} needs {wanted} — the tray holds {loaded}.",
+      "body_colour": "{file} needs {wanted} in a different colour than the one in the tray."
+    }
+  },
+  "vent": {
+    "close": {
+      "title": "Close the vent slots",
+      "body": "Now {now}, before {before} — {file}"
+    },
+    "open": {
+      "title": "Open the vent slots again",
+      "body": "Now {now}, before {before} — {file}"
     }
   },
   "maintenance": {
@@ -525,6 +536,9 @@
     "unknown_model": "Unknown model: {model}",
     "file_param_missing": "file missing",
     "makerworld_maintenance": "MakerWorld is under maintenance right now — it will be back soon",
+    "makerworld_blocked": "MakerWorld is refusing automated requests right now (Cloudflare check) — try again later",
+    "makerworld_url_missing": "No download address was sent along",
+    "makerworld_bad_download_url": "That address does not belong to MakerWorld — refused",
     "makerworld_unreachable": "MakerWorld not reachable: {error}",
     "makerworld_sign_in": "MakerWorld refused — sign in to the Bambu account first",
     "makerworld_captcha": "MakerWorld wants a captcha — too many downloads in a short time. It clears itself after a while; already fetched models still work.",
@@ -539,6 +553,9 @@
     "makerworld_instance_missing": "The profile number (instance_id) is missing",
     "makerworld_no_slicer": "Bambu Studio not found — no slicer available",
     "makerworld_no_mirror": "The SD card mirror is not available",
-    "makerworld_upload_failed": "Sliced, but the file did not reach the printer"
+    "makerworld_upload_failed": "Sliced, but the file did not reach the printer",
+    "device_on": "{browser} on {os}",
+    "device_unknown_browser": "Unknown browser",
+    "device_unknown_os": "an unknown system"
   }
 }

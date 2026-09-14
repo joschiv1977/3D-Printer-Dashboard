@@ -2,8 +2,12 @@
 # 3D Printer Web App - Service Management (Cross-Platform: macOS + Linux)
 # Usage: ./manage.sh [COMMAND]
 #
-# Web App: start|stop|restart|status|logs|config|update|deploy
+# Web App: start|stop|restart|status|logs|config|update
 # System: pwa|health|info|cloudflare|access
+#
+# Developer-only commands (deploy, license server) live in manage.private.sh,
+# sourced below when that file sits next to this one -- never part of a
+# customer installation. See docs/bauen-und-veroeffentlichen.md 3.4.
 
 APP_NAME="printer-web-app"
 # Automatically detect app directory (where this script is located)
@@ -28,7 +32,6 @@ case "$OS_TYPE" in
         exit 1
         ;;
 esac
-
 
 # Farben
 RED='\033[0;31m'
@@ -100,33 +103,33 @@ start_camera_server() {
     fi
 
     if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-        print_status "Camera Server (go2rtc) bereits gestartet"
+        print_status "Camera server (go2rtc) already running"
         return
     fi
 
     if [ -f "$CAMERA_PLIST_FILE" ]; then
-        print_status "Starte Camera Server (go2rtc via launchctl)..."
+        print_status "Starting camera server (go2rtc via launchctl)..."
         launchctl load "$CAMERA_PLIST_FILE" 2>/dev/null
         sleep 2
         if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-            print_success "Camera Server (go2rtc) gestartet"
+            print_success "Camera server (go2rtc) started"
         else
-            print_error "Camera Server (go2rtc) konnte nicht gestartet werden"
+            print_error "Camera server (go2rtc) could not be started"
         fi
     else
-        print_warning "Camera LaunchAgent nicht gefunden: $CAMERA_PLIST_FILE"
+        print_warning "Camera LaunchAgent not found: $CAMERA_PLIST_FILE"
     fi
 }
 
 stop_camera_server() {
     if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-        print_status "Stoppe Camera Server (go2rtc)..."
+        print_status "Stopping the camera server (go2rtc)..."
         if [ -f "$CAMERA_PLIST_FILE" ]; then
             launchctl unload "$CAMERA_PLIST_FILE" 2>/dev/null
         fi
         pkill -f "$GO2RTC_MUSTER" 2>/dev/null
         sleep 1
-        print_success "Camera Server (go2rtc) gestoppt"
+        print_success "Camera server (go2rtc) stopped"
     fi
 }
 
@@ -149,56 +152,56 @@ is_service_running() {
 }
 
 start_service() {
-    print_status "Starte $APP_NAME..."
+    print_status "Starting $APP_NAME..."
     if $IS_MACOS; then
         start_camera_server
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
-            print_warning "Service bereits geladen - starte neu..."
+            print_warning "Service already loaded - restarting..."
             launchctl kickstart -k "gui/$(id -u)/$PLIST_LABEL"
         else
             launchctl load "$PLIST_FILE"
         fi
         sleep 3
         if is_service_running; then
-            print_success "Service gestartet!"
+            print_success "Service started!"
             show_access_info
         else
-            print_error "Service konnte nicht gestartet werden!"
-            echo "Prüfe Logs: tail -f $APP_DIR/logs/app-error.log"
+            print_error "Service could not be started!"
+            echo "Check the logs: tail -f $APP_DIR/logs/app-error.log"
             launchctl list "$PLIST_LABEL" 2>/dev/null
         fi
     else
         sudo systemctl start $SERVICE_NAME
         sleep 2
         if is_service_running; then
-            print_success "Service gestartet!"
+            print_success "Service started!"
             show_access_info
         else
-            print_error "Service konnte nicht gestartet werden!"
+            print_error "Service could not be started!"
             sudo systemctl status $SERVICE_NAME
         fi
     fi
 }
 
 stop_service() {
-    print_status "Stoppe $APP_NAME..."
+    print_status "Stopping $APP_NAME..."
     if $IS_MACOS; then
         stop_camera_server
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
             launchctl unload "$PLIST_FILE"
             sleep 1
-            print_success "Service gestoppt!"
+            print_success "Service stopped!"
         else
-            print_warning "Service war nicht geladen"
+            print_warning "Service was not loaded"
         fi
     else
         sudo systemctl stop $SERVICE_NAME
-        print_success "Service gestoppt!"
+        print_success "Service stopped!"
     fi
 }
 
 restart_service() {
-    print_status "Starte $APP_NAME neu..."
+    print_status "Restarting $APP_NAME..."
     if $IS_MACOS; then
         stop_camera_server
         start_camera_server
@@ -209,20 +212,20 @@ restart_service() {
         fi
         sleep 3
         if is_service_running; then
-            print_success "Service erfolgreich neu gestartet!"
+            print_success "Service restarted successfully!"
             show_access_info
         else
-            print_error "Neustart fehlgeschlagen!"
-            echo "Prüfe Logs: tail -f $APP_DIR/logs/app-error.log"
+            print_error "Restart failed!"
+            echo "Check the logs: tail -f $APP_DIR/logs/app-error.log"
         fi
     else
         sudo systemctl restart $SERVICE_NAME
         sleep 3
         if is_service_running; then
-            print_success "Service erfolgreich neu gestartet!"
+            print_success "Service restarted successfully!"
             show_access_info
         else
-            print_error "Neustart fehlgeschlagen!"
+            print_error "Restart failed!"
             sudo systemctl status $SERVICE_NAME
         fi
     fi
@@ -235,17 +238,17 @@ show_status() {
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
             launchctl list "$PLIST_LABEL"
             echo
-            # PID anzeigen
+            # Show the PID
             PID=$(launchctl list "$PLIST_LABEL" 2>/dev/null | grep '"PID"' | awk '{print $NF}' | tr -d ';')
             if [ -n "$PID" ] && [ "$PID" != "0" ]; then
-                print_success "Service läuft (PID: $PID)"
+                print_success "Service running (PID: $PID)"
             else
                 EXIT_CODE=$(launchctl list "$PLIST_LABEL" 2>/dev/null | grep 'LastExitStatus' | awk '{print $NF}' | tr -d ';')
-                print_error "Service nicht aktiv (LastExitStatus: $EXIT_CODE)"
+                print_error "Service not active (LastExitStatus: $EXIT_CODE)"
             fi
         else
-            print_error "Service nicht geladen"
-            echo "Starten mit: ./manage.sh start"
+            print_error "Service not loaded"
+            echo "Start it with: ./manage.sh start"
         fi
     else
         sudo systemctl status $SERVICE_NAME --no-pager
@@ -258,22 +261,22 @@ show_status() {
 
     echo -e "${BLUE}=== Network Connections ===${NC}"
     if $IS_MACOS; then
-        lsof -i :5555 -P -n 2>/dev/null | head -5 || echo "Port 5555 nicht gebunden"
+        lsof -i :5555 -P -n 2>/dev/null | head -5 || echo "Port 5555 not bound"
     else
-        sudo netstat -tlnp | grep :5555 || echo "Port 5555 nicht gebunden"
-        sudo netstat -tlnp | grep :443 || echo "Port 443 nicht gebunden"
+        sudo netstat -tlnp | grep :5555 || echo "Port 5555 not bound"
+        sudo netstat -tlnp | grep :443 || echo "Port 443 not bound"
     fi
 }
 
 show_logs() {
-    echo -e "${BLUE}=== Live Logs (Ctrl+C zum Beenden) ===${NC}"
+    echo -e "${BLUE}=== Live logs (Ctrl+C to quit) ===${NC}"
 
-    # Log-Datei Location (in data directory)
+    # Log file location (in the data directory)
     LOG_FILE="$APP_DIR/data/printer.log"
 
     if [ -f "$LOG_FILE" ]; then
-        echo -e "${YELLOW}Zeige Logs aus $LOG_FILE${NC}"
-        echo -e "${YELLOW}Die letzten 100 Zeilen + neue Einträge${NC}"
+        echo -e "${YELLOW}Showing the logs from $LOG_FILE${NC}"
+        echo -e "${YELLOW}The last 100 lines + new entries${NC}"
         echo
         tail -n 100 -f "$LOG_FILE"
     else
@@ -282,13 +285,13 @@ show_logs() {
             STDOUT_LOG="$APP_DIR/logs/app-stdout.log"
             ERROR_LOG="$APP_DIR/logs/app-error.log"
             if [ -f "$STDOUT_LOG" ]; then
-                echo -e "${YELLOW}Zeige App Logs${NC}"
+                echo -e "${YELLOW}Showing the app logs${NC}"
                 tail -n 100 -f "$STDOUT_LOG" "$ERROR_LOG" 2>/dev/null
             else
-                print_error "Keine Log-Dateien gefunden"
+                print_error "No log files found"
             fi
         else
-            echo -e "${YELLOW}Log-Datei nicht gefunden, verwende System-Logs${NC}"
+            echo -e "${YELLOW}Log file not found, using the system logs${NC}"
             sudo journalctl -u $SERVICE_NAME -n 100 -f --no-pager
         fi
     fi
@@ -296,7 +299,7 @@ show_logs() {
 
 edit_config() {
     if [ -f "$APP_DIR/data/config.json" ]; then
-        print_status "Öffne Konfiguration..."
+        print_status "Opening the configuration..."
         if $IS_MACOS; then
             # macOS: nano oder default editor
             nano "$APP_DIR/data/config.json"
@@ -304,26 +307,26 @@ edit_config() {
             sudo nano "$APP_DIR/data/config.json"
         fi
 
-        read -p "Konfiguration geändert? Service neu starten? (y/N): " -n 1 -r
+        read -p "Configuration changed? Restart the service? (y/N): " -n 1 -r
         echo
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             restart_service
         fi
     else
-        print_error "Konfigurationsdatei nicht gefunden: $APP_DIR/data/config.json"
+        print_error "Configuration file not found: $APP_DIR/data/config.json"
     fi
 }
 
 update_app() {
-    print_status "Aktualisiere App..."
+    print_status "Updating the app..."
 
-    # Backup der Konfiguration
+    # Back up the configuration
     if [ -f "$APP_DIR/data/config.json" ]; then
         cp "$APP_DIR/data/config.json" "$APP_DIR/data/config.json.backup"
-        print_status "Konfiguration gesichert"
+        print_status "Configuration backed up"
     fi
 
-    # Service stoppen
+    # Stop the service
     stop_service
 
     # Dependencies aktualisieren
@@ -331,30 +334,30 @@ update_app() {
     source venv/bin/activate
     pip install --upgrade -r requirements.txt
 
-    print_status "Gib neue App-Dateien ein (web_app.py, templates/index.html)"
-    read -p "Dateien aktualisiert? Weiter mit Enter..."
+    print_status "Put the new app files in place (web_app.py, templates/index.html)"
+    read -p "Files updated? Press Enter to continue..."
 
-    # Service wieder starten
+    # Start the service again
     start_service
 
-    print_success "Update abgeschlossen!"
+    print_success "Update complete!"
 }
 
 show_access_info() {
     IP_ADDRESS=$(get_ip_address)
     echo
-    echo -e "${GREEN}=== Zugriff auf Web App ===${NC}"
-    echo "🔒 Lokal HTTPS:    https://$IP_ADDRESS:5555"
+    echo -e "${GREEN}=== Access to the web app ===${NC}"
+    echo "🔒 Local HTTPS:    https://$IP_ADDRESS:5555"
     if [ -n "$EXTERNAL_DOMAIN" ]; then
-        echo "🌐 Extern:         https://$EXTERNAL_DOMAIN (via Cloudflare)"
-        echo "📱 Mobile Lokal:   https://$IP_ADDRESS:5555"
-        echo "📱 Mobile Extern:  https://$EXTERNAL_DOMAIN"
+        echo "🌐 External:       https://$EXTERNAL_DOMAIN (via Cloudflare)"
+        echo "📱 Mobile local:   https://$IP_ADDRESS:5555"
+        echo "📱 Mobile external: https://$EXTERNAL_DOMAIN"
     else
-        echo "📱 Mobile Lokal:   https://$IP_ADDRESS:5555"
+        echo "📱 Mobile local:   https://$IP_ADDRESS:5555"
     fi
-    echo "⚠️  Lokal: Selbst-signiertes Zertifikat -> 'Trotzdem fortfahren'"
+    echo "⚠️  Local: self-signed certificate -> 'Proceed anyway'"
     if [ -n "$EXTERNAL_DOMAIN" ]; then
-        echo "✅ Extern: Gültiges SSL via Cloudflare"
+        echo "✅ External: valid SSL via Cloudflare"
     fi
     echo
 }
@@ -390,38 +393,40 @@ show_system_info() {
     echo -e "${BLUE}=== Cloudflare Tunnel Status ===${NC}"
     if $IS_MACOS; then
         if pgrep -x cloudflared &>/dev/null; then
-            echo "Cloudflare Tunnel: ✅ Aktiv"
+            echo "Cloudflare tunnel: ✅ active"
         elif brew services list 2>/dev/null | grep cloudflared | grep -q started; then
-            echo "Cloudflare Tunnel: ✅ Aktiv (brew service)"
+            echo "Cloudflare tunnel: ✅ active (brew service)"
         else
-            echo "Cloudflare Tunnel: ❌ Nicht aktiv"
+            echo "Cloudflare tunnel: ❌ not active"
         fi
     else
         if sudo systemctl is-active --quiet cloudflared; then
-            echo "Cloudflare Tunnel: ✅ Aktiv"
+            echo "Cloudflare tunnel: ✅ active"
         else
-            echo "Cloudflare Tunnel: ❌ Nicht aktiv"
+            echo "Cloudflare tunnel: ❌ not active"
         fi
     fi
     if [ -n "$EXTERNAL_DOMAIN" ]; then
-        echo "Externe URL: https://$EXTERNAL_DOMAIN"
+        echo "External URL: https://$EXTERNAL_DOMAIN"
     fi
 
     echo
     echo -e "${BLUE}=== SSL Certificate ===${NC}"
-    if [ -f "$APP_DIR/data/cert.pem" ]; then
-        echo "Certificate: $APP_DIR/data/cert.pem ✅"
-        echo "Private Key: $APP_DIR/data/key.pem ✅"
-        # Ablaufdatum anzeigen
-        EXPIRY=$( openssl x509 -enddate -noout -in "$APP_DIR/data/cert.pem" 2>/dev/null | cut -d= -f2 )
+    # Where the server keeps them (services/paths.zertifikatsordner).
+    CERT_DIR="$APP_DIR/data/certs"
+    if [ -f "$CERT_DIR/cert.pem" ]; then
+        echo "Certificate: $CERT_DIR/cert.pem ✅"
+        echo "Private Key: $CERT_DIR/key.pem ✅"
+        # Show the expiry date
+        EXPIRY=$( openssl x509 -enddate -noout -in "$CERT_DIR/cert.pem" 2>/dev/null | cut -d= -f2 )
         if [ -n "$EXPIRY" ]; then
-            echo "Gültig bis: $EXPIRY"
+            echo "Valid until: $EXPIRY"
         fi
-        if [ -f "$APP_DIR/data/cert.cer" ]; then
-            echo "Windows Cert: $APP_DIR/data/cert.cer ✅"
+        if [ -f "$CERT_DIR/ca-cert.pem" ]; then
+            echo "Root CA:     $CERT_DIR/ca-cert.pem ✅ (trust it once on each device)"
         fi
     else
-        print_error "SSL-Zertifikat nicht gefunden in $APP_DIR/data/"
+        print_error "SSL certificate not found in $CERT_DIR/ — the server creates it on its next start"
     fi
 
     echo
@@ -442,8 +447,8 @@ show_system_info() {
     echo
     echo -e "${BLUE}=== Port Status ===${NC}"
     if $IS_MACOS; then
-        lsof -i :5555 -P -n 2>/dev/null | grep LISTEN | head -3 || echo "  Port 5555 nicht gebunden"
-        lsof -i :443 -P -n 2>/dev/null | grep LISTEN | head -3 || echo "  Port 443 nicht gebunden"
+        lsof -i :5555 -P -n 2>/dev/null | grep LISTEN | head -3 || echo "  Port 5555 not bound"
+        lsof -i :443 -P -n 2>/dev/null | grep LISTEN | head -3 || echo "  Port 443 not bound"
     else
         sudo netstat -tlnp | grep -E ":80|:443|:5555|:8883|:8888" | while read line; do
             echo "  $line"
@@ -452,15 +457,26 @@ show_system_info() {
 }
 
 setup_pwa() {
-    print_status "Richte PWA-Unterstützung ein..."
+    print_status "Setting up PWA support..."
     echo
 
-    # Zertifikat Check und erstellen falls nötig
-    if [ ! -f "$APP_DIR/data/cert.pem" ]; then
-        print_warning "Kein SSL-Zertifikat gefunden - erstelle neues..."
-        mkdir -p "$APP_DIR/data"
-
-        # PWA-Zertifikat erstellen
+    # The server makes its certificate itself on start (services/cert_manager,
+    # signed by its own root CA in data/certs/). A second one built here would
+    # carry a CA of its own that no device trusts -- and it landed in data/,
+    # where the server never looks.
+    if [ ! -f "$APP_DIR/data/certs/cert.pem" ]; then
+        print_warning "No SSL certificate yet - the server creates it on start..."
+        restart_service
+        sleep 5
+        if [ -f "$APP_DIR/data/certs/cert.pem" ]; then
+            print_success "Certificate created: $APP_DIR/data/certs/cert.pem"
+        else
+            print_error "Still no certificate - see: sudo journalctl -u $SERVICE_NAME"
+        fi
+    else
+        print_success "SSL certificate already present"
+    fi
+    if false; then
         "$APP_DIR/venv/bin/python3" - << 'PYEOF'
 from cryptography import x509
 from cryptography.x509.oid import NameOID
@@ -513,44 +529,44 @@ with open(os.path.join(data_dir, "key.pem"), "wb") as f:
         serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
         serialization.NoEncryption()
     ))
-print(f"PWA-Zertifikat erstellt fuer IP: {local_ip}")
+print(f"PWA certificate created for IP: {local_ip}")
 PYEOF
 
         restart_service
-        print_success "Neues SSL-Zertifikat erstellt und Service neu gestartet"
+        print_success "New SSL certificate created and the service restarted"
     else
-        print_success "SSL-Zertifikat bereits vorhanden"
+        print_success "SSL certificate already present"
     fi
 
     IP_ADDRESS=$(get_ip_address)
     echo
-    echo -e "${BLUE}=== PWA Setup Anleitung ===${NC}"
+    echo -e "${BLUE}=== PWA setup guide ===${NC}"
     echo
-    echo -e "${YELLOW}Schritt 1 - Hosts-Datei:${NC}"
+    echo -e "${YELLOW}Step 1 - the hosts file:${NC}"
     if $IS_MACOS; then
         echo "sudo nano /etc/hosts"
     else
-        echo "Als Administrator: C:\\Windows\\System32\\drivers\\etc\\hosts"
+        echo "As administrator: C:\\Windows\\System32\\drivers\\etc\\hosts"
     fi
-    echo "Zeile hinzufügen: $IP_ADDRESS    3d-printer.local"
+    echo "Add this line: $IP_ADDRESS    3d-printer.local"
     echo
 
-    echo -e "${YELLOW}Schritt 2 - Zertifikat installieren:${NC}"
+    echo -e "${YELLOW}Step 2 - install the certificate:${NC}"
     if $IS_MACOS; then
         echo "sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain $APP_DIR/data/cert.pem"
     else
         if [ -f "$APP_DIR/data/cert.cer" ]; then
             echo "Download: scp user@$IP_ADDRESS:$APP_DIR/data/cert.cer ."
-            echo "PowerShell (als Admin): Import-Certificate -FilePath cert.cer -CertStoreLocation Cert:\\LocalMachine\\Root"
+            echo "PowerShell (as admin): Import-Certificate -FilePath cert.cer -CertStoreLocation Cert:\\LocalMachine\\Root"
         fi
     fi
     echo
 
-    echo -e "${YELLOW}Schritt 3 - PWA Installation:${NC}"
-    echo "1. https://3d-printer.local:5555 aufrufen"
-    echo "2. 'Trotzdem fortfahren' bei Zertifikatswarnung"
-    echo "3. Chrome: ... -> App installieren"
-    echo "4. Safari: Teilen -> Zum Home-Bildschirm (iOS)"
+    echo -e "${YELLOW}Step 3 - PWA installation:${NC}"
+    echo "1. Open https://3d-printer.local:5555"
+    echo "2. Choose 'Proceed anyway' on the certificate warning"
+    echo "3. Chrome: ... -> Install app"
+    echo "4. Safari: Share -> Add to Home Screen (iOS)"
     echo
 }
 
@@ -559,69 +575,69 @@ check_health() {
 
     # Service Status
     if is_service_running; then
-        print_success "Service läuft"
+        print_success "Service running"
     else
-        print_error "Service nicht aktiv"
+        print_error "Service not active"
     fi
 
     # Port Check
     if $IS_MACOS; then
         if lsof -i :5555 -P -n 2>/dev/null | grep -q LISTEN; then
-            print_success "Port 5555 gebunden"
+            print_success "Port 5555 bound"
         else
-            print_error "Port 5555 nicht erreichbar"
+            print_error "Port 5555 unreachable"
         fi
     else
         if sudo netstat -tlnp | grep -q :5555; then
-            print_success "Port 5555 gebunden"
+            print_success "Port 5555 bound"
         else
-            print_error "Port 5555 nicht erreichbar"
+            print_error "Port 5555 unreachable"
         fi
     fi
 
     # SSL Check
     if [ -f "$APP_DIR/data/cert.pem" ] && [ -f "$APP_DIR/data/key.pem" ]; then
-        print_success "SSL-Zertifikat vorhanden"
+        print_success "SSL certificate present"
         # Check expiry
         if $IS_MACOS || command -v openssl &>/dev/null; then
             EXPIRY_DATE=$(openssl x509 -enddate -noout -in "$APP_DIR/data/cert.pem" 2>/dev/null | cut -d= -f2)
             if [ -n "$EXPIRY_DATE" ]; then
-                echo "         Gültig bis: $EXPIRY_DATE"
+                echo "         Valid until: $EXPIRY_DATE"
             fi
         fi
     else
-        print_error "SSL-Zertifikat fehlt (in $APP_DIR/data/)"
+        print_error "SSL certificate missing (in $APP_DIR/data/)"
     fi
 
     # Config Check
     if [ -f "$APP_DIR/data/config.json" ]; then
         if "$APP_DIR/venv/bin/python3" -c "import json; json.load(open('$APP_DIR/data/config.json'))" 2>/dev/null; then
-            print_success "Konfiguration gültig"
+            print_success "Configuration valid"
         else
-            print_error "Konfiguration fehlerhaft"
+            print_error "Configuration broken"
         fi
     else
-        print_error "Konfigurationsdatei fehlt"
+        print_error "Configuration file missing"
     fi
 
     # HTTPS Check
     HTTP_CODE=$(curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 https://localhost:5555)
     if [ "$HTTP_CODE" == "200" ] || [ "$HTTP_CODE" == "302" ] || [ "$HTTP_CODE" == "301" ]; then
-        print_success "HTTPS Endpoint erreichbar (Code: $HTTP_CODE)"
+        print_success "HTTPS endpoint reachable (code: $HTTP_CODE)"
     else
         IP_ADDRESS=$(get_ip_address)
         HTTP_CODE2=$(curl -k -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "https://$IP_ADDRESS:5555")
         if [ "$HTTP_CODE2" == "200" ] || [ "$HTTP_CODE2" == "302" ] || [ "$HTTP_CODE2" == "301" ]; then
-            print_success "HTTPS Endpoint erreichbar via IP (Code: $HTTP_CODE2)"
+            print_success "HTTPS endpoint reachable via IP (code: $HTTP_CODE2)"
         else
-            print_warning "HTTPS Endpoint nicht testbar (Code: localhost=$HTTP_CODE, IP=$HTTP_CODE2)"
+            print_warning "HTTPS endpoint not testable (code: localhost=$HTTP_CODE, IP=$HTTP_CODE2)"
             if [ -n "$EXTERNAL_DOMAIN" ]; then
-                print_status "   Teste externe URL..."
+                print_status "   Testing the external URL..."
                 HTTP_CODE3=$(curl -s -o /dev/null -w "%{http_code}" --connect-timeout 5 "https://$EXTERNAL_DOMAIN")
                 if [ "$HTTP_CODE3" == "200" ] || [ "$HTTP_CODE3" == "301" ] || [ "$HTTP_CODE3" == "302" ]; then
-                    print_success "   Externe URL erreichbar"
+                    print_success "   External URL reachable"
                 else
-                    print_error "   Auch externe URL nicht erreichbar"
+                    print_error "   External URL unreachable too"
                 fi
             fi
         fi
@@ -630,15 +646,15 @@ check_health() {
     # Cloudflare Tunnel Check
     if $IS_MACOS; then
         if pgrep -x cloudflared &>/dev/null; then
-            print_success "Cloudflare Tunnel läuft"
+            print_success "Cloudflare tunnel running"
         else
-            print_warning "Cloudflare Tunnel nicht aktiv"
+            print_warning "Cloudflare tunnel not active"
         fi
     else
         if sudo systemctl is-active --quiet cloudflared; then
-            print_success "Cloudflare Tunnel läuft"
+            print_success "Cloudflare tunnel running"
         else
-            print_warning "Cloudflare Tunnel nicht aktiv"
+            print_warning "Cloudflare tunnel not active"
         fi
     fi
 
@@ -649,25 +665,25 @@ check_health() {
         DISK_USAGE=$(df "$APP_DIR" | awk 'NR==2 {print $5}' | sed 's/%//')
     fi
     if [ -n "$DISK_USAGE" ] && [ "$DISK_USAGE" -lt 90 ] 2>/dev/null; then
-        print_success "Festplattenspeicher OK ($DISK_USAGE%)"
+        print_success "Disk space OK ($DISK_USAGE%)"
     elif [ -n "$DISK_USAGE" ]; then
-        print_warning "Festplattenspeicher knapp ($DISK_USAGE%)"
+        print_warning "Disk space tight ($DISK_USAGE%)"
     fi
 
     # App Process Check
     echo
     PROCESS_COUNT=$(pgrep -f "start\.py" | wc -l | tr -d ' ')
     if [ "$PROCESS_COUNT" -gt 0 ]; then
-        print_success "App Prozess läuft ($PROCESS_COUNT)"
+        print_success "App process running ($PROCESS_COUNT)"
     else
-        print_error "Kein App-Prozess gefunden"
+        print_error "No app process found"
     fi
 
     # Memory Usage
     if $IS_MACOS; then
         MEM_MB=$(ps aux | grep "start\.py" | grep -v grep | awk '{sum += $6} END {printf "%.0f", sum/1024}')
         if [ -n "$MEM_MB" ] && [ "$MEM_MB" -gt 0 ] 2>/dev/null; then
-            print_success "App Speicherverbrauch: ${MEM_MB} MB"
+            print_success "App memory use: ${MEM_MB} MB"
         fi
     fi
 }
@@ -676,29 +692,29 @@ manage_cloudflare() {
     echo -e "${BLUE}=== Cloudflare Tunnel Management ===${NC}"
     echo
 
-    # Status anzeigen
+    # Show the status
     if $IS_MACOS; then
         if pgrep -x cloudflared &>/dev/null; then
-            print_success "Status: Läuft"
+            print_success "Status: running"
         else
-            print_warning "Status: Gestoppt"
+            print_warning "Status: stopped"
         fi
     else
         if sudo systemctl is-active --quiet cloudflared; then
-            print_success "Status: Läuft"
+            print_success "Status: running"
         else
-            print_warning "Status: Gestoppt"
+            print_warning "Status: stopped"
         fi
     fi
 
     echo
-    echo "1) Status anzeigen"
-    echo "2) Tunnel starten"
-    echo "3) Tunnel stoppen"
-    echo "4) Tunnel neustarten"
-    echo "5) Logs anzeigen"
+    echo "1) Show the status"
+    echo "2) Start the tunnel"
+    echo "3) Stop the tunnel"
+    echo "4) Restart the tunnel"
+    echo "5) Show the logs"
     echo
-    read -p "Auswahl (1-5): " choice
+    read -p "Choice (1-5): " choice
 
     case $choice in
         1)
@@ -711,28 +727,28 @@ manage_cloudflare() {
         2)
             if $IS_MACOS; then
                 brew services start cloudflared 2>/dev/null || launchctl load ~/Library/LaunchAgents/com.cloudflare.cloudflared.plist
-                print_success "Cloudflare Tunnel gestartet"
+                print_success "Cloudflare tunnel started"
             else
                 sudo systemctl start cloudflared
-                print_success "Cloudflare Tunnel gestartet"
+                print_success "Cloudflare tunnel started"
             fi
             ;;
         3)
             if $IS_MACOS; then
                 brew services stop cloudflared 2>/dev/null || launchctl unload ~/Library/LaunchAgents/com.cloudflare.cloudflared.plist
-                print_success "Cloudflare Tunnel gestoppt"
+                print_success "Cloudflare tunnel stopped"
             else
                 sudo systemctl stop cloudflared
-                print_success "Cloudflare Tunnel gestoppt"
+                print_success "Cloudflare tunnel stopped"
             fi
             ;;
         4)
             if $IS_MACOS; then
                 brew services restart cloudflared 2>/dev/null
-                print_success "Cloudflare Tunnel neu gestartet"
+                print_success "Cloudflare tunnel restarted"
             else
                 sudo systemctl restart cloudflared
-                print_success "Cloudflare Tunnel neu gestartet"
+                print_success "Cloudflare tunnel restarted"
             fi
             ;;
         5)
@@ -747,57 +763,9 @@ manage_cloudflare() {
             fi
             ;;
         *)
-            print_error "Ungültige Auswahl"
+            print_error "Invalid selection"
             ;;
     esac
-}
-
-# ==================== DEPLOY FUNKTIONEN ====================
-
-deploy_app() {
-    print_status "Deployment starten..."
-
-    # Source = Git Repo, Target = Prod Server
-    # Immer Einweg: Git Code → Prod (nie umgekehrt!)
-    SOURCE_DIR="$HOME/Github/3d-printer-web-app"
-    PROD_DIR="$HOME/printer-web-app"
-
-    # Wenn manage.sh aus dem Git-Repo läuft, deploy zum Prod-Verzeichnis
-    if [ -d "$APP_DIR/.git" ]; then
-        SOURCE_DIR="$APP_DIR"
-    fi
-
-    if [ "$SOURCE_DIR" = "$PROD_DIR" ]; then
-        print_error "Source und Prod sind identisch - Deploy nicht möglich"
-        echo "Source: $SOURCE_DIR"
-        echo "Prod:   $PROD_DIR"
-        return 1
-    fi
-
-    if [ ! -d "$SOURCE_DIR" ]; then
-        print_error "Source-Verzeichnis nicht gefunden: $SOURCE_DIR"
-        return 1
-    fi
-
-    if [ ! -d "$PROD_DIR" ]; then
-        print_error "Prod-Verzeichnis nicht gefunden: $PROD_DIR"
-        echo "Erstelle mit: mkdir -p $PROD_DIR"
-        return 1
-    fi
-
-    print_status "Sync von $SOURCE_DIR nach $PROD_DIR..."
-    rsync -av \
-          --exclude='venv' --exclude='__pycache__' \
-          --exclude='.git' --exclude='node_modules' \
-          --exclude='electron-app' --exclude='build' \
-          --exclude='data' --exclude='android' \
-          --exclude='iOS' --exclude='.idea' \
-          --exclude='macos_app' --exclude='timelapse' \
-          --exclude='logs' --exclude='*.pyc' \
-          --exclude='license_client' --exclude='license_server' \
-          "$SOURCE_DIR/" "$PROD_DIR/"
-    restart_service
-    print_success "Deployment erfolgreich! ($SOURCE_DIR → $PROD_DIR)"
 }
 
 # ==================== SERVER LOG COMMANDS (macOS) ====================
@@ -805,12 +773,12 @@ deploy_app() {
 show_server_logs() {
     echo -e "${BLUE}=== Server Logs ===${NC}"
     echo
-    echo "1) Stdout Log (App-Ausgabe)"
-    echo "2) Error Log (Fehler)"
-    echo "3) Beide Logs (live)"
-    echo "4) Letzte Fehler"
+    echo "1) Stdout log (the app output)"
+    echo "2) Error log"
+    echo "3) Both logs (live)"
+    echo "4) Recent errors"
     echo
-    read -p "Auswahl (1-4): " choice
+    read -p "Choice (1-4): " choice
 
     case $choice in
         1)
@@ -823,13 +791,13 @@ show_server_logs() {
             tail -n 50 -f "$APP_DIR/logs/app-stdout.log" "$APP_DIR/logs/app-error.log"
             ;;
         4)
-            echo -e "${RED}=== Letzte Fehler ===${NC}"
+            echo -e "${RED}=== Recent errors ===${NC}"
             grep -i -E "error|exception|traceback|critical" "$APP_DIR/logs/app-error.log" | tail -30
             echo
             grep -i -E "error|exception|traceback|critical" "$APP_DIR/logs/app-stdout.log" | tail -30
             ;;
         *)
-            print_error "Ungültige Auswahl"
+            print_error "Invalid selection"
             ;;
     esac
 }
@@ -837,9 +805,9 @@ show_server_logs() {
 # ==================== CLEAR LOGS ====================
 
 clear_logs() {
-    echo -e "${BLUE}=== Logs bereinigen ===${NC}"
+    echo -e "${BLUE}=== Clearing the logs ===${NC}"
     echo
-    echo "Folgende Logs werden geleert:"
+    echo "The following logs will be cleared:"
 
     TOTAL_SIZE=0
     for LOG in "$APP_DIR/logs/app-stdout.log" "$APP_DIR/logs/app-error.log" "$APP_DIR/data/printer.log"; do
@@ -850,7 +818,7 @@ clear_logs() {
     done
 
     echo
-    read -p "Logs wirklich leeren? (y/N): " -n 1 -r
+    read -p "Really empty the logs? (y/N): " -n 1 -r
     echo
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -859,9 +827,9 @@ clear_logs() {
                 > "$LOG"
             fi
         done
-        print_success "Logs geleert!"
+        print_success "Logs emptied!"
     else
-        print_status "Abgebrochen"
+        print_status "Cancelled"
     fi
 }
 
@@ -880,32 +848,43 @@ show_help() {
     echo "Usage: $0 [COMMAND]"
     echo
     echo -e "${GREEN}=== Web App Commands ===${NC}"
-    echo "  start           Startet den Web App Service"
-    echo "  stop            Stoppt den Web App Service"
-    echo "  restart         Startet den Service neu"
-    echo "  status          Zeigt Service-Status und Systeminfo"
-    echo "  logs            Zeigt Live-Logs (App)"
-    echo "  glogs           Gunicorn Log-Menü (stdout/error)"
-    echo "  config          Bearbeitet die Konfigurationsdatei"
-    echo "  update          Aktualisiert App und Dependencies"
-    echo "  deploy          Sync von Source + Service Restart"
-    echo "  clear-logs      Leert alle Log-Dateien"
+    echo "  start           Starts the web app service"
+    echo "  stop            Stops the web app service"
+    echo "  restart         Restarts the service"
+    echo "  status          Shows service status and system info"
+    echo "  logs            Shows the live logs (app)"
+    echo "  slogs           Gunicorn log menu (stdout/error)"
+    echo "  config          Edits the configuration file"
+    echo "  update          Updates the app and its dependencies"
+    echo "  clear-logs      Empties every log file"
     echo
     echo -e "${GREEN}=== System Commands ===${NC}"
-    echo "  cloudflare      Verwaltet Cloudflare Tunnel"
-    echo "  pwa             PWA-Setup Anleitung und Zertifikat"
-    echo "  health          Führt System-Health-Check durch"
-    echo "  info            Zeigt detaillierte Systeminfos"
-    echo "  access          Zeigt Zugriffsinformationen"
+    echo "  cloudflare      Manages the Cloudflare tunnel"
+    echo "  pwa             PWA setup instructions and certificate"
+    echo "  health          Runs a system health check"
+    echo "  info            Shows detailed system info"
+    echo "  access          Shows the access information"
+
+    # manage.private.sh, when sourced above, defines this and lists the
+    # developer-only commands (deploy, license server) here.
+    if declare -f private_help >/dev/null 2>&1; then
+        private_help
+    fi
+
     echo
-    echo "Beispiele:"
-    echo "  $0 restart          # Service neu starten"
-    echo "  $0 logs             # App Live-Logs anzeigen"
-    echo "  $0 glogs            # Gunicorn Logs"
-    echo "  $0 health           # System prüfen"
-    echo "  $0 deploy           # Source-Dateien deployen"
-    echo "  $0 info             # Systeminfo anzeigen"
+    echo "Examples:"
+    echo "  $0 restart          # restart the service"
+    echo "  $0 logs             # show the app live logs"
+    echo "  $0 slogs            # the Gunicorn logs"
+    echo "  $0 health           # check the system"
+    echo "  $0 info             # show the system info"
 }
+
+# manage.private.sh carries commands no customer installation needs (deploy,
+# license server) -- see docs/bauen-und-veroeffentlichen.md 3.4. Sourced here,
+# after every helper it relies on (print_status, restart_service, ...) is
+# already defined, and before the dispatch below tries its commands.
+[ -f "$APP_DIR/manage.private.sh" ] && . "$APP_DIR/manage.private.sh"
 
 # ==================== HAUPTLOGIK ====================
 
@@ -919,7 +898,6 @@ case "$1" in
     slogs)      show_server_logs ;;
     config)     edit_config ;;
     update)     update_app ;;
-    deploy)     deploy_app ;;
     clear-logs) clear_logs ;;
 
     # Camera Commands (macOS)
@@ -934,6 +912,13 @@ case "$1" in
     cloudflare) manage_cloudflare ;;
     access)     show_access_info ;;
 
-    # Help
-    *)          show_help; exit 1 ;;
+    # Everything else: try the developer-only commands from manage.private.sh
+    # (deploy, license server) when that file is loaded, before giving up.
+    *)
+        if declare -f private_dispatch >/dev/null 2>&1 && private_dispatch "$@"; then
+            exit 0
+        fi
+        show_help
+        exit 1
+        ;;
 esac
