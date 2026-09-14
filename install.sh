@@ -868,12 +868,11 @@ install_system_deps() {
     PACKAGES="$PACKAGES build-essential gcc g++ cmake libssl-dev libffi-dev"
     PACKAGES="$PACKAGES libjpeg-dev zlib1g-dev libfreetype6-dev"
     PACKAGES="$PACKAGES ffmpeg libgpiod-dev python3-pil"
-    # For OrcaSlicer headless thumbnail generation. libgl1, not
-    # libgl1-mesa-glx: that one was a transitional package and is gone from
-    # Debian 13 and Ubuntu 24.04 -- and a single unknown name makes apt drop
-    # the WHOLE transaction ("has no installation candidate", exit 100), so
-    # nothing on this list got installed at all (14sep26).
-    PACKAGES="$PACKAGES xvfb libgl1"
+    # Every name here has to exist on Debian 13 and Ubuntu 24.04: a single
+    # unknown one makes apt drop the WHOLE transaction ("has no installation
+    # candidate", exit 100), and nothing on this list gets installed (14sep26,
+    # libgl1-mesa-glx). No xvfb/libgl1 any more -- they were for OrcaSlicer,
+    # which is gone; Bambu Studio runs as a Flatpak with its own runtime.
 
     print_status "Packages to install:"
     echo -e "${CYAN}   Python: python${PYTHON_VERSION}-venv, python${PYTHON_VERSION}-dev${NC}"

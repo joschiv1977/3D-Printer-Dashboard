@@ -191,18 +191,16 @@ echo -e "${CYAN}[→] Configuring required files...${NC}"
     # never matches any pattern here (see above).
     echo "/dist_${PLATFORM}/"
 
-    # Start scripts
+    # Start script
     echo "/start.py"
-    echo "/deploy_platform.py"
 
     # Installation scripts
     echo "/install.sh"
     echo "/manage.sh"
-    echo "/printer-web-app.service"
 
-    # Configuration
+    # Configuration. No docker-compose.yml: install.sh writes it itself
+    # (install_spoolman), a copy here only duplicated that.
     echo "/requirements.txt"
-    echo "/docker-compose.yml"
 
     # Assets (not compiled)
     echo "/static/"
@@ -222,8 +220,6 @@ echo -e "${CYAN}[→] Configuring required files...${NC}"
     echo "/README.md"
     echo "/README.de.md"
 
-    # Non-Python files still needed
-    echo "/BambuP1Streamer/"
     echo "/docs/"
 
 } > .git/info/sparse-checkout
@@ -259,7 +255,6 @@ echo -e "    ✓ dist_${PLATFORM}/ (${SO_COUNT} .so files)"
 echo
 echo -e "${GREEN}[✓] Downloaded files:${NC}"
 [ -f "start.py" ] && echo -e "    ✓ start.py" || echo -e "    ${RED}✗ start.py${NC}"
-[ -f "deploy_platform.py" ] && echo -e "    ✓ deploy_platform.py" || echo -e "    ${YELLOW}✗ deploy_platform.py (optional)${NC}"
 [ -f "install.sh" ] && echo -e "    ✓ install.sh" || echo -e "    ${RED}✗ install.sh${NC}"
 [ -f "requirements.txt" ] && echo -e "    ✓ requirements.txt" || echo -e "    ${RED}✗ requirements.txt${NC}"
 [ -d "static" ] && echo -e "    ✓ static/" || echo -e "    ${YELLOW}✗ static/${NC}"
@@ -283,7 +278,6 @@ fi
 # Make scripts executable
 chmod +x install.sh
 chmod +x start.py 2>/dev/null || true
-chmod +x deploy_platform.py 2>/dev/null || true
 
 # Run installation with sudo
 echo
