@@ -7,19 +7,19 @@
     "files": [
       {
         "name": "Dashboard-Setup-2.3.7.exe",
-        "sha256": "c1e2243e27558b2696f2e3d6309dadae9314e0e06dcb251fc0a88e85ed8ab5a4",
-        "size": 104887411,
+        "sha256": "ded7c6c493b1551f21b9b06d85f3150640f6bbd6979e5b26505789c1b5423bfc",
+        "size": 104888063,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-Setup-2.3.7.exe"
       },
       {
         "name": "Dashboard-Setup-2.3.7.exe.blockmap",
-        "sha256": "e2c732dec9f0322a025e1285a483fa8130d2ad1df78ebec0798d7ea8503f1593",
-        "size": 110558,
+        "sha256": "2b619974dcffe4bb432bb8110961a0e76054cd8744c1f6e6244c2d6de41cda76",
+        "size": 110946,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-Setup-2.3.7.exe.blockmap"
       }
     ],
     "notes": null,
-    "issued": 1790533854
+    "issued": 1790540726
   },
-  "signature": "+j+3yLcCd1IbXvb5c57NOmjNzzlgMtgp4/pqZ3gZzWE7Thc+D5nEbJ+wFY9TsJeXoq/zjKieB6I0vT9B2GziBQ=="
+  "signature": "6XaflpLQLPZMlj9OUFHKh2Saj9ARxuhU6t64Xp6wbdQ/UqYBaU8Z+E46CheW4ZQLUUdk0oO2MDAGv+1xQSWkDA=="
 }

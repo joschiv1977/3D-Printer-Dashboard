@@ -7,19 +7,19 @@
     "files": [
       {
         "name": "Dashboard-2.3.7-arm64-mac.zip",
-        "sha256": "3eeebf6885ea07e85a3a0376ecc073a1cdda55c245a5f46d45ce331b09d7330f",
-        "size": 118423065,
+        "sha256": "04ed0b3ccd4b24c3ef4b87bb7e0877477c20b7fcd6a6d7dc14dbb7bfd04b194f",
+        "size": 118423921,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-2.3.7-arm64-mac.zip"
       },
       {
         "name": "Dashboard-2.3.7-arm64-mac.zip.blockmap",
-        "sha256": "259f36b37a9d80fce46fa97c5c0aa25e439ee46496cd87ee1bf225802d2e7f89",
-        "size": 123529,
+        "sha256": "7cb37c6d7be33dcffd1121b85361b61572ad3f463679a424e9207a62011cc7a0",
+        "size": 123392,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-2.3.7-arm64-mac.zip.blockmap"
       }
     ],
     "notes": null,
-    "issued": 1790533753
+    "issued": 1790540627
   },
-  "signature": "1YfL/KFBAuttRn/R/DOwisNaAM5/AOg2eo7arl1VCkdPzjT2n7Mhy6VhRTHERrPTnUYHV7ceMOTFuRhGjyagAQ=="
+  "signature": "Wv1UxPip9lfeffHOBABnYoIcefA66S7O96oIgyEz7SmvKD+esAV4XSRkCQxkCcSsx5W8POpV+jF5epgwFs2yAw=="
 }

@@ -1,8 +1,8 @@
 version: 2.3.7
 files:
   - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-Setup-2.3.7.exe
-    sha512: G/lsNAbpFn4VC4UlhOUmiHjEISU/YhE9sgbxykJG7sSL6Nuun4WCNVgqNHlG6vWKbgOYOJw1GBHbLxR8fynKYA==
-    size: 104887411
+    sha512: 9DwzmvMvhCV+kB/klh1RMGAgR+Qgg2pU7Z+c76Ty9RdyB5uImgziokebryEeg+KboSn699l4IScKZOoi/a0AzQ==
+    size: 104888063
 path: Dashboard-Setup-2.3.7.exe
-sha512: G/lsNAbpFn4VC4UlhOUmiHjEISU/YhE9sgbxykJG7sSL6Nuun4WCNVgqNHlG6vWKbgOYOJw1GBHbLxR8fynKYA==
-releaseDate: '2026-09-27T18:29:55.922Z'
+sha512: 9DwzmvMvhCV+kB/klh1RMGAgR+Qgg2pU7Z+c76Ty9RdyB5uImgziokebryEeg+KboSn699l4IScKZOoi/a0AzQ==
+releaseDate: '2026-09-27T20:24:29.125Z'

@@ -7,13 +7,13 @@
     "files": [
       {
         "name": "3D-Printer-Server-2.3.7-linux-arm64.tar.gz",
-        "sha256": "322c471d17e8e518cc2b4b8a9ae91504ee5a3175ceb7dbf22ed1de89f841ae83",
-        "size": 20847267,
+        "sha256": "e9b85a4b12805abac510ba0b9664af7697cd422e278d97f9c4f094eb029f2855",
+        "size": 20861004,
         "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.7/3D-Printer-Server-2.3.7-linux-arm64.tar.gz"
       }
     ],
     "notes": null,
-    "issued": 1790534102
+    "issued": 1790540972
   },
-  "signature": "/3ET7tMndRi35qjHpC0pkty50yy8vnRxZVSD6eBWVEjdnZXNGBLlT0+lpk218xM2vXTNx1Y1xBveqrqcVOnJDA=="
+  "signature": "TZRpg/yZFr9Kv7YfQrg+oIpxkNv4Z1BQeQvVSdseLIR9fkWrlTA0gm+YJYlwpWYKlAAw/N02M7AT87bMZ80hDA=="
 }
