@@ -106,42 +106,23 @@
         return { websocket: 'Web', fcm_ios: 'iOS', fcm_android: 'Android', fcm_electron: 'Desktop' }[c] || c;
     }
 
-    // The device's own name ("Mac mini (M4, 2024)"), not its platform.
-    // "read on Desktop" says nothing once there are two computers, and the
-    // server has known which one all along -- the id in `read_by` is the one
-    // from /api/auth/sessions. The rule lives in device-names.js; without
-    // that module the platform is still the answer.
-    function geraet(did) {
-        return window.deviceNames ? window.deviceNames.name(did)
-                                   : (did ? String(did).split(/[:_-]/)[0] : '?');
-    }
-
-    // As soon as any of the user's devices has marked the message, it counts as
-    // done everywhere -- otherwise a notice dismissed on the phone keeps
-    // blinking as unread in the browser.
+    // Dealt with -- the server says so, and it counts the same way for the
+    // number on the bell. Whoever did it, on whichever device: read on the
+    // phone means gone in the browser too (User 18sep26).
     function erledigt(n) {
-        return Object.keys(n.read_by || {}).length > 0
-            || Object.keys(n.dismissed_by || {}).length > 0;
+        return n.is_handled === true;
     }
 
+    // Who dealt with it -- the server resolves the names now
+    // (services/device_names.py) and sends them with every entry, newest
+    // first. The rule used to sit here alone, so Android and iOS could not
+    // name anybody (18sep26).
     function gelesenAuf(n) {
-        const alle = {};
-        for (const [did, ts] of Object.entries(n.read_by || {})) {
-            if (!alle[did] || alle[did] < ts) alle[did] = ts;
-        }
-        for (const [did, ts] of Object.entries(n.dismissed_by || {})) {
-            if (!alle[did] || alle[did] < ts) alle[did] = ts;
-        }
-        const eintraege = Object.entries(alle).sort((a, b) => b[1] - a[1]);
-        if (!eintraege.length) return '';
-        const plattformen = [];
-        for (const [did] of eintraege) {
-            const k = geraet(did);
-            if (!plattformen.includes(k)) plattformen.push(k);
-        }
+        const names = (n && n.handled_by) || [];
+        if (!names.length) return '';
         const wort = t('nb_read_on', 'gelesen auf');
-        if (plattformen.length <= 2) return `${wort} ${plattformen.join(', ')}`;
-        return `${wort} ${plattformen.slice(0, 2).join(', ')} +${plattformen.length - 2}`;
+        if (names.length <= 2) return `${wort} ${names.join(', ')}`;
+        return `${wort} ${names.slice(0, 2).join(', ')} +${names.length - 2}`;
     }
 
     function zeichne(container, meldungen, opt) {
@@ -178,9 +159,10 @@
                 </div>
                 <div class="nb-tat">
                     ${neu
-                        ? `<button class="nb-weg" data-weg="${sicher(n.id)}">
-                               <svg class="nb-ic" style="width:12px;height:12px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-                               ${sicher(t('nb_dismiss', 'Weg'))}
+                        ? `<button class="nb-weg" data-weg="${sicher(n.id)}"
+                                   title="${sicher(t('nb_dismiss', 'Weg'))}"
+                                   aria-label="${sicher(t('nb_dismiss', 'Weg'))}">
+                               <svg class="nb-ic" style="width:13px;height:13px" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
                            </button>`
                         /* When the footer already says "read on web",
                            braucht es rechts kein zweites "gelesen". */
@@ -197,20 +179,7 @@
             });
         }
 
-        // The names come from the server, the list must not wait for them:
-        // it draws at once with the platform and once more when the table is
-        // in. Only on the first pass -- afterwards the table answers straight
-        // away, and a second round would draw forever.
-        if (window.deviceNames && !namenGeholt) {
-            namenGeholt = true;
-            window.deviceNames.laden()
-                .then(() => zeichne(container, meldungen, opt))
-                .catch(() => {});
-        }
     }
-
-    //: Whether the name table has already been asked for, this page load.
-    let namenGeholt = false;
 
     window.notificationList = { zeichne, erledigt, zeit, kanal, ohneZeichen, t };
 })();

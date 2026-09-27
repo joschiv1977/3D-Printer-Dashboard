@@ -13,8 +13,11 @@ class PrintSchedulerManager {
         /** Does the file picker show the archive instead of the live list? */
         this.archivAktiv = false;
 
-        // Refresh the badge periodically
-        setInterval(() => this.updateScheduledPrintsBadge(), 30000);
+        // No periodic refresh: the server sends `scheduled_prints_changed`
+        // with the count on every change (routes/scheduled_prints.py), and
+        // socket-manager draws the badge from it. On a fresh connection the
+        // badge is fetched once, which also covers what was missed while the
+        // socket was down. Until 17sep26 this asked every 30 s on top.
     }
 
     // ========================================
@@ -79,7 +82,7 @@ class PrintSchedulerManager {
         document.getElementById('schedule-date').value = `${year}-${month}-${day}`;
         document.getElementById('schedule-time').value = `${hours}:${minutes}`;
 
-        console.log(texts.console_modal_opened_preset, {
+        console.log('Modal opened - Preset:', {
             datum: `${year}-${month}-${day}`,
             zeit: `${hours}:${minutes}`,
             lokalZeit: currentTime.toLocaleString('de-DE')
@@ -131,41 +134,20 @@ class PrintSchedulerManager {
             });
         }
 
-        // Only show the Spoolman container when connected
+        // The spool row -- the same building block as in the print dialog, so
+        // both suggest, warn and pick the same way. When editing, the saved
+        // spool is taken as it is.
         const spoolContainer = document.getElementById('schedule-spool-container');
-        if ((window.spoolmanManager && window.spoolmanManager.connected)) {
+        this.spoolRow = null;
+        spoolContainer.innerHTML = '';
+        if (window.spoolmanManager && window.spoolmanManager.connected && window.printPrepare) {
             spoolContainer.style.display = '';
-
-            // Fill the Spoolman selector
-            const scheduleSelector = document.getElementById('schedule-spool');
-            scheduleSelector.innerHTML = `<option value="">${texts.no_spool_selected}</option>`;
-
-            const mainSelector = document.getElementById('spool-selector');
-            if (mainSelector) {
-                for (let i = 1; i < mainSelector.options.length; i++) {
-                    const opt = mainSelector.options[i];
-                    scheduleSelector.innerHTML += `<option value="${opt.value}">${opt.text}</option>`;
-                }
-            }
-            // Preselect edit mode's spool, or the active spool.
-            if (prefill && prefill.spool_id != null) {
-                scheduleSelector.value = String(prefill.spool_id);
-            } else if (window.activeSpoolId != null) {
-                scheduleSelector.value = String(window.activeSpoolId);
-            }
-            scheduleSelector.onchange = () => this._aktualisierePlanButton();
-            const vorgewaehlt = (window.spoolmanManager && window.spoolmanManager.spools || [])
-                .find(x => String(x.id) === scheduleSelector.value);
-            this._spulKnopfBeschriften(vorgewaehlt || null);
-
-            // ...and only then ask what the FILE requires. This used to just
-            // default to the active spool: a PETG file would get the active
-            // PLA spool suggested. The matching now runs on the server
-            // (find_matching_spools) — the same function the immediate print
-            // uses, so there's only one opinion.
-            if (!(prefill && prefill.spool_id != null)) {
-                this._spuleVorschlagen(scheduleSelector);
-            }
+            this.spoolRow = window.printPrepare.spoolRow(spoolContainer, {
+                filename,
+                plate: 1,
+                presetId: (prefill && prefill.spool_id != null) ? prefill.spool_id : null,
+                onChange: () => this._aktualisierePlanButton(),
+            });
         } else {
             spoolContainer.style.display = 'none';
         }
@@ -174,100 +156,6 @@ class PrintSchedulerManager {
 
         // Load scheduled prints
         this.loadScheduledPrints();
-    }
-
-    /**
-     * Open the spool selection — the same window as in the
-     * material card, just with the file in tow: that way the matching
-     * spools appear at the top and carry their badge.
-     */
-    oeffneSpulenwahl() {
-        const selector = document.getElementById('schedule-spool');
-        window.openSpoolPicker({
-            datei: this.scheduledFileName,
-            plate: this.scheduledPlate || 1,
-            gewaehlt: selector && selector.value ? parseInt(selector.value, 10) : null,
-            onWahl: (spule) => {
-                if (!spule || !selector) return;
-                // The hidden list stays the source of truth for the
-                // send path — this just follows along.
-                selector.value = String(spule.id);
-                this._spulKnopfBeschriften(spule);
-                this._aktualisierePlanButton();
-            },
-        });
-    }
-
-    /** The button carries the chosen spool: color dot, name, material, remaining amount. */
-    _spulKnopfBeschriften(spule) {
-        const text = document.getElementById('schedule-spool-text');
-        const punkt = document.getElementById('schedule-spool-punkt');
-        if (!text) return;
-        const texts = window.texts || {};
-        if (!spule) {
-            text.textContent = texts.spool_choose || 'Spule wählen';
-            if (punkt) punkt.style.background = 'rgba(128,128,128,0.25)';
-            return;
-        }
-        const fil = spule.filament || {};
-        const hersteller = (fil.vendor && fil.vendor.name) || '';
-        text.textContent = [
-            [hersteller, fil.name].filter(Boolean).join(' '),
-            fil.material ? `(${fil.material})` : '',
-            `${Math.round(spule.remaining_weight || 0)} g`,
-        ].filter(Boolean).join(' · ');
-        if (punkt && fil.color_hex) {
-            punkt.style.background = '#' + String(fil.color_hex).replace('#', '').slice(0, 6);
-        }
-    }
-
-    /**
-     * Suggest a matching spool and set the hint below it.
-     *
-     * Three cases, three messages — guessing would be the worst thing to do here:
-     *   exactly one   → select it, green checkmark
-     *   several       → select the best one, name the count
-     *   none          → leave it alone, warn
-     */
-    _spuleVorschlagen(selector) {
-        const datei = this.scheduledFileName;
-        if (!datei || !selector) return;
-        const platte = this.scheduledPlate || 1;
-        const texts = window.texts || {};
-
-        window.apiCall(`/api/spoolman/match?file=${encodeURIComponent(datei)}&plate=${platte}`)
-            .then(r => r.json())
-            .then(daten => {
-                const hinweis = document.getElementById('schedule-spool-hinweis');
-                const treffer = (daten && daten.candidates) || [];
-                if (!hinweis) return;
-
-                if (!daten || !daten.wanted) { hinweis.style.display = 'none'; return; }
-
-                if (treffer.length === 0) {
-                    hinweis.className = 'sched-spulhinweis sched-spulhinweis--warnung';
-                    hinweis.textContent = (texts.spool_match_none
-                        || 'Keine passende Spule für {material} gefunden.')
-                        .replace('{material}', daten.wanted.material || '?');
-                    hinweis.style.display = '';
-                    return;
-                }
-
-                const beste = treffer[0].spool;
-                selector.value = String(beste.id);
-                this._spulKnopfBeschriften(beste);
-                this._aktualisierePlanButton();
-
-                const fil = beste.filament || {};
-                const name = [((fil.vendor || {}).name || ''), fil.name || ''].join(' ').trim();
-                hinweis.className = 'sched-spulhinweis';
-                hinweis.textContent = treffer.length === 1
-                    ? (texts.spool_match_one || 'Passend zur Datei: {spool}').replace('{spool}', name)
-                    : (texts.spool_match_many || '{n} Spulen passen — vorgewählt: {spool}')
-                        .replace('{n}', treffer.length).replace('{spool}', name);
-                hinweis.style.display = '';
-            })
-            .catch(() => { /* nothing to suggest without Spoolman */ });
     }
 
     // ========================================
@@ -320,7 +208,7 @@ class PrintSchedulerManager {
         const date = document.getElementById('schedule-date').value;
         const time = document.getElementById('schedule-time').value;
         const autoPower = document.getElementById('schedule-auto-power').checked;
-        const spoolId = document.getElementById('schedule-spool')?.value || null;
+        const spoolId = this.spoolRow ? this.spoolRow.spoolId() : null;
         // Options and plate come from the preparation step — the same
         // collection point as for the immediate print.
         const optionen = (typeof collectPrintOptions === 'function')
@@ -338,7 +226,7 @@ class PrintSchedulerManager {
             return;
         }
 
-        console.log(texts.console_schedule_debug, { date, time, scheduledFileName: this.scheduledFileName, scheduledFileLocation: this.scheduledFileLocation });
+        console.log('Schedule Debug:', { date, time, scheduledFileName: this.scheduledFileName, scheduledFileLocation: this.scheduledFileLocation });
 
         if (!date || !time) {
             skToast(texts.toast_select_datetime, 'warning');
@@ -358,14 +246,14 @@ class PrintSchedulerManager {
         const now = new Date();
         now.setSeconds(0, 0); // Ignore seconds for comparison
 
-        console.log(texts.console_time_comparison, {
+        console.log('Time comparison:', {
             geplant: scheduledDateTime.toISOString(),
             jetzt: now.toISOString(),
             istZukunft: scheduledDateTime > now
         });
 
         if (scheduledDateTime < now) {
-            console.log(texts.console_error_time_past);
+            console.log('ERROR: Time is in the past!');
             window.skToast(texts.alert_scheduled_future.replace('{scheduled}', scheduledDateTime.toLocaleString(window.currentLang === 'de' ? 'de-DE' : 'en-US')).replace('{now}', now.toLocaleString(window.currentLang === 'de' ? 'de-DE' : 'en-US')), 'warning');
             skToast(texts.toast_future_time_required, 'warning');
             return;
@@ -528,7 +416,7 @@ class PrintSchedulerManager {
                 return;
             }
 
-            console.error(texts.console_error_scheduling + ':', error);
+            console.error('Error scheduling:', error);
             const errorDiv = document.getElementById('schedule-error');
             const errorText = document.getElementById('schedule-error-text');
             errorText.textContent = (texts.sched_error_planning || 'Fehler beim Planen: {error}').replace('{error}', error.message || error);
@@ -701,7 +589,7 @@ class PrintSchedulerManager {
                 return;
             }
         } catch (error) {
-            console.error(texts.console_error_loading_spools + ':', error);
+            console.error('Error loading spools:', error);
             window.skToast(texts.error_loading_spools, 'error');
             modal.remove();
             return;
@@ -709,6 +597,9 @@ class PrintSchedulerManager {
 
         const listDiv = document.getElementById('filament-mapping-list');
         const descEl = document.getElementById('mf-description');
+        // The chosen spool per filament index -- the buttons show it, the
+        // start reads it.
+        const wahl = new Map();
 
         const renderFilamentList = () => {
             const visible = getVisibleFilaments();
@@ -718,48 +609,60 @@ class PrintSchedulerManager {
                 descEl.textContent = texts.multifilament_description.replace('{count}', visible.length);
             }
             listDiv.innerHTML = '';
+            // What a plate shows is chosen again; a spool picked for a filament
+            // of another plate must not block the suggestion here.
+            const sichtbar = new Set(visible.map(f => f.index));
+            wahl.forEach((_, index) => { if (!sichtbar.has(index)) wahl.delete(index); });
+            wahl.forEach(spule => vergeben.add(spule.id));
+            // Names and colours come out of the 3MF file -- data, not markup.
+            const esc = (v) => String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const punkt = (c) => (/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(String(c || ''))
+                ? (String(c)[0] === '#' ? c : '#' + c) : '#888888');
             visible.forEach(fil => {
                 // One row per filament: colour, name and type on the left,
-                // the spool picker on the right. Every filament used to be a
-                // grey box of its own with a heading inside it.
+                // the spool on the right -- a button that opens the same big
+                // window as the material card and the single-spool planning.
                 const filDiv = document.createElement('div');
                 filDiv.className = 'ui-zeile';
                 filDiv.innerHTML = `
                     <span class="ui-zeile-name">
-                        <span class="mf-punkt" style="background:${fil.color};"></span>
-                        <span class="mf-name">${fil.name}</span>
-                        <span class="mf-typ">${fil.type}</span>
+                        <span class="mf-punkt" style="background:${punkt(fil.color)};"></span>
+                        <span class="mf-name">${esc(fil.name)}</span>
+                        <span class="mf-typ">${esc(fil.type)}</span>
                     </span>
-                    <select id="spool-select-${fil.index}" class="sd-spool-select mf-wahl">
-                        <option value="">${texts.please_select}</option>
-                    </select>
+                    <button type="button" class="mz-spulknopf mf-wahl">
+                        <span class="mz-spulknopf__punkt"></span>
+                        <span class="mf-wahl-text"></span>
+                        <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                    </button>
                 `;
 
                 listDiv.appendChild(filDiv);
 
-                const select = document.getElementById(`spool-select-${fil.index}`);
-
-                // Fill the dropdown with the spools loaded earlier
-                spools.forEach(spool => {
-                    const filament = spool.filament || {};
-                    const vendor = filament.vendor?.name || '';
-                    const name = filament.name || 'Unbekannt';
-                    const remaining = spool.remaining_weight || 0;
-
-                    const displayName = vendor ? `${vendor} ${name}` : name;
-                    const option = document.createElement('option');
-                    option.value = spool.id;
-                    option.textContent = `${displayName} (${remaining.toFixed(0)}g)`;
-                    option.dataset.material = this._material(filament.material);
-                    select.appendChild(option);
-                });
+                const knopf = filDiv.querySelector('.mf-wahl');
 
                 // Preselection: a matching material, then the nearest colour.
-                const treffer = this._besteSpule(fil, spools, vergeben);
-                if (treffer) {
-                    select.value = String(treffer.id);
-                    vergeben.add(treffer.id);
+                if (!wahl.has(fil.index)) {
+                    const treffer = this._besteSpule(fil, spools, vergeben);
+                    if (treffer) {
+                        wahl.set(fil.index, treffer);
+                        vergeben.add(treffer.id);
+                    }
                 }
+
+                const beschriften = () => {
+                    const spule = wahl.get(fil.index);
+                    const f = (spule && spule.filament) || {};
+                    knopf.querySelector('.mz-spulknopf__punkt').style.background = spule && f.color_hex
+                        ? punkt(f.color_hex) : '';
+                    knopf.querySelector('.mf-wahl-text').textContent = spule
+                        ? [[(f.vendor && f.vendor.name) || '', f.name || texts.unknown || 'Unbekannt']
+                            .filter(Boolean).join(' '),
+                           f.material ? `(${f.material})` : '',
+                           `${Math.round(spule.remaining_weight || 0)} g`].filter(Boolean).join(' · ')
+                        : (texts.please_select || 'Bitte wählen');
+                };
 
                 // A warning row under the choice. The material of the print
                 // stands small beside the name -- skimming it, a wrong spool
@@ -770,10 +673,10 @@ class PrintSchedulerManager {
                 filDiv.appendChild(warnung);
 
                 const pruefe = () => {
-                    const opt = select.options[select.selectedIndex];
-                    const gewaehlt = opt ? (opt.dataset.material || '') : '';
-                    const passt = !select.value || gewaehlt === this._material(fil.type);
-                    select.classList.toggle('mf-wahl--falsch', !passt);
+                    const spule = wahl.get(fil.index);
+                    const gewaehlt = spule ? this._material((spule.filament || {}).material) : '';
+                    const passt = !spule || gewaehlt === this._material(fil.type);
+                    knopf.classList.toggle('mf-wahl--falsch', !passt);
                     warnung.style.display = passt ? 'none' : '';
                     if (!passt) {
                         warnung.textContent = (texts.mf_material_mismatch
@@ -782,7 +685,25 @@ class PrintSchedulerManager {
                             .replace('{spule}', gewaehlt || '?');
                     }
                 };
-                select.addEventListener('change', pruefe);
+                knopf.addEventListener('click', () => {
+                    if (!window.openSpoolPicker) return;
+                    const material = this._material(fil.type);
+                    const gewaehlt = wahl.get(fil.index);
+                    window.openSpoolPicker({
+                        gewaehlt: gewaehlt ? gewaehlt.id : null,
+                        // The spools of the print's material come first, with
+                        // their badge -- the same as the file match elsewhere.
+                        treffer: spools.filter(s => material
+                            && this._material((s.filament || {}).material) === material).map(s => s.id),
+                        onWahl: (spule) => {
+                            if (!spule) return;
+                            wahl.set(fil.index, spule);
+                            beschriften();
+                            pruefe();
+                        },
+                    });
+                });
+                beschriften();
                 pruefe();
             });
         };
@@ -805,9 +726,9 @@ class PrintSchedulerManager {
 
             const visible = getVisibleFilaments();
             visible.forEach(fil => {
-                const select = document.getElementById(`spool-select-${fil.index}`);
-                if (select && select.value) {
-                    mapping[String(fil.index)] = parseInt(select.value);  // ← String() hinzugefügt!
+                const spule = wahl.get(fil.index);
+                if (spule) {
+                    mapping[String(fil.index)] = spule.id;
                 } else {
                     allSelected = false;
                 }
@@ -825,7 +746,7 @@ class PrintSchedulerManager {
                 window.pendingPlateOverride = selectedPlateIdx;
             }
 
-            console.log(texts.console_multifilament_mapping, mapping);
+            console.log('Multi-Filament Mapping:', mapping);
 
             if (mode === 'schedule') {
                 // SCHEDULE MODE: store only the mapping and open the schedule modal
@@ -853,6 +774,7 @@ class PrintSchedulerManager {
 
                 // Spoolman Container verstecken (da Multi-Filament)
                 document.getElementById('schedule-spool-container').style.display = 'none';
+                this.spoolRow = null;
 
                 // Draw the preparation -- the same view as everywhere else.
                 // This is where the multi-colour path arrives: the spool
@@ -946,7 +868,7 @@ class PrintSchedulerManager {
                 }
             })
             .catch(error => {
-                console.error(texts.console_error_loading_scheduled + ':', error);
+                console.error('Error loading scheduled prints:', error);
             });
     }
 
@@ -968,7 +890,7 @@ class PrintSchedulerManager {
                 }
             })
             .catch(error => {
-                console.error(texts.console_error + ':', error);
+                console.error('Error:', error);
                 skToast(texts.connection_error, 'error');
             });
         });
@@ -1472,7 +1394,7 @@ class PrintSchedulerManager {
                 }
             })
             .catch(error => {
-                console.error(texts.console_sd_files_error + ':', error);
+                console.error('SD files error:', error);
                 if (document.getElementById('schedule-sd-files')) {
                     document.getElementById('schedule-sd-files').innerHTML = `
                         <div class="sd-error-state">
@@ -1653,7 +1575,7 @@ class PrintSchedulerManager {
         const mapping = window.pendingScheduleMapping;
         const hasSpool = mapping
             ? Object.keys(mapping).length > 0 && Object.values(mapping).every(Boolean)
-            : !!document.getElementById('schedule-spool')?.value;
+            : !!(this.spoolRow && this.spoolRow.spoolId());
         const requiresSpool = !!(window.spoolmanManager && window.spoolmanManager.connected);
         button.disabled = requiresSpool && !hasSpool;
         button.title = button.disabled
@@ -1873,7 +1795,7 @@ window.schedulePrintFromArchive = async function (filename) {
         schedulePrintFromScheduleManager(filename, 'root');
     } catch (fehler) {
         skToast(texts.error || 'Fehler', 'error');
-        console.error('Archiv/Planen:', fehler);
+        console.error('Archive/schedule:', fehler);
     }
 };
 function editScheduledPrint(printId) { window.printScheduler.editScheduledPrint(printId); }

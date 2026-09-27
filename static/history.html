@@ -371,7 +371,6 @@
             confirm_delete_from_history: 'Möchten Sie diesen Druck wirklich aus der Historie löschen?',
             toast_print_deleted: 'Druck gelöscht',
             toast_error_deleting: 'Fehler beim Löschen',
-            console_delete_error: 'Fehler beim Löschen',
             console_history_error: 'Fehler beim Laden der Historie',
             settings_saved_msg: 'Einstellungen gespeichert',
             toast_error_saving: 'Fehler beim Speichern',
@@ -425,7 +424,6 @@
             stats_total_label: 'Gesamt',
             stats_print_time: 'Druckzeit',
             stats_prints_list_for: 'Drucke für {date}',
-            console_error_loading_daily_stats: 'Fehler beim Laden der Tagesstatistiken',
             stats_error_loading_data: 'Fehler beim Laden der Daten',
             detail_loading: 'Lade...',
             detail_overview_tab: 'Übersicht',
@@ -469,8 +467,6 @@
             detail_nozzle_diameter: 'Düsendurchmesser',
             detail_nozzle_changes: 'Düsenwechsel',
             detail_file_size: 'Dateigröße',
-            console_error_checking_timelapse: 'Fehler beim Prüfen des Timelapse',
-            console_detail_error: 'Fehler beim Laden der Details',
             alert_error_loading_details: 'Fehler beim Laden der Details',
             chart_label_progress: 'Fortschritt (%)',
             chart_label_nozzle: 'Düse (°C)',
@@ -484,20 +480,15 @@
             timelapse_no_video: 'Kein Timelapse verfügbar',
             timelapse_offline: 'Timelapse nur bei eingeschaltetem Drucker verfügbar',
             timelapse_not_activated: 'Timelapse war für diesen Druck nicht aktiviert',
-            console_error_loading_timelapse: 'Fehler beim Laden des Timelapse',
             timelapse_available_videos: 'Verfügbare Videos',
             timelapse_no_videos_found: 'Keine Videos gefunden',
-            console_error_loading_video_list: 'Fehler beim Laden der Videoliste',
             timelapse_error_loading_video_list: 'Fehler beim Laden der Videoliste',
-            console_error_loading_settings: 'Fehler beim Laden der Einstellungen',
-            console_error_saving: 'Fehler beim Speichern',
-            console_thumbnail_error: 'Thumbnail-Fehler',
             toast_no_data_reload: 'Keine Daten zum Aktualisieren'
         };
 
         // Initialize page
         // Version marker: shows in the console which build is actually running.
-        console.log('history.html Stand 20aug26 — Kosten-Aufschluesselung Filament/Strom');
+        console.log('history.html as of 20aug26 — cost breakdown filament/power');
         document.addEventListener('DOMContentLoaded', function() {
             if (window.tabBarManager) {
                 window.tabBarManager.render();
@@ -506,6 +497,14 @@
             // Direct link to an entry: /static/history.html?print=<id>
             // The homepage preview links here to the running print.
             // Slightly delayed so the list is already in place.
+            // /static/history.html?tab=statistics -- the home page's overview
+            // opens the statistics. The data arrives later; the tab renders
+            // itself then (loadHistory).
+            if (new URLSearchParams(location.search).get('tab') === 'statistics'
+                && typeof switchHistoryTab === 'function') {
+                switchHistoryTab('statistics');
+            }
+
             const gewuenscht = new URLSearchParams(location.search).get('print');
             if (gewuenscht) {
                 setTimeout(function() {
@@ -546,7 +545,7 @@
                     document.getElementById('hist_max_current').value = maxCurrent;
                 }
             } catch (error) {
-                console.error(texts.console_error_loading_settings + ':', error);
+                console.error('Error loading settings:', error);
                 costSettings.filament_per_kg = 25;
                 costSettings.power_per_kwh = 0.30;
             }
@@ -580,7 +579,7 @@
                     showWebToast(texts.toast_error_saving, 'error');
                 }
             } catch (error) {
-                console.error(texts.console_error_saving + ':', error);
+                console.error('Error saving:', error);
                 showWebToast(texts.toast_error_saving, 'error');
             }
         }
@@ -651,7 +650,7 @@
                         texts.history_tab_archive_count.replace('{count}', 0);
                 }
             } catch (error) {
-                console.error(texts.console_history_error + ':', error);
+                console.error('History error:', error);
                 document.getElementById('hv-liste').innerHTML =
                     `<div class="hist-empty"><span style="color: var(--color-red);">${texts.console_history_error}</span></div>`;
             }
@@ -1120,8 +1119,7 @@
             });
         }
 
-        // Custom toast (named showWebToast to avoid a conflict with
-        // Electron's toast.js).
+        // A toast from the shared stack (confirm-dialog.js).
         function showWebToast(message, type = 'success') {
             if (typeof window.skToast === 'function') window.skToast(message, type);
             else console.log(message);
@@ -1144,8 +1142,8 @@
                     showWebToast(texts.toast_error_deleting, 'error');
                 }
             } catch (error) {
-                console.error(texts.console_delete_error + ':', error);
-                showToast(texts.toast_error_deleting, 'error');
+                console.error('Delete error:', error);
+                showWebToast(texts.toast_error_deleting, 'error');
             }
         }
 
@@ -1243,7 +1241,7 @@
                 showOverviewTab(data);
                 switchDetailTab('overview');
             } catch (error) {
-                console.error(texts.console_detail_error + ':', error);
+                console.error('Detail error:', error);
                 showWebToast(texts.alert_error_loading_details, 'error');
             }
         }
@@ -2240,6 +2238,8 @@
                 const c = farbe[ev.type] || 'var(--text-secondary)';
                 const text = ohneEmoji(formatEventDetail(ev.details));
                 const wie_oft = haeufigkeit[text] || 1;
+                // File names and printer messages end up in these texts.
+                const textSicher = String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 // No id, no deleting -- old answers carried none.
                 const griff = (ev.id == null) ? '' : `
                         <span class="hv-ev-aktion">
@@ -2252,7 +2252,7 @@
                 html += `
                     <div class="hv-ereignis" style="--punkt:${c};">
                         <span class="hv-ev-zeit">${zeit}</span>
-                        <span class="hv-ev-text">${text}</span>${griff}
+                        <span class="hv-ev-text">${textSicher}</span>${griff}
                     </div>`;
             });
             html += '</div>';
@@ -2264,7 +2264,7 @@
                 ? (texts.events_delete_same_ask || 'Alle {n} gleichen Einträge löschen?')
                       .replace('{n}', anzahl)
                 : (texts.events_delete_ask || 'Diesen Eintrag löschen?');
-            if (!await window.skConfirm(frage)) return;
+            if (!await window.skConfirm(frage, { okText: texts.delete || 'Löschen', danger: true })) return;
             const id = currentPrintData?.print?.id;
             try {
                 const r = await apiCall(`/api/history/${id}/events/${eventId}`, {
@@ -2273,12 +2273,12 @@
                     body: JSON.stringify({ alle_gleichen: !!alleGleichen })
                 });
                 const j = await r.json();
-                if (!j.success) { window.skToast && window.skToast(j.error || '', 'fehler'); return; }
+                if (!j.success) { window.skToast && window.skToast(j.error || '', 'error'); return; }
                 window.skToast && window.skToast(
-                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'erfolg');
+                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'success');
                 await ereignisseNeuLaden();
             } catch (e) {
-                window.skToast && window.skToast(String(e), 'fehler');
+                window.skToast && window.skToast(String(e), 'error');
             }
         }
 
@@ -2289,12 +2289,12 @@
             try {
                 const r = await apiCall(`/api/history/${id}/events/aufraeumen`, { method: 'POST' });
                 const j = await r.json();
-                if (!j.success) { window.skToast && window.skToast(j.error || '', 'fehler'); return; }
+                if (!j.success) { window.skToast && window.skToast(j.error || '', 'error'); return; }
                 window.skToast && window.skToast(
-                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'erfolg');
+                    (texts.events_deleted || '{n} gelöscht').replace('{n}', j.geloescht), 'success');
                 await ereignisseNeuLaden();
             } catch (e) {
-                window.skToast && window.skToast(String(e), 'fehler');
+                window.skToast && window.skToast(String(e), 'error');
             }
         }
 
@@ -2394,7 +2394,7 @@
                     _tlBinde();
                 })
                 .catch(error => {
-                    console.error(texts.console_error_loading_timelapse + ':', error);
+                    console.error('Error loading timelapse:', error);
                     container.innerHTML = offlineCard;
                 });
         }
@@ -2534,7 +2534,7 @@
                     modal.style.display = 'flex';
                 })
                 .catch(error => {
-                    console.error(texts.console_error_loading_daily_stats + ':', error);
+                    console.error('Error loading daily statistics:', error);
                     content.innerHTML = `<p style="color:var(--accent-red);">${texts.stats_error_loading_data}</p>`;
                     modal.style.display = 'flex';
                 });
@@ -2909,7 +2909,14 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
             const overlay = document.createElement('div');
             overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;z-index:10001;';
 
-            const wantedColor = wanted.color ? (wanted.color.startsWith('#') ? wanted.color : '#' + wanted.color) : '#888';
+            // Spoolman's and the 3MF's values are data: colours only as hex, names escaped.
+            const hexFarbe = (c) => {
+                const roh = String(c || '').replace('#', '');
+                return /^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(roh) ? '#' + roh : '#888';
+            };
+            const escText = (v) => String(v == null ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const wantedColor = hexFarbe(wanted.color);
 
             const options = [];
             candidates.forEach(s => options.push({s, label: 'Match'}));
@@ -2921,12 +2928,12 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
                 const vendor = (fil.vendor && fil.vendor.name) || '';
                 const name = fil.name || '—';
                 const material = fil.material || '';
-                const col = fil.color_hex ? '#' + String(fil.color_hex).replace('#','') : '#888';
+                const col = hexFarbe(fil.color_hex);
                 const rem = s.remaining_weight != null ? Math.round(s.remaining_weight) + 'g' : '';
                 return `<div class="mm-opt" data-id="${s.id}" style="padding:10px;border:2px solid var(--border-color);border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;align-items:center;gap:10px;">
                     <div style="width:18px;height:18px;border-radius:50%;background:${col};border:1px solid var(--border-color);"></div>
-                    <div style="flex:1;"><div style="font-weight:600;">${vendor ? vendor + ' ' : ''}${name}</div>
-                    <div style="font-size:11px;color:var(--text-secondary);">${material}${rem ? ' • ' + rem : ''}</div></div>
+                    <div style="flex:1;"><div style="font-weight:600;">${escText(vendor ? vendor + ' ' : '')}${escText(name)}</div>
+                    <div style="font-size:11px;color:var(--text-secondary);">${escText(material)}${rem ? ' • ' + rem : ''}</div></div>
                     <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:${opt.label === 'Match' ? '#1e5128' : '#444'};color:#fff;">${opt.label}</span>
                 </div>`;
             }).join('');
@@ -2937,7 +2944,7 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
                     <p style="margin:0 0 6px 0;color:var(--text-secondary);">${getText('hist_file_needs', 'Die Datei braucht:')}</p>
                     <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-secondary);border-radius:6px;margin-bottom:14px;">
                         <div style="width:20px;height:20px;border-radius:50%;background:${wantedColor};border:1px solid var(--border-color);"></div>
-                        <div><strong>${wanted.name || '—'}</strong>${wanted.material ? ' <span style="color:var(--text-secondary)">(' + wanted.material + ')</span>' : ''}</div>
+                        <div><strong>${escText(wanted.name || '—')}</strong>${wanted.material ? ' <span style="color:var(--text-secondary)">(' + escText(wanted.material) + ')</span>' : ''}</div>
                     </div>
                     ${options.length === 0 ? '<p style="color:#ffb0b0;">' + getText('hist_no_matching_spool', 'Keine passende Spule gefunden.') + '</p>' : rows}
                     <div style="display:flex;gap:8px;margin-top:14px;">
@@ -2977,6 +2984,7 @@ ${cons ? section((texts.detail_console_tab || 'Konsole'), `<div class="con">${co
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/frage-karte.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
     <script src="/static/js/modules/notification-stack.js"></script>
 </body>

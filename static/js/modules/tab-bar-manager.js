@@ -23,7 +23,7 @@ class TabBarManager {
         if (path.includes('users.html') || path.includes('/users')) return 'users';
         // Pages without a tab of their own (notifications, say) otherwise
         // wrongly marked "home" as active.
-        if (path.includes('notifications.html')) return '';
+        if (path.includes('notifications.html')) return 'notifications';
         return 'dashboard';
     }
 
@@ -39,6 +39,11 @@ class TabBarManager {
             { id: 'logs', icon: 'fa-solid fa-terminal', label: 'Konsole', href: '/static/logs.html', desktopOnly: true },
             // Bed mesh: only in Klipper direct mode (shown by _applyDirectMode).
             { id: 'bedmesh', icon: 'fa-solid fa-mountain', label: 'Bed Mesh', href: '/static/bedmesh.html', desktopOnly: false, directOnly: true },
+            // Messages: the one entry to what came in and what is still
+            // waiting for an answer. Until 17sep26 the list existed but
+            // nothing linked to it -- "later" on a question meant "gone until
+            // you happen to look at the material card".
+            { id: 'notifications', icon: 'fa-solid fa-bell', label: 'Meldungen', href: '/static/notifications.html', desktopOnly: false },
             { id: 'history', icon: 'fa-solid fa-clock-rotate-left', label: 'History', href: '/static/history.html', desktopOnly: false },
             { id: 'maintenance', icon: 'fa-solid fa-wrench', label: 'Wartung', href: '/static/maintenance.html', desktopOnly: true },
             // Mainsail: only in Klipper direct mode. It loads the printer web UI
@@ -63,6 +68,7 @@ class TabBarManager {
 
             // i18n data attribute for labels
             const i18nKey = tab.id === 'dashboard' ? 'dashboard' :
+                           tab.id === 'notifications' ? 'tab_notifications' :
                            tab.id === 'maintenance' ? 'maintenance' :
                            tab.id === 'settings' ? '' :  // Kein Label — nur Zahnrad-Icon
                            tab.id === 'bedmesh' ? 'nav_bedmesh' :
@@ -74,7 +80,8 @@ class TabBarManager {
             const style = tab.directOnly ? ' style="display:none;"' : '';
             return `
                 <a class="${classes.join(' ')}" href="${tab.href}" data-tab-id="${tab.id}"${style} ${tab.id === 'settings' && this.currentPage === 'dashboard' ? `onclick="event.preventDefault(); openSettings();"` : ''}>
-                    <span class="tab-icon"><i class="${tab.icon}"></i></span>
+                    <span class="tab-icon"><i class="${tab.icon}"></i>${tab.id === 'notifications'
+                        ? '<span class="tab-badge" id="tab-meldungen-zahl" hidden></span>' : ''}</span>
                     <span class="tab-label" ${i18nKey ? `data-i18n="${i18nKey}"` : ''}>${tab.label}</span>
                 </a>
             `;
@@ -119,6 +126,43 @@ class TabBarManager {
 
         // Mainsail-Tab bei offline ausgrauen.
         this.updateMainsailState();
+        this.zaehleMeldungen();
+    }
+
+    /**
+     * The number on the bell: open questions plus messages nobody has dealt
+     * with. The server counts it and sends it WITH THE STATUS (`inbox`), so
+     * it arrives over the socket like everything else and the apps only draw
+     * it -- three surfaces cannot come to different totals.
+     *
+     * Until 18sep26 this asked a route of its own, and only when something
+     * happened on this page: on the phone the badge then stood still until a
+     * tab was switched.
+     */
+    showMessages(inbox) {
+        const feld = document.getElementById('tab-meldungen-zahl');
+        if (!feld || !inbox) return;
+        const zahl = Math.max(0, parseInt(inbox.total || 0, 10));
+        feld.textContent = zahl > 99 ? '99+' : String(zahl);
+        feld.hidden = zahl === 0;
+        // Open questions are the loud kind: they wait for an answer.
+        feld.classList.toggle('tab-badge--frage', (inbox.questions || 0) > 0);
+    }
+
+    /**
+     * Ask now: on page load, and the moment a message arrives or is dealt
+     * with. The status carries the same number, but when the printer idles
+     * it is pushed rarely -- the bell then lagged far behind the toast that
+     * had long appeared (18sep26). The count route answers the same thing
+     * in one small request. noDedup: two messages within two seconds must
+     * not get the answer from before the second one.
+     */
+    zaehleMeldungen() {
+        if (!window.apiCall) return;
+        window.apiCall('/api/notifications/count', { noDedup: true })
+            .then(r => r.json())
+            .then(d => this.showMessages(d))
+            .catch(() => {});
     }
 
     /**

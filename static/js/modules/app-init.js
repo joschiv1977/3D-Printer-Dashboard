@@ -159,7 +159,9 @@ class AppInitManager {
         const fremd = (document.body.dataset.activePrinter !== 'klipper')
             ? ['control-card-desktop', 'dev-control-card-desktop']
             : ['printer-zone-card-grid', 'material-zone-card-grid'];
-        fremd.forEach(id => {
+        // The overview stands in the grid only while the printer is off
+        // (setzeAusModus) -- out with it like the other mode's cards.
+        fremd.concat(['off-overview-card-grid']).forEach(id => {
             const el = document.getElementById(id);
             if (el && el.gridstackNode) {
                 try { grid.removeWidget(el, false); } catch (e) { /* doesn't matter */ }
@@ -196,34 +198,45 @@ class AppInitManager {
                 return;
             }
 
-            const layout = [];
+            // Merged into what is saved, not written over it: while the
+            // printer is off the print card and material are out of the grid,
+            // and their places must still be there when it comes back on.
+            const gespeichert = {};
+            try {
+                (JSON.parse(localStorage.getItem('dashboard-layout')) || [])
+                    .forEach(eintrag => { gespeichert[eintrag.id] = eintrag; });
+            } catch (e) { /* unreadable: start afresh */ }
 
             // Get layout directly from grid items with their IDs
             const gridItems = grid.getGridItems();
             gridItems.forEach(el => {
                 const node = el.gridstackNode;
                 if (node && el.id) {
+                    const platz = { id: el.id, x: node.x, y: node.y, w: node.w, h: node.h };
+                    // The overview's place is its own (see dragstop below).
+                    if (el.id === 'off-overview-card-grid') return;
                     // Filter: only save desktop-relevant cards
                     // Skip mobile cards (control-card-mobile, dev-control-card-mobile)
-                    const isMobileOnly = el.classList.contains('control-card-mobile');
-
-                    if (!isMobileOnly) {
-                        layout.push({
-                            id: el.id,
-                            x: node.x,
-                            y: node.y,
-                            w: node.w,
-                            h: node.h
-                        });
-                    }
+                    if (!el.classList.contains('control-card-mobile')) gespeichert[el.id] = platz;
                 }
             });
 
+            const layout = Object.values(gespeichert);
             localStorage.setItem('dashboard-layout', JSON.stringify(layout));
             console.log('💾 Dashboard layout saved:', layout);
 
             // Adjust the height after a change
             this.adjustGridHeight();
+        });
+
+        // The overview keeps a place of its own only once it was moved or
+        // resized by hand. Until then it follows the cards it stands in for,
+        // wherever they are arranged at the time.
+        grid.on('dragstop resizestop', (event, el) => {
+            const node = el && el.gridstackNode;
+            if (!node || el.id !== 'off-overview-card-grid') return;
+            localStorage.setItem('dashboard-layout-off', JSON.stringify(
+                { x: node.x, y: node.y, w: node.w, h: node.h }));
         });
 
         // Window resize handler - just for grid height + reset button
@@ -277,7 +290,90 @@ class AppInitManager {
             return this;
         };
 
+        // The first status may have been faster than the grid: then the
+        // printer is already known to be off, and the swap is due now.
+        if (window.offOverview && window.offOverview.aus) this.setzeAusModus(true);
+
         console.log('✅ GridStack initialized');
+    }
+
+    /**
+     * The printer went off or came back on (off-overview.js decides).
+     *
+     * Off: the print card, the material (Klipper: Spoolman) and the drying
+     * card leave the grid, and the overview takes their place -- the
+     * smallest rectangle around the visible ones, wherever the user put
+     * them, unless the overview has a place of its own from last time. On:
+     * the overview goes and the three come back to their saved places.
+     * The camera and the printer zone stay put, so the power button does
+     * not move under the finger. On a phone there is no grid; the CSS does
+     * it there (body.drucker-aus).
+     */
+    setzeAusModus(aus) {
+        const grid = this.dashboardGrid;
+        const ueberblick = document.getElementById('off-overview-card-grid');
+        if (!grid || !ueberblick) return;
+        const ids = (document.body.dataset.activePrinter === 'klipper')
+            ? ['progress-card-grid', 'spoolman-card-grid', 'filament-drying-card-grid']
+            : ['progress-card-grid', 'material-zone-card-grid', 'filament-drying-card-grid'];
+        const setze = (el, p) => {
+            ['x', 'y', 'w', 'h'].forEach(k => el.setAttribute('gs-' + k, String(p[k])));
+        };
+
+        grid.batchUpdate();
+        try {
+            if (aus) {
+                this._ausWeg = [];
+                let rahmen = null;
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    const n = el && el.gridstackNode;
+                    if (!n) return;
+                    this._ausWeg.push({ el, x: n.x, y: n.y, w: n.w, h: n.h });
+                    if (window.getComputedStyle(el).display !== 'none') {
+                        rahmen = rahmen ? {
+                            x: Math.min(rahmen.x, n.x), y: Math.min(rahmen.y, n.y),
+                            r: Math.max(rahmen.r, n.x + n.w), b: Math.max(rahmen.b, n.y + n.h)
+                        } : { x: n.x, y: n.y, r: n.x + n.w, b: n.y + n.h };
+                    }
+                    grid.removeWidget(el, false);
+                });
+
+                let ziel = null;
+                try { ziel = JSON.parse(localStorage.getItem('dashboard-layout-off')); } catch (e) { /* none */ }
+                if (!ziel && rahmen) {
+                    ziel = { x: rahmen.x, y: rahmen.y, w: rahmen.r - rahmen.x, h: rahmen.b - rahmen.y };
+                    // Cards arranged so that the rectangle reaches over the
+                    // camera or the zone: then only the print card's place.
+                    const druckkarte = this._ausWeg.find(e => e.el.id === 'progress-card-grid');
+                    if (!grid.isAreaEmpty(ziel.x, ziel.y, ziel.w, ziel.h) && druckkarte) {
+                        ziel = { x: druckkarte.x, y: druckkarte.y, w: druckkarte.w, h: druckkarte.h };
+                    }
+                }
+                ziel = ziel || { x: 6, y: 0, w: 6, h: 40 };
+                ziel.h = Math.max(ziel.h, 16);
+                ueberblick.style.display = '';
+                setze(ueberblick, ziel);
+                grid.makeWidget(ueberblick);
+            } else {
+                if (ueberblick.gridstackNode) grid.removeWidget(ueberblick, false);
+                ueberblick.style.display = 'none';
+                const gespeichert = {};
+                try {
+                    (JSON.parse(localStorage.getItem('dashboard-layout')) || [])
+                        .forEach(eintrag => { gespeichert[eintrag.id] = eintrag; });
+                } catch (e) { /* none: their places from before */ }
+                (this._ausWeg || []).forEach(weg => {
+                    if (weg.el.gridstackNode) return;
+                    setze(weg.el, gespeichert[weg.el.id] || weg);
+                    grid.makeWidget(weg.el);
+                });
+                this._ausWeg = [];
+            }
+        } finally {
+            grid.batchUpdate(false);
+        }
+        this.adjustGridHeight();
     }
 
     // Adjust Grid Height - triggers GridStack's patched _updateContainerHeight
@@ -319,6 +415,7 @@ class AppInitManager {
         showConfirmDialog({ text: (window.texts || {}).confirm_reset_layout,
             knopf: (window.texts || {}).confirm_reset }, function() {
             localStorage.removeItem('dashboard-layout');
+            localStorage.removeItem('dashboard-layout-off');
             location.reload();
         });
     }
@@ -659,8 +756,10 @@ class AppInitManager {
         const cameraSourceText = document.getElementById('camera-source-text');
         if (cameraSourceText) cameraSourceText.textContent = texts.switch_source;
 
+        // The camera manager owns this line (off, no signal, paused) and may
+        // have set it before the page finished loading: only fill it while empty.
         const cameraLoadingText = document.getElementById('camera-loading-text');
-        if (cameraLoadingText) cameraLoadingText.textContent = texts.camera_loading;
+        if (cameraLoadingText && !cameraLoadingText.textContent) cameraLoadingText.textContent = texts.camera_loading;
 
         // Camera Overlay
         const fullscreenText = document.getElementById('fullscreen-text');
@@ -715,9 +814,6 @@ class AppInitManager {
         const scheduleSelectFilament = document.getElementById('schedule-select-filament');
         if (scheduleSelectFilament) scheduleSelectFilament.textContent = texts.schedule_section_material || 'Material';
 
-        const scheduleNoSpool = document.getElementById('schedule-no-spool');
-        if (scheduleNoSpool) scheduleNoSpool.textContent = texts.no_spool_selected;
-
         const schedulePrintOptions = document.getElementById('schedule-print-options');
         if (schedulePrintOptions) schedulePrintOptions.textContent = texts.schedule_section_options || 'Druckoptionen';
 
@@ -727,7 +823,6 @@ class AppInitManager {
             if (el) el.textContent = wert;
         };
         setzeText('schedule-startet-label', texts.schedule_starts_at || 'Druck startet');
-        setzeText('schedule-spool-label', texts.schedule_spool_label || 'Spule');
         setzeText('schedule-plate-label', texts.print_prepare_plate || 'Platte');
 
         // The options and plate selection in the schedule dialog are now
@@ -920,7 +1015,7 @@ class AppInitManager {
         try {
             await loadStatus();
         } catch (error) {
-            console.error(texts.console_loadeverything_error + ':', error);
+            console.error('LoadEverything error:', error);
         } finally {
             this.isLoading = false;
         }
@@ -1047,7 +1142,7 @@ class AppInitManager {
             }
         } catch (error) {
             zurueck();
-            console.error(texts.console_error_cancelling_timer + ':', error);
+            console.error('Error cancelling timer:', error);
             skToast(texts.toast_error_cancelling, 'error');
         }
     }
@@ -1141,41 +1236,6 @@ class AppInitManager {
         });
     }
 
-    /**
-     * Answer to "was the spool taken off the holder?".
-     *
-     * action: "reset" | "keep", code: SPULE-LINKS | SPULE-RECHTS
-     *
-     * Only the answer travels. What follows from it — clearing the spool at
-     * the printer, closing the message on every device — happens in the
-     * route, so the phone and the desktop cannot drift apart.
-     */
-    spulenAntwort(action, code) {
-        const csrfToken = sessionStorage.getItem('csrf_token')
-            || localStorage.getItem('csrf_token');
-        const spool = String(code || '').toUpperCase() === 'SPULE-LINKS' ? 254 : 255;
-        return fetch('/api/spool_prompt', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': csrfToken || ''
-            },
-            body: JSON.stringify({ spool_id: spool, reset: action === 'reset' })
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (!data.success) {
-                window.skToast(((window.texts||{}).set_error_colon || 'Fehler:') + ' '
-                    + (data.error || (window.texts||{}).unknown || 'Unbekannt'));
-            }
-            return data;
-        })
-        .catch(e => {
-            window.skToast(((window.texts||{}).network_error || 'Netzwerkfehler') + ': ' + e.message);
-            throw e;
-        });
-    }
-
     dismissHMSError() {
         // Dismissal lives in hms-banner.js — the same implementation the
         // other pages use.
@@ -1236,49 +1296,69 @@ class AppInitManager {
     async loadPowerOffTimerStatus() {
         try {
             const response = await fetch('/api/power_off_timer/status');
-            const data = await response.json();
-            console.log('⏰ Power-Off Timer Status loaded:', data);
-
-            const banner = document.getElementById('power-off-banner');
-            const bannerCountdown = document.getElementById('power-off-banner-countdown');
-            const bannerReason = document.getElementById('power-off-banner-reason');
-
-            if (data.active) {
-                window.powerOffTimerActive = true;
-
-                // Show the banner
-                if (banner) {
-                    banner.classList.add('active');
-                    if (bannerReason) bannerReason.textContent = data.reason;
-                }
-
-                // Start the countdown
-                const updateCountdown = () => {
-                    const remaining = Math.max(0, data.end_time - (Date.now() / 1000));
-                    const minutes = Math.floor(remaining / 60);
-                    const seconds = Math.floor(remaining % 60);
-                    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                    if (bannerCountdown) {
-                        bannerCountdown.textContent = timeString;
-                    }
-
-                    if (remaining > 0 && window.powerOffTimerActive) {
-                        requestAnimationFrame(updateCountdown);
-                    } else if (remaining <= 0) {
-                        // Timer expired - hide the banner
-                        if (banner) banner.classList.remove('active');
-                    }
-                };
-
-                updateCountdown();
-            } else {
-                // Timer not active - hide the banner
-                if (banner) banner.classList.remove('active');
-                window.powerOffTimerActive = false;
-            }
+            this.showPowerOffTimer(await response.json());
         } catch (error) {
             console.error('❌ Error loading Power-Off Timer status:', error);
+        }
+    }
+
+    /**
+     * The auto-off banner: the countdown, in one place.
+     *
+     * The socket event and the status fetch bring the same thing
+     * ({active, end_time, reason}) and each used to draw it their own way --
+     * one of them once a frame, which stops the moment the window is
+     * covered.
+     *
+     * "Later" takes the banner off the screen without touching the timer:
+     * the printer still switches off, and the countdown waits on the
+     * messages page (frage-karte.js, question id `power_off`) where it can
+     * still be cancelled.
+     */
+    showPowerOffTimer(daten) {
+        const banner = document.getElementById('power-off-banner');
+        const countdown = document.getElementById('power-off-banner-countdown');
+        const grund = document.getElementById('power-off-banner-reason');
+        clearTimeout(window._powerOffTicker);
+        const aktiv = !!(daten && daten.active);
+        window.powerOffTimerActive = aktiv;
+        const spaeter = () => !!(window.FrageKarte && window.FrageKarte.isPutOff
+                                 && window.FrageKarte.isPutOff('power_off'));
+        if (!banner) return;
+        if (!aktiv || spaeter()) {
+            banner.classList.remove('active');
+            return;
+        }
+        banner.classList.add('active');
+        if (grund) grund.textContent = daten.reason || '';
+
+        const tick = () => {
+            const rest = Math.max(0, (daten.end_time || 0) - (Date.now() / 1000));
+            if (countdown) {
+                countdown.textContent = Math.floor(rest / 60) + ':'
+                    + String(Math.floor(rest % 60)).padStart(2, '0');
+            }
+            if (rest <= 0 || !window.powerOffTimerActive) {
+                banner.classList.remove('active');
+                window.powerOffTimerActive = false;
+                return;
+            }
+            if (spaeter()) {
+                banner.classList.remove('active');
+                return;
+            }
+            window._powerOffTicker = setTimeout(tick, 1000);
+        };
+        tick();
+    }
+
+    /** "Later" on the banner: off the screen, on the messages page. */
+    powerOffTimerLater() {
+        const banner = document.getElementById('power-off-banner');
+        if (banner) banner.classList.remove('active');
+        clearTimeout(window._powerOffTicker);
+        if (window.FrageKarte && window.FrageKarte.putOff) {
+            window.FrageKarte.putOff('power_off');
         }
     }
 
@@ -1389,13 +1469,13 @@ class AppInitManager {
             // Just the simplest possible logic for a fast theme
             if (savedTheme === 'dark' || (!savedTheme && systemIsDark)) {
                 document.body.classList.add('dark-mode');
-                console.log('Anti-Flicker: Dark Mode aktiviert (savedTheme=' + savedTheme + ', systemIsDark=' + systemIsDark + ')');
+                console.log('Anti-flicker: dark mode on (savedTheme=' + savedTheme + ', systemIsDark=' + systemIsDark + ')');
             }
         })();
 
         // Setup theme (synchronous, before DOM ready)
         this.setupTheme();
-        console.log(texts.console_dashboard_starting);
+        console.log('3D Printer Dashboard starting...');
 
         // LEGACY: Keep sdSyncInProgress accessible for socket handlers
         Object.defineProperty(window, 'sdSyncInProgress', {
@@ -1477,7 +1557,7 @@ class AppInitManager {
 
         // domReady callback with loadEverything, spoolman init, camera setup, event handlers
         this.domReady(async function() {
-            console.log(texts.console_app_loaded);
+            console.log('App loaded');
 
             // IMPORTANT: fetch status FIRST (a bridge until the socket connects),
             // so buttons show the right state immediately.
@@ -1513,7 +1593,7 @@ class AppInitManager {
                     self.applyCardVisibility(data.ui?.card_visibility);
                     // Move the Spoolman init to idle afterwards
                     self.deferNonCritical(() => {
-                        console.log(texts.console_call_init_spoolman);
+                        console.log('Calling initSpoolman...');
                         initSpoolman();
                     });
                 });
@@ -1521,12 +1601,6 @@ class AppInitManager {
             // checkDeveloperMode() refetches status+config (pooled via TTL cache)
             // and hides certain buttons. Non-critical for the initial paint.
             self.deferNonCritical(() => checkDeveloperMode());
-
-            // Initialize HQ status asynchronously
-            setTimeout(() => initHQStatus(), 100);
-
-            // Initialize the camera source button status (direct, no API needed)
-            initCameraSourceButton();
 
             // Power-Off Timer Click Handler
             const powerOffHeader = document.getElementById('power-off-header');
@@ -1536,13 +1610,6 @@ class AppInitManager {
                         self.cancelPowerOffTimer();
                     });
                 });
-            }
-
-            setupSafariStreamFix();
-
-            // Camera stream error handler
-            const cameraStreamImg = document.getElementById('camera-stream');
-            if (cameraStreamImg) {
             }
 
             // Mouse-wheel zoom with mouse position
@@ -1595,9 +1662,9 @@ window.toggleDarkMode = () => window.appInit.toggleDarkMode();
 window.updateThemeIcon = () => window.appInit.updateThemeIcon();
 window.cancelPowerOffTimer = () => window.appInit.cancelPowerOffTimer();
 window.cancelPowerOffTimerFromBanner = () => window.appInit.cancelPowerOffTimerFromBanner();
+window.powerOffTimerLater = () => window.appInit.powerOffTimerLater();
 window.dismissHMSError = () => window.appInit.dismissHMSError();
 window.filamentChangeAction = (action) => window.appInit.filamentChangeAction(action);
-window.spulenAntwort = (action, code) => window.appInit.spulenAntwort(action, code);
 window.isHMSErrorDismissed = (c) => window.appInit.isHMSErrorDismissed(c);
 window.clearDismissedHMSErrors = () => window.appInit.clearDismissedHMSErrors();
 window.loadHMSStatus = () => window.appInit.loadHMSStatus();

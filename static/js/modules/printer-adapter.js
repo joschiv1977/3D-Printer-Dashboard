@@ -42,6 +42,9 @@
             capabilities: (info && info.capabilities) || [],
             displayName: (info && info.display_name) || null,
             connected: !!(info && info.connected),
+            // The model from the printer profile -- known while the printer
+            // is off, when the status carries no capabilities.
+            modelId: (info && info.model_id) || null,
             // Klipper-specific, for camera adapter / Spoolman / files
             klipperId: window.activePrinter.klipperId,
             klipperBaseUrl: window.activePrinter.klipperBaseUrl,
@@ -49,6 +52,11 @@
         document.body.dataset.activePrinter = type;
         document.body.dataset.printerCaps = (info.capabilities || []).join(' ');
         applyCapabilityVisibility();
+        // The machine picture follows the model as soon as it is known. With
+        // the printer off no further status may come to redraw it.
+        if (window.socketManager && window.activePrinter.modelId) {
+            window.socketManager._zeigeMaschinenbild(window.lastPrintData || {});
+        }
     }
 
     async function loadPrinterInfo() {
@@ -178,9 +186,12 @@
     const setAirduct     = (mode)              => action('set_airduct', { mode: mode });
     const buzzer         = (mode)              => action('buzzer', { mode: mode });
     // AMS: only AMS 2 Pro and AMS HT can dry (status.ams.units[].can_dry).
-    const amsDryStart    = (amsId, temp, duration, filament, rotate) =>
+    // spool_id: the spool named in the drying dialog -- the server keeps it
+    // for this run only (services/drying_spool).
+    const amsDryStart    = (amsId, temp, duration, filament, rotate, spoolId) =>
         action('ams_dry_start', { ams_id: amsId, temp: temp, duration: duration,
-                                  filament: filament || '', rotate: !!rotate });
+                                  filament: filament || '', rotate: !!rotate,
+                                  ...(spoolId != null ? { spool_id: spoolId } : {}) });
     const amsDryStop     = (amsId)             => action('ams_dry_stop', { ams_id: amsId });
     const amsReadRfid    = (amsId, slotId)     => action('ams_read_rfid', { ams_id: amsId, slot_id: slotId });
     // tray_info_idx is Bambu's profile identifier (e.g. GFL99) — without it

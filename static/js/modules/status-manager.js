@@ -85,7 +85,7 @@ class StatusManager {
         return apiCall('/api/status')
             .then(response => response.json())
             .then(data => this.applyStatus(data))
-            .catch(error => console.error(texts.console_status_load_failed + ':', error));
+            .catch(error => console.error('Status load failed:', error));
     }
 
     // ========================================
@@ -197,11 +197,16 @@ class StatusManager {
         if (beleg !== null && beleg !== undefined && beleg !== window._lastSwitchState) {
             window._lastSwitchState = beleg;
             if (beleg === 'on' && window._cameraOff) {
-                setTimeout(function() { recheckCameraMode(); }, 3000);
+                // Switched on: say so at once -- the camera follows once the
+                // printer has booted.
+                if (window.cameraManager) {
+                    window.cameraManager.zeigeAus('booting');
+                    window.cameraManager.planeNachfrage();
+                }
             } else if (beleg !== 'on' && !window._cameraOff) {
                 window._cameraOff = true;
                 window._cameraMode = 'off';
-                stopWebRTCStream();
+                stopLiveStream();
                 stopSnapshotPolling();
                 const camEl = document.getElementById('camera-stream');
                 if (camEl) {
@@ -217,7 +222,7 @@ class StatusManager {
                     const schluessel = ohneDose ? 'camera_no_signal' : 'camera_off';
                     const ersatz = ohneDose ? 'Kein Bild — Drucker antwortet nicht'
                                             : 'Kamera aus (Drucker aus)';
-                    if (txt) txt.textContent = (window.t && window.t(schluessel)) || ersatz;
+                    if (txt) txt.textContent = (window.texts || {})[schluessel] || ersatz;
                 }
             }
         }
@@ -385,6 +390,9 @@ class StatusManager {
             window.druckerDa = (window.lastPowerMode === 'none')
                 ? (window.lastMqttStatus === true)
                 : (window.lastKnownSwitchState === 'on' && window.lastMqttStatus === true);
+
+            // Off: the overview stands in for the print card and material.
+            if (window.offOverview) window.offOverview.aktualisiereZustand();
 
             // Update cards that depend on printer status
             if (typeof updatePrinterDependentCards === 'function') {
@@ -815,17 +823,18 @@ class StatusManager {
             const isPrinting = data.gcode_state === 'RUNNING';
             const isPaused = data.gcode_state === 'PAUSE' || data.paused === true;
             document.querySelectorAll('.sd-print-action').forEach(btn => {
-                const active = ['RUNNING', 'PAUSE', 'PREPARE'].includes(String(data.gcode_state || '').toUpperCase());
-                btn.disabled = active;
-                btn.setAttribute('aria-disabled', String(active));
-                btn.title = active
-                    ? (texts.print_blocked_active || 'Bei aktivem Druck kein Start möglich')
-                    : (texts.print_now || texts.print || 'Drucken');
+                // The server's table, not a rule of our own (block `actions`).
+                const frei = window.aktionen.erlaubt('print_start');
+                btn.disabled = !frei;
+                btn.setAttribute('aria-disabled', String(!frei));
+                btn.title = frei
+                    ? (texts.print_now || texts.print || 'Drucken')
+                    : window.aktionen.text('print_start');
             });
 
             // Check whether filament drying is active
             if (window.isFilamentDrying) {
-                console.log(texts.console_drying_active_cards_hidden);
+                console.log('Filament drying active - Developer Cards remain hidden');
                 hideDevCards();
                 return;
             }
@@ -846,7 +855,7 @@ class StatusManager {
             if (isPrinting) {
                 // Homing stays locked during printing; SD card and
                 // control stay visible.
-                _melde_knopfzustand('druck', texts.console_print_running_hide_buttons);
+                _melde_knopfzustand('druck', 'Print running - hide dangerous buttons');
                 ['homing-btn-mobile', 'homing-btn-desktop'].forEach(id => {
                     const btn = document.getElementById(id);
                     if (btn) btn.style.display = 'none';

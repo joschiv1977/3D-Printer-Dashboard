@@ -18,11 +18,9 @@
                           </div>
                           <img id="camera-stream"
                                class="camera-stream"
-                               data-src="/api/camera"
                                data-i18n-alt="camera_stream_alt" alt="Kamera Stream"
                                loading="eager"
                                fetchpriority="high"
-                               onerror="handleCameraError()"
                                style="transition: transform 0.3s ease; transform-origin: center; display: none;"
                                onload="document.getElementById('camera-placeholder').style.display='none'; this.style.display='block';">
                           <div id="camera-loading-overlay" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 5;">
@@ -50,10 +48,6 @@
                               <button class="overlay-btn" onclick="toggleFullscreen()">
                                   <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
                                   <span id="fullscreen-text"></span>
-                              </button>
-                              <button class="overlay-btn hide-in-direct" id="hq-button" onclick="toggleHQMode()">
-                                  <svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-                                  <span id="hq-text">SD</span>
                               </button>
                           </div>
                           <div id="desktop-zoom-controls" style="position:absolute; bottom:10px; left:10px; display:flex; gap:8px;">

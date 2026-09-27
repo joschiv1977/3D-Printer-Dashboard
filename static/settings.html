@@ -38,7 +38,7 @@
     <link rel="stylesheet" href="/static/css/design-tokens.css?v=2">
     <link rel="stylesheet" href="/static/css/base.css?v=2">
     <link rel="stylesheet" href="/static/css/tab-bar.css?v=2">
-    <link rel="stylesheet" href="/static/css/einstellungen.css?v=2">
+    <link rel="stylesheet" href="/static/css/einstellungen.css?v=3">
     <link rel="stylesheet" href="/static/css/benachrichtigungen.css?v=2">
     <link rel="stylesheet" href="/static/css/meldungen.css">
 
@@ -628,78 +628,6 @@
             color: #ffcc80;
         }
 
-        /* Toast Notifications — Glassmorphism */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 14px 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            z-index: 9999;
-            min-width: 300px;
-            max-width: 500px;
-            display: none;
-            animation: slideInRight 0.3s ease-out;
-            font-weight: 500;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .toast.show {
-            display: block;
-        }
-
-        .toast-success {
-            background: rgba(76, 175, 80, 0.15);
-            color: #2e7d32;
-            border: 1px solid rgba(76, 175, 80, 0.25);
-        }
-
-        .toast-error {
-            background: rgba(220, 53, 69, 0.15);
-            color: #c62828;
-            border: 1px solid rgba(220, 53, 69, 0.25);
-        }
-
-        body.dark-mode .toast-success {
-            background: rgba(76, 175, 80, 0.2);
-            color: #a5d6a7;
-            border-color: rgba(76, 175, 80, 0.3);
-        }
-
-        body.dark-mode .toast-error {
-            background: rgba(220, 53, 69, 0.2);
-            color: #ef9a9a;
-            border-color: rgba(220, 53, 69, 0.3);
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes slideOutRight {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
-
-        .toast.hiding {
-            animation: slideOutRight 0.3s ease-in;
-        }
-
         /* Loading Spinner */
         .loading {
             display: inline-block;
@@ -822,14 +750,6 @@
                 transform: translateX(0);
             }
 
-            .toast {
-                left: 10px;
-                right: 10px;
-                top: 10px;
-                min-width: unset;
-                max-width: unset;
-            }
-
             .fab-save {
                 bottom: 20px;
                 right: 16px;
@@ -837,28 +757,6 @@
                 height: 52px;
                 font-size: 22px;
                 border-radius: 14px;
-            }
-
-            @keyframes slideInRight {
-                from {
-                    transform: translateY(-100px);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-            }
-
-            @keyframes slideOutRight {
-                from {
-                    transform: translateY(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateY(-100px);
-                    opacity: 0;
-                }
             }
         }
 
@@ -1621,15 +1519,6 @@
                         </div>
                         <div class="es-zeile">
                             <div class="es-zeile-name">
-                                <b id="label-camera-enable" data-i18n="settings_camera_ext">Externe Kamera (uStreamer)</b>
-                                <span data-i18n="settings_camera_ext_hint">Zusätzliche Kamera an einem Pi. Die eingebaute Kamera des Druckers läuft davon unabhängig.</span>
-                            </div>
-                            <div class="es-zeile-wert">
-                                <label class="es-schalter"><input type="checkbox" id="camera_enabled"><span></span></label>
-                            </div>
-                        </div>
-                        <div class="es-zeile">
-                            <div class="es-zeile-name">
                                 <label id="label-camera-size" for="default_camera_size" data-i18n="settings_camera_size_row">Bildgröße auf der Startseite</label>
                             </div>
                             <div class="es-zeile-wert">
@@ -1892,6 +1781,29 @@
                         </div>
                     </div>
 
+                    <!-- Only on two-nozzle printers: an AMS takes the inlet of its
+                         nozzle, a 4-in-1 adapter lets the external spool feed it too
+                         (filament state R11). -->
+                    <div class="es-karte" data-requires="config_store dual_nozzle" id="card-external-spools">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5"/></svg>
+                            <span data-i18n="settings_external_spools">Außenspulen</span>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <b data-i18n="settings_external_adapter_left">4-in-1-Adapter an der linken Düse</b>
+                                <span data-i18n="settings_external_adapter_hint">Ein AMS belegt den Einlass seiner Düse. Nur mit Adapter lässt sich dort zusätzlich die Außenspule nutzen.</span>
+                            </div>
+                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="external_adapter_left"><span></span></label></div>
+                        </div>
+                        <div class="es-zeile">
+                            <div class="es-zeile-name">
+                                <b data-i18n="settings_external_adapter_right">4-in-1-Adapter an der rechten Düse</b>
+                            </div>
+                            <div class="es-zeile-wert"><label class="es-schalter"><input type="checkbox" id="external_adapter_right"><span></span></label></div>
+                        </div>
+                    </div>
+
                     <div class="es-karte" data-requires="config_store">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 14.8V5a2 2 0 1 0-4 0v9.8a4.5 4.5 0 1 0 4 0z"/></svg>
@@ -2133,41 +2045,12 @@
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
                             <span data-i18n="nav_notifications">Benachrichtigungen</span>
-                            <span class="es-rechts">
-                                <button id="meldungen-reiter-verlauf" class="es-knopf es-knopf--haupt"
-                                        onclick="zeigeMeldungsReiter('verlauf')"
-                                        data-i18n="settings_notif_history">Verlauf</button>
-                                <button id="meldungen-reiter-geraete" class="es-knopf"
-                                        onclick="zeigeMeldungsReiter('devices')"
-                                        data-i18n="settings_notif_devices">Geräte</button>
-                            </span>
-                        </div>
-
-                        <!--Verlauf: what has arrived. The first thing you want when
-                            you open this section, so it is the tab that shows.-->
-                        <div id="meldungen-inhalt-verlauf">
-                            <div class="es-zeile">
-                                <div class="es-zeile-name">
-                                    <span data-i18n="settings_notif_history_hint">Was angekommen ist — auf allen Geräten</span>
-                                </div>
-                                <div class="es-zeile-wert">
-                                    <button id="notif-filter-all" class="es-knopf es-knopf--haupt" onclick="setNotifFilter('all')" data-i18n="notifications_filter_all">Alle</button>
-                                    <button id="notif-filter-unread" class="es-knopf" onclick="setNotifFilter('unread')" data-i18n="notifications_filter_unread">Ungelesen</button>
-                                    <button class="es-knopf" onclick="loadNotificationsUI()">
-                                        <svg class="es-ic es-ic--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
-                                        <span data-i18n="refresh">Aktualisieren</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="es-block">
-                                <div id="notif-list" class="notif-list"></div>
-                            </div>
                         </div>
 
                         <!--Geraete: who gets what. Every device folded shut by
                             default -- eight switches times four devices is a wall,
                             and you come here to change ONE thing.-->
-                        <div id="meldungen-inhalt-geraete" style="display:none;">
+                        <div id="meldungen-inhalt-devices">
                             <div class="es-zeile">
                                 <div class="es-zeile-name">
                                     <span data-i18n="settings_devices_notif_hint">Was ausgeschaltet ist, schickt der Server gar nicht erst</span>
@@ -2444,6 +2327,15 @@
                 </div>
                 <!------------ Security ------------>
                 <div class="es-abschnitt" id="section-sicherheit">
+                    <!-- Trusting the server's own certificate on this device (js/modules/ca-trust.js) -->
+                    <div class="es-karte" data-requires="server">
+                        <div class="es-karte-kopf">
+                            <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+                            <span data-i18n="ca_trust_head">Diesem Gerät vertrauen</span>
+                        </div>
+                        <div class="ca-trust" id="ca-trust"></div>
+                    </div>
+
                     <div class="es-karte" data-requires="server">
                         <div class="es-karte-kopf">
                             <svg class="es-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.4-3 8.2-7 9-4-.8-7-4.6-7-9V6z"/></svg>
@@ -2980,6 +2872,7 @@
     <script src="/static/js/modules/notification-list.js"></script>
 
     <script src="/static/js/modules/confirm-dialog.js"></script>
+    <script src="/static/js/modules/ca-trust.js"></script>
     <script src="/static/auth-handler.js"></script>
     <!--Socket.IO for WebSocket notifications-->
     <script src="/static/socket.io.js"></script>
@@ -3084,6 +2977,19 @@
             }
         }
 
+        // A secret comes back empty with `<field>_set` (server
+        // services/config_secrets.py): the field stays empty and says that a
+        // value is stored; typing a new one replaces it, empty keeps it.
+        function showSecret(id, value, isSet) {
+            const field = document.getElementById(id);
+            if (!field) return;
+            if (!('placeholder' in field.dataset)) field.dataset.placeholder = field.placeholder || '';
+            field.value = value || '';
+            field.placeholder = isSet
+                ? getText('settings_secret_saved', 'Gespeichert – leer lassen, um es zu behalten')
+                : field.dataset.placeholder;
+        }
+
         function getText(key, fallback = '') {
             return texts && texts[key] ? texts[key] : fallback;
         }
@@ -3109,8 +3015,10 @@
             try { localStorage.setItem('es_abschnitt', sectionId); } catch (_) {}
 
             // Content that is only fetched when the section is opened.
-            if (sectionId === 'meldungen' && typeof loadNotificationsUI === 'function') {
-                loadNotificationsUI();
+            // The log moved to its own tab (17sep26); this section is
+            // about WHO gets what.
+            if (sectionId === 'meldungen' && typeof ladeGeraeteMeldungen === 'function') {
+                ladeGeraeteMeldungen();
             }
             // "Angeschlossen" sits on the device page, not on the
             // connection page — it is about what the printer has, not about
@@ -3124,6 +3032,9 @@
                 && companionKarte.style.display !== 'none'
                 && typeof loadCompanionStatus === 'function') {
                 loadCompanionStatus();
+            }
+            if (sectionId === 'sicherheit' && window.CaTrust) {
+                window.CaTrust.render(document.getElementById('ca-trust'), getText);
             }
             if (sectionId === 'sicherheit' && typeof loadAllTokens === 'function') {
                 loadAllTokens();
@@ -4031,7 +3942,7 @@
                 edZeichne();
                 if (typeof showToast === 'function') {
                     showToast(edText('settings_ed_failed', 'Der Drucker hat das abgelehnt') +
-                              ': ' + e.message, 'error');
+                              ': ' + getText(e.message, e.message), 'error');
                 }
                 return false;
             }
@@ -4267,21 +4178,44 @@
         }
 
         async function edKalibrieren(schritt) {
-            const frage = edText('settings_ed_cal_confirm',
-                                 getText('set_ask_calib_move', 'Kalibrierung starten? Der Drucker fährt dabei selbstständig.'));
+            const frage = getText('cali_confirm',
+                                  'Kalibrierung jetzt starten? Der Drucker fährt dabei und heizt.');
             if (typeof skConfirm === 'function') {
                 if (!await skConfirm(frage)) return;
             } else if (!confirm(frage)) return;
-            edAktion('start_calibration', { schritte: [schritt] });
+            edKalibrierungSenden('start_calibration', { schritte: [schritt] });
         }
 
         async function edKalibrierLauf(name) {
-            const frage = edText('settings_ed_cal_confirm',
-                                 getText('set_ask_calib_move', 'Kalibrierung starten? Der Drucker fährt dabei selbstständig.'));
+            const frage = getText('cali_run_confirm',
+                                  'Diesen Lauf jetzt starten? Der Drucker fährt dabei und heizt.');
             if (typeof skConfirm === 'function') {
                 if (!await skConfirm(frage)) return;
             } else if (!confirm(frage)) return;
-            edAktion('start_calibration_run', { name: name });
+            edKalibrierungSenden('start_calibration_run', { name: name });
+        }
+
+        // "Started", or the server's reason in words -- the same as the
+        // calibration card on the dashboard and both apps. The reason is a
+        // text key where the server has one (guard_needs_pla), otherwise its
+        // own sentence.
+        async function edKalibrierungSenden(pfad, koerper) {
+            const verbindung = getText('connection_error', 'Verbindungsfehler');
+            try {
+                const r = await apiCall('/api/printer/' + pfad, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(koerper)
+                });
+                const d = await r.json().catch(() => ({}));
+                if (r.ok && d.ok !== false) {
+                    window.skToast(getText('cali_started', 'Kalibrierung gestartet'), 'info');
+                } else {
+                    window.skToast(getText(d.error, d.error || verbindung), 'error');
+                }
+            } catch (e) {
+                window.skToast(verbindung, 'error');
+            }
         }
 
         // Search: filters the directory and the rows of the open
@@ -4701,7 +4635,7 @@
                 updatePrinterGallery(printerModel);
                 document.getElementById('bambu_ip').value = config.mqtt.bambu_ip || '';
                 document.getElementById('bambu_serial').value = config.mqtt.bambu_serial || '';
-                document.getElementById('bambu_access_code').value = config.mqtt.bambu_access_code || '';
+                showSecret('bambu_access_code', config.mqtt.bambu_access_code, config.mqtt.bambu_access_code_set);
 
                 // Maintenance Notifications
                 document.getElementById('maintenance_notifications_enabled').checked = config.mqtt.maintenance_notifications?.enabled !== false;
@@ -4741,11 +4675,6 @@
                 document.getElementById('hardware_button_enabled').checked = config.hardware_button.enabled || false;
             }
 
-            // Camera
-            if (config.ustreamer) {
-                document.getElementById('camera_enabled').checked = config.ustreamer.enabled || false;
-            }
-
             // Costs
             if (config.costs) {
                 document.getElementById('filament_cost').value = config.costs.filament_per_kg || 21.0;
@@ -4781,11 +4710,19 @@
                 document.getElementById('spoolman_auto_track').checked = config.spoolman.auto_track || false;
             }
 
+            // External spools. Whether the card shows, the server says
+            // (backend_capabilities: dual_nozzle).
+            {
+                const aussen = config.external_spools || {};
+                document.getElementById('external_adapter_left').checked = !!aussen.adapter_left;
+                document.getElementById('external_adapter_right').checked = !!aussen.adapter_right;
+            }
+
             // Home Assistant
             if (config.homeassistant) {
                 document.getElementById('ha_enabled').checked = config.homeassistant.enabled !== false;
                 document.getElementById('ha_url').value = config.homeassistant.ha_url || '';
-                document.getElementById('ha_token').value = config.homeassistant.token || '';
+                showSecret('ha_token', config.homeassistant.token, config.homeassistant.token_set);
             }
 
             // Build the socket picker: show the stored UUID, fetch the devices on a button press.
@@ -4853,7 +4790,7 @@
             if (config.meross) {
                 document.getElementById('meross_enabled').checked = config.meross.enabled || false;
                 document.getElementById('meross_email').value = config.meross.email || '';
-                document.getElementById('meross_password').value = config.meross.password || '';
+                showSecret('meross_password', config.meross.password, config.meross.password_set);
                 document.getElementById('meross_device').value = config.meross.device_name || '';
                 document.getElementById('meross_region').value = config.meross.region || 'eu';
                 // Local-only: the switch is always shown. Hiding it until
@@ -5073,9 +5010,6 @@
                 notifications: {
                     vent_reminder: document.getElementById('vent_reminder_enabled').checked
                 },
-                ustreamer: {
-                    enabled: document.getElementById('camera_enabled').checked
-                },
                 costs: {
                     filament_per_kg: parseFloat(document.getElementById('filament_cost').value) || 21.0,
                     power_per_kwh: parseFloat(document.getElementById('power_cost').value) || 0.285
@@ -5092,6 +5026,10 @@
                     bed_leveling: document.getElementById('print_bed_leveling_mode').value !== '0',
                     flow_cali: document.getElementById('print_flow_cali_mode').value !== '0',
                     vibration_cali: document.getElementById('print_vibration_cali').checked
+                },
+                external_spools: {
+                    adapter_left: document.getElementById('external_adapter_left').checked,
+                    adapter_right: document.getElementById('external_adapter_right').checked
                 },
                 spoolman: {
                     enabled: document.getElementById('spoolman_enabled').checked,
@@ -6070,8 +6008,11 @@
         // nothing about the rest.
         window.showSuccess = (msg) => window.skToast(msg, 'success');
         window.showError = (msg) => window.skToast(msg, 'error');
-        function showToast(id, message) {
-            window.skToast(message, id === 'errorToast' ? 'error' : 'success');
+        // (text, type) -- the way every call on this page passes it. It used
+        // to read (id, message): every call then showed the word "error" or
+        // "info" in green instead of its message.
+        function showToast(message, art) {
+            window.skToast(message, art || 'info');
         }
 
         // Test Custom HMS Code
@@ -6650,16 +6591,6 @@
         }
 
         /** Which of the two tabs in "Benachrichtigungen" is showing. */
-        function zeigeMeldungsReiter(welcher) {
-            ['verlauf', 'devices'].forEach(function (name) {
-                const inhalt = document.getElementById('meldungen-inhalt-' + name);
-                const knopf = document.getElementById('meldungen-reiter-' + name);
-                if (inhalt) inhalt.style.display = (name === welcher) ? '' : 'none';
-                if (knopf) knopf.classList.toggle('es-knopf--haupt', name === welcher);
-            });
-            if (welcher === 'devices') ladeGeraeteMeldungen();
-        }
-
         function initDeskNotifySettings() {
             const karte = document.getElementById('desk-notify-card');
             if (!karte || !window.electronAPI || !window.electronAPI.getNotifyPrefs) return;
@@ -7424,7 +7355,8 @@
         // Rechner koennen zwei Leute angemeldet sein; wer den einen abmeldet,
         // wirft den anderen nicht mit hinaus.
         async function deleteDeviceToken(loginId) {
-            if (!await window.skConfirm(getText('sec_ask_device', 'Möchtest du dieses Gerät wirklich entfernen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_device', 'Möchtest du dieses Gerät wirklich entfernen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/auth/login/${loginId}`, { method: 'DELETE' });
@@ -7441,7 +7373,8 @@
         }
 
         async function deleteWebSession(sessionId) {
-            if (!await window.skConfirm(getText('sec_ask_session', 'Möchtest du diese Web-Sitzung wirklich löschen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_session', 'Möchtest du diese Web-Sitzung wirklich löschen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/auth/sessions/${sessionId}`, { method: 'DELETE' });
@@ -7458,7 +7391,8 @@
         }
 
         async function deleteFCMToken(token) {
-            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/tokens/fcm/${encodeURIComponent(token)}`, { method: 'DELETE' });
@@ -7475,7 +7409,8 @@
         }
 
         async function deleteLiveActivityToken(token) {
-            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/tokens/live_activity/${encodeURIComponent(token)}`, { method: 'DELETE' });
@@ -7492,7 +7427,8 @@
         }
 
         async function deleteLiveActivityStartToken(token) {
-            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/tokens/live_activity_start/${encodeURIComponent(token)}`, { method: 'DELETE' });
@@ -7509,7 +7445,8 @@
         }
 
         async function deleteOrphanedToken(jti) {
-            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'))) return;
+            if (!await window.skConfirm(getText('sec_ask_token', 'Diesen Token wirklich löschen?'),
+                { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const response = await apiCall(`/api/auth/tokens/orphaned/${jti}`, { method: 'DELETE' });
@@ -7601,10 +7538,9 @@
                     statusEl.style.color = '';
                     statusEl.textContent = statusText;
 
-                    // The counters belong to the server's MJPEG pipeline. When
-                    // the apps take the stream straight from go2rtc (WebRTC)
-                    // nothing counts here -- four zeros then stood there as if
-                    // the camera were broken.
+                    // The counters belong to the one session to the printer.
+                    // While nobody watches it rests and counts nothing -- four
+                    // zeros then stood there as if the camera were broken.
                     const zaehlerAn = status.thread_alive || status.frame_count > 0;
                     document.getElementById('bambu-camera-status').style.display = zaehlerAn ? '' : 'none';
 
@@ -7701,18 +7637,18 @@
         }
 
         // Auto-refresh camera status when on camera section
-        // How does the picture reach the apps? go2rtc passes the printer's
-        // H.264 through as WebRTC; the server's single-frame pipeline is only
-        // the fallback.
+        // How does the picture reach the apps? The server passes the
+        // printer's H.264 on as the live stream; single frames are only the
+        // fallback (through the tunnel).
         async function ladeKameraUebertragung() {
             const marke = document.getElementById('kamera-uebertragung');
             if (!marke) return;
             try {
-                const r = await apiCall('/api/camera/mode');
+                const r = await apiCall('/api/camera/mode?live=1');
                 const d = await r.json();
                 marke.className = 'es-marke';
-                if (d.type === 'webrtc') {
-                    marke.textContent = getText('settings_camera_webrtc', 'WebRTC über go2rtc');
+                if (d.type === 'live') {
+                    marke.textContent = getText('settings_camera_live', 'Live-Stream (H.264)');
                     marke.classList.add('es-marke--gut');
                 } else if (d.type === 'mjpeg') {
                     marke.textContent = getText('settings_camera_mjpeg', 'Einzelbilder (MJPEG)');
@@ -7865,73 +7801,10 @@
             }
         });
 
-        // ================== Notifications Section ==================
-        window.__notifAll = [];
-        window.__notifFilter = 'all';
-        async function loadNotificationsUI() {
-            const list = document.getElementById('notif-list');
-            if (!list) return;
-            try {
-                const call = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
-                const resp = await call('/api/notifications/recent?limit=100');
-                if (!resp.ok) {
-                    list.innerHTML = '<div class="nb-leer">' + getText('nb_error', 'Fehler beim Laden') + '</div>';
-                    return;
-                }
-                const data = await resp.json();
-                window.__notifAll = data.notifications || [];
-                renderNotifications();
-            } catch (e) {
-                list.innerHTML = '<div class="nb-leer">' + getText('nb_error', 'Fehler beim Laden') + '</div>';
-            }
-        }
-
-        function setNotifFilter(f) {
-            window.__notifFilter = f;
-            document.getElementById('notif-filter-all').classList.toggle('es-knopf--haupt', f === 'all');
-            document.getElementById('notif-filter-unread').classList.toggle('es-knopf--haupt', f === 'unread');
-            renderNotifications();
-        }
-
-        function renderNotifications() {
-            window.notificationList.zeichne(document.getElementById('notif-list'), window.__notifAll, {
-                filter: window.__notifFilter,
-                aufWeg: dismissNotif,
-            });
-        }
-
-        async function dismissNotif(id) {
-            try {
-                const call = window.apiCall || ((url, opts) => fetch(url, {...opts, credentials: 'include'}));
-                await call(`/api/notifications/${encodeURIComponent(id)}/dismiss`, { method: 'POST' });
-                const n = window.__notifAll.find(x => x.id === id);
-                if (n) {
-                    n.is_dismissed_here = true;
-                    n.dismissed_by = n.dismissed_by || {};
-                    n.dismissed_by['_self'] = Date.now() / 1000;
-                }
-                renderNotifications();
-            } catch (e) { console.error('Dismiss failed', e); }
-        }
-
-        // Auto update when another client marks it
-        if (window.settingsSocket) {
-            const onPeer = data => {
-                if (!data || !data.id) return;
-                const n = window.__notifAll.find(x => x.id === data.id);
-                if (n) {
-                    if (data.device_id) {
-                        n.dismissed_by = n.dismissed_by || {};
-                        n.dismissed_by[data.device_id] = Date.now() / 1000;
-                    }
-                    renderNotifications();
-                }
-            };
-            try {
-                window.settingsSocket.on('notification_dismissed', onPeer);
-                window.settingsSocket.on('notification_read', onPeer);
-            } catch (_) {}
-        }
+        // The notification log lives on its own page since 17sep26
+        // (static/notifications.html, reachable from the tab bar). What used
+        // to stand here -- fetch, filter, dismiss -- moved with it; the
+        // section keeps what it is for: which device gets which message.
     </script>
     <script>
         // Klipper direct: hide the Bambu server sections. This applies ONLY
@@ -7958,6 +7831,8 @@
             //                 defaults, the Bambu hardware list
             //   config_store  GET and POST /api/config really store something
             //   moonraker     Moonraker and the companion, spoken to directly
+            //
+            //   dual_nozzle   a Bambu printer with two nozzles (external spools)
             //
             // The three interfaces differ here for a real reason: the web in
             // direct mode is served by the Electron adapter, which DOES have
@@ -8222,9 +8097,9 @@
                 // The printer, camera and Meross direct texts are not in the
                 // page's static markup, so they are set here.
                 var t = function (k, fb) { return getText(k, fb); };
-                // 2) Camera as on Android: out with the Bambu uStreamer cards,
+                // 2) Camera as on Android: out with the Bambu camera cards,
                 //    in with the Moonraker camera list with on/off and edit.
-                hideClosest('camera_enabled', '.es-karte');
+                hideClosest('default_camera_size', '.es-karte');
                 hideClosest('bambu-camera-status', '.es-karte');
                 var ct = document.getElementById('card-camera-title');
                 if (ct) ct.textContent = t('settings_cameras_title', 'Kameras');
@@ -8557,7 +8432,8 @@
 
             async function companionDeleteDevice(id) {
                 if (!id) return;
-                if (!await window.skConfirm(getText('companion_confirm_delete', 'Dieses Gerät aus der Companion entfernen? Es bekommt dann keine Push-Benachrichtigungen mehr.'))) return;
+                if (!await window.skConfirm(getText('companion_confirm_delete', 'Dieses Gerät aus der Companion entfernen? Es bekommt dann keine Push-Benachrichtigungen mehr.'),
+                    { okText: getText('delete', 'Löschen'), danger: true })) return;
                 try {
                     const r = await apiCall('/api/companion/device/delete', {
                         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -8607,6 +8483,7 @@
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/frage-karte.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
     <script src="/static/js/modules/notification-stack.js"></script>
 </body>

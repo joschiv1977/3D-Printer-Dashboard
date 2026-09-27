@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/css/base.css?v=3">
     <link rel="stylesheet" href="/static/css/shared-styles.css?v=3">
     <link rel="stylesheet" href="/static/css/components.css?v=3">
-    <link rel="stylesheet" href="/static/css/einstellungen.css?v=3">
+    <link rel="stylesheet" href="/static/css/einstellungen.css?v=4">
     <link rel="stylesheet" href="/static/font-awesome.min.css">
     <style>
         /* Only what a wizard needs and the settings page doesn't know:
@@ -509,6 +509,14 @@
                         data-i18n="setup_finish_start">Einrichtung abschließen</button>
             </div>
         </div>
+
+        <!-- Trusting the server's own certificate on this device (js/modules/ca-trust.js) -->
+        <div class="es-karte">
+            <div class="es-karte-kopf">
+                <i class="fa fa-shield"></i><span data-i18n="ca_trust_head">Diesem Gerät vertrauen</span>
+            </div>
+            <div class="ca-trust" id="ca-trust"></div>
+        </div>
     </div>
 </div>
 
@@ -521,6 +529,7 @@
     yet, it throws -- and `window.themeManager` never gets set. -->
 <script src="/static/js/modules/icons.js"></script>
 <script src="/static/js/modules/theme-manager.js"></script>
+<script src="/static/js/modules/ca-trust.js"></script>
 <script>
 // ─────────────────────────────────────────────────────────────────────
 // Language. Same approach as login.html: the file is loaded afterward
@@ -543,6 +552,8 @@ function texteSetzen() {
         if (wert) el.setAttribute('title', wert);
     });
     if (texte.setup_title) document.title = texte.setup_title;
+    // The trust card builds its texts itself -- again once the language is in.
+    if (caTrustShown) window.CaTrust.render(document.getElementById('ca-trust'), t);
 }
 
 (function ladeSprache() {
@@ -571,6 +582,7 @@ function texteSetzen() {
 // Steps
 // ─────────────────────────────────────────────────────────────────────
 let schritt = 1;
+let caTrustShown = false;
 
 function schritteZeichnen() {
     for (let i = 1; i <= 5; i++) {
@@ -579,6 +591,12 @@ function schritteZeichnen() {
         marke.classList.toggle('aktiv', i === schritt);
         marke.classList.toggle('fertig', i < schritt);
         karte.classList.toggle('aktiv', i === schritt);
+    }
+    // The last step: can this device trust the server? Checked only here, so
+    // the wizard registers no service worker before it is needed.
+    if (schritt === 5 && !caTrustShown && window.CaTrust) {
+        caTrustShown = true;
+        window.CaTrust.render(document.getElementById('ca-trust'), t);
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -742,7 +760,7 @@ async function modelleLaden() {
         });
     } catch (err) {
         wahl.innerHTML = '<option value="">' + t('setup_models_fail', 'Liste nicht ladbar') + '</option>';
-        console.error('Modelle laden:', err);
+        console.error('Loading the models:', err);
     }
 }
 
@@ -1033,7 +1051,6 @@ const ABSCHLUSS_TEXTE = {
     profile: ['setup_fin_profile', 'Slicer-Profile'],
     wartung: ['setup_fin_maintenance', 'Wartungsplan'],
     drucker: ['setup_fin_printer', 'Drucker erreichbar'],
-    kamera:  ['setup_fin_camera',  'Kamera vorbereiten'],
 };
 const ABSCHLUSS_ZEICHEN = { offen: '·', laeuft: '…', fertig: '✓', warnung: '!' };
 

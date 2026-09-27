@@ -664,10 +664,12 @@ input[type="range"].z-slider {
        the way the side view draws it: Z counts from the nozzle downwards, so
        pushing the handle down drops the bed. With rtl the two ran against
        each other. */
-    /* Two mechanisms on purpose: Chrome 121 removed slider-vertical and
-       orients by writing-mode, older engines only know the property. */
-    -webkit-appearance: slider-vertical;
-    appearance: slider-vertical;
+    /* Vertical by writing-mode -- the standard way (Chrome 124, Safari 17.4,
+       Firefox 120); the old slider-vertical keyword draws a deprecation
+       warning. The engine's own slider (auto, against base.css's none) keeps
+       the green fill up to the thumb. */
+    -webkit-appearance: auto;
+    appearance: auto;
     writing-mode: vertical-lr;
     /* Same 240 as the side view beside it, so bed line and handle share a
        scale. min-height keeps it standing if a parent ever shrinks it. */
@@ -1174,6 +1176,10 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 .fk-nass { fill: rgba(239,68,68,0.20); stroke: none; }
 .fk-linie { fill: none; stroke: #3b82f6; stroke-width: 1.6;
             vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+/* The newest reading. Over two days its last minutes are two pixels wide --
+   the dot is what says the curve is current (17sep26). */
+.fk-letzter { fill: #3b82f6; stroke: var(--card-bg, #1e1e1e); stroke-width: 1;
+              vector-effect: non-scaling-stroke; }
 .fk-schwelle { stroke: #ef4444; stroke-width: 1; stroke-dasharray: 4 3;
             vector-effect: non-scaling-stroke; opacity: 0.55; }
 /* Tooltip on the pointer: its own element on body, not inside the
@@ -1215,7 +1221,7 @@ body.dark-mode .dfx-wires circle { stroke: rgba(220, 220, 220, 0.75); }
 
 /* Dried filament as a badge — it's a property of the run,
    not a measured value, so not a fourth column. */
-.dry-chip-kopf { font-size: 10.5px; font-weight: 600; opacity: 0.7;
+.dry-chip-head { font-size: 10.5px; font-weight: 600; opacity: 0.7;
             margin-right: 7px; text-transform: uppercase; letter-spacing: 0.03em; }
 .dry-chip { display: inline-flex; align-items: center; margin-bottom: 12px;
             padding: 4px 11px; border-radius: 999px; font-size: 12.5px;

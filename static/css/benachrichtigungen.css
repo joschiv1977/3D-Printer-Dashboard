@@ -33,6 +33,21 @@
 .nb-btn:hover { border-color: var(--color-blue, #2196F3); }
 
 /* --- Filter: two toggles with a count --- */
+/* Section heading -- "waiting for you" above, "history" below. */
+.nb-abschnitt-titel {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary, #6b7684);
+    margin: 4px 0 8px;
+}
+
+.nb-abschnitt { margin-bottom: 18px; }
+
+/* The question list is display:flex, so [hidden] needs saying again. */
+.fk-liste[hidden] { display: none; }
+
 .nb-filter { display: flex; gap: 7px; margin-bottom: 12px; }
 .nb-filter button {
     border: 1px solid var(--border-color); background: var(--bg-card-variant);
@@ -99,12 +114,13 @@ body.dark-mode .nb-filter button.an {
 .nb-kanaele { display: inline-flex; gap: 4px; }
 
 .nb-tat { display: flex; align-items: center; gap: 6px; flex: none; }
+/* A round cross, no word beside it: "dismiss" stood next to every single
+   row and said what the cross says already (21sep26). */
 .nb-weg {
     border: 1px solid var(--border-color); background: var(--bg-card-variant);
-    color: var(--text-secondary); border-radius: var(--knopf-radius);
-    padding: var(--knopf-polster-klein); font: inherit;
-    font-size: var(--knopf-schrift-klein); cursor: pointer;
-    display: inline-flex; align-items: center; gap: 5px;
+    color: var(--text-secondary); border-radius: 999px;
+    width: 30px; height: 30px; padding: 0; font: inherit; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
 }
 .nb-weg:hover { color: var(--text-primary); border-color: var(--text-secondary); }
 .nb-gelesen { font-size: 11.5px; color: var(--text-secondary); opacity: 0.8; }

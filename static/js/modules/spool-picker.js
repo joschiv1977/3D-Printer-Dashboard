@@ -39,6 +39,7 @@
         sortierung: 'zuletzt',
         gewaehlt: null,
         onWahl: null,
+        onKeine: null,   // "none of them" -- the answer to a question of the state
     };
 
     const t = (schluessel, standard) => (window.texts || {})[schluessel] || standard;
@@ -235,6 +236,7 @@
         const name = [((fil.vendor || {}).name || ''), fil.name || ''].filter(Boolean).join(' ')
             || (e.type || '');
         const zeit = window.amsHumidity.spanne(e.history);
+        const letzte = window.amsHumidity.letzteZeit(e.history);
         const kurve = window.amsHumidity.kurve(e.history, feuchteSchwelle, 480, 96);
         const worte = {
             trocken: t('humidity_verdict_dry', 'trocken'),
@@ -264,6 +266,7 @@
                 <div class="spf-kopf">
                     <span class="spf-urteil spf-urteil--${esc(e.verdict)}">${esc(worte[e.verdict] || e.verdict)}</span>
                     ${zeit.text ? `<span class="spf-spanne">${esc(zeit.text)}</span>` : ''}
+                    ${letzte ? `<span class="spf-spanne">${esc(letzte)}</span>` : ''}
                     <span class="spf-grenze">${esc(t('humidity_threshold', 'Grenze {s} %')
                         .replace('{s}', feuchteSchwelle))}</span>
                 </div>
@@ -408,24 +411,47 @@
      */
     async function oeffne(opts = {}) {
         const sm = window.spoolmanManager;
+        // Right after a page load the manager has not asked the server yet,
+        // and `connected` is false until it has. "Assign spool" on the
+        // messages page opens the main page and the picker in the same
+        // moment: on 18sep26 it said "Spoolman must be enabled" instead of
+        // opening. Ask first, then decide.
+        if (sm && !sm.connected && typeof sm.checkStatus === 'function') {
+            await sm.checkStatus();
+        }
         if (!sm || !sm.connected) {
             window.skToast && window.skToast(t('spoolman_required', 'Spoolman nicht verbunden'), 'warning');
             return;
         }
+        // The list is no longer reloaded every 30 s (spoolman-manager.js); it
+        // is fetched here, where somebody is about to look at it.
+        if (sm.ensureSpools) await sm.ensureSpools();
 
         zustand = Object.assign(zustand, {
             spools: sm.spools || [],
-            treffer: [],
+            // Candidates: from the file's match, or handed in (the
+            // filament state suggests spools for its open question).
+            treffer: Array.isArray(opts.treffer) ? opts.treffer : [],
             datei: opts.datei || null,
             wanted: null,
             material: null,
             suche: '',
             gewaehlt: opts.gewaehlt != null ? opts.gewaehlt : (window.activeSpoolId || null),
             onWahl: opts.onWahl || null,
+            onKeine: opts.onKeine || null,
         });
 
         const fenster = document.getElementById('spoolPickerModal');
         if (!fenster) return;
+        // "No spool" only where the picker activates directly (the material
+        // card) and only while there is an active spool to clear.
+        const abwahl = document.getElementById('spw-abwaehlen');
+        // "No spool": for a question of the state it is the answer "none of
+        // them"; on the material card it clears the active spool.
+        if (abwahl) {
+            abwahl.hidden = zustand.onKeine
+                ? false : (!!zustand.onWahl || !window.activeSpoolId);
+        }
         // The tray dialog sits at z-index 10050. Without this the picker
         // opened BEHIND it -- only the dimming was visible.
         if (window.skNachVorn) window.skNachVorn(fenster, 1006);
@@ -508,6 +534,19 @@
         }
     });
 
-    window.spoolPicker = { oeffne, schliesse, uebernehmen };
+    /** "No spool": clears the active spool on the server (material card only). */
+    async function abwaehlen() {
+        if (zustand.onKeine) {
+            const fertig = zustand.onKeine;
+            schliesse();
+            fertig();
+            return;
+        }
+        const sm = window.spoolmanManager;
+        if (!sm) return;
+        if (await sm.deactivate()) schliesse();
+    }
+
+    window.spoolPicker = { oeffne, schliesse, uebernehmen, abwaehlen };
     window.openSpoolPicker = (opts) => oeffne(opts);
 })();

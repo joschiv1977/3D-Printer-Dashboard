@@ -14,138 +14,9 @@
 
     const KNOTEN = 'hms-error-banner';
 
-    // Codes that ask the user something instead of just reporting.
-    //
-    // Both are the manual filament change: the printer pauses and waits
-    // for an answer. Until now the message stood here and the answer sat
-    // on the resume button elsewhere on the screen — one had to read in
-    // one place and act in another.
-    //
-    // Tied to the phase AND the code on purpose. The phase alone would put
-    // buttons under whatever message happens to show while the printer is
-    // paused; the code alone would offer them after the pause is over.
-    // Bambu marks 345 codes for the X2D as needing an action
-    // (hms_action_20P.json in Bambu Studio), but that table does not say
-    // WHICH command answers them — for these two we know it, from the
-    // MQTT capture of 17apr26. Hence two, not 345.
-    // The confirmation "has filament been extruded?" — six times, per nozzle
-    // and AMS kind. Answer: ams_control done | resume, without a side reference.
-    const BESTAETIGEN = ['07FF-8007', '07FE-8007', '18FF-8007', '18FE-8007',
-                         '07FF-C00A', '07FE-C00A'];
-
-    // Prompts to do something by hand ("pull the filament out",
-    // "feed it into the PTFE tube"). Bambu's own action table
-    // gives them action 9, and the printer display shows
-    // "Resume" for it (hms_action_20P.json). The command behind it is
-    // ams_control resume — measured 30aug26: 07FF-C003 stood for twelve
-    // seconds, 1.3 s after the command it was gone.
-    const FORTSETZEN = [
-        '07FE-8002', '07FE-8003', '07FE-8004', '07FE-8005',
-        '07FE-8006', '07FE-8010', '07FE-8025', '07FE-8030',
-        '07FE-C003', '07FE-C006', '07FE-C008', '07FE-C009',
-        '07FE-C010', '07FE-C030', '07FF-8002', '07FF-8003',
-        '07FF-8004', '07FF-8005', '07FF-8006', '07FF-8010',
-        '07FF-8017', '07FF-8025', '07FF-8030', '07FF-C003',
-        '07FF-C006', '07FF-C008', '07FF-C009', '07FF-C010',
-        '07FF-C030', '18FE-8004', '18FE-8005', '18FF-8003',
-        '18FF-8004', '18FF-8005'];
-
-    /**
-     * Which buttons belong under which message.
-     *
-     * By CODE, not by phase. The phase only exists for the two
-     * codes the server knows — `07FF-C003` for instance never has one, and
-     * that is exactly why it stood there without a button on 30aug26 although the
-     * Druckerdisplay "Fortsetzen" anbot.
-     *
-     * `phase` only stands where it is really needed: on loading
-     * the M620 sequence goes out, and its slot numbers come from a
-     * recording of a single-nozzle device. That one stays tied to the print.
-     */
-    function frageZu(code, phase) {
-        const ist = function (liste) {
-            return liste.some(function (c) { return gleich(c, code); });
-        };
-        if (ist(BESTAETIGEN)) {
-            return [{ aktion: 'done',  text: 'filament_change_done', haupt: true },
-                    { aktion: 'retry', text: 'filament_change_retry' }];
-        }
-        if (ist(FORTSETZEN)) {
-            return [{ aktion: 'retry', text: 'filament_change_continue', haupt: true }];
-        }
-        if (phase === 1 && gleich('07FF-8003', code)) {
-            return [{ aktion: 'load', text: 'filament_change_load', haupt: true }];
-        }
-        // Our own question after unloading: was the spool taken off the
-        // holder? The answer goes to the server, not to the printer — the
-        // reset lives in the route so every client takes the same way.
-        if (gleich('SPULE-LINKS', code) || gleich('SPULE-RECHTS', code)) {
-            return [{ aktion: 'reset', text: 'spool_prompt_reset', haupt: true,
-                      ruf: 'spulenAntwort' },
-                    { aktion: 'keep', text: 'spool_prompt_keep',
-                      ruf: 'spulenAntwort' }];
-        }
-        return null;
-    }
-
-    /**
-     * Draw the answer buttons, if this message is one that asks something.
-     *
-     * Returns silently when nothing matches — most messages just report.
-     */
-    function zeichneAktionen(el, daten, code) {
-        const kasten = el.querySelector('#hms-error-actions');
-        if (!kasten) return;
-
-        const phase = (daten && daten.filament_change_phase) || 0;
-        const frage = frageZu(code, phase);
-        // Which function answers is on the button, not fixed: our own
-        // questions do not go through the filament-change route.
-        const ruferDa = (k) => typeof global[k.ruf || 'filamentChangeAction'] === 'function';
-        const passt = !!frage && frage.every(ruferDa);
-
-        // Only rebuild when something really changes.
-        //
-        // Before, the box was emptied and refilled on EVERY draw —
-        // and it is drawn on every status push, so during a filament
-        // run-out once a second. The buttons vanished under the
-        // finger that way: mouse down on one element, up on its
-        // successor, and a click never happens.
-        // Reported 30aug26 — the buttons stood there and did nothing.
-        const kennung = passt ? phase + ':' + String(code).toUpperCase() : '';
-        if (kasten.dataset.stand === kennung) return;
-        kasten.dataset.stand = kennung;
-        kasten.innerHTML = '';
-        if (!passt) return;
-
-        const texte = global.texts || {};
-        frage.forEach(function (k) {
-            const b = document.createElement('button');
-            b.className = k.haupt ? 'knopf knopf--primaer' : 'knopf';
-            b.textContent = texte[k.text] || k.aktion;
-            b.addEventListener('click', function () {
-                // Locked while the call runs, free again afterwards.
-                // Locking permanently was wrong: after "load again" the
-                // printer asks the same thing once more, and then
-                // "done — continue" has to work.
-                const frei = function (an) {
-                    Array.prototype.forEach.call(kasten.children, function (x) {
-                        x.disabled = !an;
-                    });
-                };
-                frei(false);
-                let p;
-                try { p = global[k.ruf || 'filamentChangeAction'](k.aktion, code); }
-                catch (e) { frei(true); throw e; }
-                if (p && typeof p.then === 'function') {
-                    p.then(function () { frei(true); }, function () { frei(true); });
-                } else {
-                    frei(true);
-                }
-            });
-            kasten.appendChild(b);
-        });
-    }
+    // Printer dialogs that wait for an answer ("did filament come out?",
+    // "pull it out") are not drawn here: they stand in the question card in
+    // the middle of the page, with their buttons (frage-karte.js, 16sep26).
 
     /** The stack. On the main page it stands in the page, elsewhere not.
      *
@@ -293,8 +164,14 @@
             if (!anliegend.has(k)) soebenWeggeklickt.delete(k);
         });
 
+        const phase = (daten && daten.filament_change_phase) || 0;
         const offen = alle.filter(function (f) {
             if (soebenWeggeklickt.has(schluesselVon(f))) return false;
+            if (global.FrageKarte && global.FrageKarte.druckerAktionen(f.code, phase)) return false;
+            // A printer error stands in the question card as well, until it is
+            // dismissed (frage-karte.js, 18sep26); only notices stay here.
+            if (global.FrageKarte && f.is_info !== true
+                    && String(f.code || '').toUpperCase() !== 'KLIPPER_ERROR') return false;
             return !(lage.weggeklickt && lage.weggeklickt(f.code));
         });
 
@@ -334,7 +211,6 @@
         el.dataset.messageId = fehler.message_id || '';
         el.classList.toggle('mld--info', istHinweis);
         el.classList.toggle('mld--fehler', !istHinweis);
-        zeichneAktionen(el, daten, code);
         el.classList.add('active');
         // Showing belongs here, not in the stack: .active only makes the node
         // a flex box, and it becomes visible with .mld-an

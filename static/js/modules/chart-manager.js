@@ -388,7 +388,7 @@ class ChartManager {
             });
 
         } catch (error) {
-            console.error(texts.console_combined_chart_update_error + ':', error);
+            console.error('Combined chart update error:', error);
         }
     }
 
@@ -532,7 +532,7 @@ class ChartManager {
             });
 
         } catch (error) {
-            console.error(texts.console_combined_chart_error + ':', error);
+            console.error('Combined chart error:', error);
         }
     }
 
@@ -768,7 +768,7 @@ class ChartManager {
             }
 
         } catch (error) {
-            console.error(texts.console_chart_error + ':', error);
+            console.error('Chart error:', error);
         }
     }
 
@@ -792,7 +792,7 @@ class ChartManager {
                 });
             }
         } catch (error) {
-            console.error(texts.console_chart_update_error + ':', error);
+            console.error('Chart update error:', error);
         }
     }
 }

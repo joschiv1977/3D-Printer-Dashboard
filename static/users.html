@@ -681,7 +681,8 @@
                 ? texts.users_confirm_delete_user.replace('{username}', username)
                 : `Möchtest du den Benutzer "${username}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden!`;
 
-            const confirmed = await showConfirmDialog(confirmMsg, texts.users_delete_title || 'Benutzer löschen');
+            const confirmed = await showConfirmDialog(confirmMsg, texts.users_delete_title || 'Benutzer löschen',
+                { okText: texts.delete || 'Löschen', danger: true });
             if (!confirmed) return;
 
             try {
@@ -714,16 +715,10 @@
         function showSuccess(msg) { window.skHinweis.erfolg(msg); }
         function showError(msg)   { window.skHinweis.fehler(msg); }
 
-        // Wrapper for confirm() - uses Electron's showConfirm or the native confirm
-        async function showConfirmDialog(message, title) {
-            title = title || texts.confirm_title || 'Bestätigung';
-            if (window.electronAPI && window.showConfirm) {
-                return await window.showConfirm({ title: title, message: message, type: 'warning' });
-            } else if (window.skConfirm) {
-                return await window.skConfirm(message, { title });
-            } else {
-                return confirm(message);
-            }
+        // The confirmation from confirm-dialog.js -- the same one as on every
+        // other page, in the Electron app too.
+        function showConfirmDialog(message, title, opts) {
+            return window.skConfirm(message, { ...opts, title: title || texts.confirm_title });
         }
 
         const langNames = { de: 'Deutsch', en: 'English', fr: 'Français', es: 'Español', it: 'Italiano' };
@@ -850,6 +845,7 @@
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/frage-karte.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
     <script src="/static/js/modules/notification-stack.js"></script>
 </body>

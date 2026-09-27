@@ -3,17 +3,17 @@
     "product": "server",
     "channel": "stable",
     "platform": "macos",
-    "version": "2.3.3",
+    "version": "2.3.7",
     "files": [
       {
-        "name": "3D-Printer-Server-2.3.3.zip",
-        "sha256": "49fa9aecababfbfd090004f7f34e1655891998e774142d2abd320e94cd28993a",
-        "size": 225560559,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.3/3D-Printer-Server-2.3.3.zip"
+        "name": "3D-Printer-Server-2.3.7.zip",
+        "sha256": "756e42986865f9fbeaa9ccbaf63b62c401d12f1867225c6768c0b9062e9081f4",
+        "size": 220315299,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.7/3D-Printer-Server-2.3.7.zip"
       }
     ],
     "notes": null,
-    "issued": 1789413733
+    "issued": 1790533317
   },
-  "signature": "y0sHypwj3cenZBvjkrf0v/oxDjkN/weDznzyoUFTmJmgY/7Qtj3yMTsB26OGbpezFNhLcZOUPw6Y2nKk6wS+Bg=="
+  "signature": "UMla1WYgPmASElzEs9koAfbOp5WQQ+OprWjbvtth+ryXsRrcxJ/7cZiY5BkzstAGHF86jIIWFMg1v/lQq/V8AA=="
 }

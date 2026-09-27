@@ -77,68 +77,6 @@ print_success() { echo -e "${GREEN}[OK]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# ==================== CAMERA SERVER - go2rtc (macOS) ====================
-
-# Match OUR go2rtc only. `pgrep -f go2rtc` catches every process carrying the
-# word in its command line -- on a machine running Home Assistant that
-# includes its own (seen on the Pi, 01sep26). The config file name is unique.
-GO2RTC_MUSTER="${GO2RTC_MUSTER:-go2rtc.yaml}"
-
-# Check if camera server should be used (macOS + ustreamer enabled in config)
-should_use_camera_server() {
-    if $IS_MACOS && [ -f "$APP_DIR/data/config.json" ]; then
-        USTREAMER_ENABLED=$("$APP_DIR/venv/bin/python3" -c "import json; print(json.load(open('$APP_DIR/data/config.json')).get('ustreamer',{}).get('enabled', False))" 2>/dev/null)
-        [ "$USTREAMER_ENABLED" = "True" ]
-    else
-        return 1
-    fi
-}
-
-CAMERA_PLIST_LABEL="com.printerwebapp.camera"
-CAMERA_PLIST_FILE="$HOME/Library/LaunchAgents/${CAMERA_PLIST_LABEL}.plist"
-
-start_camera_server() {
-    if ! should_use_camera_server; then
-        return
-    fi
-
-    if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-        print_status "Camera server (go2rtc) already running"
-        return
-    fi
-
-    if [ -f "$CAMERA_PLIST_FILE" ]; then
-        print_status "Starting camera server (go2rtc via launchctl)..."
-        launchctl load "$CAMERA_PLIST_FILE" 2>/dev/null
-        sleep 2
-        if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-            print_success "Camera server (go2rtc) started"
-        else
-            print_error "Camera server (go2rtc) could not be started"
-        fi
-    else
-        print_warning "Camera LaunchAgent not found: $CAMERA_PLIST_FILE"
-    fi
-}
-
-stop_camera_server() {
-    if pgrep -f "$GO2RTC_MUSTER" &>/dev/null; then
-        print_status "Stopping the camera server (go2rtc)..."
-        if [ -f "$CAMERA_PLIST_FILE" ]; then
-            launchctl unload "$CAMERA_PLIST_FILE" 2>/dev/null
-        fi
-        pkill -f "$GO2RTC_MUSTER" 2>/dev/null
-        sleep 1
-        print_success "Camera server (go2rtc) stopped"
-    fi
-}
-
-restart_camera_server() {
-    stop_camera_server
-    sleep 1
-    start_camera_server
-}
-
 # ==================== SERVICE MANAGEMENT ====================
 
 # Check if service is running
@@ -154,7 +92,6 @@ is_service_running() {
 start_service() {
     print_status "Starting $APP_NAME..."
     if $IS_MACOS; then
-        start_camera_server
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
             print_warning "Service already loaded - restarting..."
             launchctl kickstart -k "gui/$(id -u)/$PLIST_LABEL"
@@ -186,7 +123,6 @@ start_service() {
 stop_service() {
     print_status "Stopping $APP_NAME..."
     if $IS_MACOS; then
-        stop_camera_server
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
             launchctl unload "$PLIST_FILE"
             sleep 1
@@ -203,8 +139,6 @@ stop_service() {
 restart_service() {
     print_status "Restarting $APP_NAME..."
     if $IS_MACOS; then
-        stop_camera_server
-        start_camera_server
         if launchctl list "$PLIST_LABEL" &>/dev/null; then
             launchctl kickstart -k "gui/$(id -u)/$PLIST_LABEL"
         else
@@ -899,11 +833,6 @@ case "$1" in
     config)     edit_config ;;
     update)     update_app ;;
     clear-logs) clear_logs ;;
-
-    # Camera Commands (macOS)
-    camera-restart) restart_camera_server "$2" "$3" "$4" ;;
-    camera-start)   start_camera_server "$2" "$3" "$4" "$5" ;;
-    camera-stop)    stop_camera_server ;;
 
     # System Commands
     pwa)        setup_pwa ;;

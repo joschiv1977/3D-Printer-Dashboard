@@ -475,7 +475,7 @@ class PrintActionsManager {
             if (window.showConfirmDialog) {
                 window.showConfirmDialog({ text: msg, knopf: texts.confirm_start }, () => this._klipperStartWithSpoolCheck(filename));
             } else if (window.skConfirm) {
-                window.skConfirm(msg).then(ja => {
+                window.skConfirm(msg, { okText: texts.confirm_start }).then(ja => {
                     if (ja) this._klipperStartWithSpoolCheck(filename);
                 });
             }
@@ -498,23 +498,10 @@ class PrintActionsManager {
             }
         }
 
-        // PRIORITY 2: Spoolman single-filament check
-        let selectedSpoolId = window.activeSpoolId;
-
-        if (buttonElement) {
-            // .sd-zeile has been the file row since the 21aug26 rework;
-            // .sd-file-card and .file-card stay in for other lists.
-            const fileCard = buttonElement.closest('.sd-zeile')
-                || buttonElement.closest('.sd-file-card')
-                || buttonElement.closest('.file-card');
-            if (fileCard) {
-                const spoolDropdown = fileCard.querySelector('select[onchange*="selectSpoolFromSD"]');
-                if (spoolDropdown && spoolDropdown.value) {
-                    selectedSpoolId = parseInt(spoolDropdown.value) || null;
-                    console.log(`📦 Using the spool from the dropdown: ${selectedSpoolId}`);
-                }
-            }
-        }
+        // PRIORITY 2: Spoolman single-filament check. The print dialog's
+        // spool row hands over its choice (pendingSpoolChoice); other ways
+        // in take the active spool.
+        const selectedSpoolId = window.pendingSpoolChoice || window.activeSpoolId;
 
         this.currentPlateSelection = {
             filename: filename,
@@ -720,21 +707,22 @@ class PrintActionsManager {
                 }
 
                 // 2) Mengen-Check (Dateigewicht vs. Restgewicht).
+                // Empty by Spoolman's count is a warning like "too little", not a
+                // block: the count is an estimate, the roll may still hold
+                // filament. The same on the server, Android and iOS.
                 if (required > 0 && typeof remaining === 'number') {
-                    if (remaining <= 0) {
-                        window.skToast((texts.spool_check_empty || 'Aktive Spule ist leer — Druck wird nicht gestartet.').replace('{name}', name), 'error');
-                        return;
-                    }
                     if (remaining < required) {
                         const shortage = Math.round(required - remaining);
-                        const msg = (texts.spool_check_short || 'Achtung: Spule {name} hat nur {remaining} g, der Druck braucht ca. {required} g (es fehlen {shortage} g). Trotzdem starten?')
+                        const msg = (remaining <= 0
+                            ? (texts.spool_check_empty || 'Spule {name} ist laut Spoolman leer (0 g), der Druck braucht ca. {required} g. Trotzdem starten?')
+                            : (texts.spool_check_short || 'Achtung: Spule {name} hat nur {remaining} g, der Druck braucht ca. {required} g (es fehlen {shortage} g). Trotzdem starten?'))
                             .replace('{name}', name)
                             .replace('{remaining}', Math.round(remaining))
                             .replace('{required}', Math.round(required))
                             .replace('{shortage}', shortage);
                         const okShort = window.showConfirmDialog
                             ? await new Promise(res => window.showConfirmDialog({ text: msg, knopf: texts.confirm_print_anyway }, () => res(true), () => res(false)))
-                            : (window.skConfirm ? await window.skConfirm(msg) : true);
+                            : (window.skConfirm ? await window.skConfirm(msg, { okText: texts.confirm_print_anyway }) : true);
                         if (!okShort) return;
                     }
                 }
@@ -902,7 +890,7 @@ class PrintActionsManager {
             }
 
             skToast(texts.connection_error, 'error');
-            console.error(texts.console_print_start_error + ':', error);
+            console.error('Print start error:', error);
         }
     }
 
@@ -1037,7 +1025,7 @@ class PrintActionsManager {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         ams_id: fach.ams_id, slot: fach.slot, spool_id: id,
-                        typ: fil.material || '', farbe: (fil.color_hex || ''),
+                        type: fil.material || '', color: (fil.color_hex || ''),
                         name: ((fil.vendor || {}).name ? (fil.vendor.name + ' ') : '') + (fil.name || '')
                     })
                 });
@@ -1243,23 +1231,26 @@ class PrintActionsManager {
     proceedWithPlateCheck(filename, location) {
         const texts = window.texts || {};
         // NEW: debug
-        console.log('🔍 proceedWithPlateCheck aufgerufen');
+        console.log('🔍 proceedWithPlateCheck called');
         console.log('🔍 window.pendingSpoolMapping:', window.pendingSpoolMapping);
 
         // Save for later
         this.currentPlateSelection = {
             filename: filename,
             location: location,
-            spoolId: window.activeSpoolId,
+            spoolId: window.pendingSpoolChoice || window.activeSpoolId,
+            // Chosen in the print dialog: the server takes it as it is.
+            spoolChosen: !!window.pendingSpoolChoice,
             spoolMapping: window.pendingSpoolMapping || null
         };
 
         console.log('🔍 currentPlateSelection:', this.currentPlateSelection);
 
-        // Clear pending mapping
+        // Clear pending mapping and spool choice
         if (window.pendingSpoolMapping) {
             delete window.pendingSpoolMapping;
         }
+        delete window.pendingSpoolChoice;
 
         // Show modal with loading indicator
         const modal = document.getElementById('plateSelectModal');
@@ -1318,7 +1309,7 @@ class PrintActionsManager {
                 }
             })
             .catch(error => {
-                console.error(texts.console_plate_check_error + ':', error);
+                console.error('Plate check error:', error);
                 modal.style.display = 'none';
 
                 // Fallback: ask anyway
@@ -1437,7 +1428,7 @@ class PrintActionsManager {
         const texts = window.texts || {};
         if (!this.currentPlateSelection) return;
 
-        const { filename, location, spoolId, spoolMapping } = this.currentPlateSelection;
+        const { filename, location, spoolId, spoolChosen, spoolMapping } = this.currentPlateSelection;
 
         // Close SD modal immediately
         closeSDModal();
@@ -1461,44 +1452,13 @@ class PrintActionsManager {
             ...collectPrintOptions(filename)
         };
 
-        // Weight check before printing (single-filament only)
-        if (window._skipSpoolCheck) { delete window._skipSpoolCheck; }
-        else if (window.spoolmanEnabled && spoolId && !spoolMapping) {
-            // Find the file data
-            const fileData = window.sdDateiFinden ? window.sdDateiFinden(filename)
-            : window.lastSDFiles?.find(f => f.name === filename);
-
-            if (fileData && fileData.weight) {
-                const activeSpool = window.spoolmanManager?.spools?.find(s => s.id === spoolId);
-                if (activeSpool && activeSpool.remaining_weight) {
-                    const printWeight = fileData.weight;
-                    const remaining = activeSpool.remaining_weight;
-
-                    if (printWeight > remaining) {
-                        const shortage = printWeight - remaining;
-                        const message = texts.confirm_filament_shortage
-                            .replace('{needed}', printWeight.toFixed(0))
-                            .replace('{available}', remaining.toFixed(0))
-                            .replace('{shortage}', shortage.toFixed(0));
-
-                        const self = this;
-                        showConfirmDialog({ text: message, knopf: texts.confirm_print_anyway }, function() {
-                            // User confirmed — start the print anyway (skip check)
-                            window._skipSpoolCheck = true;
-                            // Continue straight on: the user already filled
-                            // out the preparation and just confirmed it —
-                            // showing the view again would only get in
-                            // the way.
-                            self.beginPrintFlow(filename, location);
-                        }, function() {
-                            self.currentPlateSelection = null;
-                        });
-                        return;
-                    }
-                }
-            }
-        }
-
+        // No weight check of our own here. The server judges it -- with the
+        // weight of the PLATE being printed, while the file list only knows
+        // the whole file: a file with two plates warned with the sum of
+        // both, and the answer "print anyway" then started the flow again
+        // and asked for the plate a second time. The server answers 409 with
+        // filament_warnings, and showFilamentWarningDialog resends with the
+        // same plate and force.
         // Build the request body BEFORE the apiCall
         const requestBody = {
             command: 'print_sd',
@@ -1518,6 +1478,7 @@ class PrintActionsManager {
             console.log('🔍 Only spool_id:', spoolId);
             // Single-filament: use a single spool ID
             requestBody.spool_id = spoolId;
+            if (spoolChosen) requestBody.spool_chosen = true;
         }
 
         await this._confirmHumidityAssignmentBeforePrint(
@@ -1607,7 +1568,7 @@ class PrintActionsManager {
         })
         .catch(error => {
             skToast(texts.connection_error, 'error');
-            console.error(texts.console_print_start_error + ':', error);
+            console.error('Print start error:', error);
             self.currentPlateSelection = null;
         });
     }

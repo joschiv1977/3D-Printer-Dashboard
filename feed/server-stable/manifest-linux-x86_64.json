@@ -3,17 +3,17 @@
     "product": "server",
     "channel": "stable",
     "platform": "linux-x86_64",
-    "version": "2.3.3",
+    "version": "2.3.7",
     "files": [
       {
-        "name": "3D-Printer-Server-2.3.3-linux-x86_64.tar.gz",
-        "sha256": "51e01699c6627df83151dc2670212798070a16053930d280810ec910d9970c4c",
-        "size": 20719879,
-        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.3/3D-Printer-Server-2.3.3-linux-x86_64.tar.gz"
+        "name": "3D-Printer-Server-2.3.7-linux-x86_64.tar.gz",
+        "sha256": "df17df9f614f9e83fdb26cb36066a27f12a961f9164bc09a77acf244360feb9c",
+        "size": 22536528,
+        "url": "https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/server-stable-2.3.7/3D-Printer-Server-2.3.7-linux-x86_64.tar.gz"
       }
     ],
     "notes": null,
-    "issued": 1789415725
+    "issued": 1790534346
   },
-  "signature": "JljIyh64kqTff9O61kVgr3qeSO70sifOWIRvWrAEzQg61TxUVVfc1kNUcsc2D9tBC7Xs+3TIGvkU5h2bRp3tBQ=="
+  "signature": "xNccjwSGXkdrpvy5HDcM5I3zX2wrd3jzU0TmkfoXvBHjnX6gZCWTntS3pH7zAMxBHgdUR//18+BbEs/9fMpwBw=="
 }

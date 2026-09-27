@@ -1,0 +1,25 @@
+          <!--Overview while the printer is off: next planned print, last print,
+              maintenance, the month. It stands in for the print card, the
+              material and the drying card while the socket reports the
+              printer off (off-overview.js) and is not in the grid otherwise.
+              On a phone it follows the printer zone, under the system bar.
+              gs-y 400: far below everything, so the grid's start does not
+              push a card aside for it before it is taken out.-->
+          <div class="grid-stack-item" gs-w="6" gs-h="40" gs-x="0" gs-y="400" gs-min-w="4" gs-min-h="16" gs-max-w="12" gs-max-h="60" id="off-overview-card-grid" style="display: none;">
+              <div class="grid-stack-item-content">
+                  <div class="card aus-karte">
+                      <div class="card-header">
+                          <h3 class="card-title"><svg class="hd-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg> <span data-i18n="home_off_title">Überblick</span></h3>
+                          <span class="aus-kopf-hinweis" data-i18n="home_off_hint">Drucker aus</span>
+                      </div>
+                      <div class="aus-koerper">
+                          <div class="aus-paar">
+                              <div class="aus-feld aus-feld--plan" id="aus-plan" style="display: none;"></div>
+                              <div class="aus-feld" id="aus-letzter" style="display: none;"></div>
+                          </div>
+                          <div class="aus-feld" id="aus-wartung" style="display: none;"></div>
+                          <div class="aus-feld" id="aus-monat" style="display: none;"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>

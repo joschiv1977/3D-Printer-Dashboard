@@ -2,27 +2,54 @@
  * Spoolman Manager
  * Filament spool management, activation, and display
  */
+/** How often the connection to Spoolman itself is looked at. Slow on purpose:
+ *  it is a yes/no that changes when Spoolman is restarted, not printer data. */
+const VERBINDUNGSTAKT_MS = 5 * 60 * 1000;
+/** How old the spool list may be when somebody opens a chooser. */
+const LISTE_FRISCH_MS = 60 * 1000;
+
 class SpoolmanManager {
     constructor() {
         this.connected = false;
         this.activeSpoolId = null;
+        this.spools = [];
+        this.spoolsGeladen = 0;
     }
 
     async init() {
         const texts = window.texts || {};
-        console.log(texts.console_spoolman_init_start);
+        console.log('Spoolman Init START');
 
         await this.checkStatus();
         if (this.connected) {
             await this.loadSpools();
         }
 
+        // No 30-second round any more. What changes, the server says: a spool
+        // change arrives as the socket event `spoolman_active_spool`
+        // (socket-manager.js) and redraws the card. The list only changes when
+        // somebody edits Spoolman, so it is refreshed when a chooser opens.
+        //
+        // Until 17sep26 every open window asked three times a minute --
+        // /api/spoolman/status, /spool/<id>, /spools -- and each of those went
+        // through the server to Spoolman for data that had not changed.
+        //
+        // What remains is the connection itself, slowly: Spoolman coming back
+        // has to reach the card without a reload.
         setInterval(async () => {
+            const vorher = this.connected;
             await this.checkStatus();
-            if (this.connected) {
-                await this.loadSpools();
-            }
-        }, 30000);
+            if (this.connected && !vorher) await this.loadSpools();
+        }, VERBINDUNGSTAKT_MS);
+    }
+
+    /** The list, loaded when it is older than `maxAlter`. Callers that show a
+     *  chooser use this instead of a periodic reload. */
+    async ensureSpools(maxAlter = LISTE_FRISCH_MS) {
+        if (!this.connected) return this.spools;
+        if (this.spools.length && Date.now() - this.spoolsGeladen < maxAlter) return this.spools;
+        await this.loadSpools();
+        return this.spools;
     }
 
     async checkStatus() {
@@ -65,7 +92,7 @@ class SpoolmanManager {
             }
 
         } catch (error) {
-            console.error(texts.console_spoolman_status_error + ':', error);
+            console.error('Spoolman status error:', error);
         }
     }
 
@@ -79,6 +106,7 @@ class SpoolmanManager {
             // Remembered: the file list shows the active spool in its toolbar
             // and needs more than just the id for that.
             this.spools = spools;
+            this.spoolsGeladen = Date.now();
             if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
             this._knopfBeschriften();
 
@@ -128,7 +156,7 @@ class SpoolmanManager {
                 }
             }
         } catch (error) {
-            console.error(texts.console_error_loading_spools + ':', error);
+            console.error('Error loading spools:', error);
         }
     }
 
@@ -147,10 +175,15 @@ class SpoolmanManager {
         const remaining = spool.remaining_weight || 0;
         const percentage = spool.remaining_percentage || 0;
 
+        // Spoolman's values are data: a colour only as hex, the rest escaped.
+        const esc = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const roh = String(color).replace('#', '');
+        const farbe = /^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(roh) ? '#' + roh : '#888888';
         card.innerHTML = `
-            <div class="spool-color-indicator" style="background-color:${color}"></div>
-            <div class="spool-name">${name}</div>
-            <div class="spool-weight">${material} - ${remaining.toFixed(0)}g</div>
+            <div class="spool-color-indicator" style="background-color:${farbe}"></div>
+            <div class="spool-name">${esc(name)}</div>
+            <div class="spool-weight">${esc(material)} - ${remaining.toFixed(0)}g</div>
             <div class="spool-percentage">${percentage.toFixed(0)}%</div>
         `;
 
@@ -164,7 +197,7 @@ class SpoolmanManager {
         const infoDiv = document.getElementById('active-spool-info');
 
         if (!infoDiv) {
-            console.log(texts.console_active_spool_div_not_found);
+            console.log('Active spool info div not found');
             return;
         }
 
@@ -243,13 +276,39 @@ class SpoolmanManager {
         }
     }
 
+    /**
+     * No active spool -- on the server, not only here. Until 16sep26 "no
+     * spool" emptied only the browser's copy; the server kept the spool, and
+     * the next page load showed it again. Refused during a print (the server
+     * says why). Resolves true when it worked.
+     */
+    async deactivate() {
+        const texts = window.texts || {};
+        try {
+            const response = await apiCall('/api/spoolman/deactivate', { method: 'POST' });
+            const data = await response.json();
+            if (!data.success) {
+                skToast(data.error || texts.toast_error_activating, 'error');
+                return false;
+            }
+            window.activeSpoolId = null;
+            this.activeSpoolId = null;
+            const selector = document.getElementById('spool-selector');
+            if (selector) selector.value = '';
+            this.updateDisplay();
+            skToast(texts.toast_spool_deactivated, 'success');
+            return true;
+        } catch (error) {
+            console.error('Error:', error);
+            skToast(texts.connection_error, 'error');
+            return false;
+        }
+    }
+
     async activate(spoolId) {
         const texts = window.texts || {};
         if (!spoolId) {
-            window.activeSpoolId = null;
-            this.activeSpoolId = null;
-            this.updateDisplay();
-            return;
+            return this.deactivate();
         }
 
         try {
@@ -297,7 +356,7 @@ class SpoolmanManager {
                 skToast(texts.toast_error_activating, 'error');
             }
         } catch (error) {
-            console.error(texts.console_error + ':', error);
+            console.error('Error:', error);
             window.activeSpoolId = null;
             this.activeSpoolId = null;
             document.getElementById('spool-selector').value = '';
@@ -338,6 +397,8 @@ class SpoolmanManager {
     updateDisplay() {
         const texts = window.texts || {};
         this._knopfBeschriften();
+        // The file list shows the active spool too: its chip and row buttons
+        if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
         const activeInfo = document.getElementById('active-spool-info');
         if (!activeInfo) return;
 
@@ -451,7 +512,7 @@ class SpoolmanManager {
                 }
             })
             .catch(error => {
-                console.error(texts.console_error_loading_spool_details + ':', error);
+                console.error('Error loading spool details:', error);
                 activeInfo.innerHTML = `
                     <div style="color:var(--accent-red); font-size:13px; text-align:center;">
                         ${texts.connection_error}
@@ -475,52 +536,11 @@ class SpoolmanManager {
 
             window.open(spoolmanUrl, '_blank');
         } catch (error) {
-            console.error(texts.console_error_opening + ':', error);
+            console.error('Error opening:', error);
             skToast(texts.connection_error || 'Verbindungsfehler', 'error');
         }
     }
 
-    selectFromSD(spoolId) {
-        const texts = window.texts || {};
-        if (spoolId) {
-            apiCall(`/api/spoolman/spool/${spoolId}/activate`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.activeSpoolId = parseInt(spoolId);
-                    const mainSelector = document.getElementById('spool-selector');
-                    if (mainSelector) {
-                        mainSelector.value = spoolId;
-                    }
-                    console.log(`✅ Spool ${spoolId} activated`);
-                }
-            });
-        } else {
-            window.activeSpoolId = null;
-        }
-    }
-
-    updateSelection(spoolId) {
-        const texts = window.texts || {};
-        if (spoolId) {
-            apiCall('/api/spoolman/select', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({spool_id: parseInt(spoolId)})
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.activeSpoolId = parseInt(spoolId);
-                    skToast(texts.toast_spool_selected.replace('{spool}', spoolId), 'success');
-                }
-            });
-        } else {
-            window.activeSpoolId = null;
-        }
-    }
 }
 
 // Global singleton
@@ -535,5 +555,3 @@ window.updateActiveSpoolInfo = (spool) => window.spoolmanManager.updateActiveInf
 window.activateSpool = (id) => window.spoolmanManager.activate(id);
 window.updateSpoolmanDisplay = () => window.spoolmanManager.updateDisplay();
 window.openSpoolmanWeb = () => window.spoolmanManager.openWeb();
-window.selectSpoolFromSD = (id) => window.spoolmanManager.selectFromSD(id);
-window.updateSpoolSelection = (id) => window.spoolmanManager.updateSelection(id);

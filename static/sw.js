@@ -132,13 +132,7 @@ self.addEventListener('fetch', (event) => {
                             return cachedResponse;
                         }
                         // Fallback: a valid error response (never null/undefined!)
-                        return new Response('Page unavailable (offline)', {   // bewusst englisch:
-                            // a service worker runs without the language
-                            // files, and this is the body of a 503 answer,
-                            // not a control.
-                            status: 503,
-                            headers: { 'Content-Type': 'text/html' }
-                        });
+                        return offlineSeite();
                     });
                 })
             );
@@ -375,3 +369,113 @@ self.addEventListener('unhandledrejection', (event) => {
 });
 
 console.log('[SW] Service Worker loaded');
+
+/**
+ * The page for an HTML page that is neither reachable nor cached.
+ *
+ * It was the bare text "Page unavailable (offline)" -- a dead end: nothing
+ * reloaded, and a reload by hand while the server was still away gave the
+ * same text again (seen 14sep26 in the Dashboard after a server restart).
+ * Now it looks like the rest of the app (the tokens of design-tokens.css, a
+ * card like .es-karte, the spinner of .sd-sync-kreisel), asks /login every
+ * two seconds and reloads the page the moment the server answers. /login is
+ * public and not routed through this worker (only /api and /static are), so
+ * a failed fetch is a real "away" and any answer, the redirect of a signed-in
+ * visitor included, a real "back". Not /health: that does not exist (the
+ * system routes sit under /api), and every recovery left a 404 in the log.
+ *
+ * A service worker has no language files; the page reads the app's own
+ * choices (language, theme) from localStorage -- it is the same origin.
+ */
+function offlineSeite() {
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Printer Dashboard</title>
+<style>
+  :root {
+    --bg-primary: #F3F3F7; --bg-card: #FFFFFF; --text-primary: #1a1f2e;
+    --text-secondary: #5a6270; --border-color: #D3D3D3; --accent-blue: #2196f3;
+    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-primary: #0F1419; --bg-card: #1A1F2E; --text-primary: #E8EAED;
+      --text-secondary: #B8BCC8; --border-color: #404859;
+      --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-primary: #0F1419; --bg-card: #1A1F2E; --text-primary: #E8EAED;
+    --text-secondary: #B8BCC8; --border-color: #404859;
+    --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg-primary); color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro', 'Segoe UI', system-ui, Roboto, sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 0 16px;
+  }
+  .karte {
+    width: 100%; max-width: 380px; background: var(--bg-card);
+    border: 1px solid var(--border-color); border-radius: 16px;
+    box-shadow: var(--shadow-card); padding: 26px 24px 22px; text-align: center;
+  }
+  .kreisel {
+    width: 30px; height: 30px; margin: 0 auto 16px; border-radius: 50%;
+    border: 3px solid rgba(128, 128, 128, 0.25); border-top-color: var(--accent-blue);
+    animation: dreh .8s linear infinite;
+  }
+  @keyframes dreh { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .kreisel { animation-duration: 2.4s; } }
+  .titel { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+  .text { font-size: 14px; line-height: 1.45; color: var(--text-secondary); }
+  .adresse { margin-top: 12px; font-size: 12px; color: var(--text-secondary); opacity: .8; word-break: break-all; }
+</style>
+</head>
+<body>
+  <div class="karte">
+    <div class="kreisel" aria-hidden="true"></div>
+    <div class="titel" id="titel"></div>
+    <div class="text" id="text"></div>
+    <div class="adresse" id="adresse"></div>
+  </div>
+<script>
+  (function () {
+    var TEXTE = {
+      de: ['Server nicht erreichbar — neuer Versuch …', 'Die Seite lädt von selbst neu, sobald der Server wieder da ist.'],
+      en: ['Server not reachable — trying again …', 'The page reloads by itself as soon as the server is back.'],
+      es: ['Servidor no accesible: reintentando …', 'La página se recarga sola en cuanto el servidor vuelva.'],
+      fr: ['Serveur injoignable — nouvel essai …', 'La page se recharge d’elle-même dès que le serveur revient.'],
+      it: ['Server non raggiungibile: nuovo tentativo …', 'La pagina si ricarica da sola appena il server torna.']
+    };
+    var sprache = 'de', theme = 'auto';
+    try {
+      sprache = localStorage.getItem('language') || (navigator.language || 'de').slice(0, 2);
+      theme = localStorage.getItem('theme') || 'auto';
+    } catch (e) {}
+    if (theme === 'dark' || theme === 'light') document.documentElement.setAttribute('data-theme', theme);
+    var t = TEXTE[sprache] || TEXTE.en;
+    document.documentElement.lang = TEXTE[sprache] ? sprache : 'en';
+    document.getElementById('titel').textContent = t[0];
+    document.getElementById('text').textContent = t[1];
+    document.getElementById('adresse').textContent = location.host;
+    document.title = t[0];
+    function frage() {
+      fetch('/login', { cache: 'no-store', redirect: 'manual' })
+        .then(function () { location.reload(); })
+        .catch(function () { setTimeout(frage, 2000); });
+    }
+    setTimeout(frage, 2000);
+  })();
+</script>
+</body>
+</html>`;
+    return new Response(html, {
+        status: 503,
+        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
+    });
+}

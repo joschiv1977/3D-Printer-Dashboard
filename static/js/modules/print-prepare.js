@@ -38,9 +38,44 @@
     function setzeStartKnopf(daten) {
         const knopf = document.getElementById('prep-start');
         if (!knopf) return;
+        // With the spool row the choice is made on this sheet: "Drucken",
+        // and only once a spool is chosen.
+        if (aktuell && aktuell.spoolShown) {
+            knopf.textContent = t('print', 'Drucken');
+            knopf.disabled = !(aktuell.spoolRow && aktuell.spoolRow.spoolId());
+            return;
+        }
+        knopf.disabled = false;
         knopf.textContent = daten && daten.spool_choice_needed
             ? t('print_prepare_continue', 'Weiter')
             : t('print', 'Drucken');
+    }
+
+    /** Does this print take ONE spool? Then the sheet chooses it. The preview
+     *  lists no filament for a sliced single-filament file, so the file list
+     *  says whether it is a multi-colour one. */
+    function oneSpool(daten, filename) {
+        if ((daten.filaments || []).length > 1) return false;
+        const file = window.sdDateiFinden ? window.sdDateiFinden(filename)
+            : (window.lastSDFiles || []).find(f => f && f.name === filename);
+        return !(file && file.is_multifilament);
+    }
+
+    /** Put up the spool row on the sheet when this print takes one spool. */
+    function setupSpoolRow(daten) {
+        const box = document.getElementById('prep-spool');
+        aktuell.spoolRow = null;
+        aktuell.spoolShown = false;
+        if (!box) return;
+        box.innerHTML = '';
+        const spoolman = window.spoolmanManager && window.spoolmanManager.connected;
+        if (!spoolman || !oneSpool(daten, aktuell.filename)) return;
+        aktuell.spoolShown = true;
+        aktuell.spoolRow = spoolRow(box, {
+            filename: aktuell.filename,
+            plate: daten.plate,
+            onChange: () => setzeStartKnopf(aktuell && aktuell.daten),
+        });
     }
 
     const esc = (t) => String(t == null ? '' : t)
@@ -279,6 +314,168 @@
                 .replace('{count}', liste.length));
     }
 
+    // ------------------------------------------------------------------
+    // The spool row -- one building block for "print" and "schedule print"
+    // ------------------------------------------------------------------
+
+    /** Material names compared the way the multi-colour dialog does:
+     *  "PLA Basic", "pla-cf" and "PLA+" are all PLA. */
+    function materialKey(text) {
+        return String(text || '').toUpperCase().replace(/[^A-Z0-9]/g, ' ').trim().split(' ')[0];
+    }
+
+    /**
+     * Which spool to preselect, and what to say under it.
+     *
+     * `match` is the answer of /api/spoolman/match: {wanted, candidates:
+     * [{spool, score}]}. The active spool stays when it is among the
+     * candidates; otherwise the best candidate is taken; with none, the
+     * active spool stays (or none) and the row warns.
+     *
+     * Returns {spool, hint: 'one' | 'many' | 'none' | ''}.
+     */
+    function preselectSpool(match, active) {
+        const candidates = (match && match.candidates) || [];
+        if (!match || !match.wanted) return { spool: active || null, hint: '' };
+        if (!candidates.length) return { spool: active || null, hint: 'none' };
+        const own = active && candidates.find(c => c.spool && String(c.spool.id) === String(active.id));
+        return {
+            spool: own ? own.spool : candidates[0].spool,
+            hint: candidates.length === 1 ? 'one' : 'many',
+        };
+    }
+
+    /** One line for a spool: vendor and name, material, what is left. */
+    function spoolLabel(spool) {
+        const fil = (spool && spool.filament) || {};
+        const vendor = (fil.vendor && fil.vendor.name) || '';
+        return [
+            [vendor, fil.name].filter(Boolean).join(' '),
+            fil.material ? `(${fil.material})` : '',
+            `${Math.round((spool && spool.remaining_weight) || 0)} g`,
+        ].filter(Boolean).join(' · ');
+    }
+
+    /**
+     * The row "Spool" with its hint, drawn into `el`.
+     *
+     * The same row stands in the print dialog and in "schedule print": the
+     * spool chosen here is the spool the print runs on. Choosing does NOT
+     * switch the active spool -- that happens when the print starts, on the
+     * server, so the grams are booked to it at the end.
+     *
+     * options: { filename, plate, presetId, onChange }
+     * Returns: { spoolId(), setPlate(n) }
+     */
+    function spoolRow(el, options) {
+        const opts = options || {};
+        const spools = () => (window.spoolmanManager && window.spoolmanManager.spools) || [];
+        const byId = (id) => spools().find(x => String(x.id) === String(id)) || null;
+        const state = {
+            plate: opts.plate || 1,
+            spool: opts.presetId != null ? byId(opts.presetId) : null,
+            picked: opts.presetId != null,
+            match: null,
+            hint: '',
+        };
+
+        el.innerHTML = `
+            <div class="ui-zeile">
+                <span class="ui-zeile-name">${esc(t('schedule_spool_label', 'Spule'))}</span>
+                <button type="button" class="mz-spulknopf ui-breit">
+                    <span class="mz-spulknopf__punkt"></span>
+                    <span class="spool-row-text"></span>
+                    <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                </button>
+            </div>
+            <div class="sched-spulhinweis" style="display:none;"></div>`;
+        const button = el.querySelector('.mz-spulknopf');
+        const dot = el.querySelector('.mz-spulknopf__punkt');
+        const text = el.querySelector('.spool-row-text');
+        const hint = el.querySelector('.sched-spulhinweis');
+
+        const paint = () => {
+            const spool = state.spool;
+            text.textContent = spool ? spoolLabel(spool) : t('spool_choose', 'Spule wählen');
+            const hex = spool && spool.filament && spool.filament.color_hex;
+            dot.style.background = hex ? '#' + String(hex).replace('#', '').slice(0, 6)
+                                       : 'rgba(128,128,128,0.25)';
+
+            const wanted = state.match && state.match.wanted;
+            const own = spool ? materialKey((spool.filament || {}).material) : '';
+            const need = wanted ? materialKey(wanted.material) : '';
+            let line = '', warn = false;
+            if (spool && need && own && own !== need) {
+                line = t('mf_material_mismatch', 'Andere Sorte als im Druck: {datei} gebraucht, Spule ist {spule}')
+                    .replace('{datei}', wanted.material || need).replace('{spule}', own);
+                warn = true;
+            } else if (state.hint === 'none') {
+                line = t('spool_match_none', 'Keine passende Spule für {material} gefunden.')
+                    .replace('{material}', (wanted && wanted.material) || '?');
+                warn = true;
+            } else if (spool && (state.hint === 'one' || state.hint === 'many')) {
+                const fil = spool.filament || {};
+                const name = [((fil.vendor || {}).name || ''), fil.name || ''].join(' ').trim();
+                const count = ((state.match && state.match.candidates) || []).length;
+                line = state.hint === 'one'
+                    ? t('spool_match_one', 'Passend zur Datei: {spool}').replace('{spool}', name)
+                    : t('spool_match_many', '{n} Spulen passen — vorgewählt: {spool}')
+                        .replace('{n}', count).replace('{spool}', name);
+            }
+            hint.className = 'sched-spulhinweis' + (warn ? ' sched-spulhinweis--warnung' : '');
+            hint.textContent = line;
+            hint.style.display = line ? '' : 'none';
+            if (typeof opts.onChange === 'function') opts.onChange(spool ? spool.id : null);
+        };
+
+        // The spool list may not be loaded yet (it is not polled): the
+        // preset of an edited entry and the active spool are looked up in it.
+        const sm = window.spoolmanManager;
+        const ready = (sm && sm.ensureSpools) ? sm.ensureSpools().catch(() => {}) : Promise.resolve();
+
+        const refresh = () => ready.then(() => {
+            if (opts.presetId != null && !state.spool) state.spool = byId(opts.presetId);
+            if (!opts.filename) { paint(); return null; }
+            return window.apiCall(`/api/spoolman/match?file=${encodeURIComponent(opts.filename)}`
+                                  + `&plate=${state.plate}`)
+                .then(r => r.json())
+                .then(match => {
+                    state.match = match || null;
+                    const pick = preselectSpool(state.match, byId(window.activeSpoolId));
+                    state.hint = pick.hint;
+                    if (!state.picked) state.spool = pick.spool;
+                    paint();
+                })
+                .catch(() => {
+                    // Without an answer the active spool stays the suggestion.
+                    if (!state.picked) state.spool = byId(window.activeSpoolId);
+                    paint();
+                });
+        });
+
+        button.onclick = () => {
+            if (!window.openSpoolPicker) return;
+            window.openSpoolPicker({
+                datei: opts.filename,
+                plate: state.plate,
+                gewaehlt: state.spool ? state.spool.id : null,
+                onWahl: (spool) => {
+                    if (!spool) return;
+                    state.spool = spool;
+                    state.picked = true;
+                    paint();
+                },
+            });
+        };
+
+        paint();
+        refresh();
+        return {
+            spoolId: () => (state.spool ? state.spool.id : null),
+            setPlate: (n) => { state.plate = n || 1; return refresh(); },
+        };
+    }
+
     function zeichne(daten) {
         const facts = [];
         const zeit = dauer(daten.print_time_seconds);
@@ -310,12 +507,17 @@
 
         const filBlock = document.getElementById('prep-filament-block');
         const filamente = daten.filaments || [];
-        filBlock.style.display = filamente.length ? '' : 'none';
+        const withSpool = !!(aktuell && aktuell.spoolShown);
+        filBlock.style.display = (filamente.length || withSpool) ? '' : 'none';
+        document.getElementById('prep-filament-title').textContent = withSpool
+            ? t('schedule_section_material', 'Material')
+            : t('print_prepare_filament', 'Filament');
         document.getElementById('prep-filaments').innerHTML = zeichneFilamente(daten);
 
+        // In the grid of "schedule print": toggles left, auto/on/off right.
         document.getElementById('prep-options').innerHTML =
-            zeichneOptionen(aktuell.filename, daten.defaults || {},
-                            daten.manual_color_change_possible === true);
+            `<div class="prep-rows">${zeichneOptionen(aktuell.filename, daten.defaults || {},
+                            daten.manual_color_change_possible === true)}</div>`;
     }
 
     async function oeffne(filename, location) {
@@ -336,6 +538,11 @@
         const fuss0 = document.getElementById('prep-fuss');
         if (fuss0) fuss0.style.display = 'none';
         modal.style.display = 'block';
+        // The spool list feeds the drying suggestion (last_used) and the
+        // filament rows. It is no longer reloaded on a timer, so it is
+        // refreshed here, where it is about to be read.
+        const sm0 = window.spoolmanManager;
+        if (sm0 && sm0.ensureSpools) { try { await sm0.ensureSpools(); } catch (_) {} }
 
         try {
             const [antwort] = await Promise.all([
@@ -346,6 +553,7 @@
             if (daten.error) throw new Error(daten.error);
             aktuell.daten = daten;
             aktuell.plate = daten.plate;
+            setupSpoolRow(daten);
             zeichne(daten);
 
             // Does a spool question still follow this sheet? Then "Drucken"
@@ -382,7 +590,12 @@
     function bestaetige() {
         if (!aktuell) return;
         const { filename, location, plate } = aktuell;
+        const spoolId = aktuell.spoolRow ? aktuell.spoolRow.spoolId() : null;
+        if (aktuell.spoolShown && !spoolId) return;
         schliesse();
+        // The spool chosen on this sheet is the one the print runs on.
+        if (spoolId) window.pendingSpoolChoice = spoolId;
+        else delete window.pendingSpoolChoice;
         // The plate is already chosen here — otherwise the later plate
         // dialog would ask again.
         if (typeof plate === 'number') window.pendingPlateOverride = plate;
@@ -518,6 +731,8 @@
     window.printPrepare = {
         oeffne,
         rendereIn,
+        spoolRow,
+        preselectSpool,
         /**
          * A different plate was chosen — and its data needs to be fetched
          * fresh.
@@ -549,6 +764,8 @@
                 // shouldn't jump.
                 aktuell.daten = daten;
                 zeichne(daten);          // also redraws the tiles
+                // Which spool fits can depend on the plate.
+                if (aktuell.spoolRow) aktuell.spoolRow.setPlate(index);
                 setzeStartKnopf(daten);
             } catch (e) {
                 console.warn('Plate change: preview not reloaded', e);

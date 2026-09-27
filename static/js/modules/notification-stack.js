@@ -44,6 +44,11 @@
     let schubY = 0;
     let griff = null;
 
+    // Messages the question card shows instead of the stack. The Electron
+    // bridge asks for them: "nothing drawn here" is not "not shown" when the
+    // card has it, and it must not put up a popup beside the open window.
+    const heldByCard = new Set();
+
     function setzeSchub() {
         if (!stapel) return;
         stapel.style.transform = (schubX || schubY)
@@ -572,6 +577,7 @@
                         titel: n.title || '',
                         text: n.body || '',
                         art: n.event_type || '',
+                        inCard: n.in_card === true,
                         extra: (n.meta || {}).extra_data || {},
                     }));
                 // The answer is the truth — the books get corrected by it,
@@ -598,6 +604,22 @@
                 continue;
             }
             const zusatz = n.extra || {};
+            // A printer dialog that waits for an answer stands in the
+            // question card (frage-karte.js) -- in the app only there, not a
+            // second time as "printer error" in the stack (16sep26).
+            if (zusatz.error_code && window.FrageKarte
+                    && window.FrageKarte.druckerAktionen(zusatz.error_code, 0)) {
+                console.log('⏭️ Message stack: skipped, the question card asks it:', n.kennung);
+                heldByCard.add(String(n.kennung));
+                continue;
+            }
+            // What matters stands in the question card until it is dealt with
+            // -- the server says which (in_card, 18sep26).
+            if (n.inCard && window.FrageKarte) {
+                console.log('⏭️ Message stack: skipped, the question card holds it:', n.kennung);
+                heldByCard.add(String(n.kennung));
+                continue;
+            }
             const schonDa = stapel.querySelector(
                 '.mld:not(.mld-geht)[data-kennung="'
                 + String(n.kennung).replace(/"/g, '\\"') + '"]');
@@ -691,6 +713,49 @@
         return stapel;
     }
 
+    /** The cross of the top message in the corner, or null.
+     *
+     *  "The corner" is two hosts: this stack and skToast's (confirm-dialog.js).
+     *  Both stand top right, so the one on top is the one whose cross sits
+     *  highest on the screen -- that also holds on the phone, where the
+     *  stack runs reversed from the bottom. States (drying is running) have
+     *  no cross and so never count.
+     */
+    function topCross() {
+        const crosses = [
+            ...document.querySelectorAll('#notification-stack .mld.active:not(.mld-geht) .mld-zu'),
+            ...document.querySelectorAll('#sk-toast-host .sk-toast.sk-an .sk-toast-zu'),
+        ];
+        let topmost = null;
+        let highest = Infinity;
+        crosses.forEach(k => {
+            const r = k.getBoundingClientRect();
+            if (!r.width || !r.height) return;          // truncated behind "+N more"
+            if (r.top < highest) { highest = r.top; topmost = k; }
+        });
+        return topmost;
+    }
+
+    // N (with or without Shift) closes the top message in the corner -- the
+    // same as a click on its cross, so the server hears of it as a dismissal
+    // too (18sep26, the user: "mit n will ich die weg klicken können").
+    // In a text field the letter belongs to the text. Only the page's own
+    // window sees the key: the Electron popups that stand while the app is in
+    // the background are left to their cross -- a global N would swallow
+    // the letter in every other app while one stands.
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'n' && e.key !== 'N') return;
+        if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || e.isComposing) return;
+        const target = e.target;
+        if (target && (target.isContentEditable
+                     || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName || ''))) return;
+        const cross = topCross();
+        if (!cross) return;
+        e.preventDefault();
+        cross.click();
+    });
+
     window.NotificationStack = { ordne: anstossen, zeige, entferne, entferneSache,
-                              holeOffene, behaelter };
+                              holeOffene, behaelter,
+                              heldByCard: (id) => heldByCard.has(String(id)) };
 })();

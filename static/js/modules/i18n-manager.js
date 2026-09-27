@@ -46,8 +46,17 @@ class I18nManager {
 
         this.texts = this.translationsMap[this.currentLang] || this.translationsMap['en'] || {};
 
-        // Apply the translations
-        this.applyTranslations();
+        // The shared dialogs and toasts (confirm-dialog.js) and serverText()
+        // read window.texts; the main page sets it itself, every subpage
+        // gets it here.
+        if (!window.texts) window.texts = this.texts;
+
+        // The texts exist now; the elements only once the page is parsed.
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.applyTranslations(), { once: true });
+        } else {
+            this.applyTranslations();
+        }
     }
 
     /**
@@ -119,14 +128,10 @@ class I18nManager {
     }
 }
 
-// Create the global instance (after the DOM has loaded)
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.i18nManager = new I18nManager();
-    });
-} else {
-    window.i18nManager = new I18nManager();
-}
+// The global instance right away -- the language files sit before this script
+// on every page, and page scripts read their texts while the page is still
+// loading (users.html: const texts = getTexts()).
+window.i18nManager = new I18nManager();
 
 // Backwards compatibility: the old functions are kept
 window.switchLanguage = (lang) => {

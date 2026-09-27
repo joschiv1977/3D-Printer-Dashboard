@@ -215,6 +215,12 @@ class PrinterControlManager {
      */
     applyStatusPayload(data) {
         if (!data) return;
+        // The central filament state rides along with the status. Every
+        // renderer below asks window.filamentState instead of judging the
+        // slots for itself.
+        if (window.filamentState) window.filamentState.update(data.filament_state);
+        // What may be done right now -- same path, same moment.
+        if (window.aktionen) window.aktionen.update(data.actions);
         const flach = Object.assign({}, data, data.temperatures || {}, {
             ams_units: (data.ams && data.ams.units) || data.ams_units || [],
             device_report: data.device_report || {},
@@ -254,29 +260,24 @@ class PrinterControlManager {
      *
      *  The server guard remains the second safety net. */
     sperreDruckTabs() {
-        const zustand = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
-        const druckt = zustand === 'RUNNING' || zustand === 'PREPARE';
-        const rep = (this.lastState || {});
-        const schritt = e => (e && (e.filament_step != null
-            ? e.filament_step : ((e.stat || 0) & 0xFF))) || 0;
-        const filLaeuft = (rep.extruders || []).some(e => schritt(e) !== 0);
-        const beschaeftigt = druckt || filLaeuft;
-
-        ['movement-tab', 'extruder-tab'].forEach(id => {
+        // No rule of its own any more: the server says per group what may be
+        // done (services/action_guards.py, block `actions`). The axes tab
+        // follows `move`, the extruder tab `extruder`.
+        const gate = window.aktionen;
+        const achsenFrei = gate.erlaubt('move');
+        const extruderFrei = gate.erlaubt('extruder');
+        [['movement-tab', achsenFrei], ['extruder-tab', extruderFrei]].forEach(([id, frei]) => {
             const el = document.getElementById(id);
-            if (el) el.classList.toggle('ctrl-gesperrt', beschaeftigt);
+            if (el) el.classList.toggle('ctrl-gesperrt', !frei);
         });
 
         // And say WHY it's locked -- a grey surface without a reason
-        // looks broken.
-        const texts = window.texts || {};
-        // The element sits next to the camera in the layout -- just fill it here.
+        // looks broken. The reason comes with the block.
         const hinweis = document.getElementById('ctrl-busy-hinweis');
         if (hinweis) {
-            hinweis.style.display = beschaeftigt ? '' : 'none';
-            hinweis.textContent = filLaeuft
-                ? (texts.guard_ams_busy || 'Filament-Vorgang läuft noch – bitte warten.')
-                : (texts.guard_printing || 'Während des Drucks nicht möglich.');
+            const grund = gate.text('move') || gate.text('extruder');
+            hinweis.style.display = grund ? '' : 'none';
+            hinweis.textContent = grund;
         }
     }
 
@@ -350,26 +351,32 @@ class PrinterControlManager {
         if (liste) {
             const seiten = { 254: texts.spool_left || 'Links', 255: texts.spool_right || 'Rechts' };
             const einzeln = (rep.spools || []).length < 2;
-            // Which spool feeds which nozzle is reported by the printer itself.
-            const quelle = {};
-            (rep.extruders || []).forEach(e => {
-                if (e && e.source != null) quelle[e.source] = e.id;
-            });
+            // Roll, content and the nozzle it feeds: the filament state's word.
+            const fs = window.filamentState;
             liste.innerHTML = (rep.spools || []).map(sp => {
                 const name = einzeln ? (texts.spool_external || 'Externe Spule')
                                      : (seiten[sp.id] || String(sp.id));
-                if (sp.empty) {
+                const key = fs.externalKey(parseInt(sp.id, 10));
+                // R11: an AMS takes this spool's nozzle inlet -- as on the material card.
+                const sperre = fs.blockedBy(key);
+                if (sperre) {
                     return `<div class="dev-row"><span>${esc(name)}</span>` +
-                           `<strong>${esc(texts.ams_empty || 'leer')}</strong></div>`;
+                           `<strong>${esc((texts.fs_place_blocked || 'Belegt durch {unit}')
+                               .replace('{unit}', sperre.model || 'AMS'))}</strong></div>`;
                 }
+                if (!fs.hasRoll(key)) {
+                    return `<div class="dev-row"><span>${esc(name)}</span>` +
+                           `<strong>${esc(fs.isEmpty(key) ? (texts.ams_empty || 'leer') : '?')}</strong></div>`;
+                }
+                const inhalt = (fs.place(key) || {}).content || {};
                 const teile = [];
-                if (sp.temp_min && sp.temp_max) teile.push(`${esc(sp.temp_min)}–${esc(sp.temp_max)}°C`);
+                if (inhalt.temp_min && inhalt.temp_max) teile.push(`${esc(inhalt.temp_min)}–${esc(inhalt.temp_max)}°C`);
                 if (sp.diameter) teile.push(`${esc(sp.diameter)} mm`);
-                if (quelle[sp.id] != null) {
-                    teile.push(`${esc(texts.spool_feeds || 'speist Düse')} ${quelle[sp.id]}`);
+                if (fs.feeding(key) != null) {
+                    teile.push(`${esc(texts.spool_feeds || 'speist Düse')} ${fs.feeding(key)}`);
                 }
                 return `<div class="dev-row"><span>${esc(name)}</span>` +
-                       `<strong>${esc(sp.type)}</strong></div>` +
+                       `<strong>${esc(inhalt.material || '?')}</strong></div>` +
                        (teile.length ? `<div class="dev-row"><span></span>` +
                                        `<span>${teile.join(' · ')}</span></div>` : '');
             }).join('');
@@ -567,18 +574,24 @@ class PrinterControlManager {
         if (u.temperature != null) parts.push(window.skIcon('thermo', 'hd-ic--xs') + ' ' + Math.round(u.temperature) + '°C');
         setzeMarkup('ams-' + u.id + '-env', parts.join('&nbsp; '));
 
+        // Roll and content per slot: the filament state's word, not the raw
+        // tray (which keeps its type while a roll is pulled or dries).
+        const fs = window.filamentState;
         (u.trays || []).forEach(t => {
+            const schluessel = fs.slotKey(u.id, t.id || 0);
+            const drin = fs.hasRoll(schluessel);
+            const inhalt = drin ? ((fs.place(schluessel) || {}).content || {}) : {};
             const dot = document.getElementById('ams-' + u.id + '-dot-' + t.id);
             if (dot) {
-                // tray_color is RRGGBBAA; the alpha part doesn't matter.
-                const c = (t.color || '').slice(0, 6);
+                const c = (inhalt.color || '').slice(0, 6);
                 dot.style.background = c ? ('#' + c) : 'transparent';
                 dot.style.borderStyle = c ? 'solid' : 'dashed';
             }
-            set('ams-' + u.id + '-type-' + t.id, t.type || (texts.ams_empty || 'leer'));
+            set('ams-' + u.id + '-type-' + t.id,
+                fs.isEmpty(schluessel) ? (texts.ams_empty || 'leer') : (inhalt.material || '?'));
             // remain = -1 means unknown (only filled with Bambu RFID).
             set('ams-' + u.id + '-remain-' + t.id,
-                (t.remain != null && t.remain >= 0) ? t.remain + '%' : '');
+                (inhalt.remain != null && inhalt.remain >= 0) ? inhalt.remain + '%' : '');
         });
 
         if (u.can_dry) {
@@ -827,21 +840,23 @@ class PrinterControlManager {
                     custom.value = '#' + hex;
                     maleFarbe();
                 }
-                // Preselect a matching profile so the printer gets an
-                // id -- without one it accepts nothing. Try the
-                // manufacturer first, otherwise any profile of that type.
-                const mat = String(fil.material || '').toUpperCase();
-                const marken_name = String((fil.vendor || {}).name || '').toLowerCase();
-                const passend = db.filter(x => String(x[2]).toUpperCase() === mat);
-                const treffer = passend.find(x => marken_name
-                        && String(x[1]).toLowerCase().startsWith(marken_name.split(' ')[0]))
-                    || passend[0];
-                if (treffer) {
-                    gewaehlt = treffer[0];
-                    aktMarke = marke(treffer[1]);
-                    selMarke.value = aktMarke;
-                    maleSorten();
-                }
+                // The profile comes from the server -- the same choice an
+                // assignment makes (remembered, by name, Generic). Guessed
+                // here until 16sep26: Overture TPU became "Bambu TPU 95A".
+                // Generic is only preselected, with a hint; Confirm decides.
+                window.apiCall('/api/filament/spools/' + spule.id + '/profile')
+                    .then(r => r.json()).then(d => {
+                        const p = d && d.success ? d.profile : null;
+                        const treffer = p ? db.find(x => x[0] === p.idx) : null;
+                        if (treffer) {
+                            gewaehlt = treffer[0];
+                            aktMarke = marke(treffer[1]);
+                            selMarke.value = aktMarke;
+                            maleSorten();
+                        }
+                        if (d && d.hint) skToast(d.hint, 'warning');
+                        else if (!treffer) skToast((d && d.error) || texts.connection_error, 'warning');
+                    }).catch(() => skToast(texts.connection_error, 'error'));
                 spoolName.textContent = [((fil.vendor || {}).name || ''), fil.name || '']
                     .filter(Boolean).join(' ');
                 const punkt = overlay.querySelector('#tray-edit-spoolpunkt');
@@ -866,7 +881,9 @@ class PrinterControlManager {
                         // the spool is also the active one. For any other slot
                         // that would be wrong -- a click on slot 3 would then
                         // displace the spool that's actually being printed.
-                        if (this._istAktivesFach(amsId, trayId) && window.activateSpool) {
+                        const fs = window.filamentState;
+                        const schluessel = amsId >= 254 ? fs.externalKey(amsId) : fs.slotKey(amsId, trayId);
+                        if (fs.feeding(schluessel) != null && window.activateSpool) {
                             window.activateSpool(spoolWahl);
                         }
                     }
@@ -905,6 +922,15 @@ class PrinterControlManager {
             const h = String(hex || '').replace('#', '');
             return h ? '#' + h.slice(0, 6) : 'transparent';
         };
+        // Is a roll in this slot? The central filament state answers it. The
+        // old rule (a type is there) went blind exactly here: drying WITH the
+        // roll turning needs the filament out of the feeder, and the printer
+        // then reports the slot as empty -- type and colour gone. The slots
+        // vanished from this card in the middle of the run (measured
+        // 15sep26, 21:37). Without a block the old rule still applies.
+        const drin = (t) => window.filamentState.hasRoll(window.filamentState.slotKey(unit.id, t.id || 0));
+        const esc = v => String(v == null ? '' : v).replace(/[&<>"]/g,
+            c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
         const fertig = new Date(Date.now() + (unit.dry_time || 0) * 60000);
         const fertigUm = String(fertig.getHours()).padStart(2, '0') + ':' +
             String(fertig.getMinutes()).padStart(2, '0');
@@ -939,9 +965,18 @@ class PrinterControlManager {
                   (unit.dry_filament && !(unit.trays || []).some(t =>
                       String(t.type || '').toUpperCase() ===
                       String(unit.dry_filament).toUpperCase())
-                    ? '<div class="dry-chip"><span class="dry-chip-kopf">'
+                    ? '<div class="dry-chip"><span class="dry-chip-head">'
                       + (texts.ams_dry_program || 'Programm') + '</span>'
                       + unit.dry_filament + '</div>' : '') +
+                  // The spool that dries -- named at the start, or the one
+                  // known in the slot (dry_spool, services/drying_spool).
+                  (unit.dry_spool
+                    ? '<div class="dry-chip"><span class="dry-chip-head">'
+                      + (texts.spool || 'Spule') + '</span>'
+                      + (unit.dry_spool.color
+                        ? '<span class="mz-slot-col" style="background:'
+                          + farbe(unit.dry_spool.color) + '"></span>' : '')
+                      + esc(this.drySpoolText(unit.dry_spool)) + '</div>' : '') +
                   '<div class="dry-mess">' +
                     (unit.humidity != null
                       ? mess('wasser', 'RH', unit.humidity + ' %') : '') +
@@ -957,11 +992,11 @@ class PrinterControlManager {
                   '</div>' +
                   // What's in this unit. During drying that's exactly the
                   // question: which spools are currently loaded in there.
-                  ((unit.trays || []).some(t => t.type)
+                  ((unit.trays || []).some(drin)
                     ? '<div class="dry-faecher-titel">'
                         + (texts.ams_dry_slots || 'Faecher') + '</div>'
                       + '<div class="dry-faecher">' +
-                        (unit.trays || []).filter(t => t.type).map(t =>
+                        (unit.trays || []).filter(drin).map(t =>
                           '<span class="dry-fach">'
                           + '<span class="mz-slot-col" style="background:' + farbe(t.color) + '"></span>'
                           + (t.type || '?') + '</span>').join('') +
@@ -995,6 +1030,21 @@ class PrinterControlManager {
         overlay.onclick = (e) => { if (e.target === overlay) zu(); };
     }
 
+    /**
+     * A drying spool in one line: vendor, material, name -- the material
+     * only when the name does not already carry it ("Bambu Lab PETG Black",
+     * "Bambulab PLA Matte black"). Android and iOS write it the same way.
+     */
+    drySpoolText(spool) {
+        const s = spool || {};
+        const name = String(s.name || '');
+        const material = String(s.material || '');
+        const parts = [s.vendor,
+            material && !name.toLowerCase().includes(material.toLowerCase()) ? material : '',
+            name].filter(Boolean);
+        return parts.length ? parts.join(' ') : '#' + s.id;
+    }
+
     amsDryStart(amsId) {
         const texts = window.texts || {};
         const unit = ((this.lastState || {}).ams_units || []).find(u => u.id === amsId) || {};
@@ -1010,10 +1060,18 @@ class PrinterControlManager {
         const presets = window.BAMBU_DRY_PRESETS || {};
         const typen = Object.keys(presets);
 
-        // Default: type of the first loaded slot (base type), otherwise PLA.
-        const fachTyp = ((unit.trays || []).map(t => (t.type || '').toUpperCase())
-            .find(t => t) || 'PLA');
-        let typ = typen.find(t => fachTyp.startsWith(t)) || 'PLA';
+        // The program the server suggests for this unit: from the roll KNOWN
+        // to be in it (RFID, assigned by hand, parked while drying) -- not
+        // from the raw tray, which reads empty in exactly those cases
+        // (services/filament_db.trocken_vorschlag). Android and iOS take the
+        // same field.
+        const typ = unit.dry_suggestion;
+        // The spool that dries: the server names the one it knows in the
+        // unit. It can be chosen in Spoolman and goes with the start -- only
+        // for this run, never assigned to the slot: a roll that lies in the
+        // unit to turn is not fed, and the printer takes no setting for it
+        // (services/drying_spool).
+        let spool = unit.dry_spool || null;
 
         let overlay = document.getElementById('dry-overlay');
         if (overlay) overlay.remove();
@@ -1030,6 +1088,15 @@ class PrinterControlManager {
               // The current value above doesn't answer whether drying is
               // needed -- only the history does that. Loaded afterward.
               '<div class="fk-block" id="dry-gedaechtnis"></div>' +
+              '<div class="tray-edit-zeile">' +
+                '<span class="tray-edit-label">' + (texts.spool || 'Spule') + '</span>' +
+                '<div class="tray-edit-felder">' +
+                  '<button type="button" class="tray-edit-spoolknopf" id="dry-spool">' +
+                    '<span class="tray-edit-spoolpunkt" id="dry-spool-dot"></span>' +
+                    '<span class="tray-edit-spoolname" id="dry-spool-name"></span>' +
+                  '</button>' +
+                '</div>' +
+              '</div>' +
               '<div class="tray-edit-zeile">' +
                 '<span class="tray-edit-label">' + (texts.ams_dry_setting || 'Trocknungseinstellung') + '</span>' +
                 '<div class="tray-edit-felder">' +
@@ -1075,6 +1142,39 @@ class PrinterControlManager {
         selTyp.addEventListener('change', fuelle);
         fuelle();
 
+        const showSpool = () => {
+            const dot = overlay.querySelector('#dry-spool-dot');
+            const hex = String((spool || {}).color || '').replace('#', '').slice(0, 6);
+            dot.style.background = hex.length === 6 ? '#' + hex : '';
+            dot.style.display = hex.length === 6 ? 'inline-block' : '';
+            overlay.querySelector('#dry-spool-name').textContent = spool
+                ? (this.drySpoolText(spool))
+                : (texts.ams_edit_from_spoolman || 'Rolle wählen');
+        };
+        showSpool();
+        overlay.querySelector('#dry-spool').addEventListener('click', () => {
+            if (!window.openSpoolPicker) return;
+            window.openSpoolPicker({
+                gewaehlt: spool ? spool.id : null,
+                onWahl: (s) => {
+                    if (!s) return;
+                    const fil = s.filament || {};
+                    spool = { id: s.id, vendor: (fil.vendor || {}).name || '',
+                              name: fil.name || '', material: fil.material || '',
+                              color: fil.color_hex || '', program: s.dry_program || null };
+                    showSpool();
+                    // The program follows the spool's material -- the server
+                    // says which (dry_program), nothing is worked out here.
+                    if (spool.program && presets[spool.program]) {
+                        selTyp.value = spool.program;
+                        fuelle();
+                    }
+                },
+                // "No spool": dry without naming one.
+                onKeine: () => { spool = null; showSpool(); },
+            });
+        });
+
         overlay.addEventListener('click', (ev) => { if (ev.target === overlay) overlay.remove(); });
         overlay.querySelector('#dry-cancel').addEventListener('click', () => overlay.remove());
         overlay.querySelector('#dry-start').addEventListener('click', () => {
@@ -1082,7 +1182,8 @@ class PrinterControlManager {
             const std = parseInt(inStd.value, 10) || 0;
             const drehen = !!(overlay.querySelector('#dry-rotate') || {}).checked;
             window.printerAdapter.amsDryStart(amsId, temp, std * 60,
-                                              selTyp.value, drehen).then(r => {
+                                              selTyp.value, drehen,
+                                              spool ? spool.id : null).then(r => {
                 if (r.ok) {
                     skToast(texts.ams_dry_started || 'Trocknung gestartet', 'info');
                     overlay.remove();
@@ -1091,72 +1192,6 @@ class PrinterControlManager {
                 }
             }).catch(() => skToast(texts.connection_error, 'error'));
         });
-    }
-
-    /**
-     * A slot's global source number -- from the server.
-     *
-     * It has lived as `global_id` on every slot since 28aug26
-     * (services/printer_state.parse_ams_units). Before that, every UI
-     * computed it itself: here in two places, on Android in one, on
-     * iOS not at all -- and the HT special case (add from 128 instead
-     * of multiplying) was missing at first and had to be added later.
-     *
-     * The computation remains as a fallback, as long as a server without
-     * `global_id` can still answer.
-     */
-    _globaleFachnummer(amsId, trayId) {
-        const einheit = ((this.lastState || {}).ams || {}).units
-            || (this.lastState || {}).ams_units || [];
-        for (const u of einheit) {
-            if (u.id !== amsId) continue;
-            for (const t of (u.trays || [])) {
-                if (t.id === trayId && t.global_id != null) return t.global_id;
-            }
-        }
-        return amsId >= 128 ? amsId + trayId : amsId * 4 + trayId;
-    }
-
-    /**
-     * Is this slot currently the source?
-     *
-     * The printer reports the current source as a GLOBAL number: 0-3 for
-     * AMS 0, 4-7 for AMS 1, from 128 the HT units, 254/255 the external
-     * spools. Same computation as in the server (`_spool_ids`), which is
-     * checked against print_filaments.ams_tray_id.
-     */
-    _istAktivesFach(amsId, trayId) {
-        const st = this.lastState || {};
-        // First choice: the extruder block names unit and slot directly.
-        const quellen = ((st.device_report || {}).extruders || [])
-            .filter(e => e && e.source != null && e.source_slot != null);
-        if (quellen.length) {
-            return quellen.some(e => e.source === amsId && e.source_slot === trayId);
-        }
-        // Second choice: the AMS hall mask (`geladen`), also per slot.
-        const einheiten = (st.ams && st.ams.units) || st.ams_units || [];
-        for (const u of einheiten) {
-            if (u.id !== amsId) continue;
-            for (const t of (u.trays || [])) {
-                if (t.id === trayId && t.loaded != null) return !!t.loaded;
-            }
-        }
-        // Fallback. It never once matched here: the printer reports only
-        // "something" (0) or "nothing" (255) in `tray_current`, while the
-        // AMS HT's global number is 128 -- and 128 never becomes 0. During
-        // a print the answer therefore always fell through to the state
-        // check below, and editing the REALLY active slot never marked the
-        // spool active (found in the 02sep26 recording). Kept for devices
-        // that send neither the extruder block nor the hall mask.
-        const jetzt = parseInt((st.ams && st.ams.tray_current) || st.tray_current || '255', 10);
-        const global = this._globaleFachnummer(amsId, trayId);
-        if (jetzt === global) return true;
-        // As long as nothing is being printed, there's nothing to displace:
-        // the printer then usually reports 255 ("no source"), and the guard
-        // would never have let the mapping through anyway. It only needs to
-        // protect an active print.
-        const zustand = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
-        return !['RUNNING', 'PREPARE', 'PAUSE'].includes(zustand);
     }
 
     /**
@@ -1178,41 +1213,172 @@ class PrinterControlManager {
      * Added afterward, not part of the initial build: the humidity data
      * comes from its own request, and the card shouldn't wait on it.
      */
-    _markiereOhneZuordnung(wrap, units) {
-        if (!window.amsHumidity || !wrap) return;
-        window.amsHumidity.hole(14).then(daten => {
-            if (!daten || !wrap.isConnected) return;
-            const zuordnung = new Map(
-                (daten.spools || []).map(s => [s.ams_id + ':' + s.slot, s]));
-            (units || []).forEach(u => (u.trays || []).forEach(t => {
-                // Via the id on the element, not via ordering.
-                const feld = wrap.querySelector(
-                    '.mz-slot[data-ams="' + u.id + '"][data-slot="' + (t.id || 0) + '"]');
-                // Empty slot: nothing to report. `vorhanden === false` is
-                // the reliable answer, the missing type only the old
-                // workaround -- which still applies where the printer
-                // doesn't send the bitmask.
-                if (!feld || t.present === false || !t.type) return;
-                const eintrag = zuordnung.get(u.id + ':' + (t.id || 0));
-                // No entry at all does NOT mean "no mapping", but
-                // "nothing recorded yet". `spulen()` only returns a
-                // dwell time once it has a first measurement in it, and
-                // measurements only happen every few minutes -- so a slot
-                // stays unknown for a while after loading.
-                // Claiming something regardless is exactly the kind of message
-                // that costs trust.
-                if (!eintrag) return;
-                if (eintrag.spool_id != null) return;
+    /**
+     * The open questions of the filament state: "which spool is in AMS HT
+     * slot 1?" -- as a row under the slots, plus an orange edge on the place
+     * itself. Deliberately not a window that opens by itself: that lands in
+     * the middle of a print, and nothing about the question is urgent.
+     *
+     * A contradiction (spool PETG in an ASA slot, R8) is shown the same way.
+     * Once it has been accepted on purpose it keeps no question -- it stays
+     * visible, and asks nothing any more.
+     */
+    _zeigeFragen(wrap) {
+        const fs = window.filamentState;
+        if (!fs || !wrap || !fs.block()) return;
+        // Same reason as the card itself: this runs once a second, and the
+        // questions change a few times a day. The signature covers what the
+        // rows show; renderMaterialZone clears it when it rebuilds wrap,
+        // because the rows go with it.
+        const sig = JSON.stringify([fs.questions(), fs.conflicts()]);
+        if (this._mzFragenSig === sig) return;
+        this._mzFragenSig = sig;
+        const texts = window.texts || {};
+        const esc = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        const konfliktText = (k) => (texts.fs_conflict
+            || 'Der Drucker meldet {printer}, die Spule ist {spool}.')
+            .replace('{printer}', k.printer).replace('{spool}', k.spool);
+
+        wrap.querySelectorAll('.mz-fragen').forEach(e => e.remove());
+        const zeilen = [];
+        // The rows are the quiet view; the question card in the middle of the
+        // page is where a new question announces itself (frage-karte.js).
+        fs.questions().forEach(f => {
+            // The place itself carries the mark, so the row and the slot
+            // point at the same thing.
+            const ams = /^ams:(\d+)\/(\d+)$/.exec(f.place);
+            const aussen = /^ext:(\d+)$/.exec(f.place);
+            const wahl = ams ? '[data-ams="' + ams[1] + '"][data-slot="' + ams[2] + '"]'
+                : (aussen ? '[data-ams="' + aussen[1] + '"][data-slot="0"]' : null);
+            const feld = wahl ? document.querySelector('.mz-slot' + wahl) : null;
+            const konflikt = fs.conflictFor(f.place);
+            // R13: after unloading -- reset the external spool, or keep it.
+            const abgenommen = f.kind === 'spool_removed';
+            // R14: set the proposed profile, or not.
+            const vorschlag = f.kind === 'confirm_profile';
+            const profilName = f.profile_name || f.profile || '';
+            const text = abgenommen
+                ? (texts.fs_removed_question || 'Filament ist draußen. {place} zurücksetzen?')
+                    .replace('{place}', fs.placeLabel(f.place))
+                : vorschlag
+                ? (texts.fs_proposal_question || 'Kein eigenes Profil für diese Spule – {name} einstellen?')
+                    .replace('{name}', profilName)
+                : konflikt ? konfliktText(konflikt)
+                // R15: a roll with a chip that no free Spoolman spool fits
+                : f.reason === 'not_in_spoolman'
+                ? (texts.fs_question_new_spool || 'Neue Spule in {place} erkannt – noch keiner Spoolman-Spule zugewiesen')
+                    .replace('{place}', fs.placeLabel(f.place))
+                : (texts.fs_question || 'Welche Spule liegt in {place}?')
+                    .replace('{place}', fs.placeLabel(f.place));
+            if (feld) {
                 feld.classList.add('mz-slot--offen');
-                const vorschlag = (eintrag && (eintrag.suggestions || [])[0]) || null;
-                feld.title = (texts.humidity_unassigned
-                    || 'Fach {n} im AMS ist keiner Spule zugeordnet.')
-                    .replace('{n}', (t.id || 0) + 1)
-                    + (vorschlag ? ' ' + (texts.humidity_suggestion || 'Vorschlag: {name}')
-                        .replace('{name}', vorschlag.name || '') : '');
-                this._meldeOhneZuordnung(u.id, t.id || 0, feld.title);
-            }));
-        }).catch(() => {});
+                feld.title = text;
+            }
+            const knopf = (aufruf, beschriftung) => '<button type="button" class="mz-frage-knopf" '
+                + 'onclick="window.printerControlManager.' + aufruf + '">' + esc(beschriftung) + '</button>';
+            const ort = esc(f.place);
+            zeilen.push('<div class="mz-frage"><span class="mz-frage-text">' + esc(text) + '</span>'
+                + (abgenommen
+                    ? knopf('abgenommenAntworten(\'' + ort + '\', true)',
+                            texts.spool_prompt_reset || 'Zurücksetzen')
+                      + knopf('abgenommenAntworten(\'' + ort + '\', false)',
+                              texts.spool_prompt_keep || 'Behalten')
+                    : vorschlag
+                    ? knopf('vorschlagAntworten(\'' + ort + '\', true)',
+                            (texts.fs_proposal_set_button || '{name} einstellen').replace('{name}', profilName))
+                      + knopf('vorschlagAntworten(\'' + ort + '\', false)',
+                              texts.fs_proposal_skip || 'Nicht einstellen')
+                    : knopf('frageBeantworten(\'' + ort + '\')', texts.fs_assign || 'Spule zuordnen'))
+                + '</div>');
+
+        });
+        fs.conflicts().filter(k => !fs.questionFor(k.place)).forEach(k => {
+            zeilen.push('<div class="mz-frage"><span class="mz-frage-text">'
+                + esc(konfliktText(k)) + '</span></div>');
+        });
+        if (zeilen.length) {
+            wrap.insertAdjacentHTML('beforeend',
+                '<div class="mz-fragen">' + zeilen.join('') + '</div>');
+        }
+    }
+
+    /**
+     * R13: "was the spool taken off?" -- true resets the external spool at
+     * the printer (the server waits for its confirmation), false keeps it.
+     */
+    abgenommenAntworten(schluessel, ja) {
+        const texts = window.texts || {};
+        window.apiCall('/api/filament/places/' + schluessel + '/removed', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ removed: !!ja }),
+        }).then(r => r.json()).then(d => {
+            if (!d || !d.success) {
+                skToast((d && d.error) || texts.connection_error, 'error');
+                return;
+            }
+            if (window.filamentState) window.filamentState.update(d.filament_state);
+            this.renderMaterialZone();
+            skToast(d.message, 'success');
+        }).catch(() => skToast(texts.connection_error, 'error'));
+    }
+
+    /** R14: yes or no to the profile proposed for a place. */
+    vorschlagAntworten(schluessel, ja) {
+        const texts = window.texts || {};
+        window.apiCall('/api/filament/places/' + schluessel + '/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accept: !!ja }),
+        }).then(r => r.json()).then(d => {
+            if (!d || !d.success) {
+                skToast((d && d.error) || texts.connection_error, 'error');
+                return;
+            }
+            if (window.filamentState) window.filamentState.update(d.filament_state);
+            this.renderMaterialZone();
+            skToast(d.message, 'success');
+        }).catch(() => skToast(texts.connection_error, 'error'));
+    }
+
+    /** Answer it: pick a spool from the candidates, or "none of them". */
+    frageBeantworten(schluessel) {
+        const fs = window.filamentState;
+        if (!fs || !window.openSpoolPicker) return;
+        const frage = fs.questionFor(schluessel);
+        const ort = fs.place(schluessel);
+        window.openSpoolPicker({
+            // The candidates the server found for this roll (material and
+            // colour) are marked in the window.
+            treffer: (frage && frage.candidates) || [],
+            gewaehlt: (ort && ort.spool) ? ort.spool.id : null,
+            onWahl: (spule) => this._antwortSenden(schluessel, spule ? spule.id : null),
+            onKeine: () => this._antwortSenden(schluessel, null),
+        });
+    }
+
+    /** The answer goes to the server; it sends the new state back. */
+    _antwortSenden(schluessel, spule) {
+        const texts = window.texts || {};
+        window.apiCall('/api/filament/places/' + schluessel + '/spool', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ spool_id: spule }),
+        }).then(r => r.json()).then(d => {
+            if (!d || !d.success) {
+                skToast((d && d.error) || texts.connection_error, 'error');
+                return;
+            }
+            if (window.filamentState) window.filamentState.update(d.filament_state);
+            this.renderMaterialZone();
+            // What happened at the printer, in the server's words (part 3):
+            // set, already matching, chip, or only assigned and why.
+            const detail = [d.printer_text, d.hint].filter(Boolean).join(' · ');
+            skToast(texts.fs_answer_saved || 'Zuordnung gespeichert', 'success',
+                    detail ? { detail } : undefined);
+        }).catch(() => skToast(texts.connection_error, 'error'));
     }
 
     /**
@@ -1241,7 +1407,7 @@ class PrinterControlManager {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 ams_id: amsId, slot: trayId, spool_id: spoolId,
-                typ: typ || '', farbe: farbe || '', name: name || '',
+                type: typ || '', color: farbe || '', name: name || '',
             }),
         }).then(() => { if (window.amsHumidity) window.amsHumidity.vergiss(); })
           .catch(() => {});
@@ -1253,8 +1419,28 @@ class PrinterControlManager {
      * Loaded afterward, not built in from the start: the dialog should be up
      * immediately. If the request fails, the spot just stays empty -- the
      * dialog keeps working without the history.
+     *
+     * And loaded again while the dialog stands open. A measurement lands
+     * every five minutes; the window used to show the state of the moment it
+     * was opened and nothing after it -- ten minutes of readings missing on
+     * screen while the database had them all (reported 17sep26).
      */
     _feuchteGedaechtnis(overlay, unit) {
+        const ziel = overlay.querySelector('#dry-gedaechtnis');
+        if (!ziel || !window.amsHumidity) return;
+        clearInterval(this._feuchteTakt);
+        this._feuchteTakt = setInterval(() => {
+            if (!overlay.isConnected) { clearInterval(this._feuchteTakt); return; }
+            // The module holds an answer for a minute; without this the
+            // refresh would redraw the same points.
+            window.amsHumidity.vergiss();
+            this._feuchteGedaechtnisZeichnen(overlay, unit);
+        }, 60000);
+        this._feuchteGedaechtnisZeichnen(overlay, unit);
+    }
+
+    /** One drawing pass of the humidity history (see _feuchteGedaechtnis). */
+    _feuchteGedaechtnisZeichnen(overlay, unit) {
         const ziel = overlay.querySelector('#dry-gedaechtnis');
         if (!ziel || !window.amsHumidity) return;
         const texts = window.texts || {};
@@ -1276,7 +1462,11 @@ class PrinterControlManager {
             if (!daten || !overlay.isConnected) return;
             const e = window.amsHumidity.einheit(daten, unit.id);
             const kurve = e ? window.amsHumidity.kurve(e.history, daten.threshold) : '';
-            const faecher = (unit.trays || []).filter(t => t.type).map(t => {
+            // Which slots hold a roll -- from the state, not from the type.
+            // While drying with the roll turning the printer reports the slot
+            // empty, and the history of exactly that roll would disappear.
+            const steckt = (t) => window.filamentState.hasRoll(window.filamentState.slotKey(unit.id, t.id || 0));
+            const faecher = (unit.trays || []).filter(steckt).map(t => {
                 const spule = window.amsHumidity.fuerFach(daten, unit.id, t.id);
                 if (!spule) return '';
                 return '<div class="fk-fach">'
@@ -1303,9 +1493,11 @@ class PrinterControlManager {
                             .replace('{zeit}', uhrzeit(e.history[0].time))) + '</div>';
                 return;
             }
+            const letzte = window.amsHumidity.letzteZeit(e && e.history);
             ziel.innerHTML =
                 '<div class="fk-kopf">' + esc(texts.humidity_title || 'Feuchte')
                 + (zeit.text ? '<span class="fk-spanne">' + esc(zeit.text) + '</span>' : '')
+                + (letzte ? '<span class="fk-spanne">' + esc(letzte) + '</span>' : '')
                 + '<span class="fk-schwelle-text">' + esc(
                     (texts.humidity_threshold || 'Grenze {s} %').replace('{s}', daten.threshold))
                 + '</span></div>' + kurve + faecher;
@@ -1442,11 +1634,16 @@ class PrinterControlManager {
         // produces an error message shouldn't be offered. The
         // checkboxes stay usable: preparing the selection for the next
         // pass is fine to do in the meantime.
-        const gesperrt = ['RUNNING', 'PREPARE', 'PAUSE'].includes(zustand);
-        document.querySelectorAll('.cali-lauf-btn').forEach(b => { b.disabled = gesperrt; });
+        const gesperrt = !window.aktionen.erlaubt('calibrate');
+        const warum = window.aktionen.text('calibrate');
+        document.querySelectorAll('.cali-lauf-btn').forEach(b => {
+            b.disabled = gesperrt;
+            if (gesperrt) b.title = warum; else b.removeAttribute('title');
+        });
         const knopf = document.getElementById('cali-start');
         if (knopf) {
             knopf.disabled = gesperrt;
+            if (gesperrt) knopf.title = warum; else knopf.removeAttribute('title');
             knopf.textContent = gesperrt && system
                 ? (texts.cali_running || 'Kalibrierung läuft')
                 : (texts.cali_start || 'Kalibrierung starten');
@@ -1891,70 +2088,51 @@ class PrinterControlManager {
         const kZahl = parseFloat(kRoh);
         const kWert = (isFinite(kZahl) && kZahl > 0) ? kZahl.toFixed(3) : '';
 
-        const slot = (t, aktiv, onclick, seite, kennung) => {
-            // Is there anything in there at all? Only the printer's own
-            // bitmask (`vorhanden`) says so. `type`, `name` and `color` STAY
-            // as they were when pulled out -- captured on 02sep26 while
-            // plugging and unplugging twice. Without this check the card kept
-            // showing the type, name and color of a spool that wasn't even
-            // in the device anymore. Studio does it the same way and
-            // deliberately does NOT read the filament type for presence.
-            //
-            // Only clear on an explicit `false`: `null` means
-            // "the printer doesn't say", and then it keeps the old
-            // behavior instead of hiding a full spool.
-            const leer = t.present === false;
-            const rest = (!leer && t.remain != null && t.remain > 0) ? t.remain + '%' : '';
-            const name = leer
-                ? (seite ? seite + ' · ' : '') + (texts.ams_empty || 'leer')
-                : [seite, t.type || '?', t.name].filter(Boolean).join(' · ');
+        // One slot of the card -- everything from the filament state: whether
+        // a roll is in, what it holds, whether a nozzle pulls from it, whether
+        // it is parked or blocked. `spoolman` names the active spool's name
+        // and fill level where Spoolman knows them better than the printer.
+        const fs = window.filamentState;
+        const slot = (schluessel, onclick, seite, kennung, spoolman) => {
+            const ort = fs.place(schluessel) || {};
+            const inhalt = fs.hasRoll(schluessel) ? (ort.content || {}) : {};
+            const leer = !fs.hasRoll(schluessel);
+            const aktiv = fs.feeding(schluessel) != null;
+            // Parked (R10): the slot reports empty while its unit dries with
+            // the roll turning. The roll is in there -- and says why.
+            const geparkt = fs.isParked(schluessel);
+            // R11: an AMS takes this external spool's nozzle inlet -- nothing
+            // can feed from it, so it says so and cannot be edited.
+            const sperre = fs.blockedBy(schluessel);
+            const nameSpule = (aktiv && spoolman && spoolman.name) || inhalt.name;
+            const restZahl = (aktiv && spoolman && spoolman.remain) ? spoolman.remain : inhalt.remain;
+            const rest = (!leer && restZahl != null && restZahl > 0) ? restZahl + '%' : '';
+            const name = sperre
+                ? (seite ? seite + ' · ' : '') + (texts.fs_place_blocked || 'Belegt durch {unit}')
+                    .replace('{unit}', sperre.model || 'AMS')
+                : leer
+                ? (seite ? seite + ' · ' : '') + (fs.isEmpty(schluessel) ? (texts.ams_empty || 'leer') : '?')
+                : [seite, inhalt.material || '?', geparkt ? (texts.fs_parked || 'trocknet') : nameSpule]
+                    .filter(Boolean).join(' · ');
             const k = (aktiv && kWert && !leer)
                 ? '<span class="mz-slot-k" title="' + (texts.k_factor_hint || 'Pressure Advance') + '">K ' + kWert + '</span>'
                 : '';
-            // Id on the element. `_markiereOhneZuordnung` used to count the
-            // slots off by DOM order (felder[i++]) and relied on both
-            // loops being nested the same way. As soon as any slot is
-            // skipped somewhere, or an in-between row is inserted, the orange
-            // edge silently moves to the wrong slot.
             const kenn = kennung
                 ? ' data-ams="' + kennung.ams + '" data-slot="' + kennung.slot + '"'
                 : '';
-            return '<div class="mz-slot' + (aktiv ? ' mz-active-slot' : '')
-                + (leer ? ' mz-slot--leer' : '') + '"' + kenn +
-                (onclick ? ' onclick="' + onclick + '"' : '') + '>' +
+            return '<div class="mz-slot' + (aktiv && !sperre ? ' mz-active-slot' : '')
+                + (leer ? ' mz-slot--leer' : '')
+                + (sperre ? ' mz-slot--gesperrt' : '')
+                + (fs.isLastSeen() ? ' mz-slot--gesehen' : '') + '"' + kenn +
+                (onclick && !sperre ? ' onclick="' + onclick + '"' : '') + '>' +
                 '<span class="mz-slot-col" style="background:'
-                + (leer ? 'transparent' : farbe(t.color)) + '"></span>' +
-                '<span class="mz-slot-name">' + name + '</span>' + k +
-                '<span class="mz-slot-pct">' + rest + '</span></div>';
+                + (leer || sperre ? 'transparent' : farbe(inhalt.color)) + '"></span>' +
+                '<span class="mz-slot-name">' + name + '</span>' + (sperre ? '' : k) +
+                '<span class="mz-slot-pct">' + (sperre ? '' : rest) + '</span></div>';
         };
 
-        // AMS units (incl. AMS HT). Which slot is currently feeding a
-        // nozzle is reported by the extruder block -- NOT `tray_now`.
-        //
-        // Captured on 02sep26, while the AMS slot was being loaded:
-        //
-        //     extruder[1].snow = 32768  = 0x8000 = 128<<8 | 0   -> AMS 128, slot 0
-        //     ams.tray_now     = '0'
-        //     extruder[1].snow = 65279  = 0xFEFF                -> nothing loaded
-        //     ams.tray_now     = '255'
-        //
-        // So `tray_now` only toggles between "something loaded" and
-        // "nothing" -- it carries no slot number on this printer. The
-        // comparison could only match by coincidence: for the AMS HT the
-        // global number is 128 (Studio computes it the same way, DevFilaSystem.cpp:
-        // for the N3S the index is the AMS number itself), and 128 never
-        // becomes 0. The ring on the active slot therefore never showed up.
-        //
-        // The external spools further down in the same card have long read
-        // the source from `extruders` -- only the old field was still here.
+        // AMS units (incl. AMS HT).
         const units = st.ams_units || [];
-        const quellenPaare = (rep.extruders || [])
-            .filter(e => e && e.source != null && e.source_slot != null)
-            .map(e => e.source + ':' + e.source_slot);
-        // Last fallback, for devices that send neither the extruder block
-        // nor the hall mask. It is worth little -- see above, `tray_now`
-        // carries no slot number on this printer.
-        const aktivTray = parseInt((st.ams && st.ams.tray_current) || st.tray_current || '255', 10);
         // Model name into the card heading. With EXACTLY one unit,
         // "AMS HT" is better placed there than at the start of every header
         // row -- it doesn't repeat and makes room in the row that the
@@ -2053,30 +2231,41 @@ class PrinterControlManager {
                 (trocknet ? '<div class="mz-unit-dry">' + trockenZeile + '</div>' : '') +
                 '</div>' + dryBtn + '</div>';
             (u.trays || []).forEach(t => {
-                // Global source number -- comes from the server (`global_id`),
-                // see _globaleFachnummer.
-                const global = t.global_id != null ? t.global_id
-                    : (u.id >= 128 ? u.id + (t.id || 0) : u.id * 4 + (t.id || 0));
-                // First choice stays the extruder block. Without it the
-                // AMS hall mask (`geladen`) answers: an own sensor at the
-                // slot outlet that matched `extruders[].snow` to the second
-                // over a full print on 02sep26, and even ran one second
-                // ahead of the reported state. Unlike `tray_now` it names
-                // the SLOT.
-                const aktiv = quellenPaare.length
-                    ? quellenPaare.includes(u.id + ':' + (t.id || 0))
-                    : (t.loaded != null ? t.loaded : aktivTray === global);
-                html += slot(t, aktiv, "amsEditTray(" + u.id + "," + (t.id || 0) + ")",
+                html += slot(fs.slotKey(u.id, t.id || 0), "amsEditTray(" + u.id + "," + (t.id || 0) + ")",
                              null, { ams: u.id, slot: t.id || 0 });
             });
             html += '</div>';
         });
-        wrap.innerHTML = html;
-        this._markiereOhneZuordnung(wrap, units);
+        // Not live: say since when. Without this the card showed the last
+        // values of a printer that had been off for hours as if they were
+        // current -- nothing on this page said otherwise.
+        if (fs.isLastSeen()) {
+            const zeit = fs.seenAt();
+            const text = (texts.fs_last_seen || 'Zuletzt gesehen {time}').replace(
+                '{time}', zeit ? zeit.toLocaleTimeString(undefined,
+                    { hour: '2-digit', minute: '2-digit' }) : '');
+            html = '<div class="mz-gesehen">' + window.skIcon('uhr', 'hd-ic--xs')
+                + '<span>' + String(text).replace(/</g, '&lt;') + '</span></div>' + html;
+        }
 
-        // External spools: 254 left, 255 right. Active = source of a nozzle.
+        // Only write when it really differs.
+        //
+        // This runs on every status push -- once a second while a print is
+        // going (measured 17sep26: 0.9 pushes a second). Slots and spools
+        // stand still for minutes at a time, but rebuilding the HTML tore
+        // down and rebuilt the card's DOM every single time, and the window
+        // plus the GPU process spent about 9 % of a core on redrawing it.
+        // The string is built either way -- that is cheap; what costs is
+        // layout, paint and composite.
+        if (this._mzHtml !== html) {
+            this._mzHtml = html;
+            wrap.innerHTML = html;
+            // The question rows live inside wrap and went with it.
+            this._mzFragenSig = null;
+        }
+
+        // External spools: 254 left, 255 right. Active = a nozzle pulls from it.
         const spools = rep.spools || [];
-        const quellen = (rep.extruders || []).map(e => e && e.source).filter(v => v != null);
         const zeile = document.getElementById('mz-spools');
         const titel = document.getElementById('mz-spools-title');
         // Name + fill level of the ACTIVE spool come from Spoolman -- the
@@ -2084,25 +2273,25 @@ class PrinterControlManager {
         const smName = (document.getElementById('spool-name') || {}).textContent || '';
         const smPct = ((document.getElementById('spool-percent') || {}).textContent || '').trim();
         if (zeile) {
-            zeile.innerHTML = spools.map(sp => {
+            const spoolHtml = spools.map(sp => {
                 const id = parseInt(sp.id, 10);
-                const seite = id === 254 ? 'L' : 'R';
-                // Ring only when the spool is set as the source AND loaded.
-                // The printer keeps the source from the last print --
-                // otherwise the empty left spool carried the ring while the
-                // full right one looked inactive.
-                const aktiv = quellen.includes(id) && !sp.empty;
                 // Click = filament editor, same as for the AMS slots.
-                return slot({ type: sp.type, color: (sp.cols && sp.cols[0]) || sp.color,
-                              name: aktiv ? smName : sp.name,
-                              remain: (aktiv && smPct) ? parseInt(smPct, 10) : sp.remain },
-                            aktiv, 'amsEditTray(' + id + ',0)', seite);
+                return slot(fs.externalKey(id), 'amsEditTray(' + id + ',0)', id === 254 ? 'L' : 'R',
+                            { ams: id, slot: 0 },
+                            { name: smName, remain: smPct ? parseInt(smPct, 10) : null });
             }).join('');
+            if (this._mzSpoolsHtml !== spoolHtml) {
+                this._mzSpoolsHtml = spoolHtml;
+                zeile.innerHTML = spoolHtml;
+            }
             if (titel) {
                 titel.style.display = spools.length ? '' : 'none';
                 titel.textContent = texts.dev_spools || 'Externe Spulen';
             }
         }
+
+        // The open questions of the state, below everything it asks about.
+        this._zeigeFragen(wrap);
 
         // System bar: light/MQTT state as ring/color
         const licht = document.getElementById('mz-sys-light');
@@ -2212,9 +2401,8 @@ class PrinterControlManager {
     // ========================================
     jogAxis(axis, distance) {
         const texts = window.texts || {};
-        const zustand = (window.lastPrintData || {}).gcode_state;
-        if (zustand === 'RUNNING' || zustand === 'PREPARE') {
-            skToast(texts.toast_no_move_printing || 'Während des Drucks nicht verfahrbar', 'warning');
+        if (!window.aktionen.erlaubt('move')) {
+            skToast(window.aktionen.text('move'), 'warning');
             return;
         }
         if (!this.modalHomingDone) {
@@ -2342,9 +2530,10 @@ class PrinterControlManager {
 
     extActivateSide() {
         const texts = window.texts || {};
-        const zustand = (window.lastPrintData || {}).gcode_state;
-        if (zustand === 'RUNNING' || zustand === 'PREPARE') {
-            skToast(texts.toast_no_nozzle_switch_printing || 'Während des Drucks keinen Düsenwechsel auslösen', 'warning');
+        // A nozzle switch is a movement of the tool head, and it belongs to
+        // the extruder group in the server's table.
+        if (!window.aktionen.erlaubt('extruder')) {
+            skToast(window.aktionen.text('extruder'), 'warning');
             return;
         }
         const seite = this._extSide != null ? this._extSide : 0;
@@ -2365,6 +2554,15 @@ class PrinterControlManager {
         const rep = st.device_report || {};
         const spools = rep.spools || [];
         const gewaehlt = (document.getElementById('ctrl-nozzle') || {}).value || '254';
+        // The default side (left) may be the one an AMS blocks (R11): then
+        // the first usable external spool is the target.
+        const fsZiel = window.filamentState;
+        if (!this._filZiel && fsZiel && fsZiel.blockedBy
+                && fsZiel.blockedBy(fsZiel.externalKey(parseInt(gewaehlt, 10)))) {
+            const frei = spools.map(s => parseInt(s.id, 10))
+                .find(i => !fsZiel.blockedBy(fsZiel.externalKey(i)));
+            if (frei != null) this._filZiel = { ams: frei, slot: 0 };
+        }
 
         const farbe = (hex) => {
             const h = String(hex || '').replace('#', '');
@@ -2381,10 +2579,16 @@ class PrinterControlManager {
                 // the main page) -- loading used to ALWAYS go out as an
                 // external spool and the printer demanded manual intervention.
                 const aktiv = ziel.ams === u.id && ziel.slot === (t.id || 0);
+                const schluessel = window.filamentState.slotKey(u.id, t.id || 0);
+                const inhalt = window.filamentState.hasRoll(schluessel)
+                    ? ((window.filamentState.place(schluessel) || {}).content || {}) : {};
+                const bezeichnung = window.filamentState.isEmpty(schluessel)
+                    ? (texts.ams_empty || 'leer')
+                    : [inhalt.material || '?', inhalt.name].filter(Boolean).join(' · ');
                 html += '<div class="mz-slot' + (aktiv ? ' mz-ziel-slot' : '') + '"' +
                     ' onclick="filSelectTray(' + u.id + ',' + (t.id || 0) + ')">' +
-                    '<span class="mz-slot-col" style="background:' + farbe(t.color) + '"></span>' +
-                    '<span class="mz-slot-name">' + [t.type || '?', t.name].filter(Boolean).join(' · ') + '</span>' +
+                    '<span class="mz-slot-col" style="background:' + farbe(inhalt.color) + '"></span>' +
+                    '<span class="mz-slot-name">' + bezeichnung + '</span>' +
                     (aktiv ? '<span class="mz-ziel-check">✓</span>' : '') +
                     '<button class="mz-edit-btn" title="Filament" ' +
                         'onclick="event.stopPropagation();amsEditTray(' + u.id + ',' + (t.id || 0) + ')">✎</button>' +
@@ -2393,16 +2597,29 @@ class PrinterControlManager {
         });
         if (spools.length) {
             html += '<div class="mz-sec">' + (texts.dev_spools || 'Externe Spulen') + '</div><div class="mz-spool-row">';
+            const fs = window.filamentState;
             html += spools.map(sp => {
                 const id = parseInt(sp.id, 10);
                 const seite = id === 254 ? 'L' : 'R';
+                // R11: an AMS takes this spool's nozzle inlet -- nothing to
+                // load, unload or edit there, as in the material card.
+                const sperre = fs.blockedBy(fs.externalKey(id));
                 // Selected only when no AMS slot is the target.
-                const aktiv = ziel.ams != null
+                const aktiv = !sperre && (ziel.ams != null
                     ? (ziel.ams === id)
-                    : String(id) === String(gewaehlt);
+                    : String(id) === String(gewaehlt));
+                if (sperre) {
+                    return '<div class="mz-slot mz-slot--gesperrt">' +
+                        '<span class="mz-slot-col" style="background:transparent"></span>' +
+                        '<span class="mz-slot-name">' + seite + ' · ' + (texts.fs_place_blocked || 'Belegt durch {unit}')
+                            .replace('{unit}', sperre.model || 'AMS') + '</span></div>';
+                }
+                const schluessel = fs.externalKey(id);
+                const inhalt = fs.hasRoll(schluessel) ? ((fs.place(schluessel) || {}).content || {}) : {};
                 return '<div class="mz-slot' + (aktiv ? ' mz-ziel-slot' : '') + '" onclick="filSelectSpool(' + id + ')">' +
-                    '<span class="mz-slot-col" style="background:' + farbe((sp.cols && sp.cols[0]) || sp.color) + '"></span>' +
-                    '<span class="mz-slot-name">' + seite + ' · ' + (sp.type || '?') + '</span>' +
+                    '<span class="mz-slot-col" style="background:' + farbe(inhalt.color) + '"></span>' +
+                    '<span class="mz-slot-name">' + seite + ' · ' + (fs.isEmpty(schluessel)
+                        ? (texts.ams_empty || 'leer') : (inhalt.material || '?')) + '</span>' +
                     (aktiv ? '<span class="mz-ziel-check">✓</span>' : '') +
                     '<button class="mz-edit-btn" title="Filament" ' +
                         'onclick="event.stopPropagation();amsEditTray(' + id + ',0)">✎</button>' +
@@ -2410,39 +2627,36 @@ class PrinterControlManager {
             }).join('');
             html += '</div>';
         }
-        wrap.innerHTML = html;
+        // Same as the material card: only write when it differs. The tab is
+        // redrawn on every status push while it stands open.
+        if (this._filHtml !== html) {
+            this._filHtml = html;
+            wrap.innerHTML = html;
+        }
         const hint = document.getElementById('fil-hint');
         if (hint) hint.textContent = texts.fil_pick_hint || 'Fach antippen = Zielseite für Laden/Entladen';
 
-        // The process step sits in the LOWER 8 bits of `stat`; the upper
-        // bits carry something else. `stat !== 0` used to be checked --
-        // 768 then looks like "running" this way, but is actually step 0,
-        // i.e. nothing. The server now delivers the step ready-made as `filament_step`.
-        const schritt = e => (e && (e.filament_step != null
-            ? e.filament_step : ((e.stat || 0) & 0xFF))) || 0;
+        // The routine running on a nozzle, from the filament state: its step
+        // and whether it loads or unloads.
+        const laufend = window.filamentState.routine();
 
-        // Grey out load/unload/purge while printing is happening or a
-        // filament process is already running -- the server guard blocks it
-        // too, but the buttons shouldn't offer it in the first place.
-        const zustand = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
-        const gesperrt = zustand === 'RUNNING' || zustand === 'PREPARE' ||
-            ((rep.extruders || []).some(e => schritt(e) !== 0));
-        document.querySelectorAll('.fil-abtn').forEach(b => { b.disabled = gesperrt; });
+        // Load, unload and purge follow the server's table -- it knows the
+        // print, the running routine and the calibration, and it refuses the
+        // same call if a button is pressed anyway.
+        const gesperrt = !window.aktionen.erlaubt('filament');
+        const warumFil = window.aktionen.text('filament');
+        document.querySelectorAll('.fil-abtn').forEach(b => {
+            b.disabled = gesperrt;
+            if (gesperrt) b.title = warumFil; else b.removeAttribute('title');
+        });
 
         // The load button says what's currently happening -- the same
         // thing the printer shows on its screen. As long as nothing is
-        // running, it says "Load" again.
-        const laufend = (rep.extruders || []).map(schritt).find(x => x > 0) || 0;
-        // The step belongs on the button the user pressed --
-        // during unload it otherwise said "Load" (reported 25aug26).
-        //
-        // If the process was triggered elsewhere (Bambu Studio, printer
-        // display), we don't know that; then the step decides for itself:
-        // 4 = pull old filament -> unload, 5/6 = push/grab new
-        // -> load. For the shared steps (heating, cutting) it
-        // stays on load.
+        // running, it says "Load" again. The step belongs on the button the
+        // user pressed (during unload it otherwise said "Load", 25aug26); a
+        // routine started at the printer or in Studio names its side itself.
         let seite = this._filLaufAktion;
-        if (!seite) seite = (laufend === 4) ? 'unload' : 'load';
+        if (!seite && laufend) seite = laufend.action;
         if (!laufend) this._filLaufAktion = null;
 
         const namen = texts.fil_steps || {};
@@ -2451,7 +2665,7 @@ class PrinterControlManager {
             const el = document.getElementById(id);
             if (!el) return;
             const aktiv = !!laufend && seite === welche;
-            el.textContent = aktiv ? (namen[laufend] || standard) : standard;
+            el.textContent = aktiv ? (namen[laufend.step] || standard) : standard;
             // The button is locked in the meantime -- but greyed out it
             // would be hardest to read exactly when it says the most.
             // Hence its own state: not clickable, but clearly visible.
@@ -2499,11 +2713,10 @@ class PrinterControlManager {
     // ========================================
     moveAxis(axis, distance) {
         const texts = window.texts || {};
-        // No jogging while a print is running -- the window has been
-        // reachable during printing too, since the overview tab was added.
-        const zustand = (window.lastPrintData || {}).gcode_state;
-        if (zustand === 'RUNNING' || zustand === 'PREPARE') {
-            skToast(texts.toast_no_move_printing || 'Während des Drucks nicht verfahrbar', 'warning');
+        // The window is reachable during a print too (since the overview tab
+        // exists), so the axes have to be locked -- the server says when.
+        if (!window.aktionen.erlaubt('move')) {
+            skToast(window.aktionen.text('move'), 'warning');
             return;
         }
         // NEW: safety check
@@ -2709,22 +2922,15 @@ class PrinterControlManager {
 
     /** Is there any filament in a nozzle at all? (for unload/purge) */
     filamentGeladen() {
-        const rep = (this.lastState || {}).device_report || {};
-        return (rep.extruders || []).some(e => e && e.has_filament);
+        return window.filamentState.nozzleLoaded();
     }
 
-    /** Is the selected target (slot/spool) empty? */
+    /** Is the selected target (slot/spool) without a roll? */
     zielLeer(ziel) {
-        const st = this.lastState || {};
         if (ziel.ams == null) return false;
-        if (ziel.ams >= 254) {
-            const sp = (((st.device_report || {}).spools) || [])
-                .find(s => parseInt(s.id, 10) === ziel.ams);
-            return !!sp && !(sp.type || '').trim();
-        }
-        const unit = (st.ams_units || []).find(u => u.id === ziel.ams);
-        const tray = ((unit || {}).trays || []).find(t => (t.id || 0) === (ziel.slot || 0));
-        return !!tray && !(tray.type || '').trim();
+        const fs = window.filamentState;
+        return !fs.hasRoll(ziel.ams >= 254 ? fs.externalKey(ziel.ams)
+                                           : fs.slotKey(ziel.ams, ziel.slot || 0));
     }
 
     loadFilament() {
@@ -2735,6 +2941,28 @@ class PrinterControlManager {
         // The selected AMS slot takes priority; otherwise the external spool
         // from the (invisible) side select.
         const ziel = this._filZiel || { ams: this.selectedAmsId(), slot: 0 };
+        // Bambu with the filament state: the server loads (part 3, task 6).
+        // An external spool without a spool asks which one goes in first --
+        // its profile is set at the printer before the load. Without a type
+        // entered it is not "empty": something is about to be put in.
+        const fs = window.filamentState;
+        if (fs && fs.block() && ziel.ams != null) {
+            const schluessel = ziel.ams >= 254 ? fs.externalKey(ziel.ams)
+                                               : fs.slotKey(ziel.ams, ziel.slot || 0);
+            const ort = fs.place(schluessel);
+            reset();
+            if (ziel.ams >= 254 && !(ort && ort.spool && ort.spool.id != null) && window.openSpoolPicker) {
+                window.openSpoolPicker({
+                    treffer: [],
+                    gewaehlt: null,
+                    onWahl: (spule) => this._laden(schluessel, spule ? spule.id : null),
+                    onKeine: () => this._laden(schluessel, null),
+                });
+                return;
+            }
+            this._laden(schluessel, null);
+            return;
+        }
         if (this.zielLeer(ziel)) {
             skToast(texts.guard_slot_empty || 'Gewähltes Fach ist leer.', 'warning');
             reset();
@@ -2746,6 +2974,42 @@ class PrinterControlManager {
             else skToast(this.fehlerText(r.error, texts.toast_load_failed), 'error');
             reset();
         }).catch(() => { skToast(texts.connection_error, 'error'); reset(); });
+    }
+
+    /**
+     * Load a place through the server, with the spool that goes in (or null).
+     * Only a Generic profile known for that spool: the answer asks, and the
+     * toast's button is the yes (`profil`).
+     */
+    _laden(schluessel, spule, profil) {
+        const texts = window.texts || {};
+        this._filLaufAktion = 'load';
+        const daten = { spool_id: spule };
+        if (profil) daten.profile = profil;
+        return window.apiCall('/api/filament/places/' + schluessel + '/load', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(daten),
+        }).then(r => r.json()).then(d => {
+            if (d && d.success) {
+                if (d.filament_state && window.filamentState) window.filamentState.update(d.filament_state);
+                this.renderMaterialZone();
+                skToast(d.message || texts.toast_loading_filament, 'info');
+                return;
+            }
+            const p = (d && d.error_params) || {};
+            if (d && d.error_key === 'load_confirm_profile' && p.profile) {
+                skToast(d.error, 'warning', {
+                    aktion: {
+                        text: (texts.fs_proposal_set_button || '{name} einstellen').replace('{name}', p.name || p.profile),
+                        onClick: () => this._laden(schluessel, spule, p.profile),
+                    },
+                    dauer: 15000,
+                });
+                return;
+            }
+            skToast((d && d.error) || texts.toast_load_failed, 'error');
+        }).catch(() => skToast(texts.connection_error, 'error'));
     }
 
     /**
@@ -3073,16 +3337,21 @@ class PrinterControlManager {
                 if (!box) return;
                 const groups = (data && data.groups) || [];
                 const macros = (data && data.macros) || [];
-                const esc = (n) => n.replace(/'/g, "\\'");
+                // Names and colours come from printer.cfg: escaped, a colour
+                // only as hex, and the macro handed over through a data attribute.
+                const esc = (v) => String(v == null ? '' : v)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                const hex = (c) => /^#[0-9a-fA-F]{3,8}$/.test(String(c || '')) ? c : '';
                 const chip = (name, color) =>
-                    `<button class="kctrl-macro" style="${color ? `background:${color};border-color:${color};color:#fff;` : ''}" onclick="window.printerControlManager.kRunMacro('${esc(name)}')">${name}</button>`;
+                    `<button class="kctrl-macro" style="${hex(color) ? `background:${hex(color)};border-color:${hex(color)};color:#fff;` : ''}" data-macro="${esc(name)}" onclick="window.printerControlManager.kRunMacro(this.dataset.macro)">${esc(name)}</button>`;
                 let html = '';
                 if (groups.length) {
                     const grouped = new Set();
                     groups.forEach(g => {
                         g.macros.forEach(m => grouped.add(m.name.toUpperCase()));
-                        html += `<div class="kctrl-macro-group" style="border-color:${g.color}99;">
-                            <div class="kctrl-macro-group-title" style="color:${g.color};">${g.name}</div>
+                        const gruppenFarbe = /^#[0-9a-fA-F]{6}$/.test(String(g.color || '')) ? g.color : '';
+                        html += `<div class="kctrl-macro-group"${gruppenFarbe ? ` style="border-color:${gruppenFarbe}99;"` : ''}>
+                            <div class="kctrl-macro-group-title"${gruppenFarbe ? ` style="color:${gruppenFarbe};"` : ''}>${esc(g.name)}</div>
                             <div class="kctrl-macro-wrap">${g.macros.map(m => chip(m.name, m.color)).join('')}</div></div>`;
                     });
                     const other = macros.filter(m => !grouped.has(m.toUpperCase()));

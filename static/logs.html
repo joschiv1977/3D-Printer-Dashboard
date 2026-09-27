@@ -1019,8 +1019,8 @@
 
         // The confirmation and the message come from confirm-dialog.js — the
         // same ones as on every other page.
-        function showConfirmDialog(message, title) {
-            return window.skConfirm(message, { title: title });
+        function showConfirmDialog(message, title, opts) {
+            return window.skConfirm(message, { ...opts, title: title });
         }
 
         function showWebToast(message, type) {
@@ -1030,7 +1030,8 @@
         async function clearLogs() {
             const confirmed = await showConfirmDialog(
                 getText('confirm_clear_logs', 'Möchten Sie wirklich alle Logs löschen?'),
-                getText('confirm_title', 'Bestätigung')
+                getText('confirm_title', 'Bestätigung'),
+                { okText: getText('delete', 'Löschen'), danger: true }
             );
             if (!confirmed) return;
 
@@ -1081,6 +1082,7 @@
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/frage-karte.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
     <script src="/static/js/modules/notification-stack.js"></script>
 </body>

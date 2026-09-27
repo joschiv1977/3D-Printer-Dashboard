@@ -454,6 +454,7 @@
     </div>
 
     <script src="/static/js/modules/confirm-dialog.js"></script>
+    <script src="/static/js/modules/maintenance-rest.js"></script>
     <script src="/static/auth-handler.js"></script>
     <script>
         // Global variables
@@ -573,7 +574,7 @@
                 'Drucker "{name}" inkl. ALLER Wartungsaufgaben und Historie entfernen?\n\nDruckhistorie bleibt erhalten.'
             ).replace('{name}', printerLabel);
 
-            if (!await window.skConfirm(confirmMsg)) return;
+            if (!await window.skConfirm(confirmMsg, { okText: getText('delete', 'Löschen'), danger: true })) return;
 
             try {
                 const res = await apiCall(`/api/maintenance/printers/${printerId}`, {
@@ -660,50 +661,9 @@
         const esc = v => String(v == null ? '' : v)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-        // Usage-based maintenance has no due date: converting "every 5 rolls"
-        // or "every 720 print hours" into a date via the current consumption
-        // rate and showing it as "due in 87 days" next to real due dates is
-        // misleading, so these get their own block showing current status
-        // instead. `prints` belongs here too: "every 10 prints" is a
-        // consumption metric just like hours and rolls.
-        const istVerbrauch = t => t.interval_type === 'hours'
-            || t.interval_type === 'filament_rolls'
-            || t.interval_type === 'prints';
-
-        function restAngabe(task) {
-            if (istVerbrauch(task)) {
-                const ist = Number(task.progress_current || 0);
-                const soll = Number(task.progress_target || task.interval_value || 0);
-                const einheit = task.interval_type === 'hours' ? 'h'
-                    : task.interval_type === 'prints'
-                        ? getText('maintenance_prints_unit', 'Drucke')
-                        : getText('maintenance_rolls_unit', 'Rollen');
-                const anteil = soll > 0 ? ist / soll : 0;
-                // Prints are whole numbers, hours are rounded, rolls get
-                // one decimal place.
-                const stellen = (task.interval_type === 'filament_rolls') ? 1 : 0;
-                const zahl = n => Number(n).toLocaleString(undefined,
-                    { maximumFractionDigits: stellen });
-                return {
-                    text: `${zahl(ist)} / ${zahl(soll)} ${einheit}`,
-                    art: anteil >= 1 ? 'ueber' : anteil >= 0.9 ? 'bald' : '',
-                    anteil: Math.min(100, anteil * 100)
-                };
-            }
-            const tage = task.days_until_due;
-            if (tage < 0) return {
-                text: getText('maintenance_overdue_days', '{days} Tage überfällig')
-                    .replace('{days}', Math.abs(tage)), art: 'ueber', anteil: 100 };
-            if (tage === 0) return {
-                text: getText('maintenance_due_today', 'heute fällig'), art: 'bald', anteil: 100 };
-            const art = tage <= 7 ? 'bald' : '';
-            const spanne = parseFloat(task.interval_value) || 30;
-            return {
-                text: getText('maintenance_due_in_short', 'in {days} Tagen').replace('{days}', tage),
-                art,
-                anteil: Math.max(2, Math.min(100, (spanne - tage) / spanne * 100))
-            };
-        }
+        // The rest text of a task -- shared with the home page's overview
+        // (maintenance-rest.js), so both say the same about the same task.
+        const { istVerbrauch, restAngabe } = window.WartungRest;
 
         function renderTaskItem(task) {
             const rest = restAngabe(task);
@@ -1025,7 +985,7 @@
                 'Möchten Sie diese Wartung wirklich löschen?\n\n"{name}"\n\nDiese Aktion kann nicht rückgängig gemacht werden!')
                 .replace('{name}', taskName);
 
-            if (!await window.skConfirm(confirmMessage)) {
+            if (!await window.skConfirm(confirmMessage, { okText: getText('delete', 'Löschen'), danger: true })) {
                 return;
             }
 
@@ -1519,7 +1479,8 @@
             const model = document.getElementById('init-model').value;
             const force = document.getElementById('init-force').checked;
 
-            if (force && !await window.skConfirm(getText('maintenance_init_force_confirm', 'Achtung: Alle bestehenden Wartungen werden gelöscht!\n\nMöchten Sie wirklich fortfahren?'))) {
+            if (force && !await window.skConfirm(getText('maintenance_init_force_confirm', 'Achtung: Alle bestehenden Wartungen werden gelöscht!\n\nMöchten Sie wirklich fortfahren?'),
+                { danger: true })) {
                 return;
             }
 
@@ -1579,6 +1540,7 @@
     </script>
     <script src="/static/js/modules/hms-severity.js"></script>
     <script src="/static/js/modules/hms-banner.js"></script>
+    <script src="/static/js/modules/frage-karte.js"></script>
     <script src="/static/js/modules/hms-overlay.js"></script>
     <script src="/static/js/modules/notification-stack.js"></script>
 </body>

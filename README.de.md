@@ -108,8 +108,22 @@ sich später nachholen.
 https://<ip-deines-pi>:5555
 ```
 
-Der Browser warnt wegen des Zertifikats. Das gehört so — es ist selbst signiert,
-825 Tage gültig, und es ist dein eigener Rechner. Warnung wegklicken.
+Der Browser warnt wegen des Zertifikats. Das gehört so — der Server signiert es
+mit seiner eigenen Stammzertifizierungsstelle, und es ist dein eigener Rechner.
+Dieses eine Mal die Warnung wegklicken.
+
+Danach dieser Stelle einmal je Gerät vertrauen, und die Warnung ist für immer weg
+— auch nach jeder Erneuerung. Das zählt nicht nur wegen der Warnung: Ein Browser,
+der dem Zertifikat nicht traut, verweigert den Service Worker, und das Dashboard
+läuft nicht offline. Die letzte Seite des Assistenten und *Einstellungen →
+Sicherheit* tragen dafür die Karte **Diesem Gerät vertrauen**: Sie sagt, ob das
+Gerät schon vertraut, bietet den Download an und zeigt die Schritte für macOS,
+iOS, Windows, Android und Linux.
+
+| Gerät | Download |
+|---|---|
+| Mac, Windows, Android, Linux | `https://<ip-deines-pi>:5555/ca.crt` |
+| iPhone, iPad | `https://<ip-deines-pi>:5555/ca.mobileconfig` — Profil installieren, dann unter *Einstellungen → Allgemein → Info → Zertifikatsvertrauenseinstellungen* einschalten |
 
 ### Schritt 3 — der Assistent, fünf Schritte
 
@@ -148,6 +162,7 @@ Den Rest macht der Server, sichtbar: Slicer-Profile, Wartungsplan für das gewä
 Modell, Erreichbarkeitstest des Druckers, Warmstart des Kamera-Relais. Jede Aufgabe
 meldet sich einzeln; keine kann den Abschluss blockieren. Ein Drucker, der gerade
 aus ist, hält keine Installation auf.
+Darunter steht die Karte **Diesem Gerät vertrauen** aus Schritt 2.
 
 Danach startet der Server einmal neu, und du landest auf der Anmeldeseite.
 
@@ -172,16 +187,16 @@ Apple Silicon. Eine App, und der Server steckt darin.
    stellt sich ihr Zertifikat aus.
 4. `https://localhost:5555` — dann derselbe Assistent wie oben, ab Schritt 3.
 
-Die App bringt ihr eigenes Python mit, dazu ffmpeg und go2rtc; kein Homebrew,
+Die App bringt ihr eigenes Python mit, dazu ffmpeg; kein Homebrew,
 nichts vorher zu installieren. Sie sieht beim Start und danach täglich nach einer
 neuen Fassung und meldet sich, wenn es eine gibt.
 
 **Dem Zertifikat muss man einmal vertrauen.** Bis dahin nennt der Browser die
 Verbindung unsicher, und das Dashboard läuft nicht offline — ein Service Worker
-meldet sich an einem nicht vertrauten Zertifikat nicht an.
-`~/Library/Application Support/PrinterWebApp/data/certs/ca-cert.pem`
-doppelklicken und im Schlüsselbund auf *Immer vertrauen* stellen. Danach erneuert
-es sich selbst.
+meldet sich an einem nicht vertrauten Zertifikat nicht an. Für diesen Mac macht
+das die App: **Vertrauen** in der Karte *Diesem Mac vertrauen* auf der letzten
+Seite ihrer Einrichtung oder später unter *Security & SSH*. macOS fragt dabei einmal nach dem Passwort. Andere
+Geräte nehmen die Web-Karte aus Schritt 2. Danach erneuert es sich selbst.
 
 **Spoolman ist unter macOS nicht dabei.** Der Server spricht mit einem, der schon
 im Netz läuft; die Adresse steht in den Einstellungen.
@@ -203,7 +218,7 @@ es auch die Spulenverwaltung mit.
    — nur die Handys erreichen den Server dann nicht.
 4. `https://localhost:5555` — dann derselbe Assistent wie oben, ab Schritt 3.
 
-Im Paket: Python 3.13, alle Pakete, ffmpeg, go2rtc **und Spoolman**. Nichts wird
+Im Paket: Python 3.13, alle Pakete, ffmpeg **und Spoolman**. Nichts wird
 nachgeladen, nichts muss vorher installiert sein. Spoolman kommt auf `:7912` neben
 dem Server hoch — und tritt zur Seite, wenn dort schon etwas antwortet.
 
@@ -261,8 +276,9 @@ Der Steuerungsdialog hat fünf Reiter: Übersicht, Achsen, Extruder, Filament, G
   Totalverlusts, keine unsichtbare Naht
 - 🧪 **Kalibrierungen sind keine Drucke** — Systemläufe werden als solche
   gekennzeichnet und bleiben aus Statistik und Filamentabrechnung heraus
-- 📸 **Livebild** — WebRTC über go2rtc, das H.264 des Druckers unverändert
-  durchgereicht, ohne Transkodieren. MJPEG bleibt als Rückfall. Bambu-Modelle
+- 📸 **Livebild** — der Server liest den Drucker einmal, so wie Bambu Studio, und
+  reicht sein H.264 unverändert weiter; jede App zeichnet jedes Bild, sobald es
+  da ist. Über den Tunnel Einzelbilder. Bambu-Modelle
   benutzen zwei verschiedene Protokolle (Port 6000 bei P1/A1, RTSPS bei
   X1/X2D/H2) — die Quelle wird beim Drucker erfragt, nie am Modell geraten
 
@@ -486,12 +502,11 @@ hat.
    Container namens `spoolman`, oder antwortet etwas auf Port 7912, tritt der
    Schritt zur Seite und die Konfiguration übernimmt diese Instanz
 5. **Anwendungsverzeichnis** — `/opt/printer-web-app`, dann die Dateien
-6. **go2rtc** — das Kamera-Relais, passend zur Architektur
-7. **Python-Umgebung** — ein venv mit den Laufzeit-Abhängigkeiten
-8. **Konfiguration** — ein erkanntes Spoolman wird eingetragen
-9. **TLS-Zertifikat** — selbst signiert, 825 Tage
-10. **Cloudflare-Tunnel** und **Firebase** — freiwillig, beide fragen, Vorgabe nein
-11. **systemd-Einheit** — `printer-web-app.service`, startet beim Hochfahren
+6. **Python-Umgebung** — ein venv mit den Laufzeit-Abhängigkeiten
+7. **Konfiguration** — ein erkanntes Spoolman wird eingetragen
+8. **TLS-Zertifikat** — selbst signiert, 825 Tage
+9. **Cloudflare-Tunnel** und **Firebase** — freiwillig, beide fragen, Vorgabe nein
+10. **systemd-Einheit** — `printer-web-app.service`, startet beim Hochfahren
 
 ### 💻 Plattformen
 
@@ -512,11 +527,7 @@ Deshalb sind die Pakete nicht austauschbar: ein für 3.13 auf aarch64 übersetzt
 Modul wird von 3.12 auf einem Mac nicht einmal *angesehen*. Jede Plattform bekommt
 ihr eigenes.
 
-### Zwei Einzelheiten, die man kennen sollte
-
-**go2rtc ist kein systemd-Dienst.** Der Server startet und stoppt es selbst,
-passend zum Druckerstrom, und schreibt vorher seine Konfiguration mit der aktuellen
-RTSP-Adresse des Geräts.
+### Eine Einzelheit, die man kennen sollte
 
 **`SuccessExitStatus=42`** steht in der Einheit. Der Neustart-Knopf in der
 Weboberfläche beendet den Server mit Code 42; ohne diese Zeile zählt systemd jeden
@@ -586,9 +597,8 @@ harmlos.
 <summary><b>Kein Kamerabild</b></summary>
 
 Ohne einen Drucker, der antwortet, hat die Kamera nichts zu zeigen — die Karte sagt
-das, statt das letzte Standbild einzufrieren. Mit go2rtc ist der Modus WebRTC,
-sonst MJPEG. `curl -s http://127.0.0.1:1984/api/streams` zeigt, ob das Relais einen
-Strom hat.
+das, statt das letzte Standbild einzufrieren. In den Einstellungen zeigt die
+Kamerakarte, ob die Sitzung zum Drucker läuft und wann das letzte Bild kam.
 </details>
 
 <details>
@@ -635,8 +645,8 @@ lösen, dann auf dem neuen aktivieren.
 ## 🏗️ Gebaut mit
 
 **Server** — Python (Flask, Socket.IO), SQLite für Konten, Sitzungen, Historie und
-Wartung, MQTT zum Drucker, FTPS für die SD-Karte, ffmpeg für Zeitraffer, go2rtc für
-die Kamera, Cython für die mitgelieferten Module.
+Wartung, MQTT zum Drucker, FTPS für die SD-Karte, RTSPS für die Kamera, ffmpeg für
+Einzelbilder, Cython für die mitgelieferten Module.
 
 **Clients** — Swift mit SwiftUI/UIKit und ActivityKit/WidgetKit auf iOS, Kotlin mit
 Jetpack Compose auf Android, Electron auf dem Desktop, Vanilla JS mit Socket.IO im
@@ -664,7 +674,7 @@ eigenes mit, und auf dem Rechner wird keines benutzt oder verändert.
 
 <div align="center">
 
-**Version 2.3.3** · 🇬🇧 [English version](README.md)
+**Version 2.3.7** · 🇬🇧 [English version](README.md)
 
 Für die 3D-Druck-Gemeinde gemacht
 

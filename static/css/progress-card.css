@@ -852,6 +852,19 @@ body[data-active-printer="bambu"] .pc-temp-card--rows { display: none; }
    type and colour stay put and are no help as a clue. Restrained rather than
    hidden: the tray does exist, there is just nothing in it. */
 .mz-slot--leer { opacity: .55; }
+/* R11: an AMS takes this external spool's nozzle inlet. */
+.mz-slot--gesperrt { opacity: .55; cursor: default; }
+/* Not live: the printer is off or out of reach, these are the values as
+   last seen (filament_state.contact). */
+.mz-slot--gesehen { opacity: .5; }
+.mz-gesehen {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 0 6px;
+    font-size: .78rem;
+    color: var(--text-secondary);
+}
 .mz-slot--leer .mz-slot-col {
     background: transparent !important;
     border-style: dashed;
@@ -1291,6 +1304,29 @@ body.dark-mode .pcb-chip-ic { filter: invert(0.8); }
    server no longer guesses assignments, so this needs to be visible right
    here, where you're already looking. Restrained: a line on the side, no
    exclamation mark. */
+/* Open question of the filament state: which spool is in this place. A row
+   under the slots, not a modal that jumps up in the middle of a print. */
+.mz-fragen { margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
+.mz-frage {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8rem;
+    color: var(--text-secondary);
+}
+.mz-frage-text { flex: 1 1 auto; }
+.mz-frage-knopf {
+    flex: 0 0 auto;
+    padding: 3px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: .78rem;
+    cursor: pointer;
+}
+.mz-frage-knopf:hover { background: var(--hover-bg, rgba(127,127,127,.12)); }
+
 .mz-slot--offen {
     border-left: 3px solid var(--accent-orange, #f59e0b);
     padding-left: 5px;

@@ -13,27 +13,27 @@
     pointer-events: none;
 }
 
+/* The same card as the question card in the middle (frage-karte.js): corners,
+   shadow, a full round icon, the title's size -- the user liked that one
+   better (18sep26), so the corner looks the same now. */
 .mld {
     pointer-events: auto;
     position: relative;
     display: none;                 /* .active fades it in */
-    gap: 11px; align-items: flex-start;
-    padding: 11px 12px;
-    border-radius: 11px;
+    gap: 12px; align-items: flex-start;
+    padding: 14px 12px 14px 16px;
+    border-radius: 16px;
     background: var(--bg-card);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 18px 50px rgba(20, 30, 50, 0.28);
+    font-size: 14px; line-height: 1.45;
     opacity: 0; transform: translateX(14px);
     transition: opacity 0.18s, transform 0.18s;
 }
 .mld.active { display: flex; }
 .mld.mld-an { opacity: 1; transform: translateX(0); }
-.mld::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
-    border-radius: 11px 0 0 11px;
-    background: var(--mld-strich);
-}
+/* The colour is the icon's now, as in the card -- no stripe at the edge. */
 .mld--fehler  { --mld-strich: var(--color-red); }
 .mld--warnung { --mld-strich: var(--color-orange); }
 .mld--info    { --mld-strich: var(--color-blue); }
@@ -42,19 +42,19 @@
 .mld.overdue  { --mld-strich: var(--color-red); }
 
 .mld-ic {
-    width: 26px; height: 26px; border-radius: 50%; flex: none;
+    width: 30px; height: 30px; border-radius: 50%; flex: none;
     display: grid; place-items: center;
-    background: color-mix(in srgb, var(--mld-strich) 16%, transparent);
-    color: var(--mld-strich);
+    background: var(--mld-strich);
+    color: #fff;
 }
 .mld-ic svg {
-    width: 14px; height: 14px;
-    stroke: currentColor; fill: none; stroke-width: 2;
+    width: 16px; height: 16px;
+    stroke: currentColor; fill: none; stroke-width: 2.2;
     stroke-linecap: round; stroke-linejoin: round;
 }
-.mld-t { flex: 1; min-width: 0; }
-.mld-titel { font-weight: 640; font-size: 13.5px; word-break: break-word; }
-.mld-detail { font-size: 12px; color: var(--text-secondary); margin-top: 2px; word-break: break-word; }
+.mld-t { flex: 1; min-width: 0; padding-top: 1px; }
+.mld-titel { font-weight: 700; font-size: 15px; word-break: break-word; }
+.mld-detail { font-size: 12.5px; color: var(--text-secondary); margin-top: 3px; word-break: break-word; }
 /* The error code belongs under the message, not in the heading:
    "HMS error 0700-2000-0002-0001" as the title was the code, not the problem. */
 .mld-code {
@@ -65,25 +65,29 @@
 }
 .mld-code:empty { display: none; }
 
-.mld-akt { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.mld-akt { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .mld-akt button,
 .mld-akt a {
     border: 1px solid var(--border-color);
-    background: var(--bg-card-variant);
+    background: var(--bg-card);
     color: var(--text-primary);
-    border-radius: 7px; padding: 5px 11px;
-    font: inherit; font-size: 12px; font-weight: 600;
+    border-radius: 9px; padding: 7px 13px;
+    font: inherit; font-size: 13px; font-weight: 600;
     cursor: pointer; text-decoration: none;
 }
 .mld-akt .mld-haupt {
     background: var(--mld-strich); border-color: var(--mld-strich); color: #fff;
 }
+/* A target the finger finds: 32 px round, the cross in it larger (18sep26,
+   "das X zum Wegklicken kann gerne größer"). */
 .mld-zu {
     border: 0; background: none; color: var(--text-secondary);
-    cursor: pointer; font-size: 19px; line-height: 1;
-    padding: 0 2px; flex: none;
+    cursor: pointer; font-size: 24px; line-height: 1;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center;
+    padding: 0; margin: -4px -2px 0 0; flex: none;
 }
-.mld-zu:hover { color: var(--text-primary); }
+.mld-zu:hover { color: var(--text-primary); background: var(--flaeche-3, rgba(0, 0, 0, .07)); }
 
 /* States describe what the printer is currently DOING — dismissing them
    would be wrong, since the state keeps running regardless. Instead of a

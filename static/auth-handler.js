@@ -248,13 +248,19 @@ class AuthHandler {
     }
 
     showInactivityWarning() {
-        const msg = (window.texts || {}).session_idle_ask
+        const texts = window.texts || {};
+        const msg = texts.session_idle_ask
             || 'Du warst 60 Minuten inaktiv. Angemeldet bleiben?';
         const onResult = (stay) => {
             if (stay) { this.refreshToken(); this.resetInactivityTimer(); }
             else { this.logout(); }
         };
-        if (window.skConfirm) window.skConfirm(msg).then(onResult);
+        // The buttons name what happens: the "other" answer signs you out, so
+        // it must not read "Cancel".
+        if (window.skConfirm) window.skConfirm(msg, {
+            okText: texts.session_stay || 'Angemeldet bleiben',
+            cancelText: texts.logout || 'Abmelden',
+        }).then(onResult);
         else onResult(confirm(msg));
     }
 

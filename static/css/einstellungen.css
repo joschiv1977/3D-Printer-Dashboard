@@ -332,3 +332,17 @@ body.dark-mode .es-marke--weg { color: #ef9a9a; }
 .es-karte select:focus {
     outline: none; border-color: var(--color-blue, #2196F3) !important;
 }
+
+/* ---- "Trust this device" (js/modules/ca-trust.js) ---- */
+.ca-trust { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; }
+.ca-trust-status { font-weight: 600; }
+.ca-trust-status.ca-trust-ok { color: var(--accent-green); }
+.ca-trust-status.ca-trust-missing { color: var(--accent-red); }
+.ca-trust-status.ca-trust-unknown { color: var(--text-secondary); }
+.ca-trust-why, .ca-trust-note { color: var(--text-secondary); font-size: 13px; line-height: 1.45; }
+.ca-trust-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.ca-trust-buttons .es-knopf { text-decoration: none; display: inline-flex; align-items: center; }
+.ca-trust-picker { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.ca-trust-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px;
+    font-size: 13.5px; line-height: 1.45; }
+.ca-trust > .es-knopf { align-self: flex-start; }

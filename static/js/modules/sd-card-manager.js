@@ -31,19 +31,6 @@ class SDCardManager {
         }
         const texts = window.texts || {};
 
-        // Copy Spoolman spool HTML from the main selector
-        if (window.spoolmanManager && window.spoolmanManager.connected) {
-            window.spoolmanSpoolsHtml = '';
-            const mainSelector = document.getElementById('spool-selector');
-            if (mainSelector && mainSelector.options.length > 1) {
-                for (let i = 1; i < mainSelector.options.length; i++) {
-                    const opt = mainSelector.options[i];
-                    const selected = opt.value == window.activeSpoolId ? 'selected' : '';
-                    window.spoolmanSpoolsHtml += `<option value="${opt.value}" ${selected}>${opt.text}</option>`;
-                }
-            }
-        }
-
         // The dialog always opens in the live system. The archive is a
         // detour, not a state you'd expect to land back in next time it opens.
         window.sdArchivAktiv = false;
@@ -243,7 +230,7 @@ class SDCardManager {
                 if (progressInterval) {
                     clearInterval(progressInterval);
                 }
-                console.error(texts.console_sd_card_error + ':', error);
+                console.error('SD card error:', error);
                 document.getElementById('sd-loading').style.display = 'none';
                 document.getElementById('sd-error').style.display = 'block';
             })
@@ -568,11 +555,14 @@ class SDCardManager {
         const texts = window.texts || {};
         const mode = (opts && opts.mode) || 'full';
 
-        const safeFilename = file.name.replace(/'/g, "\\'");
         const fileLocation = file.location || 'cache';
         const e = (v) => String(v == null ? '' : v)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;');
+        // The file name as a JavaScript string for the onclick attributes:
+        // JSON-quoted, then escaped for the attribute. Escaping only the
+        // apostrophe let a name with a quote or backslash break out.
+        const jsName = e(JSON.stringify(String(file.name)));
         const ic = (pfad) => `<svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true">${pfad}</svg>`;
         const IC_ZEIT = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>';
         const IC_GEWICHT = '<path d="M12 3v10M7 21h10M6 13h12l-2 8H8z"/>';
@@ -589,16 +579,15 @@ class SDCardManager {
         const ungeschnitten = file.not_sliced === true;
         const isPrintable = !isCorrupt && !ungeschnitten
             && window.isPrintFile(file.name);
-        const printState = String((window.lastPrintData || {}).gcode_state || '').toUpperCase();
-        const printActive = ['RUNNING', 'PAUSE', 'PREPARE'].includes(printState);
-        // With the printer off, printing does not work — it needs the
-        // printer. Deleting DOES: the server removes the file here and notes
-        // a tombstone, and the sync at power-on removes it from the printer
-        // as well (routes/mqtt.py delete_file_from_printer, sd_tombstones).
-        // Until 14sep26 the button was disabled here all the same, so a click
-        // with the printer off did nothing at all.
-        const druckerAus = window.lastKnownSwitchState === 'off';
-        const printDisabled = (printActive || druckerAus) ? ' disabled aria-disabled="true"' : '';
+        // Starting a print follows the server's table (block `actions`):
+        // it knows the running print, a filament routine and a calibration.
+        // Deleting does NOT need the printer: the server removes the file
+        // here and notes a tombstone, and the sync at power-on removes it
+        // from the printer as well (routes/mqtt.py delete_file_from_printer,
+        // sd_tombstones). Until 14sep26 the button was disabled all the same,
+        // so a click with the printer off did nothing at all.
+        const startFrei = window.aktionen.erlaubt('print_start');
+        const printDisabled = startFrei ? '' : ' disabled aria-disabled="true"';
         const deleteDisabled = '';
         const meta = file.extended_meta || {};
         const mdata = file.metadata || {};
@@ -684,13 +673,10 @@ class SDCardManager {
                          : (texts.storage_usb || 'USB-Stick')) + '</span>');
         }
 
-        // Spool picker only in the expanded row, and only with Spoolman.
-        // It used to sit in EVERY card, spanning the full width.
         // In the archive, the same card has different buttons: restore instead
-        // of archive, and the trash icon deletes for good.
+        // of archive, and the trash icon deletes for good. The spool is chosen
+        // in the print dialog (printPrepare.spoolRow), not in the list.
         const imArchiv = file.archived === true || file.location === 'archiv';
-        const zeigeSpule = mode === 'full'
-            && window.spoolmanManager && window.spoolmanManager.connected;
 
         // --- Actions: printing carries color, the rest are icons -------
         let aktionen;
@@ -699,8 +685,8 @@ class SDCardManager {
             // otherwise the plan points at a file the sync deliberately never
             // carries onto the printer.
             const planen = imArchiv
-                ? `schedulePrintFromArchive('${safeFilename}')`
-                : `schedulePrintFromScheduleManager('${safeFilename}', '${fileLocation}')`;
+                ? `schedulePrintFromArchive(${jsName})`
+                : `schedulePrintFromScheduleManager(${jsName}, '${fileLocation}')`;
             aktionen = isPrintable ? `
                 <button class="sd-btn-haupt" onclick="${planen}"
                         title="${e(imArchiv ? (texts.sched_archive_pick
@@ -710,33 +696,31 @@ class SDCardManager {
         } else {
             aktionen = `
                 ${isPrintable ? `
-                        <button class="sd-btn-haupt sd-print-action"${printDisabled} onclick="${imArchiv ? `sdArchivHolenUndDrucken('${safeFilename}', this)` : `startPrintFromSD('${safeFilename}', '${fileLocation}', this)`}"
-                            title="${e(druckerAus ? (texts.sd_printer_off || 'Drucker ist aus')
-                                : printActive ? (texts.print_blocked_active || 'Bei aktivem Druck kein Start möglich')
-                                : (texts.print_now || texts.print || 'Drucken'))}">
+                        <button class="sd-btn-haupt sd-print-action"${printDisabled} onclick="${imArchiv ? `printFromArchive(${jsName}, this)` : `startPrintFromSD(${jsName}, '${fileLocation}', this)`}"
+                            title="${e(startFrei ? (texts.print_now || texts.print || 'Drucken')
+                                : window.aktionen.text('print_start'))}">
                         ${ic(IC_DRUCKER)}${e(texts.print || 'Drucken')}</button>
-                    <button class="sd-iknopf" onclick="schedulePrintFromSD('${safeFilename}', '${fileLocation}')"
+                    <button class="sd-iknopf" onclick="schedulePrintFromSD(${jsName}, '${fileLocation}')"
                             title="${e(texts.schedule || 'Planen')}">${ic(IC_ZEIT)}</button>
                 ` : ''}
                 ${imArchiv ? `
-                    <button class="sd-iknopf" onclick="sdArchivZurueckholen('${safeFilename}')"
+                    <button class="sd-iknopf" onclick="sdArchivZurueckholen(${jsName})"
                             title="${e(texts.sd_archive_restore || 'Zurück ins Live-System')}">
                         <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
                     </button>` : `
-                    <button class="sd-iknopf" onclick="sdArchivAblegen('${safeFilename}', '${fileLocation}')"
+                    <button class="sd-iknopf" onclick="sdArchivAblegen(${jsName}, '${fileLocation}')"
                             title="${e(texts.sd_archive_put || 'Ins Archiv legen')}">
                         <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v3H3zM5 10v9h14v-9M10 14h4"/></svg>
                     </button>`}
-                <button class="sd-iknopf sd-iknopf--rot"${imArchiv ? '' : deleteDisabled} onclick="${imArchiv ? `sdArchivLoeschen('${safeFilename}')` : `deleteFileFromSD('${safeFilename}', '${fileLocation}')`}"
+                <button class="sd-iknopf sd-iknopf--rot"${imArchiv ? '' : deleteDisabled} onclick="${imArchiv ? `sdArchivLoeschen(${jsName})` : `deleteFileFromSD(${jsName}, '${fileLocation}')`}"
                         title="${e(imArchiv ? (texts.sd_archive_delete || 'Endgültig löschen')
-                                  : druckerAus ? (texts.sd_printer_off || 'Drucker ist aus')
                                   : (texts.delete_file || 'Löschen'))}">
                     <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>
                 </button>`;
         }
 
         const hatBild = file.has_thumbnail || file.name.endsWith('.3mf');
-        const aufklappbar = details || zeigeSpule;
+        const aufklappbar = !!details;
 
         return `
             <div class="sd-zeile${isCorrupt ? ' sd-zeile--korrupt' : ''}" data-filename="${e(file.name)}">
@@ -750,7 +734,7 @@ class SDCardManager {
                 </div>
 
                 <div class="sd-zeile-text">
-                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.storage !== 'intern' ? ` ondblclick="startRenameFile(this, '${safeFilename}')"` : ''}>${e(file.name)}</div>
+                    <div class="sd-zeile-name" title="${e(file.name)}"${mode === 'full' && file.storage !== 'intern' ? ` ondblclick="startRenameFile(this, this.closest('[data-filename]').dataset.filename)"` : ''}>${e(file.name)}</div>
                     <div class="sd-zeile-fakten">${fakten.map(f => `<span>${f}</span>`).join('')}</div>
                     <div class="sd-zeile-marken">
                         ${marken.join('')}
@@ -758,14 +742,6 @@ class SDCardManager {
                             <svg class="hd-ic hd-ic--xs" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>${e(texts.sd_details || 'Details')}</button>` : ''}
                     </div>
                     ${details ? `<div class="sd-zeile-details">${details}</div>` : ''}
-                    ${zeigeSpule ? `
-                        <div class="sd-zeile-spule">
-                            <span>${e(texts.schedule_spool_label || 'Spule')}</span>
-                            <select class="sd-spool-select" onchange="selectSpoolFromSD(this.value)">
-                                <option value="">${e(texts.no_spool || 'Keine Spule')}</option>
-                                ${window.spoolmanSpoolsHtml || ''}
-                            </select>
-                        </div>` : ''}
                 </div>
 
                 <div class="sd-zeile-akt">${aktionen}</div>
@@ -796,13 +772,17 @@ class SDCardManager {
         }
         const fil = spule.filament || {};
         const hersteller = (fil.vendor && fil.vendor.name) || '';
-        const farbe = String(fil.color_hex || '888888').replace('#', '');
+        // Spoolman's values are data: a colour only as hex, names escaped.
+        const roh = String(fil.color_hex || '').replace('#', '');
+        const farbe = /^[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(roh) ? roh : '888888';
+        const esc = (v) => String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         const rest = spule.remaining_weight != null
             ? ` · ${Math.round(spule.remaining_weight)} g` : '';
         chip.style.display = '';
         chip.className = 'sd-aktive-spule';
         chip.innerHTML = `<span class="sd-filament-dot" style="background:#${farbe};"></span>`
-            + `<span>${hersteller ? hersteller + ' ' : ''}${fil.name || ''}${rest}</span>`;
+            + `<span>${esc(hersteller ? hersteller + ' ' : '')}${esc(fil.name || '')}${rest}</span>`;
         chip.title = texts.sd_active_spool || 'Aktive Spule';
     }
 
@@ -955,7 +935,7 @@ class SDCardManager {
             }
 
         } catch (error) {
-            console.error(texts.console_error_loading_print_defaults + ':', error);
+            console.error('Error loading print defaults:', error);
         }
     }
 
@@ -992,7 +972,7 @@ class SDCardManager {
         uploadStatus.innerHTML = `
             <div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                    <div style="font-weight:500; color:var(--text-primary);">${file.name}</div>
+                    <div style="font-weight:500; color:var(--text-primary);">${String(file.name).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
                     <div id="upload-progress-percent" style="font-weight:600; color:var(--accent-green); font-size:14px;">0%</div>
                 </div>
                 <div style="background:var(--border-color); height:8px; border-radius:4px; overflow:hidden;">
@@ -1090,7 +1070,7 @@ class SDCardManager {
             });
             const msg = (texts.confirm_delete_file || 'Datei wirklich löschen') + '?\n' + filename;
             if (window.showConfirmDialog) window.showConfirmDialog({ text: msg, knopf: texts.confirm_ok, gefaehrlich: true }, doDelete);
-            else if (window.skConfirm) window.skConfirm(msg, { danger: true })
+            else if (window.skConfirm) window.skConfirm(msg, { okText: texts.delete, danger: true })
                 .then(ja => { if (ja) doDelete(); });
             return;
         }
@@ -1118,7 +1098,7 @@ class SDCardManager {
                 });
             })
             .catch(error => {
-                console.error(texts.console_error_checking + ':', error);
+                console.error('Error checking:', error);
                 showConfirmDialog({ text: texts.confirm_delete_file_warning.replace('{filename}', filename), knopf: texts.confirm_ok, gefaehrlich: true }, function() {
                     self.doDeleteFile(filename, location, { count: 0 });
                 });
@@ -1182,7 +1162,7 @@ class SDCardManager {
                         if (data.success) {
                             // Printer off: gone here, and the sync at
                             // power-on removes it from the printer too.
-                            let meldung = data.vorgemerkt
+                            let meldung = data.queued
                                 ? texts.sd_delete_queued
                                 : (texts.file_deleted_ok || 'Datei gelöscht');
                             if (checkData.count > 0) {
@@ -1223,7 +1203,7 @@ class SDCardManager {
                                    `Null: ${data.null_fields.length}\n` +
                                    `${data.recommendation}`;
 
-                    console.log(texts.console_data_quality, data);
+                    console.log('Data quality:', data);
                     window.skToast(message);
 
                     if (data.completeness_percent < 80) {
@@ -1365,10 +1345,12 @@ class SDCardManager {
 
             if (data.success) {
                 // Update name element
-                const safeNew = newFilename.replace(/'/g, "\\'");
+                // setAttribute takes the handler as JavaScript, so the name goes in
+                // as a JSON string literal -- quotes and backslashes cannot break out.
+                const jsNew = JSON.stringify(String(newFilename));
                 nameEl.textContent = newFilename;
                 nameEl.title = newFilename;
-                nameEl.setAttribute('ondblclick', `startRenameFile(this, '${safeNew}')`);
+                nameEl.setAttribute('ondblclick', "startRenameFile(this, this.closest('[data-filename]').dataset.filename)");
 
                 // Update card attributes
                 const card = nameEl.closest('.sd-zeile') || nameEl.closest('.sd-file-card');
@@ -1382,17 +1364,17 @@ class SDCardManager {
                     const knopf = (teil) => card.querySelector(`button[onclick^="${teil}"]`);
                     const printBtn = knopf('startPrintFromSD');
                     if (printBtn) {
-                        printBtn.setAttribute('onclick', `startPrintFromSD('${safeNew}', '${location}', this)`);
+                        printBtn.setAttribute('onclick', `startPrintFromSD(${jsNew}, '${location}', this)`);
                     }
 
                     const scheduleBtn = knopf('schedulePrintFromSD');
                     if (scheduleBtn) {
-                        scheduleBtn.setAttribute('onclick', `schedulePrintFromSD('${safeNew}', '${location}')`);
+                        scheduleBtn.setAttribute('onclick', `schedulePrintFromSD(${jsNew}, '${location}')`);
                     }
 
                     const deleteBtn = knopf('deleteFileFromSD');
                     if (deleteBtn) {
-                        deleteBtn.setAttribute('onclick', `deleteFileFromSD('${safeNew}', '${location}')`);
+                        deleteBtn.setAttribute('onclick', `deleteFileFromSD(${jsNew}, '${location}')`);
                     }
 
                     // Update thumbnail
@@ -1513,19 +1495,6 @@ class SDCardManager {
         if (wrapper) wrapper.style.display = 'none';
         if (container) container.innerHTML = '';
 
-        // Cache Spoolman spools too — same code as the Bambu path
-        if (window.spoolmanManager && window.spoolmanManager.connected) {
-            window.spoolmanSpoolsHtml = '';
-            const mainSelector = document.getElementById('spool-selector');
-            if (mainSelector && mainSelector.options.length > 1) {
-                for (let i = 1; i < mainSelector.options.length; i++) {
-                    const opt = mainSelector.options[i];
-                    const selected = opt.value == window.activeSpoolId ? 'selected' : '';
-                    window.spoolmanSpoolsHtml += `<option value="${opt.value}" ${selected}>${opt.text}</option>`;
-                }
-            }
-        }
-
         const texts = window.texts || {};
 
         // Backend delivers Klipper files in a Bambu-compatible format
@@ -1588,11 +1557,15 @@ class SDCardManager {
 // Klipper-specific helpers (print start without AMS/plate wizard,
 // delete via unified Files-API). Bambu equivalents are
 // startPrintFromSD/deleteFileFromSD above in the class.
-// Confirmation via the styled in-app modal (showConfirmDialog) instead of the native
-// confirm(); falls back to confirm() if that module isn't loaded.
-function _skConfirm(msg, onYes) {
-    if (window.showConfirmDialog) window.showConfirmDialog(msg, onYes);
-    else if (window.skConfirm) window.skConfirm(msg).then(ja => { if (ja) onYes(); });
+// Confirmation via the styled in-app modal (showConfirmDialog), falling back to
+// skConfirm. `loeschen` gives the confirming button the red delete label.
+function _skConfirm(msg, onYes, loeschen) {
+    const knopf = loeschen ? (window.texts || {}).delete : undefined;
+    if (window.showConfirmDialog) {
+        window.showConfirmDialog({ text: msg, knopf, gefaehrlich: !!loeschen }, onYes);
+    } else if (window.skConfirm) {
+        window.skConfirm(msg, { okText: knopf, danger: !!loeschen }).then(ja => { if (ja) onYes(); });
+    }
 }
 window.klipperFileStartPrint = function (path, btn) {
     const txt = window.texts || {};
@@ -1756,28 +1729,11 @@ window.sdArchivLoeschen = function(name) {
 };
 
 /** Print from the archive: restore, upload, start. */
-window.sdArchivHolenUndDrucken = async function(name, knopf) {
-    const texts = window.texts || {};
-    if (knopf) knopf.disabled = true;
-    try {
-        const antwort = await apiCall('/api/sd/archiv/zurueckholen', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ filename: name })
-        });
-        const daten = await antwort.json();
-        if (!daten || !daten.success) {
-            skToast((daten && daten.error) || (texts.error || 'Fehler'), 'error');
-            return;
-        }
-        // Back to the live view, then the normal path — that loads the
-        // file onto the printer itself if needed. `sdArchivUmschalten` flips
-        // the state, so it's called here exactly once.
-        if (window.sdArchivAktiv) window.sdArchivUmschalten();
-        startPrintFromSD(name, 'root', knopf);
-    } finally {
-        if (knopf) knopf.disabled = false;
-    }
+window.printFromArchive = function(name, knopf) {
+    // The file stays in the archive while the print dialog is open: the
+    // server brings it back when the print is really sent
+    // (sd_archive.bring_back_for_print). Cancelling leaves it archived.
+    startPrintFromSD(name, 'root', knopf);
 };
 
 // ========================================
@@ -1839,96 +1795,15 @@ window.sdDateiFinden = function(name) {
 window.createSDFileCardHTML = function(file, opts) { return window.sdCardManager.createSDFileCardHTML(file, opts); };
 
 /**
- * Spool picker directly from the file list. The chip used to close the list
- * and jump to the material zone — you'd land on the main page and have
- * to click back. The picker belongs where you already are.
+ * Spool picker directly from the file list -- the chip in the toolbar and the
+ * button in every expanded row. The same big window as on the material card,
+ * so it activates the spool itself; spoolmanManager.updateDisplay relabels the
+ * chip and the row buttons after. From a row it gets the file: the spools that
+ * fit it come first, with their badge.
  */
-window.openSpoolmanFromSD = async function() {
-    const texts = window.texts || {};
-    const sm = window.spoolmanManager;
-    if (!sm || !sm.connected) return;
-
-    // Fetch a fresh list if the cache is empty (dialog opened before the
-    // material zone has loaded for the first time).
-    let spulen = sm.spools || [];
-    if (!spulen.length) {
-        try {
-            spulen = await (await apiCall('/api/spoolman/spools')).json() || [];
-            sm.spools = spulen;
-        } catch (e) {
-            console.warn('Spools not loaded:', e);
-            return;
-        }
-    }
-
-    const e = (v) => String(v == null ? '' : v)
-        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    const farbe = (v) => {
-        const c = String(v || '').replace('#', '');
-        return c ? `#${c}` : '#888';
-    };
-
-    const zeile = (sp) => {
-        const fil = sp.filament || {};
-        const hersteller = (fil.vendor && fil.vendor.name) || '';
-        const rest = sp.remaining_weight != null ? `${Math.round(sp.remaining_weight)} g` : '';
-        const aktiv = sp.id === sm.activeSpoolId;
-        return `
-            <label class="ui-zeile ui-zeile--klick fm-option" data-spool-id="${sp.id}">
-                <input type="radio" name="sd-spule" class="fm-radio"${aktiv ? ' checked' : ''}>
-                <span class="mf-punkt" style="background:${farbe(fil.color_hex)};"></span>
-                <span class="ui-zeile-name">
-                    <span class="mf-name">${e(hersteller ? hersteller + ' ' : '')}${e(fil.name || '—')}</span>
-                    <span class="mf-typ">${e(fil.material || '')}${rest ? ' · ' + e(rest) : ''}</span>
-                </span>
-                ${aktiv ? `<span class="sched-marke">${e(texts.fm_current || 'aktuell aktiv')}</span>` : ''}
-            </label>`;
-    };
-
-    const modal = document.createElement('div');
-    modal.className = 'modal-overlay';
-    modal.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%;'
-        + 'background:rgba(0,0,0,0.6); z-index:10001; display:flex;'
-        + 'align-items:center; justify-content:center;';
-    const panel = document.createElement('div');
-    panel.className = 'modal-panel';
-    panel.style.cssText = 'position:relative; width:92%; max-width:520px;'
-        + 'max-height:82vh; overflow-y:auto; border-radius:12px; padding:0;';
-    panel.innerHTML = `
-        <div class="sd-modal-header">
-            <h2 class="sd-modal-title">
-                <svg class="hd-ic hd-ic--lg" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg>
-                <span>${e(texts.sd_active_spool || 'Aktive Spule')}</span>
-            </h2>
-        </div>
-        <div class="ui-koerper" style="padding:16px 20px 20px;">
-            <div class="ui-karte">${spulen.map(zeile).join('')}</div>
-        </div>
-        <div class="ui-fuss">
-            <button class="modal-btn modal-btn-cancel" id="sds-abbruch">${e(texts.cancel || 'Abbrechen')}</button>
-            <button class="modal-btn modal-btn-success" id="sds-ok">${e(texts.ams_edit_save || 'Übernehmen')}</button>
-        </div>`;
-    modal.appendChild(panel);
-    document.body.appendChild(modal);
-
-    let gewaehlt = sm.activeSpoolId || null;
-    panel.querySelectorAll('.fm-option').forEach(el => {
-        el.addEventListener('change', () => {
-            gewaehlt = parseInt(el.dataset.spoolId, 10);
-        });
-    });
-    const zu = () => modal.remove();
-    modal.addEventListener('click', (ev) => { if (ev.target === modal) zu(); });
-    panel.querySelector('#sds-abbruch').onclick = zu;
-    panel.querySelector('#sds-ok').onclick = async () => {
-        zu();
-        if (!gewaehlt || gewaehlt === sm.activeSpoolId) return;
-        await sm.activate(gewaehlt);
-        // Update the chip in the toolbar immediately — activate() doesn't know
-        // about the file list.
-        if (window.sdCardManager) window.sdCardManager.zeigeAktiveSpule();
-    };
+window.openSpoolmanFromSD = function(datei) {
+    if (!window.openSpoolPicker) return;
+    window.openSpoolPicker(datei ? { datei: String(datei) } : {});
 };
 
 /** Expand and collapse the details and spool picker of a file row. */

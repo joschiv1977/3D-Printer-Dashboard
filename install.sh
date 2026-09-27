@@ -543,56 +543,6 @@ install_docker() {
 # SPOOLMAN INSTALLATION
 # ============================================================================
 
-install_go2rtc() {
-    print_step "${CAMERA:-📷} go2rtc (WebRTC camera)"
-
-    # WHY
-    # ---
-    # Without go2rtc, /api/camera/mode falls back to MJPEG -- single frames
-    # instead of a video stream. On Linux that was the permanent state until
-    # 01sep26, because the starter in services/power_management.py sat behind
-    # a Darwin gate: only the macOS app ever shipped the binary.
-    #
-    # go2rtc passes the printer's H.264 straight through, it transcodes
-    # nothing -- so on a Pi it costs almost nothing.
-    #
-    # No systemd unit: the server starts and stops it itself, in step with
-    # the printer's power, and writes the config with the device's current
-    # RTSP address beforehand.
-    local version="1.9.14"
-    local ziel="$APP_DIR/bin/go2rtc"
-
-    if [ -x "$ziel" ]; then
-        print_success "go2rtc already present: $("$ziel" --version 2>/dev/null | head -1)"
-        return 0
-    fi
-
-    local arch
-    case "$(uname -m)" in
-        aarch64|arm64)  arch="arm64" ;;
-        x86_64|amd64)   arch="amd64" ;;
-        armv7l|armv6l)  arch="arm" ;;
-        *)
-            print_warning "go2rtc: unknown architecture $(uname -m) - skipped"
-            print_status "   The camera then keeps running as MJPEG."
-            return 0
-            ;;
-    esac
-
-    print_status "Downloading go2rtc v${version} for ${arch}..."
-    sudo mkdir -p "$APP_DIR/bin"
-    if sudo curl -fsSL --retry 2 --max-time 120 \
-        "https://github.com/AlexxIT/go2rtc/releases/download/v${version}/go2rtc_linux_${arch}" \
-        -o "$ziel"; then
-        sudo chmod +x "$ziel"
-        sudo chown ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$ziel"
-        print_success "go2rtc installed: $("$ziel" --version 2>/dev/null | head -1)"
-    else
-        sudo rm -f "$ziel"
-        print_warning "go2rtc could not be downloaded - the camera runs as MJPEG"
-    fi
-}
-
 install_spoolman() {
     print_step "${DOCKER} Install Spoolman Filament Manager"
 
@@ -1672,7 +1622,8 @@ ensure_certificate('')
     if [ "${PIPESTATUS[0]}" -eq 0 ] && [ -f "$CERTS/cert.pem" ] && [ -f "$CERTS/ca-cert.pem" ]; then
         sudo chown -R ${SUDO_USER:-$(whoami)}:${SUDO_USER:-$(whoami)} "$APP_DIR/data" 2>/dev/null || true
         print_success "Certificates ready in $CERTS"
-        print_status "For a browser without warnings: trust $CERTS/ca-cert.pem once"
+        print_status "For a browser without warnings: trust the CA once on every device —"
+        print_status "the setup wizard and Settings → Security show how (Trust this device)"
         print_status "The server renews them itself, 30 days before they expire."
     else
         # Not fatal: the server makes them itself on its first start
@@ -1873,13 +1824,16 @@ show_completion_message() {
 
     echo
     echo -e "${CYAN}📷 Camera:${NC}"
-    if [ -x "$APP_DIR/bin/go2rtc" ]; then
-        echo -e "${WHITE}   WebRTC via go2rtc. The server starts and stops it itself,${NC}"
-        echo -e "${WHITE}   following the printer power. MJPEG stays the fallback.${NC}"
-    else
-        echo -e "${WHITE}   MJPEG via ffmpeg — go2rtc is not installed.${NC}"
-        echo -e "${WHITE}   To add it later: run ${YELLOW}sudo ./install.sh${WHITE} again.${NC}"
-    fi
+    echo -e "${WHITE}   The server reads the printer camera itself and streams it live;${NC}"
+    echo -e "${WHITE}   ffmpeg makes the single frames. Nothing else to install.${NC}"
+    echo
+
+    echo -e "${CYAN}🔒 Certificate:${NC}"
+    echo -e "${WHITE}   Self-signed by the server's own CA. Trust it once per device and${NC}"
+    echo -e "${WHITE}   the browser warning goes away — the dashboard then runs offline too.${NC}"
+    echo -e "${WHITE}   Certificate: ${YELLOW}https://${LOCAL_IP}:5555/ca.crt${NC}"
+    echo -e "${WHITE}   iPhone/iPad: ${YELLOW}https://${LOCAL_IP}:5555/ca.mobileconfig${NC}"
+    echo -e "${WHITE}   Steps per system: last wizard page, or Settings → Security.${NC}"
     echo
 
     echo -e "${CYAN}🔐 Credentials:${NC}"
@@ -2036,11 +1990,6 @@ main() {
     clone_repository
     set_script_permissions
     deploy_obfuscated_files
-
-    # After deployment: clone_repository may git-clone into $APP_DIR, and git
-    # refuses to clone into a non-empty directory. A bin/ created earlier
-    # would therefore have aborted the installation right there.
-    install_go2rtc
 
     install_font_awesome
     setup_python_env

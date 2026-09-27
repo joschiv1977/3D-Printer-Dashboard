@@ -53,13 +53,13 @@
          for all nine instead of two versions drifting apart.
          hms-overlay.js notices on its own that the stack already exists here, and
          does not bother asking -- the socket fills it in here.-->
+    <script defer src="/static/js/modules/frage-karte.js"></script>
     <script defer src="/static/js/modules/hms-banner.js"></script>
     <script defer src="/static/js/modules/hms-overlay.js"></script>
 
     <!-- Jinja2 Config for JS modules (decoupled from inline JS) -->
     <script>
         window.JINJA_CONFIG = {
-            ustreamerEnabled: {{ 'true' if ustreamer_enabled else 'false' }},
             vapidPublicKey: '{{ vapid_public_key }}'
         };
     </script>
@@ -84,6 +84,7 @@
           {% include 'partials/cards/_controls.html' %}
           {% include 'partials/cards/_progress.html' %}
           {% include 'partials/cards/_zones.html' %}
+          {% include 'partials/cards/_off-overview.html' %}
           {% if active_printer_type == 'klipper' %}
           {% include 'partials/cards/_spoolman.html' %}
           {% endif %}

@@ -740,17 +740,20 @@
     function calendar(r) {
       const days = Object.keys(r.calendar); if (!days.length) return '';
       const maxC = Math.max(...Object.values(r.calendar));
-      // Week columns: from the week of the first print on, at least the 17 of
-      // the normal view, at most what the range covers (26 / 52) -- the same
-      // rule on Android and iOS. A fixed 52 for "all" showed eleven empty
-      // months before the first print, and the prints sat off to the right.
-      // Cells have a fixed size (CSS), NOT stretched to the card width
-      // (otherwise huge on a wide desktop).
+      // Week columns: from the week of the first print on, at most what the
+      // range covers (17 / 26 / 52) -- the same rule on Android and iOS. No
+      // minimum: with prints from August on, a floor of 17 weeks drew the
+      // calendar from June, three empty months before the first print.
+      // Counted Monday to Monday, or a first print late in its week added an
+      // empty column. Cells have a fixed size (CSS), NOT stretched to the
+      // card width (otherwise huge on a wide desktop).
       const cap = (state.range === 'D90') ? 26 : (state.range === 'Y1' || state.range === 'ALL') ? 52 : 17;
       const today = new Date(); today.setHours(0, 0, 0, 0);
       const firstPrint = new Date(days.slice().sort()[0] + 'T00:00:00');
-      const since = isNaN(firstPrint) ? 0 : Math.round((today - firstPrint) / 864e5);
-      const wks = Math.min(cap, Math.max(17, Math.floor((since + 6) / 7) + 1));
+      const montag = d => { const m = new Date(d); m.setDate(m.getDate() - ((m.getDay() + 6) % 7)); return m; };
+      const wochenDazwischen = isNaN(firstPrint) ? 0
+        : Math.round((montag(today) - montag(firstPrint)) / (7 * 864e5));
+      const wks = Math.min(cap, Math.max(0, wochenDazwischen) + 1);
       const fmt = d => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       // Start = Monday of the week that is (wks-1) weeks before the current week.
       const start = new Date(today);

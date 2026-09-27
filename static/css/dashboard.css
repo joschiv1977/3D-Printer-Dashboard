@@ -314,3 +314,87 @@
 @media (max-width: 768px) {
     .hr-plaetze { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ============================================================
+ * Overview while the printer is off (off-overview.js)
+ * It stands in for the print card, the material and the drying
+ * card; the fields have the zone tiles' look (.ov-card).
+ * ============================================================ */
+body.drucker-aus #progress-card-grid,
+body.drucker-aus #material-zone-card-grid,
+body.drucker-aus #spoolman-card-grid,
+body.drucker-aus #filament-drying-card-grid { display: none !important; }
+
+.aus-karte { height: 100%; overflow-y: auto; }
+.aus-kopf-hinweis { font-size: 12px; color: var(--text-secondary); }
+.aus-koerper { display: flex; flex-direction: column; gap: 12px; }
+.aus-paar { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+
+.aus-feld {
+    background: rgba(128, 128, 128, 0.10);
+    border: 1px solid rgba(128, 128, 128, 0.16);
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+/* The one that does something next wears the accent. */
+.aus-feld--plan { border-color: var(--accent-blue); background: rgba(33, 150, 243, 0.08); }
+
+.aus-feld-kopf { display: flex; align-items: center; gap: 8px; margin-bottom: 9px;
+    font-size: 14px; font-weight: 650; color: var(--text-primary); }
+.aus-link { margin-left: auto; display: inline-flex; align-items: center; gap: 2px;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: inherit; font-size: 13px; font-weight: 400; color: var(--accent-blue); }
+.aus-tipp { cursor: pointer; }
+
+.aus-zeile { display: flex; align-items: center; gap: 12px; }
+.aus-bild { position: relative; flex: none; width: 56px; height: 56px; border-radius: 10px;
+    background: rgba(128, 128, 128, 0.12); display: flex; align-items: center; justify-content: center;
+    color: var(--text-placeholder); overflow: hidden; }
+.aus-bild img { position: absolute; inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px);
+    object-fit: contain; }
+.aus-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.aus-name { display: flex; align-items: center; gap: 7px; min-width: 0;
+    font-size: 15px; font-weight: 650; color: var(--text-primary); }
+.aus-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aus-klein { font-size: 12.5px; color: var(--text-secondary); }
+.aus-menge { display: flex; align-items: center; gap: 4px; }
+.aus-punkt { width: 10px; height: 10px; border-radius: 50%; flex: none;
+    border: 1px solid rgba(0, 0, 0, 0.15); }
+.aus-menge span:not(.aus-punkt) { margin-left: 2px; }
+.aus-strom { display: flex; align-items: center; gap: 5px; margin-top: 9px; }
+
+.aus-marke { flex: none; font-size: 11.5px; font-weight: 500; border-radius: 999px;
+    padding: 2px 9px; border: 1px solid; }
+.aus-marke--erfolg { color: #2e7d32; background: rgba(76, 175, 80, 0.13); border-color: rgba(76, 175, 80, 0.3); }
+.aus-marke--fehler { color: #c62828; background: rgba(244, 67, 54, 0.13); border-color: rgba(244, 67, 54, 0.3); }
+.aus-marke--abbruch { color: #e65100; background: rgba(255, 152, 0, 0.13); border-color: rgba(255, 152, 0, 0.3); }
+body.dark-mode .aus-marke--erfolg, [data-theme="dark"] .aus-marke--erfolg { color: #81c784; }
+body.dark-mode .aus-marke--fehler, [data-theme="dark"] .aus-marke--fehler { color: #ef9a9a; }
+body.dark-mode .aus-marke--abbruch, [data-theme="dark"] .aus-marke--abbruch { color: #ffb74d; }
+
+.aus-wartung + .aus-wartung { border-top: 1px solid rgba(128, 128, 128, 0.16);
+    margin-top: 9px; padding-top: 9px; }
+.aus-wartung-kopf { display: flex; align-items: baseline; gap: 8px; font-size: 14px;
+    color: var(--text-primary); }
+.aus-wartung-kopf > span:first-child { flex: 1; min-width: 0; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap; }
+.aus-rest { flex: none; font-size: 12.5px; color: var(--text-secondary); }
+.aus-rest--bald { color: var(--accent-orange); font-weight: 650; }
+.aus-rest--ueber { color: #e5534b; font-weight: 650; }
+.aus-bahn { height: 5px; border-radius: 3px; background: rgba(128, 128, 128, 0.14);
+    margin-top: 6px; overflow: hidden; }
+.aus-bahn i { display: block; height: 100%; border-radius: 3px; background: var(--accent-green); }
+.aus-bahn i.aus-bahn--bald { background: var(--accent-orange); }
+.aus-bahn i.aus-bahn--ueber { background: #e5534b; }
+
+.aus-zahlen { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.aus-zahl { text-align: center; background: rgba(128, 128, 128, 0.08); border-radius: 10px;
+    padding: 8px 4px; }
+.aus-zahl b { display: block; font-size: 18px; font-weight: 650; color: var(--text-primary); }
+.aus-zahl span { font-size: 11.5px; color: var(--text-secondary); }
+
+@media (max-width: 768px) {
+    body:not(.drucker-aus) #off-overview-card-grid { display: none !important; }
+    body.drucker-aus #off-overview-card-grid { display: block !important; }
+    .aus-karte { height: auto; overflow: visible; }
+}

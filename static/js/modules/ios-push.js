@@ -134,7 +134,7 @@ class IOSPushManager {
                     this.showNotification('Push blockiert', 'error');
                 }
             } catch (error) {
-                console.error((texts.console_push_setup_failed || 'Push setup failed') + ':', error);
+                console.error(('[Push] Setup failed') + ':', error);
                 // Clean up after an error
                 const reg = await navigator.serviceWorker.ready;
                 const sub = await reg.pushManager.getSubscription();

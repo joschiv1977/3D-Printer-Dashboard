@@ -241,21 +241,6 @@ body.dark-mode * {
     to { transform: translateX(-50%) translateY(100%); opacity: 0; }
 }
 
-/* HQ Button */
-#hq-button {
-    transition: all var(--transition-normal);
-}
-
-#hq-button:disabled {
-    opacity: 0.5;
-    cursor: wait;
-}
-
-#hq-button.active {
-    background: rgba(255, 107, 0, 0.2) !important;
-    border-color: #ff6b00 !important;
-}
-
 /* Custom Range Input */
 input[type="range"] {
     -webkit-appearance: none;

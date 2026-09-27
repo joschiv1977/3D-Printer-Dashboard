@@ -41,6 +41,11 @@ body.dark-mode .modal-panel {
     /* iOS Press Animation */
 }
 
+/* `hidden` has to beat the display above: "Keine Spule" in the spool window
+   stayed visible where it is hidden (planning, multi-filament) and would have
+   cleared the active spool there (17sep26). */
+.modal-btn[hidden] { display: none !important; }
+
 body.dark-mode .modal-btn {
     border-color: rgba(255, 255, 255, 0.1) !important;
 }

@@ -1030,18 +1030,6 @@ body.dark-mode .sd-marke--ungeschnitten { color: #e8b563; }
 .sd-zeile.offen .sd-zeile-details { display: grid; }
 .sd-zeile-details b { font-weight: 600; color: var(--text-primary); }
 
-.sd-zeile-spule {
-    display: none;
-    margin-top: 9px;
-    align-items: center;
-    gap: 9px;
-    font-size: 12.5px;
-    color: var(--text-secondary);
-}
-
-.sd-zeile.offen .sd-zeile-spule { display: flex; }
-.sd-zeile-spule .sd-spool-select { flex: 1; min-width: 0; }
-
 /* Print carries color, schedule and delete are icons — three equally
    sized colored buttons drew more attention than the files themselves. */
 .sd-zeile-akt {

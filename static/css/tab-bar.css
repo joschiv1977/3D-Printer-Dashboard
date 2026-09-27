@@ -86,14 +86,17 @@ body.dark-mode .tab-item.active {
     font-weight: 600;
 }
 
-/* Tab Badge */
+/* Tab Badge -- the number on the bell (messages tab).
+   Blue: only unread messages, nothing is waiting. Red: at least one open
+   question, someone has to answer it. `hidden` needs its own rule because
+   display:flex beats the browser's default for [hidden]. */
 .tab-badge {
     position: absolute;
     top: 2px;
     right: 6px;
     min-width: 18px;
     height: 18px;
-    background: var(--color-red);
+    background: var(--color-blue);
     color: white;
     font-size: 10px;
     font-weight: 700;
@@ -103,6 +106,14 @@ body.dark-mode .tab-item.active {
     justify-content: center;
     padding: 0 4px;
     line-height: 1;
+}
+
+.tab-badge--frage {
+    background: var(--color-red);
+}
+
+.tab-badge[hidden] {
+    display: none;
 }
 
 /* Desktop/Tablet only tabs */

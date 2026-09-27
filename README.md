@@ -108,9 +108,21 @@ setup wizard.
 https://<ip-of-your-pi>:5555
 ```
 
-Your browser will warn about the certificate. That is expected — it is
-self-signed, valid for 825 days, and it is your own machine. Click through the
-warning.
+Your browser will warn about the certificate. That is expected — the server signs
+it with its own root CA, and it is your own machine. Click through the warning
+this once.
+
+Then trust that CA once per device, and the warning is gone for good — renewals
+included. It also matters beyond the warning: a browser that does not trust the
+certificate refuses the Service Worker, so the dashboard would not run offline.
+The last wizard page and *Settings → Security* carry a card **Trust this device**:
+it says whether this device already does, offers the download and shows the
+steps for macOS, iOS, Windows, Android and Linux.
+
+| Device | Download |
+|---|---|
+| Mac, Windows, Android, Linux | `https://<ip-of-your-pi>:5555/ca.crt` |
+| iPhone, iPad | `https://<ip-of-your-pi>:5555/ca.mobileconfig` — install the profile, then switch it on under *Settings → General → About → Certificate Trust Settings* |
 
 ### Step 3 — the wizard, five steps
 
@@ -149,6 +161,7 @@ The server does the rest while you watch: slicer profiles, the maintenance plan
 for the model you picked, a reachability check of the printer, and a warm-up of
 the camera relay. Each task reports on its own; none of them can block the finish.
 A printer that happens to be switched off does not hold up an installation.
+Below them sits the **Trust this device** card from Step 2.
 
 Then the server restarts once and you land on the login page.
 
@@ -173,15 +186,16 @@ Apple Silicon. One app, and the server lives inside it.
    and issues itself a certificate.
 4. `https://localhost:5555` — then the same wizard as above, from Step 3.
 
-The app brings its own Python, ffmpeg and go2rtc; no Homebrew, nothing to install
+The app brings its own Python and ffmpeg; no Homebrew, nothing to install
 first. It checks for a new version at start and once a day afterwards and says so
 when there is one.
 
 **The certificate wants trusting once.** Until it is, the browser calls the
 connection insecure and the dashboard will not run offline — a Service Worker
-refuses to register over a certificate it does not trust. Double-click
-`~/Library/Application Support/PrinterWebApp/data/certs/ca-cert.pem` and set it to
-*Always Trust* in Keychain Access. It renews itself afterwards.
+refuses to register over a certificate it does not trust. The app does it for
+this Mac: **Trust** in the card *Trust this Mac* on the last page of its setup,
+or later under *Security & SSH*. macOS asks for your password once. Other devices use the web card
+from Step 2. The certificate renews itself afterwards.
 
 **Spoolman is not included** on macOS. The server talks to one already running on
 your network; its address goes in the settings.
@@ -203,7 +217,7 @@ that also brings the spool manager.
    server.
 4. `https://localhost:5555` — then the same wizard as above, from Step 3.
 
-Inside the box: Python 3.13, all packages, ffmpeg, go2rtc **and Spoolman**. Nothing
+Inside the box: Python 3.13, all packages, ffmpeg **and Spoolman**. Nothing
 is fetched, nothing has to be installed first. Spoolman comes up on `:7912` beside
 the server — and stands aside if something already answers there.
 
@@ -260,8 +274,9 @@ The control dialog has five tabs: overview, axes, extruder, filament, device.
   invisible seam
 - 🧪 **Calibrations are not prints** — system runs are marked as such and stay out
   of the statistics and the filament accounting
-- 📸 **Live camera** — WebRTC through go2rtc, the printer's H.264 passed through
-  unchanged, no transcoding. MJPEG stays as the fallback. Bambu models use two
+- 📸 **Live camera** — the server reads the printer once, the way Bambu Studio
+  does, and passes its H.264 on unchanged; every app draws each frame the moment
+  it arrives. Single frames through the tunnel. Bambu models use two
   different protocols (port 6000 on P1/A1, RTSPS on X1/X2D/H2) — the source is
   read from the printer, never guessed from the model
 
@@ -482,12 +497,11 @@ macOS and Windows do none of this — they bring what they need. In this order. 
    `spoolman` runs, or something answers on port 7912, the step stands aside and
    the configuration adopts that instance
 5. **Application directory** — `/opt/printer-web-app`, then the files
-6. **go2rtc** — the camera relay, matching your architecture
-7. **Python environment** — a venv with the runtime dependencies
-8. **Configuration** — a detected Spoolman is filled in
-9. **TLS certificate** — self-signed, 825 days
-10. **Cloudflare Tunnel** and **Firebase** — optional, both ask, both default to no
-11. **systemd unit** — `printer-web-app.service`, starts at boot
+6. **Python environment** — a venv with the runtime dependencies
+7. **Configuration** — a detected Spoolman is filled in
+8. **TLS certificate** — self-signed, 825 days
+9. **Cloudflare Tunnel** and **Firebase** — optional, both ask, both default to no
+10. **systemd unit** — `printer-web-app.service`, starts at boot
 
 ### 💻 Platforms
 
@@ -507,11 +521,7 @@ filenames and stops with instructions if it is missing.
 That is why the packages are not interchangeable: a module compiled for 3.13 on
 aarch64 is not even *looked at* by 3.12 on a Mac. Each platform gets its own.
 
-### Two details worth knowing
-
-**go2rtc is not a systemd service.** The server starts and stops it itself, in step
-with the printer's power, and writes its configuration with the device's current
-RTSP address beforehand.
+### A detail worth knowing
 
 **`SuccessExitStatus=42`** is in the unit. The restart button in the web interface
 ends the server with exit code 42; without that line systemd counts each one as a
@@ -580,9 +590,8 @@ the printer under *Settings → Network*. Regenerating it there is harmless.
 <summary><b>No camera picture</b></summary>
 
 Without a printer that answers, the camera has nothing to show — the card says so
-instead of freezing on the last frame. With go2rtc installed the mode is WebRTC,
-otherwise MJPEG. `curl -s http://127.0.0.1:1984/api/streams` shows whether the
-relay has a stream.
+instead of freezing on the last frame. In the settings, the camera card shows
+whether the session to the printer runs and when the last picture came.
 </details>
 
 <details>
@@ -628,8 +637,8 @@ then activate it on the new one.
 ## 🏗️ Built with
 
 **Server** — Python (Flask, Socket.IO), SQLite for accounts, sessions, history and
-maintenance, MQTT to the printer, FTPS for the SD card, ffmpeg for timelapses,
-go2rtc for the camera, Cython for the shipped modules.
+maintenance, MQTT to the printer, FTPS for the SD card, RTSPS for the camera,
+ffmpeg for single frames, Cython for the shipped modules.
 
 **Clients** — Swift with SwiftUI/UIKit and ActivityKit/WidgetKit on iOS, Kotlin
 with Jetpack Compose on Android, Electron on the desktop, vanilla JS with Socket.IO
@@ -657,7 +666,7 @@ and nothing on the machine is used or changed.
 
 <div align="center">
 
-**Version 2.3.3** · 🇩🇪 [Deutsche Fassung](README.de.md)
+**Version 2.3.7** · 🇩🇪 [Deutsche Fassung](README.de.md)
 
 Made for the 3D printing community
 

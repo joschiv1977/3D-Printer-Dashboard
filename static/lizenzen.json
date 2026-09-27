@@ -1027,12 +1027,6 @@
       "bereich": "Android (app), wear"
     },
     {
-      "name": "io.github.webrtc-sdk:android",
-      "version": "125.6422.07",
-      "lizenz": "",
-      "bereich": "Android (app)"
-    },
-    {
       "name": "io.socket:socket.io-client",
       "version": "2.1.0",
       "lizenz": "",
@@ -1159,12 +1153,6 @@
       "name": "ffmpeg",
       "version": "8.1",
       "lizenz": "LGPL (ohne --enable-gpl)",
-      "bereich": "Mitgeliefertes Programm"
-    },
-    {
-      "name": "go2rtc",
-      "version": "1.9.14",
-      "lizenz": "MIT",
       "bereich": "Mitgeliefertes Programm"
     }
   ]

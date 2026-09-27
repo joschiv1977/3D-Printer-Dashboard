@@ -478,7 +478,7 @@ class TemperatureModalManager {
 
     requestFullStatus() {
         const texts = window.texts || {};
-        console.log(texts.console_request_full_status);
+        console.log('Request full status data');
 
         apiCall('/api/request_full_status', {
             method: 'POST',
@@ -488,19 +488,19 @@ class TemperatureModalManager {
         .then(data => {
             if (data.success) {
                 skToast(texts.toast_full_data_requested, 'success');
-                console.log(texts.console_current_data, data.current_data);
+                console.log('Current data:', data.current_data);
 
                 if (data.current_data) {
-                    console.log(texts.console_progress, data.current_data.progress + '%');
-                    console.log(texts.console_layers, data.current_data.layer_num + '/' + data.current_data.total_layers);
-                    console.log(texts.console_remaining, data.current_data.remaining_time + ' min');
+                    console.log('Progress:', data.current_data.progress + '%');
+                    console.log('Layers:', data.current_data.layer_num + '/' + data.current_data.total_layers);
+                    console.log('Remaining:', data.current_data.remaining_time + ' min');
                 }
             } else {
                 skToast(texts.toast_error_fetching_data, 'error');
             }
         })
         .catch(error => {
-            console.error(texts.console_error + ':', error);
+            console.error('Error:', error);
             skToast(texts.connection_error, 'error');
         });
     }

@@ -123,6 +123,11 @@
             Math.round(p.humidity * 10) / 10,
             p.temperature == null ? null : Math.round(p.temperature * 10) / 10,
         ]);
+        // A dot on the newest reading. Over two days the last ten minutes are
+        // two pixels wide: without it nobody can tell whether the curve is
+        // current, and the pointer has to hit the very edge to find out
+        // (reported 17sep26).
+        const letzter = punkte[punkte.length - 1];
         return `<svg class="fk-kurve" viewBox="0 0 ${b} ${h}" preserveAspectRatio="none"
                      role="img" aria-hidden="true"
                      data-fk="${esc(JSON.stringify(daten))}">
@@ -130,7 +135,23 @@
             <path class="fk-nass" d="${flaeche(punkte, x, y, h)}" clip-path="url(#${nr})"/>` : ''}
             <line class="fk-schwelle" x1="0" y1="${ys}" x2="${b}" y2="${ys}"/>
             <path class="fk-linie" d="${d}"/>
+            <circle class="fk-letzter" cx="${x(letzter).toFixed(1)}"
+                    cy="${y(letzter.humidity).toFixed(1)}" r="2.5"/>
         </svg>`;
+    }
+
+    /** "zuletzt 21:05" -- the time of the newest reading, or ''. */
+    function letzteZeit(verlauf) {
+        const p = (verlauf || []).filter(x => x.humidity != null);
+        if (!p.length) return '';
+        const d = new Date(String(p[p.length - 1].time).replace(' ', 'T'));
+        if (isNaN(d)) return '';
+        const heute = new Date();
+        const gleicherTag = d.toDateString() === heute.toDateString();
+        const zeit = d.toLocaleString(undefined, gleicherTag
+            ? { hour: '2-digit', minute: '2-digit' }
+            : { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        return t('humidity_last', 'zuletzt {zeit}').replace('{zeit}', zeit);
     }
 
     /** The summary line for a spool: verdict, peak value, time above the threshold. */
@@ -223,5 +244,5 @@
     }, { passive: true });
     document.addEventListener('touchend', versteckeSchild, { passive: true });
 
-    window.amsHumidity = { hole, vergiss, fuerFach, einheit, kurve, merkzeile, spanne };
+    window.amsHumidity = { hole, vergiss, fuerFach, einheit, kurve, merkzeile, spanne, letzteZeit };
 })();

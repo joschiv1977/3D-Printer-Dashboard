@@ -106,6 +106,12 @@ window.showConfirmDialog = (message, onConfirm, onCancel, optionen) =>
 // `if (!await skConfirm(msg)) return;`
 // SELF-CONTAINED (its own inline styles) -> it works on EVERY page, even without
 // the app CSS (subpages like settings, slicer and maintenance do not load it).
+//
+// Same rule as show() above: the default button is a plain yes. It used to be
+// `texts.confirm_ok`, which reads "Delete" in all five languages -- so "stay
+// signed in?", "start calibration?" and "restart the server?" were all
+// answered with DELETE. A question that really deletes passes
+// `{ okText: texts.delete, danger: true }`.
 window.skConfirm = (message, opts) => new Promise((resolve) => {
     const o = opts || {};
     const texts = window.texts || {};
@@ -128,7 +134,7 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         return b;
     };
     const cancel = mkBtn(o.cancelText || texts.cancel || 'Abbrechen', 'transparent', '#cdd5df', 'rgba(255,255,255,.18)');
-    const ok = mkBtn(o.okText || texts.confirm_ok || 'OK', o.danger ? '#dc2626' : '#2196f3', '#fff', 'transparent');
+    const ok = mkBtn(o.okText || texts.confirm_yes || 'OK', o.danger ? '#dc2626' : '#2196f3', '#fff', 'transparent');
     row.appendChild(cancel); row.appendChild(ok);
     panel.appendChild(title); panel.appendChild(body); panel.appendChild(row);
     ov.appendChild(panel); document.body.appendChild(ov);
@@ -243,7 +249,8 @@ window.skConfirm = (message, opts) => new Promise((resolve) => {
         el.style.setProperty('--sk-text', ton.text);
 
         const sicher = (v) => String(v == null ? '' : v)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
         const punkt = o.farbe
             ? `<span class="sk-toast-punkt" style="background:${sicher(o.farbe)}"></span>` : '';

@@ -125,7 +125,7 @@ class FilamentDryingManager {
                 this.updateCardVisibility();
             }
         } catch (error) {
-            console.error((texts && texts.console_error_loading_materials) || '❌ Error while loading the materials' + ':', error);
+            console.error((texts && 'Error loading materials') || '❌ Error while loading the materials:', error);
         }
     }
 
@@ -198,11 +198,10 @@ class FilamentDryingManager {
                 // 'block' would have put label and fields underneath each other.
                 materialInfo.style.display = '';
 
-                // Enable the button only when NO print is running
-                const isPrinting = window.lastPrintData &&
-                                  (window.lastPrintData.gcode_state === 'RUNNING' ||
-                                   window.lastPrintData.gcode_state === 'PREPARE');
-                if (!isPrinting) {
+                // Drying follows the server's table (block `actions`): the
+                // X2D dries by itself during a print, and the AMS cannot turn
+                // a spool whose filament is being pulled.
+                if (window.aktionen.erlaubt('dry')) {
                     startBtn.disabled = false;
                     startBtn.style.opacity = '';
                 // Set the LABEL only: textContent on the button would throw
@@ -283,7 +282,7 @@ class FilamentDryingManager {
                 skToast(texts.error + ': ' + result.error, 'error');
             }
         } catch (error) {
-            console.error(texts.console_start_drying_error + ':', error);
+            console.error('Start drying error:', error);
             skToast(texts.toast_error_starting, 'error');
         }
     }
@@ -305,7 +304,7 @@ class FilamentDryingManager {
                 skToast(texts.error + ': ' + result.error, 'error');
             }
         } catch (error) {
-            console.error(texts.console_stop_drying_error + ':', error);
+            console.error('Stop drying error:', error);
             skToast(texts.toast_error_stopping, 'error');
         }
     }
@@ -392,7 +391,7 @@ class FilamentDryingManager {
                 window.applyDryingBanner(status);
             }
         } catch (error) {
-            console.error(texts.console_update_drying_status_error + ':', error);
+            console.error('Update drying status error:', error);
         }
     }
 

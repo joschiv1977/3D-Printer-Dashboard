@@ -34,6 +34,7 @@
             // The acknowledgement list comes along in the state -- it may have
             // changed on another device.
             if (Array.isArray(d.hms_dismissed)) weggeklickt = d.hms_dismissed;
+            if (window.FrageKarte) window.FrageKarte.status(d);
             window.HmsBanner.zeichne(d, {
                 geladen,
                 weggeklickt: c => weggeklickt.some(x => window.HmsBanner.gleich(x, c)),

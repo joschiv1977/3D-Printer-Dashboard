@@ -35,6 +35,10 @@
             <div id="spw-raster" class="spw-raster"></div>
 
             <div class="spw-fussleiste">
+                <!--Only from the material card, and only while a spool is
+                    active: it clears the active spool on the server.-->
+                <button class="modal-btn" id="spw-abwaehlen" hidden
+                        onclick="window.spoolPicker.abwaehlen()" data-i18n="spool_deselect">Keine Spule</button>
                 <button class="modal-btn" onclick="window.spoolPicker.schliesse()" data-i18n="cancel">Abbrechen</button>
                 <button class="modal-btn modal-btn--gruen" id="spw-uebernehmen"
                         onclick="window.spoolPicker.uebernehmen()" data-i18n="apply">Übernehmen</button>

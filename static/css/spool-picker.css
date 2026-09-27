@@ -174,12 +174,22 @@
     box-shadow: var(--shadow-card);
     border-color: var(--text-secondary);
 }
-.spw-spule--passt { border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue) inset; }
-.spw-spule--aktiv { border-color: var(--accent-green); box-shadow: 0 0 0 1px var(--accent-green) inset; }
+/* "Fits" says so with its chip and nothing else. It used to carry a blue
+   border as well, the same blue the choice uses -- with a dozen matching
+   spools the whole window was blue, and the card actually chosen vanished
+   in it (reported 16sep26). */
+.spw-spule--aktiv,
+.spw-spule--aktiv:hover { border-color: var(--accent-green); box-shadow: 0 0 0 1px var(--accent-green) inset; }
 .spw-spule--knapp { border-color: var(--accent-orange); }
-/* The chosen selection carries the strongest border — it stands out
-   even next to "fits" and "active". */
-.spw-spule--wahl { border-color: var(--accent-blue); box-shadow: 0 0 0 2px var(--accent-blue) inset; }
+/* The choice is the only blue frame: fill, border and a ring around it.
+   `:hover` is more specific than a plain class and used to wipe the border
+   off the moment the pointer arrived -- which is exactly when one looks. */
+.spw-spule--wahl,
+.spw-spule--wahl:hover {
+    border-color: var(--accent-blue);
+    background: rgba(33, 150, 243, .08);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, .26);
+}
 .spw-spule--leer { opacity: .45; cursor: not-allowed; }
 .spw-spule--leer:hover { transform: none; box-shadow: none; border-color: var(--border-color); }
 

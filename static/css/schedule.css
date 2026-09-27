@@ -435,8 +435,9 @@ body.dark-mode .sched-marke--orange { color: #ffb74d; }
 .mf-typ { color: var(--text-secondary); font-size: 12px; flex: none; }
 
 /* The spool choice is the actual task here — it may be wide,
-   but not swallow the whole row. */
-.mf-wahl { flex: 0 1 300px; min-width: 0; }
+   but not swallow the whole row. A button (.mz-spulknopf) that opens the
+   big spool window. */
+.mf-wahl { flex: 0 1 300px; min-width: 0; width: auto; }
 
 /* Wrong material chosen: border plus a notice below it. Without this,
    a PETG spool for an ASA print slips through when skimming. */

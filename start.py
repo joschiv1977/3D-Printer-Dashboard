@@ -209,7 +209,19 @@ _root_certificates_for_windows()
 
 def main():
     try:
-        # Import kompiliertes Modul
+        # The data folder holds passwords and the login keys: whatever the
+        # server writes is for its own account only, and what an older
+        # version left readable is closed once (services/data_permissions.py).
+        os.umask(0o077)
+        try:
+            from services.paths import datenordner
+            from services.data_permissions import tighten
+            closed = tighten(datenordner(anlegen=True))
+            if closed:
+                print(f"Data folder: {closed} entries no longer readable for other accounts")
+        except Exception as e:
+            print(f"Data folder permissions not tightened: {e}")
+
         print("Loading compiled modules...")
         import web_app
 

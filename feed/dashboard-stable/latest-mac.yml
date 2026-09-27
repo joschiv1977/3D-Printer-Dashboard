@@ -1,11 +1,11 @@
-version: 2.3.3
+version: 2.3.7
 files:
-  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.3/Dashboard-2.3.3-arm64-mac.zip
-    sha512: NFdNeXF80oXkev3ZS8WYSibrbXdJTxw0bRZ8U9HjAVa4T/QxQSDK0dNdBrz28MwDH7WZXBM9AEiHZJloqS5G3w==
-    size: 118230265
-  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.3/Dashboard-2.3.3-arm64.dmg
-    sha512: pWpwLv75sPVoIg/phPJzJ8z2/bmvoS+e71jLg62tXeb0xbu9ztrvGGqjaMYd+UAe7hjWEkjuS7aH/TeGzHFDYA==
-    size: 123394701
-path: Dashboard-2.3.3-arm64-mac.zip
-sha512: NFdNeXF80oXkev3ZS8WYSibrbXdJTxw0bRZ8U9HjAVa4T/QxQSDK0dNdBrz28MwDH7WZXBM9AEiHZJloqS5G3w==
-releaseDate: '2026-09-14T19:27:37.766Z'
+  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-2.3.7-arm64-mac.zip
+    sha512: aMnG3DzDU1yFvGieDY5xzRoA59Ttoh3FMSZ5+p8w144JLwqc+KKO1ipvOezfI/1c53kXrkVO+h4g4iIPSb2HfA==
+    size: 118423065
+  - url: https://github.com/joschiv1977/3D-Printer-Dashboard/releases/download/dashboard-stable-2.3.7/Dashboard-2.3.7-arm64.dmg
+    sha512: ayYDX/9U8GVPFPqHHctoO5vvMeQTj4zsfFtOanA4gNQmDn9deOHSX/D7YtjSKrzL79gcryDVLOstUOVkCjlkXw==
+    size: 123592854
+path: Dashboard-2.3.7-arm64-mac.zip
+sha512: aMnG3DzDU1yFvGieDY5xzRoA59Ttoh3FMSZ5+p8w144JLwqc+KKO1ipvOezfI/1c53kXrkVO+h4g4iIPSb2HfA==
+releaseDate: '2026-09-27T18:28:17.067Z'

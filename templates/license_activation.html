@@ -88,8 +88,11 @@
     </div>
 
     <div class="lz-fuss">
+        {% if setup_completed %}
+        <!-- Releasing needs a login; before the setup nobody can log in. -->
         <button type="button" class="es-knopf" onclick="lizenzLoesen()"
                 data-i18n="licgate_release">Lizenz lösen</button>
+        {% endif %}
         <a href="/" class="es-knopf es-knopf--haupt"
            data-i18n="licgate_continue">Weiter zum Dashboard</a>
     </div>
@@ -307,7 +310,7 @@ async function lizenzDatei(e) {
     const datei = e.target.files && e.target.files[0];
     if (!datei) return;
     const daten = new FormData();
-    daten.append('file', datei);
+    daten.append('license_file', datei);
     try {
         const a = await senden('/license/api/upload', {
             method: 'POST', credentials: 'include', body: daten

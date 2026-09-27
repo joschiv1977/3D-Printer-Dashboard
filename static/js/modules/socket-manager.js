@@ -32,10 +32,10 @@ class SocketManager {
 
             // PWA session recovery BEFORE socket initialization
             if (window.isSafariPWA && window.authHandler) {
-                console.log(texts.console_safari_pwa_session_recovery);
+                console.log('Safari PWA: Session Recovery...');
                 const sessionValid = await window.authHandler.restorePWASession();
                 if (!sessionValid) {
-                    console.log(texts.console_pwa_session_recovery_failed);
+                    console.log('PWA Session Recovery failed');
                     window.authHandler.redirectToLogin();
                     return;
                 }
@@ -53,12 +53,12 @@ class SocketManager {
             });
 
             clearTimeout(warmupTimeout);
-            console.log(texts.console_connection_warmup_success);
+            console.log('Connection warm-up successful');
         } catch (error) {
-            console.log(texts.console_warmup_timeout_not_critical);
+            console.log('Warm-up timeout, but not critical');
         }
 
-        console.log(texts.console_initialize_websocket);
+        console.log('Initialize WebSocket...');
         console.log(`📱 Safari: ${window.isSafari}, PWA: ${window.isPWA}`);
 
         // IMPORTANT: cleanly close old socket connection if one exists
@@ -123,9 +123,9 @@ class SocketManager {
 
             // On socket error: session recovery
             socket.on('connect_error', async (error) => {
-                console.log(texts.console_socket_connection_error, error.message);
+                console.log('Socket connection error:', error.message);
                 if (error.message.includes('unauthorized') || error.message.includes('401')) {
-                    console.log(texts.console_attempting_session_recovery);
+                    console.log('Attempting session recovery...');
                     const recovered = await window.authHandler.restorePWASession();
                     if (!recovered) {
                         window.authHandler.redirectToLogin();
@@ -139,7 +139,7 @@ class SocketManager {
 
         // Now register all handlers
         socket.on('connect', function() {
-            console.log(texts.console_websocket_connected);
+            console.log('WebSocket connected');
 
             // Fetch a fresh CSRF token. A new socket usually means the
             // server was just restarted, and our previous token may
@@ -165,9 +165,9 @@ class SocketManager {
             // Check browser notifications
             if ('Notification' in window) {
                 if (Notification.permission === 'default') {
-                    console.log(texts.console_browser_notifications_not_allowed);
+                    console.log('Browser notifications not allowed yet');
                 } else if (Notification.permission === 'granted') {
-                    console.log(texts.console_browser_notifications_enabled);
+                    console.log('Browser notifications enabled');
                 }
             }
 
@@ -188,61 +188,22 @@ class SocketManager {
         });
 
         socket.on('disconnect', function() {
-            console.log(texts.console_websocket_disconnected);
+            console.log('WebSocket disconnected');
             // Fallback polling takes over the gated 8s interval in app-init
             // (runs whenever socket/printer aren't fully online).
         });
 
-        // Power-off timer WebSocket handler - ONLY ONE!
-        socket.on('power_off_timer', function(data) {
-            console.log(texts.console_poweroff_timer_event, data);
-
-            const banner = document.getElementById('power-off-banner');
-            const bannerCountdown = document.getElementById('power-off-banner-countdown');
-            const bannerReason = document.getElementById('power-off-banner-reason');
-
-            if (data.active) {
-                window.powerOffTimerActive = true;
-
-                // Show banner
-                if (banner) {
-                    banner.classList.add('active');
-                    if (bannerReason) bannerReason.textContent = data.reason;
-                }
-
-                // Update countdown
-                const updateCountdown = () => {
-                    const remaining = Math.max(0, data.end_time - (Date.now() / 1000));
-                    const minutes = Math.floor(remaining / 60);
-                    const seconds = Math.floor(remaining % 60);
-                    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                    if (bannerCountdown) {
-                        bannerCountdown.textContent = timeString;
-                    }
-
-                    if (remaining > 0 && window.powerOffTimerActive) {
-                        requestAnimationFrame(updateCountdown);
-                    } else if (remaining <= 0) {
-                        // Timer expired - hide banner
-                        if (banner) banner.classList.remove('active');
-                    }
-                };
-
-                updateCountdown();
-
-            } else {
-                // Timer deactivated - hide banner
-                window.powerOffTimerActive = false;
-                if (banner) {
-                    banner.classList.remove('active');
-                }
+        // Power-off timer: the banner is drawn in one place (app-init).
+        socket.on('power_off_timer', function (data) {
+            console.log('Power-Off Timer Event:', data);
+            if (window.appInit && window.appInit.showPowerOffTimer) {
+                window.appInit.showPowerOffTimer(data);
             }
         });
 
         // Filament drying status handler
         socket.on('filament_drying_status', function(data) {
-            console.log(texts.console_drying_status, data);
+            console.log('Filament drying status:', data);
 
             // Update the card and control visibility together. They hang off
             // FilamentDryingManager.updateStatus() — which used to fetch the
@@ -299,7 +260,7 @@ class SocketManager {
 
         // SD sync status updates
         socket.on('sd_sync_start', function(data) {
-            console.log(texts.console_auto_sync_started);
+            console.log('Auto-Sync started');
             if (window.sdCardManager) window.sdCardManager.sdSyncInProgress = true;
 
             // Disable refresh button
@@ -312,7 +273,7 @@ class SocketManager {
             }
         });
         socket.on('sd_sync_complete', function(data) {
-            console.log(texts.console_auto_sync_completed);
+            console.log('Auto-Sync completed');
             if (window.sdCardManager) window.sdCardManager.sdSyncInProgress = false;
 
             // Re-enable refresh button
@@ -417,23 +378,6 @@ class SocketManager {
             }
         });
 
-        // Bidirectional sync completed
-        socket.on('bidirectional_sync_complete', function(data) {
-            const t = window.texts || {};
-            skToast((t.toast_sync_done || 'Sync fertig — {down} geladen, {up} gesendet')
-                .replace('{down}', data.downloaded).replace('{up}', data.uploaded), 'success');
-            // Reload SD files
-            if (document.getElementById('sd-modal')?.style.display === 'block') {
-                showSDFiles();
-            }
-        });
-
-        // Bidirectional sync error
-        socket.on('bidirectional_sync_error', function(data) {
-            const t = window.texts || {};
-            skToast((t.toast_sync_error || 'Sync-Fehler: {error}').replace('{error}', data.error), 'error');
-        });
-
         // Scheduled prints changed (created/updated/deleted/started/failed) ->
         // reload the badge right away instead of waiting for the 30s poll.
         // Backend delivers {count, reason} - we use count directly if the
@@ -457,6 +401,8 @@ class SocketManager {
                         if (badgeZone) badgeZone.style.display = 'none';
                     }
                 }
+                // The overview while the printer is off shows the next plan.
+                if (window.offOverview) window.offOverview.planNeu();
                 // If the management list is open, refresh its content too
                 if (window.printScheduler && typeof window.printScheduler.loadScheduledPrints === 'function') {
                     const mgr = document.getElementById('scheduleManagerModal');
@@ -502,10 +448,54 @@ class SocketManager {
         // Spoolman active spool update (from backend after print start)
         socket.on('spoolman_active_spool', function(data) {
             console.log('🧵 Spoolman active spool update:', data);
-            if (data.spool_id) {
-                window.activeSpoolId = data.spool_id;
-                updateSpoolmanDisplay();
+            // null is news too: the filament state releases the active spool
+            // once its roll has left the printer. Skipping it kept showing a
+            // spool that is no longer in there. Both copies of the id are
+            // set -- the card reads window.activeSpoolId || manager's own.
+            const id = (data && data.spool_id) || null;
+            window.activeSpoolId = id;
+            if (window.spoolmanManager) window.spoolmanManager.activeSpoolId = id;
+            if (!id) {
+                const selector = document.getElementById('spool-selector');
+                if (selector) selector.value = '';
             }
+            updateSpoolmanDisplay();
+        });
+
+        // A spool's numbers changed on the server: the print booked its
+        // filament, a spool change split it, somebody corrected it by hand.
+        // The card shows remaining weight and last use, so it has to hear
+        // about it -- the list is no longer reloaded on a timer.
+        socket.on('spoolman_spool_updated', function(data) {
+            const sm = window.spoolmanManager;
+            if (!sm) return;
+            sm.loadSpools().then(() => updateSpoolmanDisplay()).catch(() => {});
+            // The drying verdict counts hours in the AMS and reads the same
+            // spool; its answer is a minute old at most, but after a booking
+            // it is simply stale.
+            if (window.amsHumidity) window.amsHumidity.vergiss();
+            console.log('🧵 Spoolman spool updated:', data && data.spool_id);
+        });
+
+        // The central filament state: the server judges every slot and says
+        // so on every change (services/filament_state_service.py). The
+        // screens read it through window.filamentState.
+        socket.on('filament_state', function(block) {
+            if (window.FrageKarte) window.FrageKarte.zustand(block);
+            if (!window.filamentState) return;
+            window.filamentState.update(block);
+            if (window.printerControlManager) {
+                window.printerControlManager.renderMaterialZone();
+            }
+        });
+
+        // "Later" on the question card, tapped on any device.
+        socket.on('prompts_later', function(data) {
+            if (window.FrageKarte) window.FrageKarte.spaeterListe(data && data.ids);
+        });
+        // A print's filament against its tray, closed on some device.
+        socket.on('print_mismatch', function(data) {
+            if (window.FrageKarte) window.FrageKarte.mismatch(data && data.mismatch);
         });
 
         socket.on('mqtt_status', function(data) {
@@ -532,7 +522,7 @@ class SocketManager {
 
             if (data.connected) {
                 updateBothButtons('mqtt-btn', 'control-btn active', window.skIcon('funk') + '<span>' + (texts.mqtt_button_connected || 'MQTT') + '</span>');
-                console.log(texts.console_mqtt_auto_connect_success);
+                console.log('MQTT Auto-Connect successful');
             } else {
                 updateBothButtons('mqtt-btn', 'control-btn', window.skIcon('funk') + '<span>MQTT</span>');
                 // Stop timer if still running
@@ -568,8 +558,20 @@ class SocketManager {
         });
 
         // === CENTRAL NOTIFICATION HANDLER ===
+        // The bell follows what happens to messages AT ONCE: one arrives, one
+        // is read or dismissed somewhere, a filament question opens or is
+        // answered. The status push carries the same number too, but only as
+        // often as the printer reports -- idle, that is seldom.
+        const zaehleMeldungen = () => {
+            if (window.tabBarManager && window.tabBarManager.zaehleMeldungen) {
+                window.tabBarManager.zaehleMeldungen();
+            }
+        };
+        ['notification', 'notification_read', 'notification_dismissed',
+         'filament_state'].forEach(name => socket.on(name, zaehleMeldungen));
+
         socket.on('notification', function(data) {
-            console.log(texts.console_unified_notification, data);
+            console.log('Unified Notification received:', data);
 
             // If already read/dismissed on another device:
             // don't show it again (cross-device read sync, stage 2).
@@ -615,7 +617,14 @@ class SocketManager {
                 window.NotificationStack.holeOffene();
             }
 
-            if ('Notification' in window && Notification.permission === 'granted') {
+            // A printer dialog that waits for an answer: the question card on
+            // this page asks it -- no system banner on top (16sep26).
+            const dialogCode = data.params && data.params.error_code;
+            // The same for every message the server puts in the card (in_card).
+            const inDerKarte = !!(window.FrageKarte && ((dialogCode
+                && window.FrageKarte.druckerAktionen(dialogCode, 0))
+                || data.in_card === true));
+            if (!inDerKarte && 'Notification' in window && Notification.permission === 'granted') {
                 // Desktop browser (web only, not Electron!)
                 const options = {
                     body: data.message,
@@ -774,7 +783,7 @@ class SocketManager {
         setTimeout(() => {
             if (!socket.connected && !window.socketReconnecting) {
                 window.socketReconnecting = true;  // Set flag
-                console.error(texts.console_socket_not_connected);
+                console.error('Socket not connected after 3 seconds');
                 // Manual connect attempt
                 socket.connect();
                 setTimeout(() => { window.socketReconnecting = false; }, 1000);
@@ -1276,7 +1285,10 @@ class SocketManager {
         // Straight from the status packet: window.lastPrintData isn't set
         // until further below and still carries the previous one here.
         const caps = (data && data.capabilities) || {};
-        const kennung = (caps.model_id || '').toLowerCase();
+        // Off, the status carries no capabilities: the profile's model from
+        // /api/printer/info stands in. The page's own default is the X2D,
+        // right for one machine only.
+        const kennung = (caps.model_id || (window.activePrinter || {}).modelId || '').toLowerCase();
         if (!kennung) return;              // no model set: leave the old image as is
         const quelle = `/static/img/printers/${kennung}.png`;
         if (bild.dataset.modell === kennung) return;
@@ -1367,10 +1379,13 @@ class SocketManager {
                 filamentValue.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(102,126,234,0.2);padding:1px 6px;border-radius:6px;font-size:11px;">${texts.multifilament_count ? texts.multifilament_count.replace('{count}', data.filament_count) : data.filament_count + ' Farben'}</span>`;
             } else if (data.filament_display) {
                 let html = '';
-                if (data.filament_color) {
-                    html += `<span style="display:inline-block;width:8px;height:8px;background:${data.filament_color};border-radius:50%;margin-right:4px;border:1px solid rgba(255,255,255,0.2);"></span>`;
+                // Both come out of the print file: a colour only as hex, the name as text.
+                if (/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/.test(String(data.filament_color || ''))) {
+                    const farbe = data.filament_color[0] === '#' ? data.filament_color : '#' + data.filament_color;
+                    html += `<span style="display:inline-block;width:8px;height:8px;background:${farbe};border-radius:50%;margin-right:4px;border:1px solid rgba(255,255,255,0.2);"></span>`;
                 }
-                html += data.filament_display;
+                html += String(data.filament_display)
+                    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 filamentValue.innerHTML = html;
             } else {
                 filamentValue.textContent = '--';
@@ -1711,6 +1726,13 @@ class SocketManager {
 
         this.applyHmsBanner(data);
 
+        // The number on the messages tab rides along with the status
+        // (server: status_builder._inbox) -- one count for every device, and
+        // it arrives whenever anything else does.
+        if (window.tabBarManager && window.tabBarManager.showMessages) {
+            window.tabBarManager.showMessages(data.inbox);
+        }
+
         // Multi-color external-spool: no separate banner — the
         // pause/resume button (handlePrintUpdate above) adjusts its text
         // and behavior depending on filament_change_phase.
@@ -1731,6 +1753,9 @@ class SocketManager {
         // the console, history and settings. Only what exists ONLY on the
         // main page lives here: the acknowledgment list from
         // startup and the notice that it's already there.
+        // The question card takes the printer dialogs and the state's
+        // questions out of the same status (frage-karte.js).
+        if (window.FrageKarte) window.FrageKarte.status(data);
         if (!window.HmsBanner) return;
         window.HmsBanner.zeichne(data, {
             geladen: hmsStatusLoaded,
@@ -1968,7 +1993,7 @@ class SocketManager {
                             return;
                         }
                     } catch (error) {
-                        console.error(texts.console_token_refresh_error + ':', error);
+                        console.error('Token refresh error:', error);
                         window.socketReconnectInProgress = false;
                         return;
                     }
