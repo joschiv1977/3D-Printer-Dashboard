@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# 3D Printer Web App - Complete One-Click Installer
+# 3D Printer Server - Complete One-Click Installer
 # Supports: Raspberry Pi, Ubuntu, Debian, Generic Linux
 # Includes: Docker, Spoolman, FCM Setup, Cloudflare Tunnel
 #
@@ -1936,7 +1936,7 @@ show_completion_message() {
     fi
 
     echo
-    echo -e "${CYAN}🚀 Enjoy your 3D Printer Web App!${NC}"
+    echo -e "${CYAN}🚀 Enjoy your 3D Printer Server!${NC}"
     echo
 }
 

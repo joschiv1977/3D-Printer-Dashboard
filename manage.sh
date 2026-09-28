@@ -1,5 +1,5 @@
 #!/bin/bash
-# 3D Printer Web App - Service Management (Cross-Platform: macOS + Linux)
+# 3D Printer Server - Service Management (Cross-Platform: macOS + Linux)
 # Usage: ./manage.sh [COMMAND]
 #
 # Web App: start|stop|restart|status|logs|config|update
@@ -776,7 +776,7 @@ show_help() {
         PLATFORM="Linux (systemd)"
     fi
 
-    echo -e "${BLUE}3D Printer Web App - Service Manager${NC}"
+    echo -e "${BLUE}3D Printer Server - Service Manager${NC}"
     echo -e "Platform: ${GREEN}$PLATFORM${NC}"
     echo
     echo "Usage: $0 [COMMAND]"

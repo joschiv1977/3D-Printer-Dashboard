@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Quick Install Script for 3D Printer Web App (Obfuscated Version)
+# Quick Install Script for 3D Printer Server (Obfuscated Version)
 # Downloads compiled .so files for the current platform
 #
 

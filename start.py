@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Start script for obfuscated 3D Printer Web App
+Start script for obfuscated 3D Printer Server
 Loads compiled .so modules and starts the server
 """
 
