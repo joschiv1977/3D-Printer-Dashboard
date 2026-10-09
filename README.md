@@ -382,8 +382,8 @@ Status is never colour alone — there is always a glyph or a word beside it.
 |---|---|---|---|---|---|---|
 | 🏠 **Home** | ⌨️ **Console** | 🕐 **History** | 🔧 **Maintenance** | 📦 **Slicer** | 👥 **Users** | ⚙️ **Settings** |
 
-**Dialogs** — fans, speed, temperatures, editing filament, choosing a spool, and
-the sensor history:
+**Dialogs** — fans, speed, temperatures, editing filament, choosing a spool, the
+sensor history, and drying in the AMS with the spool's humidity history:
 
 <div align="center">
 <a href="docs/screenshots/dialog-fans.png"><img src="docs/screenshots/dialog-fans.png" width="190"/></a>
@@ -392,6 +392,9 @@ the sensor history:
 <a href="docs/screenshots/dialog-filament-edit.png"><img src="docs/screenshots/dialog-filament-edit.png" width="190"/></a>
 <a href="docs/screenshots/dialog-spool-select.png"><img src="docs/screenshots/dialog-spool-select.png" width="190"/></a>
 <a href="docs/screenshots/dialog-sensors.png"><img src="docs/screenshots/dialog-sensors.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying.png"><img src="docs/screenshots/dialog-drying.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying-history.png"><img src="docs/screenshots/dialog-drying-history.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying-running.png"><img src="docs/screenshots/dialog-drying-running.png" width="190"/></a>
 </div>
 
 **Settings and console:**

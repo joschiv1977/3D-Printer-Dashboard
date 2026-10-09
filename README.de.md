@@ -385,7 +385,7 @@ Wort.
 | 🏠 **Start** | ⌨️ **Konsole** | 🕐 **Historie** | 🔧 **Wartung** | 📦 **Slicer** | 👥 **Benutzer** | ⚙️ **Einstellungen** |
 
 **Dialoge** — Lüfter, Geschwindigkeit, Temperaturen, Filament bearbeiten, Spule
-wählen und der Sensorverlauf:
+wählen, der Sensorverlauf und das Trocknen im AMS mit dem Feuchteverlauf der Spule:
 
 <div align="center">
 <a href="docs/screenshots/dialog-fans.png"><img src="docs/screenshots/dialog-fans.png" width="190"/></a>
@@ -394,6 +394,9 @@ wählen und der Sensorverlauf:
 <a href="docs/screenshots/dialog-filament-edit.png"><img src="docs/screenshots/dialog-filament-edit.png" width="190"/></a>
 <a href="docs/screenshots/dialog-spool-select.png"><img src="docs/screenshots/dialog-spool-select.png" width="190"/></a>
 <a href="docs/screenshots/dialog-sensors.png"><img src="docs/screenshots/dialog-sensors.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying.png"><img src="docs/screenshots/dialog-drying.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying-history.png"><img src="docs/screenshots/dialog-drying-history.png" width="190"/></a>
+<a href="docs/screenshots/dialog-drying-running.png"><img src="docs/screenshots/dialog-drying-running.png" width="190"/></a>
 </div>
 
 **Einstellungen und Konsole:**
