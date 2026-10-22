@@ -265,15 +265,18 @@ def main():
         print(f"   URL: https://0.0.0.0:5555")
         print("="*60 + "\n")
 
-        # Start the server
+        # Start the server. The TLS handshake runs in each connection's own
+        # thread with a deadline (services/https_server.py): in Werkzeug's
+        # accept thread one silent client stopped the whole server (21oct26).
         from services.ssl_context import create_multi_ssl_context
+        from services.https_server import server_options
         web_app.app.run(
             host='0.0.0.0',
             port=5555,
             debug=False,
-            ssl_context=create_multi_ssl_context(web_app.DATA_DIR),
             threaded=True,
-            use_reloader=False
+            use_reloader=False,
+            **server_options(create_multi_ssl_context(web_app.DATA_DIR))
         )
 
     except KeyboardInterrupt:
